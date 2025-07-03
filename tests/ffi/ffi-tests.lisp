@@ -1,7 +1,5 @@
 (in-package :nnl2.ffi.tests)
 
-(fiveam:def-suite nnl2.ffi-suite :description "Tests for nnl.math")
-
 (fiveam:in-suite nnl2.ffi-suite)
 
 (fiveam:test nnl.ffi-test/ffi-1
