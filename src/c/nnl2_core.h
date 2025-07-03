@@ -1,6 +1,7 @@
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H
 
-void __nnl2_test(void);
+uint32_t __nnl2_test_1(void);
+uint32_t __nnl2_test_2(void);
 
 #endif
