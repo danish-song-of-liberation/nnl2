@@ -1,3 +1,5 @@
 *.lisp linguist-language=Common Lisp
 
-backends/** linguist-vendored
+backends/**/*.c linguist-vendored
+backends/**/*.cpp linguist-vendored
+backends/**/*.h linguist-vendored
