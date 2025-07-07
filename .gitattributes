@@ -3,3 +3,8 @@
 backends/**/*.c linguist-vendored
 backends/**/*.cpp linguist-vendored
 backends/**/*.h linguist-vendored
+
+CMakeLists.txt linguist-vendored
+*.cmake linguist-vendored
+Makefile linguist-vendored
+*.mk linguist-vendored
