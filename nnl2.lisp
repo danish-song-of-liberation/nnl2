@@ -8,7 +8,7 @@
   "Contains the project path")
 
 (asdf:defsystem "nnl2"
-  :depends-on (:cffi :fiveam)
+  :depends-on (:cffi :fiveam :cl-json)
   :license "MIT"
   :description "Common Lisp (CL) neural networks framework"
   :serial t
@@ -24,7 +24,9 @@
 							  :components ((:module "system"
 											:serial t
 										    :components ((:file "system-package" :type "lisp")
-														 (:file "system-utils" :type "lisp")))
+														 (:file "system-utils" :type "lisp")
+														 (:file "system-impl-upd" :type "lisp")
+														 (:file "system-config" :type "lisp")))
 										   
 										   (:module "ffi"
 											:serial t
