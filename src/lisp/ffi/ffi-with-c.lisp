@@ -22,7 +22,7 @@
 	(assert (probe-file makefile-path) nil (format nil "File ~a is missing" makefile-path))
 	
 	(multiple-value-bind (output error-output exit-code)
-	  (uiop:run-program (format nil "make") 
+	  (uiop:run-program (format nil "make openblas0330woa64static_available=~d" (nnl2.system:bool-to-int nnl2.system:*openblas0330woa64static-available*))
 	    :error-output :interactive 
 		:output :string
 		:directory project-path)

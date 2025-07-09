@@ -21,7 +21,12 @@
 				:serial t
 				:components ((:module "lisp"
 							  :serial t
-							  :components ((:module "system"
+							  :components ((:module "backend-status"
+											:serial t
+											:components ((:file "backend-status-package" :type "lisp")
+														 (:file "openblas0330woa64static-status" :type "lisp")))
+											
+										   (:module "system"
 											:serial t
 										    :components ((:file "system-package" :type "lisp")
 														 (:file "system-utils" :type "lisp")
@@ -31,7 +36,8 @@
 										   (:module "ffi"
 											:serial t
 											:components ((:file "ffi-package" :type "lisp")
-														 (:file "ffi-with-c" :type "lisp")))))))
+														 (:file "ffi-with-c" :type "lisp")
+														 (:file "ffi-status" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t
@@ -39,7 +45,9 @@
 							  :serial t
 							  :components ((:file "ffi-tests-package" :type "lisp")
 										   (:file "ffi-tests-defcf" :type "lisp")
+										   (:file "ffi-tests-status" :type "lisp")
 										   (:file "ffi-tests" :type "lisp")))
+										   
 										   
 							 (:module "system"
 							  :serial t
