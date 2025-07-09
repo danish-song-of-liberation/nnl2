@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H
 

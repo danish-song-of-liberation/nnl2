@@ -20,7 +20,7 @@
 # nnl2
 Common Lisp (CL) neural network framework 
 
-*About the Author:* This framework is being developed by a 14-year-old as a personal solo project. All code, all bugs, all mine!
+*About the Author:* This framework is being developed by a 14-year-old (already 15) as a personal solo project. All code, all bugs, all mine!
 
 I write the framework mainly for myself because writing on torch or tensorflow develops into eternal procrastination and unwillingness to write code on it.
 
