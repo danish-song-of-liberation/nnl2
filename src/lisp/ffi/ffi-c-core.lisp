@@ -80,23 +80,58 @@
           (:int32 (setf (cffi:mem-ref ptr :int32) new-value))
           (:float32 (setf (cffi:mem-ref ptr :float) new-value))
           (:float64 (setf (cffi:mem-ref ptr :double) new-value)))))))
+		  
+(defun print-1d-tensor (tensor rows stream)
+  (dotimes (i rows)
+    (format stream "~%")
+    (format stream "      ~a" (tref tensor i))))
+		  
+(defun print-2d-tensor (tensor rows cols stream)
+  (dotimes (i rows)
+    (format stream "~%")
+  
+    (dotimes (j cols)
+	  (format stream "      ~a" (tref tensor i j)))))
   
 (defun print-tensor (tensor &optional (stream *standard-output*))
-  (declare (optimize (speed 0) (safety 3) (space 3) (debug 3))
+  "warning: code is not ready"
+
+  (declare (optimize (speed 3) (safety 0) (space 0) (debug 0))
 		   (type stream stream)
 		   (type cffi:foreign-pointer tensor))
 
-    (cffi:with-foreign-objects ((dtype :int) (rank :int) (shape-ptr :pointer))
-	  (tensor-metadata! tensor dtype rank shape-ptr)
+  (cffi:with-foreign-objects ((dtype :int) (rank :int) (shape-ptr :pointer))
+	(tensor-metadata! tensor dtype rank shape-ptr)
 	
-	  (format stream "#<NNL2-TENSOR ~a [~{~ax~}~a]>" 
-	    (case (cffi:mem-ref dtype :int)
-		  (0 :int32)
-		  (1 :float32)
-		  (2 :float64))
-		  
-		(loop for i from 0 below (1- (cffi:mem-ref rank :int))
-			  collect (cffi:mem-aref shape-ptr :int i))
-			  
-		(cffi:mem-aref shape-ptr :int (1- (cffi:mem-ref rank :int))))))
+	(let* ((dtype-val (cffi:mem-ref dtype :int))
+		   (tensor-rank (cffi:mem-ref rank :int))
+		   (shape-array (cffi:mem-ref shape-ptr :pointer))
+		   
+		   (type (case (cffi:mem-ref dtype :int)
+				   (0 :int32)
+				   (1 :float32)
+				   (2 :float64)))
+		 
+		   (shape (loop for i from 0 below (1- tensor-rank)
+						collect (cffi:mem-aref shape-array :int i)))
+						
+		   (last-shape (cffi:mem-aref shape-array :int (1- tensor-rank))))
+	
+	  (cond 
+	    ((= tensor-rank 1)
+		   (format stream "#<NNL2-TENSOR ~a [~a]:" type last-shape)
+		   
+		   (print-1d-tensor tensor last-shape stream)
+		   
+		   (format stream ">"))
+		
+		((= tensor-rank 2)
+		   (format stream "#<NNL2-TENSOR ~a [~{~ax~}~a]:" type shape last-shape)
+		   
+		   (print-2d-tensor tensor (car shape) last-shape stream)
+		   
+		   (format stream ">"))
+						   
+		
+		(t (format stream "#<NNL2-TENSOR ~a [~{~ax~}~a]>" type shape last-shape))))))
 	  
