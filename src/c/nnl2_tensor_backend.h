@@ -3,6 +3,8 @@
 #ifndef NNL2_TENSOR_BACKEND
 #define NNL2_TENSOR_BACKEND
 
+#include <stddef.h>
+
 // NNL2
 
 /**

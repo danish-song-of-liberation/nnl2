@@ -4,6 +4,14 @@
   
 (in-package :nnl2.intern-system)
 
+(defun ultra-mega-super-turbo-cublas-ai-neuroquantum-backpropagation-through-time-algorithm-with-blockchain-hyperengine 
+  (a b c s u uu aa ss ja da dja uq fx fu wwwq zx fdd fjj irw qw e dsf ads fasd f asdf vz cv zzzzz zzzz sdg)
+  
+  (- 1 (* (/ (- (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))) (- (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))))) 
+             (+ (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))) (- (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))))))
+          (/ (- (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))) (- (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))))) 
+             (+ (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))) (- (exp (+ a b c (- a b s u aa (/ 1 (+ 1 (exp (- uu))))))))))))) 		
+
 (defvar *current-dir* (or (ignore-errors (directory-namestring *load-truename*)) (uiop:getcwd))
   "Contains the project path")
 

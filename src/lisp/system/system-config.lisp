@@ -12,6 +12,8 @@
   
 (defparameter *openblas0330woa64static-available* nil)
 
+(defparameter *silent-mode* nil)
+
 (defparameter *implementations* (list 
 								  (cons 'openblas0330woa64static *json-false*))
 								 
