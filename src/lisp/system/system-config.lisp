@@ -10,12 +10,14 @@
 (defparameter *first-launch* nil
   "flag indicating if this is the first system launch")
   
+(defparameter *naive-available* t)  
 (defparameter *openblas0330woa64static-available* nil)
 
 (defparameter *silent-mode* nil)
 
 (defparameter *implementations* (list 
-								  (cons 'openblas0330woa64static *json-false*))
+								  (cons 'naive *alist-true*)
+								  (cons 'openblas0330woa64static *alist-false*))
 								 
   "Contains an associative list for subsequent conversion 
    to json format in the format (implementation . *is-it-working-or-not*)")
@@ -24,53 +26,54 @@
   (uiop:merge-pathnames*
     (make-pathname :directory '(:relative "src" "lisp" "system")
 				   :name "config"
-				   :type "json")
+				   :type "alist")
 				   
 	nnl2.intern-system:*current-dir*))
-	
+
 (defun create-default-config (path)
   "creates json config file"
   
-  (assert (not (probe-file path)) nil (format nil "(~a): File ~a does not exist" #'create-default-config path))
+  (assert (not (probe-file path)) nil (format nil "(~a): File ~a does not exist" #'acreate-default-config path))
 
-  (let ((default-config (list (cons "firstLaunch" *json-true*) (cons "implementations" *implementations*))))
+  (let ((default-config (list (cons 'first-launch *alist-true*) (cons 'implementations *implementations*))))
   
 	(with-open-file (out path :direction :output
 							  :if-exists :supersede
 							  :if-does-not-exist :create)
 							  
-	  (json:encode-json default-config out))))
+	  (format out "~a~%" default-config))))	  	  
 
 (defun init-system ()
   "creates a json file if it doesn't exist and then reads it"
 
   (let* ((config-filepath (get-config-path)))
-    (unless (probe-file config-filepath)
+	  
+	(unless (probe-file config-filepath)
 	  (create-default-config config-filepath)
 	  (update-implementations-config nnl2.intern-system:*current-dir* config-filepath))
 	
 	(handler-case
-	    (let ((data (with-open-file (in config-filepath :direction :input)
-					  (json:decode-json-from-source in))))
-					  
+	    (let ((data (read-from-string (uiop:read-file-string config-filepath))))
+					  		
 		  (with-open-file (stream config-filepath :direction :io
-											      :if-exists :supersede
-												  :if-does-not-exist :create)
-										
-			(let* ((first-launch-json (cdar data))
-				   (first-launch-p (json-string-to-bool first-launch-json))
-				   (openblas0330woa64static-available-json (cdr (cadadr data))) ; im so sorry for that its cause cl-json is so buggy and cant correctly write key so assoc is broken
-				   (openblas0330woa64static-available-p (json-string-to-bool openblas0330woa64static-available-json)))
+												   :if-exists :supersede
+												   :if-does-not-exist :create)
+												   
+			(let* ((first-launch-json (assoc-key 'first-launch data))
+				   (first-launch-p (alist-symbol-to-bool first-launch-json))
+				   (naive-available-alist (assoc-key 'naive (assoc-key 'implementations data)))
+				   (naive-available-p (alist-symbol-to-bool naive-available-alist))
+				   (openblas0330woa64static-available-alist (assoc-key 'openblas0330woa64static (assoc-key 'implementations data)))
+				   (openblas0330woa64static-available-p (alist-symbol-to-bool openblas0330woa64static-available-alist)))
 				   
-			  (setf *openblas0330woa64static-available* openblas0330woa64static-available-p)
+			  (setf *naive-available* naive-available-p
+					*openblas0330woa64static-available* openblas0330woa64static-available-p	     
+					*first-launch* first-launch-p)
 				   
-			  (setf *first-launch* first-launch-p)
-				   
-    		  (when first-launch-p ; first launch
-		        (setf (cdar data) *json-false*)) ; to affect setter
-			    
-		      (unwind-protect
-				(json:encode-json data stream)))))
+    		  (when first-launch-p (setf (assoc-key 'first-launch data) *alist-false*)) 
+			  
+			  (unwind-protect
+			    (format stream "~a~%" data)))))
 	  
 	  (error (e)
 	    (error "(~a): ~a~%" e)))))
@@ -79,5 +82,6 @@
   
 (defparameter +architecture+ 
   (list
-    (cons '*openblas0330woa64static* *openblas0330woa64static-available*)))
+    (cons '*naive* *naive-available*)
+	(cons '*openblas0330woa64static* *openblas0330woa64static-available*)))
   

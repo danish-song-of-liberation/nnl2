@@ -21,17 +21,19 @@
 				  dir-path)))
 					
 	path))	
+	  
+(defun update-implementations-config (path list-path)
+  (let ((data (read-from-string (uiop:read-file-string list-path)))) ; i guess it most danger code of all time
+    (let* ((blas-include (get-openblas0330woa64static-backend-include-path path))
+		   (blas-lib (get-openblas0330woa64static-backend-lib-path path))
+		   (available-p (if (zerop (nnl2.backends:get-openblas0330woa64-status path blas-include blas-lib)) t nil)))
+		   
+	  (setf (assoc-key 'openblas0330woa64static (assoc-key 'implementations data)) (bool-to-alist available-p))
+		   
+	  (with-open-file (out list-path :direction :output
+						    		 :if-exists :supersede
+									 :if-does-not-exist :create)
+									  
+	    (format out "~a~%" data)))))
 
-(defun update-implementations-config (path json-path)
-  "updates the json file based on whether the backends are working or not"
-  
-  (let ((data (with-open-file (in json-path :direction :input) (json:decode-json-from-source in))))
-    (with-open-file (out json-path :direction :output :if-exists :supersede)
-	  (let* ((blas-include (get-openblas0330woa64static-backend-include-path path))
-	    	 (blas-lib (get-openblas0330woa64static-backend-lib-path path))
-			 (available-p (if (zerop (nnl2.backends:get-openblas0330woa64-status path blas-include blas-lib)) t nil)))
-		 
-	    (setf (cdr (cadadr data)) (bool-to-json-string available-p))) ; wtf is that 
-		
-	  (json:encode-json data out))))
  

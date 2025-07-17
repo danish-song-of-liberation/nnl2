@@ -7,25 +7,25 @@
    that handles t, nil, and kebab-case in a very strange way,
    forcing me to resort to such measures.   |#
 
-(defparameter *json-true* "true") 
-(defparameter *json-false* "false")
+(defparameter *alist-true* 'true) 
+(defparameter *alist-false* 'false)
 
-(defun json-string-to-bool (str)
-  "returns T if string is \"true\"
-   returns NIL if string is \"false\"
+(defun alist-symbol-to-bool (str)
+  "returns T if string is 'true
+   returns NIL if string is 'false
    otherwise returns error"
 
   (cond
-    ((string= str *json-true*) t)
-	((string= str *json-false*) nil)
-	(t (error "(~a): Unknown value: ~a~%" #'json-string-to-bool str))))
-
-(defun bool-to-json-string (bool)
+    ((eq str *alist-true*) t)
+	((eq str *alist-false*) nil)
+	(t (error "(~a): Unknown value: ~a~%" #'alist-string-to-bool str))))
+	
+(defun bool-to-alist (bool)
   #| if T returns "true" otherwise "false" |#
 
   (if bool 
-    *json-true* 
-	*json-false*))
+    *alist-true* 
+	*alist-false*))
 	
 (defun bool-to-int (bool)
   "if T returns 1 otherwise 0"
@@ -33,3 +33,6 @@
   (if bool
 	1
 	0))
+
+(defmacro assoc-key (list alist)
+  `(cdr (assoc ,list ,alist)))	 

@@ -3,8 +3,6 @@
 #ifndef NNL2_TENSOR_BACKEND
 #define NNL2_TENSOR_BACKEND
 
-#include <stddef.h>
-
 // NNL2
 
 /**
@@ -12,8 +10,9 @@
  * @brief Contains the tensor and implemenets structures
  */
 
-/**
- * @brief Enumerations of available tensor types (INT32, FLOAT32/FLOAT, FLOAT64/DOUBLE)
+/** @brief 
+ * Enumerations of available tensor types (INT32, FLOAT32/FLOAT, FLOAT64/DOUBLE)
+ *
  */
 typedef enum {
 	INT32,
@@ -21,12 +20,25 @@ typedef enum {
 	FLOAT64
 } TensorType;
 
-/**
- * @brief Tensor structure with an arbitrary number of dimensions
- * 		  - dtype : Type of tensor (INT32, FLOAT32/FLOAT, FLOAT64/DOUBLE)
- *		  - data : Void pointer to tensor data
- * 		  - shape : Pointer to an int array of tensor dimensions
- * 		  - rank : The number of dimensions of the tensor
+/** @brief 
+ * Tensor structure with an arbitrary number of dimensions
+ *
+ *** dtype :
+ *
+ * Type of tensor (INT32, FLOAT32/FLOAT, FLOAT64/DOUBLE) 
+ *
+ *** data :
+ *
+ * Void pointer to tensor data
+ *
+ *** shape :
+ *
+ * Pointer to an int array of tensor dimensions
+ *
+ *** rank :
+ *
+ * The number of dimensions of the tensor
+ *
  */
 typedef struct {
 	TensorType dtype;
@@ -35,18 +47,42 @@ typedef struct {
 	int rank;
 } Tensor;
 
-/**
- * @brief Structure for creating an implementation of a linear algebra function (e.t.c. matmul)
- * 		  - fn: A voidtype pointer to a function
- *		  - speed: Priority for speed, the higher the better
- *		  - available: Flag for availability of implementation
- * 		  - name: Name of implementation
- */
 typedef struct {
-	void* fn;
-	int speed;
-	bool available;
-	const char* name;
+    void* fn;
+    int speed_priority;
+    bool available;
+    const char* name;
 } Implementation;
+
+typedef enum {
+	nnl2ColMajor=101,
+	nnl2RowMajor=102
+} nnl2_order;
+
+typedef enum {
+	nnl2NoTrans=111,
+	nnl2Trans=112,
+} nnl2_transpose;
+
+typedef void (*fn_inplace_fill)(Tensor*, void*, TensorType);
+typedef Tensor* (*fn_empty)(const int*, int, TensorType);
+typedef Tensor* (*fn_zeros)(const int*, int, TensorType);
+typedef Tensor* (*fn_ones)(const int*, int, TensorType);
+
+typedef void (*sgemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+							   const int, const int, const int, const float, const Tensor*, 
+							   const int, const Tensor*, const int, const float, Tensor*, const int);
+
+typedef void (*dgemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+							   const int, const int, const int, const double, const Tensor*, 
+							   const int, const Tensor*, const int, const double, Tensor*, const int);
+
+typedef Tensor* (*sgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+					       const int, const int, const int, const float, const Tensor*, 
+					       const int, const Tensor*, const int, const float);
+
+typedef Tensor* (*dgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+					       const int, const int, const int, const double, const Tensor*, 
+					       const int, const Tensor*, const int, const double);
 
 #endif

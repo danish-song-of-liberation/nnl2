@@ -39,7 +39,8 @@
 										    :components ((:file "system-package" :type "lisp")
 														 (:file "system-utils" :type "lisp")
 														 (:file "system-impl-upd" :type "lisp")
-														 (:file "system-config" :type "lisp")))
+														 (:file "system-config" :type "lisp")
+														 (:file "system-greetings" :type "lisp")))
 										   
 										   (:module "ffi"
 											:serial t
