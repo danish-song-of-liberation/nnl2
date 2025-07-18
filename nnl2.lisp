@@ -47,7 +47,12 @@
 											:components ((:file "ffi-package" :type "lisp")
 														 (:file "ffi-with-c" :type "lisp")
 														 (:file "ffi-c-core" :type "lisp")
-														 (:file "ffi-status" :type "lisp")))))))
+														 (:file "ffi-status" :type "lisp")))
+										
+										   (:module "highlevel"
+										    :serial t
+											:components ((:file "highlevel-package" :type "lisp")
+														 (:file "highlevel-accessors" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

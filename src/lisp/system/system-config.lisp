@@ -13,6 +13,8 @@
 (defparameter *naive-available* t)  
 (defparameter *openblas0330woa64static-available* nil)
 
+(defparameter *default-tensor-type* :float64)
+
 (defparameter *silent-mode* nil)
 
 (defparameter *implementations* (list 

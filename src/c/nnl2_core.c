@@ -12,5 +12,14 @@ void init_system() {
 	init_dgemminplace();
 	init_sgemm();
 	init_dgemm();
-} 
+}  
+
+Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
+	return empty(shape, rank, dtype);
+}
+
+Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
+	return zeros(shape, rank, dtype);
+}
+ 
  
