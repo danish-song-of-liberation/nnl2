@@ -30,6 +30,34 @@
     } while(0)
 #define FREE_ALIGNED(ptr) free(ptr)
 
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+
+#ifdef __AVX__
+#include <immintrin.h>
+#endif
+
+#ifdef __SSE2__
+#include <emmintrin.h>
+#endif
+
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
+
+#ifdef __SSSE3__
+#include <tmmintrin.h>
+#endif
+
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
+
+#ifdef __SSE4_2__
+#include <nmmintrin.h>
+#endif
+
 #endif
 
 #define NUM_TENSOR_TYPES 3 // int32, float32, float64

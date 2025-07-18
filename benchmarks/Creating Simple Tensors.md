@@ -36,3 +36,27 @@ Top 1: nnl2
 Top 2: Torch
 Top 3: NumPy
 ```
+
+## Lisp code from benchmarks (Empty):
+
+```lisp
+(declaim (optimize (speed 3) (debug 0) (safety 0) (space 0))) ;; optimizing
+
+(time (let ((shape (nnl2.hli.ts:make-shape-pntr #(64 64)))) ;; to avoid recreating the dimensions every time
+        (dotimes (i 1000000) ;; 1_000_000
+          (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:empty-with-pntr shape 2 :dtype :float64))))))) ;; an optimized form of empty that takes a pointer to dimensions instead of a vector. is 10-20% faster than the original zeros
+
+;; tlet is a tensor-based version of let that automatically clears memory at the end
+```
+
+## Lisp code from benchmarks (Zeros):
+
+```lisp
+(declaim (optimize (speed 3) (debug 0) (safety 0) (space 0))) ;; optimizing
+
+(time (let ((shape (nnl2.hli.ts:make-shape-pntr #(64 64)))) ;; to avoid recreating the dimensions every time
+        (dotimes (i 1000000) ;; 1_000_000
+          (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:zeros-with-pntr shape 2 :dtype :float64))))))) ;; an optimized form of zeros that takes a pointer to dimensions instead of a vector. is 10-20% faster than the original zeros
+
+;; tlet is a tensor-based version of let that automatically clears memory at the end
+```

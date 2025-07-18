@@ -22,4 +22,4 @@ Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype);
 }
  
- 
+  
