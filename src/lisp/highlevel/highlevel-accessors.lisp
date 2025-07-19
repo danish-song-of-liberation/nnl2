@@ -42,3 +42,19 @@
 
 (defmacro zeros-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%zeros ,shape-pntr ,rank ,dtype))
+
+(defmacro ones (indices &key (dtype nnl2.system:*default-tensor-type*))
+  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+    `(nnl2.ffi:%ones ,shape ,rank ,dtype))) 
+
+(defmacro ones-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
+  `(nnl2.ffi:%ones ,shape-pntr ,rank ,dtype))
+
+(defmacro full (indices &key (dtype nnl2.system:*default-tensor-type*) (filler 0.0d0))
+  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+    (let ((filler-pntr (cffi:foreign-alloc :double)))
+	  (setf (cffi:mem-ref filler-pntr :double) filler)
+     `(nnl2.ffi:%full ,shape ,rank ,dtype ,filler-pntr))))
+	 
+(defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
+  `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 

@@ -30,38 +30,19 @@
     } while(0)
 #define FREE_ALIGNED(ptr) free(ptr)
 
-#ifdef __SSE__
-#include <xmmintrin.h>
-#endif
-
-#ifdef __AVX__
-#include <immintrin.h>
-#endif
-
-#ifdef __SSE2__
-#include <emmintrin.h>
-#endif
-
-#ifdef __SSE3__
-#include <pmmintrin.h>
-#endif
-
-#ifdef __SSSE3__
-#include <tmmintrin.h>
-#endif
-
-#ifdef __SSE4_1__
-#include <smmintrin.h>
-#endif
-
-#ifdef __SSE4_2__
-#include <nmmintrin.h>
-#endif
-
 #endif
 
 #define NUM_TENSOR_TYPES 3 // int32, float32, float64
-#define TENSOR_MEM_ALIGNMENT 64
+
+#if defined(__AVX512F__)
+	#define TENSOR_MEM_ALIGNMENT 64
+#elif defined(__AVX2__)
+	#define TENSOR_MEM_ALIGNMENT 32
+#elif defined(__AVX__)
+	#define TENSOR_MEM_ALIGNMENT 32
+#else 
+	#define TENSOR_MEM_ALIGNMENT 16
+#endif
 
 #ifdef OPENBLAS_AVAILABLE
 #include <cblas.h>
@@ -559,29 +540,81 @@ void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	switch(dtype) {
 		case INT32: {
 			int32_t filler = *(int32_t*)value;
-			int32_t* data = (int32_t*)tensor->data;	
-			for(size_t i = 0; i < total_elems; ++i) data[i]  = filler;
+			volatile int32_t* data = (int32_t*)tensor->data;	
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+		
+		case FLOAT32: {
+			float filler = *(float*)value;
+			volatile float* data = (float*)tensor->data;
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+		
+		case FLOAT64: {
+			double filler = *(double*)value;
+			volatile double* data = (double*)tensor->data;
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+	}
+}
+
+#ifdef __AVX__
+void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	if (total_elems == 0) return;
+	
+	switch(dtype) {
+		case INT32: {
+			int32_t filler = *(int32_t*)value;
+			int32_t* data = (int32_t*)tensor->data;
+			
+			__m256i avx_filler = _mm256_set1_epi32(filler);
+			
+			size_t it = 0;
+			
+			for(; it < total_elems - 7; it += 8) _mm256_storeu_si256((__m256i*)(data + it), avx_filler);		
+			for(size_t j = it; j < total_elems; j++) data[j] = filler;
+				
 			break;
 		}
 		
 		case FLOAT32: {
 			float filler = *(float*)value;
 			float* data = (float*)tensor->data;
-			for(size_t i = 0; i < total_elems; ++i) data[i]  = filler;
+			
+			__m256 avx_filler = _mm256_set1_ps(filler);
+			
+			size_t it = 0;
+			
+			for(; it < total_elems - 7; it += 8) _mm256_storeu_ps(data + it, avx_filler);		
+			for(size_t j = it; j < total_elems; j++) data[j] = filler;
+			
 			break;
 		}
 		
 		case FLOAT64: {
 			double filler = *(double*)value;
 			double* data = (double*)tensor->data;
-			for(size_t i = 0; i < total_elems; ++i) data[i]  = filler;
+			
+			__m256d avx_filler = _mm256_set1_pd(filler);
+			
+			size_t it = 0;
+			
+			for(; it < total_elems - 3; it += 4) _mm256_storeu_pd(data + it, avx_filler);
+			for(size_t j = it; j < total_elems; j++) data[j] = filler;
+			
 			break;
 		}
 	}
 }
+#endif
 
 Implementation inplace_fill_backends[] = {
-	{naive_inplace_fill, 10, true, "NAIVE"}
+	{naive_inplace_fill, 10, true, "NAIVE"},
+
 };
 
 fn_inplace_fill inplace_fill;
@@ -589,7 +622,7 @@ fn_inplace_fill inplace_fill;
 void init_inplace_fill() {
 	for(size_t i = 0; i < sizeof(inplace_fill_backends) / sizeof(inplace_fill_backends[0]); i++) {
 		if (inplace_fill_backends[i].available) inplace_fill = inplace_fill_backends[i].fn;
-	}
+	}	
 }
 
 Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
@@ -603,7 +636,7 @@ Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
         }
         
         case FLOAT32: {
-            float filler = 1.0f;
+            float filler = 1.0;
             inplace_fill(tensor_t, &filler, dtype);
             break;
         }

@@ -23,6 +23,17 @@
   (rank :int)
   (dtype tensor-type))  
   
+(cffi:defcfun ("lisp_call_ones" %ones) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type))  
+    
+(cffi:defcfun ("lisp_call_full" %full) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (filler :pointer))  
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))    
 
