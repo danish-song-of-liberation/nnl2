@@ -85,4 +85,20 @@ typedef Tensor* (*dgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_tr
 					       const int, const int, const int, const double, const Tensor*, 
 					       const int, const Tensor*, const int, const double);
 
+char* get_tensortype_name(TensorType dtype) {
+	switch(dtype) {
+		case INT32:
+			return "INT32";
+			
+		case FLOAT32:
+			return "FLOAT32";
+			
+		case FLOAT64:
+			return "FLOAT64";
+			
+		default:
+			return "BAD DATA TYPE";
+	}	
+}
+
 #endif

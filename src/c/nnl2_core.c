@@ -54,10 +54,26 @@ Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {
 	return ones(shape, rank, dtype);
 }  
- 
+    
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
+
+Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
+						const nnl2_transpose transb, const int m, const int n, 
+						const int k, const double alpha, const Tensor* a, const int lda,
+						const Tensor* b, const int ldb, const double beta) {
+							
+	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
+}
+
+Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa, 
+						const nnl2_transpose transb, const int m, const int n, 
+						const int k, const float alpha, const Tensor* a, const int lda,
+						const Tensor* b, const int ldb, const float beta) {
+							
+	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
+}  
  
 void debug_implementation(Implementation* implementation, char* name, size_t size) {
 	printf("Implementation: %s\n", name);
@@ -67,5 +83,5 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 		printf("		Speed: %d\n", implementation[i].speed_priority);
 		printf("		Availble?: %d\n", implementation[i].available);
 	}
-}	
+}	          
   

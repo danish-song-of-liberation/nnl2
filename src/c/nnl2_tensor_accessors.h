@@ -614,7 +614,10 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 
 Implementation inplace_fill_backends[] = {
 	{naive_inplace_fill, 10, true, "NAIVE"},
-
+	
+	#ifdef __AVX__
+	{avx_inplace_fill, 70, true, "AVX"}
+	#endif
 };
 
 fn_inplace_fill inplace_fill;
@@ -676,106 +679,106 @@ Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
 }
 
 void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa, 
-						const nnl2_transpose transb, const int m, const int n, 
-					    const int k, const float alpha, const Tensor* a, const int lda,
-					    const Tensor* b, const int ldb, const float beta, Tensor* c,
-						const int ldc) {
+                        const nnl2_transpose transb, const int m, const int n, 
+                        const int k, const float alpha, const Tensor* a, const int lda,
+                        const Tensor* b, const int ldb, const float beta, Tensor* c,
+                        const int ldc) {
 
-	if (!a || !b || !c || !a->data || !b->data || !c->data) {
+    if (!a || !b || !c || !a->data || !b->data || !c->data) {
         fprintf(stderr, "Error (Hello from C!): Null pointer passed as argument (matmul)");
-		return;
+        return;
     }
-	
-	if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
+    
+    if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
         fprintf(stderr, "Error (Hello from C!): Invalid dimensions provided (matmul)");
-		return;
+        return;
     }
-	
-	int a_cols = (transa == nnl2Trans) ? m : k;
+    
+    int a_cols = (transa == nnl2Trans) ? m : k;
     int b_cols = (transb == nnl2Trans) ? k : n;
-	
-	if (lda < a_cols) {
-		fprintf(stderr, "Error (Hello from C!): lda is less than number of columns of a matrix! (matmul)");
-		return;
+    
+    if (lda < a_cols) {
+        fprintf(stderr, "Error (Hello from C!): lda is less than number of columns of a matrix! (matmul)");
+        return;
     }
-	
-	if (ldb < b_cols) {  
+    
+    if (ldb < b_cols) {  
         fprintf(stderr, "Error (Hello from C!): ldb is less than number of columns of b matrix! (matmul)");
-		return;
+        return;
     }
 
-	if (ldc < n) {    
+    if (ldc < n) {    
         fprintf(stderr, "Error (Hello from C!): ldc is less than n! (matmul)");
-		return;
+        return;
     }
 
-	float* data_a = (float*)a->data;
-	float* data_b = (float*)b->data;
-	float* data_c = (float*)c->data;						  
-	
-	if(order == nnl2RowMajor){
-		for(int i = 0; i < m; i++) {
-			for(int j = 0; j < n; j++) {	
-				float acc = 0.0;
-		
-				for(int l = 0; l < k; l++) {
-					float a_val; 
-					float b_val; 
-				
-					if (transa == nnl2Trans) {
-						a_val = *(data_a + l * lda + i);
-					} else {
-						a_val = *(data_a + i * lda + l);
-					}
-					
-					if (transb == nnl2Trans) {
-						b_val = *(data_b + j * ldb + l);
-					} else {
-						b_val = *(data_b + l * ldb + j);
-					}
-				
-					acc += a_val * b_val;
-				}
-			
-				if(beta == 0) {
-					*(data_c + i * ldc + j) = acc * alpha;
-				} else {
-					*(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
-				}
-			}
-		}
-	} else {
-		for(int i = 0; i < m; i++) {
-			for(int j = 0; j < n; j++) {
-				float acc = 0.0;
-				
-				for(int l = 0; l < k; l++) {
-					float a_val;
-					float b_val;
-				
-					if (transa == nnl2Trans) {
-						a_val = *(data_a + i * lda + l);
-					} else {
-						a_val = *(data_a + l * lda + i);
-					}
-					
-					if (transb == nnl2Trans) {
-						b_val = *(data_b + l * ldb + j);
-					} else {
-						b_val = *(data_b + j * ldb + l);
-					}
-				
-					acc += a_val * b_val;
-				}
-				
-				if(beta == 0) {
-					*(data_c + i * ldc + j) = acc * alpha;
-				} else {
-					*(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
-				}
-			}
-		}
-	}
+    volatile float* data_a = (volatile float*)a->data;
+    volatile float* data_b = (volatile float*)b->data;
+    volatile float* data_c = (volatile float*)c->data;                          
+    
+    if(order == nnl2RowMajor){
+        for(volatile int i = 0; i < m; i++) {
+            for(volatile int j = 0; j < n; j++) {    
+                float acc = 0.0;
+        
+                for(volatile int l = 0; l < k; l++) {
+                    float a_val; 
+                    float b_val; 
+                
+                    if (transa == nnl2Trans) {
+                        a_val = *(data_a + l * lda + i);
+                    } else {
+                        a_val = *(data_a + i * lda + l);
+                    }
+                    
+                    if (transb == nnl2Trans) {
+                        b_val = *(data_b + j * ldb + l);
+                    } else {
+                        b_val = *(data_b + l * ldb + j);
+                    }
+                
+                    acc += a_val * b_val;
+                }
+            
+                if(beta == 0) {
+                    *(data_c + i * ldc + j) = acc * alpha;
+                } else {
+                    *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
+                }
+            }
+        }
+    } else {
+        for(volatile int i = 0; i < m; i++) {
+            for(volatile int j = 0; j < n; j++) {
+                float acc = 0.0;
+                
+                for(volatile int l = 0; l < k; l++) {
+                    float a_val;
+                    float b_val;
+                
+                    if (transa == nnl2Trans) {
+                        a_val = *(data_a + i * lda + l);
+                    } else {
+                        a_val = *(data_a + l * lda + i);
+                    }
+                    
+                    if (transb == nnl2Trans) {
+                        b_val = *(data_b + l * ldb + j);
+                    } else {
+                        b_val = *(data_b + j * ldb + l);
+                    }
+                
+                    acc += a_val * b_val;
+                }
+                
+                if(beta == 0) {
+                    *(data_c + i * ldc + j) = acc * alpha;
+                } else {
+                    *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
+                }
+            }
+        }
+    }
 }
 
 Implementation sgemminplace_backends[] = {
@@ -790,107 +793,107 @@ void init_sgemminplace() {
 	}
 }
 
-void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa, 
-						const nnl2_transpose transb, const int m, const int n, 
-					    const int k, const double alpha, const Tensor* a, const int lda,
-					    const Tensor* b, const int ldb, const double beta, Tensor* c,
-						const int ldc) {
+void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
+                        const nnl2_transpose transb, const int m, const int n,
+                        const int k, const double alpha, const Tensor* a, const int lda,
+                        const Tensor* b, const int ldb, const double beta, Tensor* c,
+                        const int ldc) {
 
-	if (!a || !b || !c || !a->data || !b->data || !c->data) {
+    if (!a || !b || !c || !a->data || !b->data || !c->data) {
         fprintf(stderr, "Error (Hello from C!): Null pointer passed as argument (matmul)");
-		return;
+        return;
     }
-	
-	if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
+
+    if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
         fprintf(stderr, "Error (Hello from C!): Invalid dimensions provided (matmul)");
-		return;
+        return;
     }
-	
-	int a_cols = (transa == nnl2Trans) ? m : k;
+
+    int a_cols = (transa == nnl2Trans) ? m : k;
     int b_cols = (transb == nnl2Trans) ? k : n;
-	
-	if (lda < a_cols) {
-		fprintf(stderr, "Error (Hello from C!): lda is less than number of columns of a matrix! (matmul)");
-		return;
+
+    if (lda < a_cols) {
+        fprintf(stderr, "Error (Hello from C!): lda is less than number of columns of a matrix! (matmul)");
+        return;
     }
-	
-	if (ldb < b_cols) {  
+
+    if (ldb < b_cols) {
         fprintf(stderr, "Error (Hello from C!): ldb is less than number of columns of b matrix! (matmul)");
-		return;
+        return;
     }
 
-	if (ldc < n) {    
+    if (ldc < n) {
         fprintf(stderr, "Error (Hello from C!): ldc is less than n! (matmul)");
-		return;
+        return;
     }
 
-	double* data_a = (double*)a->data;
-	double* data_b = (double*)b->data;
-	double* data_c = (double*)c->data;						  
-	
-	if(order == nnl2RowMajor){
-		for(int i = 0; i < m; i++) {
-			for(int j = 0; j < n; j++) {	
-				double acc = 0.0;
-		
-				for(int l = 0; l < k; l++) {
-					double a_val; 
-					double b_val; 
-				
-					if (transa == nnl2Trans) {
-						a_val = *(data_a + l * lda + i);
-					} else {
-						a_val = *(data_a + i * lda + l);
-					}
-					
-					if (transb == nnl2Trans) {
-						b_val = *(data_b + j * ldb + l);
-					} else {
-						b_val = *(data_b + l * ldb + j);
-					}
-				
-					acc += a_val * b_val;
-				}
-			
-				if(beta == 0) {
-					*(data_c + i * ldc + j) = acc * alpha;
-				} else {
-					*(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
-				}
-			}
-		}
-	} else {
-		for(int i = 0; i < m; i++) {
-			for(int j = 0; j < n; j++) {
-				double acc = 0.0;
-				
-				for(int l = 0; l < k; l++) {
-					double a_val;
-					double b_val;
-				
-					if (transa == nnl2Trans) {
-						a_val = *(data_a + i * lda + l);
-					} else {
-						a_val = *(data_a + l * lda + i);
-					}
-					
-					if (transb == nnl2Trans) {
-						b_val = *(data_b + l * ldb + j);
-					} else {
-						b_val = *(data_b + j * ldb + l);
-					}
-				
-					acc += a_val * b_val;
-				}
-				
-				if(beta == 0) {
-					*(data_c + i * ldc + j) = acc * alpha;
-				} else {
-					*(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
-				}
-			}
-		}
-	}
+    volatile double* data_a = (volatile double*)a->data;
+    volatile double* data_b = (volatile double*)b->data;
+    volatile double* data_c = (volatile double*)c->data;
+
+    if(order == nnl2RowMajor){
+        for(volatile int i = 0; i < m; i++) {
+            for(volatile int j = 0; j < n; j++) {
+                double acc = 0.0;
+
+                for(volatile int l = 0; l < k; l++) {
+                    double a_val;
+                    double b_val;
+
+                    if (transa == nnl2Trans) {
+                        a_val = *(data_a + l * lda + i);
+                    } else {
+                        a_val = *(data_a + i * lda + l);
+                    }
+
+                    if (transb == nnl2Trans) {
+                        b_val = *(data_b + j * ldb + l);
+                    } else {
+                        b_val = *(data_b + l * ldb + j);
+                    }
+
+                    acc += a_val * b_val;
+                }
+
+                if(beta == 0) {
+                    *(data_c + i * ldc + j) = acc * alpha;
+                } else {
+                    *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
+                }
+            }
+        }
+    } else {
+        for(volatile int i = 0; i < m; i++) {
+            for(volatile int j = 0; j < n; j++) {
+                double acc = 0.0;
+
+                for(volatile int l = 0; l < k; l++) {
+                    double a_val;
+                    double b_val;
+
+                    if (transa == nnl2Trans) {
+                        a_val = *(data_a + i * lda + l);
+                    } else {
+                        a_val = *(data_a + l * lda + i);
+                    }
+
+                    if (transb == nnl2Trans) {
+                        b_val = *(data_b + l * ldb + j);
+                    } else {
+                        b_val = *(data_b + j * ldb + l);
+                    }
+
+                    acc += a_val * b_val;
+                }
+
+                if(beta == 0) {
+                    *(data_c + i * ldc + j) = acc * alpha;
+                } else {
+                    *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
+                }
+            }
+        }
+    }
 }
 
 Implementation dgemminplace_backends[] = {
@@ -955,10 +958,158 @@ Implementation dgemm_backends[] = {
 
 dgemmfn dgemm;
 
+Tensor* gemm(const nnl2_order order, const nnl2_transpose transa, 
+			 const nnl2_transpose transb, const int m, const int n, 
+		     const int k, const double alpha, const Tensor* a, const int lda,
+			 const Tensor* b, const int ldb, const double beta) {
+				
+	TensorType dtype = a->dtype;
+	
+	switch(dtype) {
+		case FLOAT64: return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
+		case FLOAT32: return sgemm(order, transa, transb, m, n, k, (const float)alpha, a, lda, b, ldb, (const float)beta);
+		
+		default: {
+			fprintf(stderr, "Unsupported data type!");
+			return NULL;
+		}
+	}
+}
+
 void init_dgemm() {
 	for(size_t i = 0; i < sizeof(dgemm_backends) / sizeof(dgemm_backends[0]); i++) {
 		if (dgemm_backends[i].available) dgemm = dgemm_backends[i].fn;
 	}
+}
+
+void print_1d_tensor(Tensor* tensor) {		
+	if (tensor == NULL) return;
+	
+	printf("#<NNL2:TENSOR/");
+	
+	int rows = tensor->shape[0];
+	TensorType dtype_tensor = tensor->dtype;
+	
+	char* type_name = get_tensortype_name(dtype_tensor);
+	
+	printf("%s [%d]:", type_name, rows);
+	
+	switch(dtype_tensor) {
+		case FLOAT64: {
+			double* data_t = (double*)tensor->data;
+			for(int i = 0; i < rows; i++) printf("\n    %f", data_t[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* data_t = (float*)tensor->data;
+			for(int i = 0; i < rows; i++) printf("\n    %f", data_t[i]);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* data_t = (int32_t*)tensor->data;
+			for(int i = 0; i < rows; i++) printf("\n    %d", data_t[i]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "UNKNOWN DATA TYPE: %s\n", type_name);
+			break;
+		}
+	}
+	
+	printf(">\n");
+}
+
+void print_2d_tensor(Tensor* tensor) {
+	if (tensor == NULL) return;
+	
+	printf("#<NNL2:TENSOR/");
+	
+	int rows = tensor->shape[0];
+	int cols = tensor->shape[1];
+	
+	TensorType dtype_tensor = tensor->dtype;
+	
+	char* type_name = get_tensortype_name(dtype_tensor);
+	
+	printf("%s [%dx%d]:", type_name, rows, cols);
+	
+	switch(dtype_tensor) {
+		case FLOAT64: {
+			for(int i = 0; i < rows; i++) {
+				printf("\n");		
+				
+				for(int j = 0; j < cols; j++) {
+					int index = (i * cols) + j;
+					double* data_t = (double*)tensor->data;
+					printf("     %f", data_t[index]);
+				}
+			}
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			for(int i = 0; i < rows; i++) {
+				printf("\n");
+				
+				for(int j = 0; j < cols; j++) {
+					int index = (i * cols) + j;
+					float* data_t = (float*)tensor->data;
+					printf("     %f", data_t[index]);
+				}
+			}
+			
+			break;
+		}
+		
+		case INT32: {
+			for(int i = 0; i < rows; i++) {
+				printf("\n");
+				
+				for(int j = 0; j < cols; j++) {
+					int index = (i * cols) + j;
+					int32_t* data_t = (int32_t*)tensor->data;
+					printf("     %d", data_t[index]);
+				}
+			}
+			
+			break;
+		}
+	}
+	
+	printf(">\n");
+}
+
+void print_huge_tensor(Tensor* tensor) {
+	if (tensor == NULL) return;
+	
+	printf("#<NNL2:TENSOR/");
+	
+	TensorType dtype_tensor = tensor->dtype;
+    char* type_name = get_tensortype_name(dtype_tensor);
+	
+	printf("%s [", type_name);
+	
+	if (tensor->rank > 0) {
+        printf("%d", tensor->shape[0]);
+        for (int i = 1; i < tensor->rank; i++) {
+            printf("x%d", tensor->shape[i]);
+        }
+    }
+	
+    printf("]>");
+}
+
+void print_tensor(Tensor* tensor) {
+	int rank = tensor->rank;
+	
+	if(rank <= 0)      {return;}
+	else if(rank == 1) {print_1d_tensor(tensor);}
+	else if(rank == 2) {print_2d_tensor(tensor);}
+	else 			   {print_huge_tensor(tensor);}
 }
 
 #endif
