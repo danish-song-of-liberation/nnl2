@@ -52,9 +52,9 @@ Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype);
 } 
 
-Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {
+Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) { 
 	return ones(shape, rank, dtype);
-}               
+}                    
     
 Tensor* lisp_call_full(const int* shape, int rank, TensorType  dtype, void* filler) {
 	return full(shape, rank, dtype, filler);

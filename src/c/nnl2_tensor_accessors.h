@@ -564,7 +564,7 @@ void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 }
 
 #ifdef __AVX__
-void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {	
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	if (total_elems == 0) return;
 	
@@ -574,11 +574,15 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			int32_t* data = (int32_t*)tensor->data;
 			
 			__m256i avx_filler = _mm256_set1_epi32(filler);
-			
-			size_t it = 0;
-			
-			for(; it < total_elems - 7; it += 8) _mm256_storeu_si256((__m256i*)(data + it), avx_filler);		
-			for(size_t j = it; j < total_elems; j++) data[j] = filler;
+				
+			size_t avx_iters = total_elems / 8; 
+			for (size_t i = 0; i < avx_iters; i++) { 
+				_mm256_storeu_si256((__m256i*)(data + i * 8), avx_filler);
+			}
+
+			for (size_t j = avx_iters * 8; j < total_elems; j++) {
+				data[j] = filler;
+			}	
 				
 			break;
 		}
@@ -589,10 +593,14 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			
 			__m256 avx_filler = _mm256_set1_ps(filler);
 			
-			size_t it = 0;
-			
-			for(; it < total_elems - 7; it += 8) _mm256_storeu_ps(data + it, avx_filler);		
-			for(size_t j = it; j < total_elems; j++) data[j] = filler;
+			size_t avx_iters = total_elems / 8; // there are ghosts in my code
+			for (size_t i = 0; i < avx_iters; i++) { // WHY DOESN'T AVX_ITERS WORK IN LISP, BUT IT WORKS IN C? WHAT IS GOING ON?
+				_mm256_storeu_ps(data + i * 8, avx_filler);
+			}
+
+			for (size_t j = avx_iters * 8; j < total_elems; j++) {
+				data[j] = filler;
+			}
 			
 			break;
 		}
@@ -605,7 +613,10 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			
 			size_t it = 0;
 			
-			for(; it < total_elems - 3; it += 4) _mm256_storeu_pd(data + it, avx_filler);
+			for(; it < total_elems - 3; it += 4) _mm256_storeu_pd(data + it, avx_filler); // I MEAN THIS
+			// wth does fleet64 work with this but not other data types, and only in Lisp wrappers?
+			// I would make such concise loops everywhere, but ghosts don't like it
+			
 			for(size_t j = it; j < total_elems; j++) data[j] = filler;
 			
 			break;
@@ -1584,6 +1595,10 @@ void init_subinplace() {
 	for(size_t i = 0; i < sizeof(subinplace_backends) / sizeof(subinplace_backends[0]); i++) {
 		if (subinplace_backends[i].available) subinplace = subinplace_backends[i].fn;
 	}
+}
+
+int get_mem_alignment() {
+	return TENSOR_MEM_ALIGNMENT;
 }
 	
 #endif

@@ -21,11 +21,6 @@
   (shape :pointer)
   (rank :int))
   
-#| 1.4
-
-   now that I'm at the point of building frameworks from scratch, 
-   I've tried to come up with the concept of meta-neural networks again. |#
-  
 (cffi:defcfun ("lisp_call_empty" %empty) :pointer
   (shape :pointer)
   (rank :int)
@@ -133,5 +128,7 @@
   
 (cffi:defcfun ("lisp_call_debug_blas_sgemminplace" %%internal-debug-sgemm!) :void
   (check-to :unsigned-long))  
+  
+(cffi:defcfun ("get_mem_alignment" %%%internal-lisp-call-get-mem-alignment) :int)
   
 (nnl-init-system)
