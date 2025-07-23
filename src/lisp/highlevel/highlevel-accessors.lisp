@@ -62,35 +62,35 @@
 (defmacro print-tensor (tensor)
   `(nnl2.ffi:print-tensor ,tensor))
 
-(defmacro get-rank (tensor)
+(defmacro rank (tensor)
   `(nnl2.ffi:get-tensor-rank ,tensor))
   
-(defmacro get-dtype (tensor)
+(defmacro dtype (tensor)
   `(nnl2.ffi:get-tensor-dtype ,tensor))  
 
-(defmacro get-int-dtype (tensor)
+(defmacro int-dtype (tensor)
   `(nnl2.ffi:get-int-tensor-dtype ,tensor))    
   
-(defmacro get-shape-pointer (tensor)
+(defmacro shape-pointer (tensor)
   `(nnl2.ffi:get-pointer-to-tensor-shape ,tensor))
 
 (defun get-shape-as-list (tensor rank)
-  (loop with rank-t = (if rank rank (get-rank tensor))
-		with shape-pointer = (get-shape-pointer tensor)
+  (loop with rank-t = (if rank rank (rank tensor))
+		with shape-pointer = (shape-pointer tensor)
 		for i from 0 below rank-t
 		collect (cffi:mem-aref shape-pointer :int i)))
 
 (defun get-shape-as-vector (tensor rank)
-  (let* ((rank-t (if rank rank (get-rank tensor)))
+  (let* ((rank-t (if rank rank (rank tensor)))
 		 (vec (make-array rank-t))
-		 (shape-pointer (get-shape-pointer tensor)))
+		 (shape-pointer (shape-pointer tensor)))
 		 
 	(dotimes (i rank-t)
 	  (setf (aref vec i) (cffi:mem-aref shape-pointer :int i)))
 	  
 	vec))
 	
-(defmacro get-shape (tensor &key (as :vector) (rank nil))
+(defmacro shape (tensor &key (as :vector) (rank nil))
   (case as
     (:list `(get-shape-as-list ,tensor ,rank))
 	(:vector `(get-shape-as-vector ,tensor ,rank))
@@ -126,4 +126,9 @@
 (defmacro -= (summand sumend) 
   `(nnl2.ffi:%-= ,summand ,sumend))  
     
+(defmacro size (tensor)
+  `(nnl2.ffi:%get-size ,tensor))
+
+(defmacro size-in-bytes (tensor)
+  `(nnl2.ffi:%get-size-in-bytes ,tensor))  
   

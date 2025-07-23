@@ -54,7 +54,7 @@ Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 
 Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) { 
 	return ones(shape, rank, dtype);
-}                    
+}                     
     
 Tensor* lisp_call_full(const int* shape, int rank, TensorType  dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
@@ -92,7 +92,7 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 		printf("		Speed: %d\n", implementation[i].speed_priority);
 		printf("		Availble?: %d\n", implementation[i].available);
 	}
-}	          
+}	           
 
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);

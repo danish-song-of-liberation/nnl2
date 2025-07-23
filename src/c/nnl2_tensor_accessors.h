@@ -1600,5 +1600,13 @@ void init_subinplace() {
 int get_mem_alignment() {
 	return TENSOR_MEM_ALIGNMENT;
 }
+
+int get_size(Tensor* tensor) {
+	return product(tensor->shape, tensor->rank);
+}
+
+int get_size_in_bytes(Tensor* tensor) {
+	return product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
+}
 	
 #endif
