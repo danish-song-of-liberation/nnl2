@@ -1,5 +1,6 @@
 (defpackage :nnl2.ffi
   (:use :cl)
   (:export :get-openblas0330woa64static-status :%empty :%zeros :%ones :%full :free-tensor :print-tensor
-   :%dgemm :%sgemm :%gemm))
+   :%dgemm :%sgemm :%gemm :get-tensor-rank :get-tensor-dtype :get-int-tensor-dtype :get-pointer-to-tensor-shape
+   :%gemm! :%+= :%-=))
   

@@ -21,6 +21,11 @@
   (shape :pointer)
   (rank :int))
   
+#| 1.4
+
+   now that I'm at the point of building frameworks from scratch, 
+   I've tried to come up with the concept of meta-neural networks again. |#
+  
 (cffi:defcfun ("lisp_call_empty" %empty) :pointer
   (shape :pointer)
   (rank :int)
@@ -82,12 +87,51 @@
   (lda :int)
   (b :pointer)
   (ldb :int)
-  (beta :double))    
+  (beta :double))   
+
+(cffi:defcfun ("gemminplace" %gemm!) :pointer
+  (order nnl2-order)
+  (transa nnl2-transpose)
+  (transb nnl2-transpose)
+  (m :int)
+  (n :int)
+  (k :int)
+  (alpha :double)
+  (a :pointer)
+  (lda :int)
+  (b :pointer)
+  (ldb :int)
+  (beta :double)
+  (c :pointer)
+  (ldc :int))  
+  
+(cffi:defcfun ("lisp_call_addinplace" %+=) :void
+  (summand :pointer)
+  (sumend :pointer))
+  
+(cffi:defcfun ("lisp_call_subinplace" %-=) :void
+  (summand :pointer)
+  (sumend :pointer))  
   
 (cffi:defcfun ("free_tensor" free-tensor) :void
-  (tensor :pointer))    
+  (tensor :pointer))     
   
 (cffi:defcfun ("print_tensor" print-tensor) :void
   (tensor :pointer))  
+  
+(cffi:defcfun ("get_tensor_rank" get-tensor-rank) :int
+  (tensor :pointer))  
+  
+(cffi:defcfun ("get_tensor_dtype" get-tensor-dtype) tensor-type
+  (tensor :pointer))    
+  
+(cffi:defcfun ("get_tensor_dtype" get-int-tensor-dtype) :int
+  (tensor :pointer))     
+
+(cffi:defcfun ("get_tensor_shape" get-pointer-to-tensor-shape) :pointer
+  (tensor :pointer))        
+  
+(cffi:defcfun ("lisp_call_debug_blas_sgemminplace" %%internal-debug-sgemm!) :void
+  (check-to :unsigned-long))  
   
 (nnl-init-system)

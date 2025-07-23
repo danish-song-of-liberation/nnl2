@@ -85,6 +85,9 @@ typedef Tensor* (*dgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_tr
 					       const int, const int, const int, const double, const Tensor*, 
 					       const int, const Tensor*, const int, const double);
 
+typedef void (*addinplacefn)(Tensor*, const Tensor*);			
+typedef void (*subinplacefn)(Tensor*, const Tensor*);				   
+
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {
 		case INT32:

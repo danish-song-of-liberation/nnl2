@@ -75,3 +75,5 @@
   :perform (asdf:test-op (o c)
 			 (uiop:symbol-call :nnl2.tests :run-all-tests)))
   
+; 1.5 - and you know what? I did it  
+  

@@ -30,7 +30,6 @@
 #include "nnl2_ffi_test.h"
 #include "backends_status/nnl2_status.h"
 #include "nnl2_tensor_core.h"
-
  
 void init_system() {
 	init_inplace_fill();
@@ -41,21 +40,23 @@ void init_system() {
 	init_dgemminplace();
 	init_sgemm();
 	init_dgemm();
-}  
+	init_addinplace();
+	init_subinplace();
+}    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return empty(shape, rank, dtype);
 }
-
+ 
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype);
 } 
 
 Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {
 	return ones(shape, rank, dtype);
-}  
+}               
     
-Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
+Tensor* lisp_call_full(const int* shape, int rank, TensorType  dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
 
@@ -63,17 +64,25 @@ Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa,
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const double alpha, const Tensor* a, const int lda,
 						const Tensor* b, const int ldb, const double beta) {
-							
+							    
 	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}
+}     
 
 Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const float alpha, const Tensor* a, const int lda,
 						const Tensor* b, const int ldb, const float beta) {
-							
+							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}  
+}   
+
+void lisp_call_addinplace(Tensor* summand, Tensor* sumend) { 
+	addinplace(summand, sumend);
+}
+
+void lisp_call_subinplace(Tensor* summand, Tensor* sumend) {
+	subinplace(summand, sumend);
+}
  
 void debug_implementation(Implementation* implementation, char* name, size_t size) {
 	printf("Implementation: %s\n", name);
@@ -84,4 +93,8 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 		printf("		Availble?: %d\n", implementation[i].available);
 	}
 }	          
-  
+
+void lisp_call_debug_blas_sgemminplace(size_t check_to) {
+	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
+}
+        

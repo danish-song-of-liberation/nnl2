@@ -62,4 +62,68 @@
 (defmacro print-tensor (tensor)
   `(nnl2.ffi:print-tensor ,tensor))
 
+(defmacro get-rank (tensor)
+  `(nnl2.ffi:get-tensor-rank ,tensor))
+  
+(defmacro get-dtype (tensor)
+  `(nnl2.ffi:get-tensor-dtype ,tensor))  
 
+(defmacro get-int-dtype (tensor)
+  `(nnl2.ffi:get-int-tensor-dtype ,tensor))    
+  
+(defmacro get-shape-pointer (tensor)
+  `(nnl2.ffi:get-pointer-to-tensor-shape ,tensor))
+
+(defun get-shape-as-list (tensor rank)
+  (loop with rank-t = (if rank rank (get-rank tensor))
+		with shape-pointer = (get-shape-pointer tensor)
+		for i from 0 below rank-t
+		collect (cffi:mem-aref shape-pointer :int i)))
+
+(defun get-shape-as-vector (tensor rank)
+  (let* ((rank-t (if rank rank (get-rank tensor)))
+		 (vec (make-array rank-t))
+		 (shape-pointer (get-shape-pointer tensor)))
+		 
+	(dotimes (i rank-t)
+	  (setf (aref vec i) (cffi:mem-aref shape-pointer :int i)))
+	  
+	vec))
+	
+(defmacro get-shape (tensor &key (as :vector) (rank nil))
+  (case as
+    (:list `(get-shape-as-list ,tensor ,rank))
+	(:vector `(get-shape-as-vector ,tensor ,rank))
+	(otherwise (error "Unknown type: ~a~%" as))))
+
+(defun gemm (a b &key (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb)
+  (let* ((shape-a (get-shape a :as :vector :rank 2))
+		 (shape-b (get-shape b :as :vector :rank 2))
+		 (m (if m m (aref shape-a 0)))
+		 (n (if n n (aref shape-b 1)))
+		 (k (if k k (aref shape-a 1)))
+		 (lda (if lda lda k))
+		 (ldb (if ldb ldb n)))
+		 
+	(nnl2.ffi:%gemm order transa transb m n k alpha a lda b ldb beta)))
+  
+(defun gemm! (a b &key out (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb ldc)
+  (let* ((shape-a (get-shape a :as :vector :rank 2))
+		 (shape-b (get-shape b :as :vector :rank 2))
+		 (shape-out (get-shape out :as :vector :rank 2))
+		 (m (if m m (aref shape-a 0)))
+		 (n (if n n (aref shape-b 1)))
+		 (k (if k k (aref shape-a 1)))
+		 (lda (if lda lda k))
+		 (ldb (if ldb ldb n))
+		 (ldc (if ldc ldc (aref shape-out 1))))
+		 
+	(nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))  
+  
+(defmacro += (summand sumend) 
+  `(nnl2.ffi:%+= ,summand ,sumend))  
+  
+(defmacro -= (summand sumend) 
+  `(nnl2.ffi:%-= ,summand ,sumend))  
+    
+  
