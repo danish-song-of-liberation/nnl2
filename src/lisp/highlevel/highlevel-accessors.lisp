@@ -4,7 +4,7 @@
   (declare (type vector shape))
 
   (let* ((len (the (integer 0 *) (length shape)))
-		(shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
+	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
 		
 	(declare (type (integer 0 *) len))
 	(declare (type cffi:foreign-pointer shape-pntr))
@@ -126,10 +126,10 @@
 (defmacro -= (summand sumend) 
   `(nnl2.ffi:%-= ,summand ,sumend))  ;sry for the naming like summand sumend i  remake the after
   
-(defmacro + (summand addend)
+(defmacro .+ (summand addend)
   `(nnl2.ffi:%+ ,summand ,addend))  
   
-(defmacro - (minuend subtrahend)
+(defmacro .- (minuend subtrahend)
   `(nnl2.ffi:%- ,minuend ,subtrahend))    
 
 (defmacro *= (multiplicand multiplier)
@@ -137,6 +137,12 @@
 
 (defmacro /= (dividend divisor)
   `(nnl2.ffi:%/= ,dividend ,divisor))  
+  
+(defmacro .* (multiplicand multiplier)
+  `(nnl2.ffi:%* ,multiplicand ,multiplier))  
+  
+(defmacro ./ (dividend divisor)
+  `(nnl2.ffi:%/ ,dividend ,divisor))  
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))

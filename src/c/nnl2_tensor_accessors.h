@@ -2074,5 +2074,164 @@ void init_divinplace() {
 		if (divinplace_backends[i].available) divinplace = divinplace_backends[i].fn;
 	}
 }
+
+Tensor* naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
+    size_t len = product(multiplicand->shape, multiplicand->rank);
+    
+    TensorType dtype_multiplicand = multiplicand->dtype;
+    TensorType dtype_multiplier = multiplier->dtype;
+    
+    if(dtype_multiplicand != dtype_multiplier) {
+        fprintf(stderr, "Error (Hello from C!): In mul (in-place) data-types are other\n");
+        return NULL;
+    }
+    
+    Tensor* product = zeros(multiplicand->shape, multiplicand->rank, dtype_multiplicand);
+    
+    switch(dtype_multiplicand) {
+        case FLOAT64: {
+            volatile double* data_multiplicand = (double*)multiplicand->data;
+            volatile double* data_multiplier = (double*)multiplier->data;
+            volatile double* data_product = (double*)product->data;
+    
+            for(size_t i = 0; i < len; i++) {
+                data_product[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_multiplicand = (float*)multiplicand->data;
+            volatile float* data_multiplier = (float*)multiplier->data;
+            volatile float* data_product = (float*)product->data;
+    
+            for(size_t i = 0; i < len; i++) {
+                data_product[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
+            volatile int32_t* data_multiplier = (int32_t*)multiplier->data;
+            volatile int32_t* data_product = (int32_t*)product->data;
+    
+            for(size_t i = 0; i < len; i++) {
+                data_product[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+        
+        default: {
+            fprintf(stderr, "Error (Hello from C!): Bad data type (mul in-place)");
+            return NULL;
+        }
+    }
+    
+    return product;
+}
+
+Implementation mul_backends[] = {
+	{naive_mul, 10, true, "NAIVE"},
+};
+
+mulfn mul; 
+
+void init_mul() {
+	for(size_t i = 0; i < sizeof(mul_backends) / sizeof(mul_backends[0]); i++) {
+		if (mul_backends[i].available) mul = mul_backends[i].fn;
+	}
+}
+
+Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
+    size_t len = product(dividend->shape, dividend->rank);
+    
+    TensorType dtype_dividend = dividend->dtype;
+    TensorType dtype_divisor = divisor->dtype;
+    
+    if (dtype_dividend != dtype_divisor) {
+        fprintf(stderr, "Error (Hello from C!): In div (in-place) data-types are different\n");
+        return NULL;
+    }
+    
+    Tensor* quotient = zeros(dividend->shape, dividend->rank, dtype_dividend);
+    
+    switch (dtype_dividend) {
+        case FLOAT64: {
+            volatile double* data_dividend = (double*)dividend->data;
+            volatile double* data_divisor = (double*)divisor->data;
+            volatile double* data_quotient = (double*)quotient->data;
+    
+            for (size_t i = 0; i < len; i++) {			
+                if (data_divisor[i] == 0.0) {
+                    fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);	
+                    return NULL;
+                }
+				
+                data_quotient[i] = data_dividend[i] / data_divisor[i];
+            }
+			
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_dividend = (float*)dividend->data;
+            volatile float* data_divisor = (float*)divisor->data;
+            volatile float* data_quotient = (float*)quotient->data;
+    
+            for (size_t i = 0; i < len; i++) {
+                if (data_divisor[i] == 0.0f) {
+                    fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                    free_tensor(quotient);
+                    return NULL;
+                }
+				
+                data_quotient[i] = data_dividend[i] / data_divisor[i];
+            }
+			
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_dividend = (int32_t*)dividend->data;
+            volatile int32_t* data_divisor = (int32_t*)divisor->data;
+            volatile int32_t* data_quotient = (int32_t*)quotient->data;
+    
+            for (size_t i = 0; i < len; i++) {
+                if (data_divisor[i] == 0) {
+                    fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                    return NULL;
+                }
+				
+                data_quotient[i] = data_dividend[i] / data_divisor[i];
+            }
+			
+            break;
+        }
+        
+        default: {
+            fprintf(stderr, "Error (Hello from C!): Bad data type (div)\n");
+            free_tensor(quotient);
+            return NULL;
+        }
+    }
+    
+    return quotient;
+}
+
+Implementation div_backends[] = {
+	{naive_div, 10, true, "NAIVE"},
+};
+
+divfn nnl2_div;
+
+void init_div() {
+	for(size_t i = 0; i < sizeof(div_backends) / sizeof(div_backends[0]); i++) {
+		if (div_backends[i].available) nnl2_div = div_backends[i].fn;
+	}
+}
 	
 #endif

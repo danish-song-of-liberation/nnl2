@@ -124,6 +124,14 @@
   (dividend :pointer)
   (divisor :pointer))  
   
+(cffi:defcfun ("lisp_call_mul" %*) :pointer
+  (multiplicand :pointer)
+  (multiplier :pointer))
+
+(cffi:defcfun ("lisp_call_div" %/) :pointer
+  (dividend :pointer)
+  (divisor :pointer))
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   
