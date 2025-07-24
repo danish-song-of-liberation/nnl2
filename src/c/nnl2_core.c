@@ -42,6 +42,8 @@ void init_system() {
 	init_dgemm();
 	init_addinplace();
 	init_subinplace();
+	init_add();    
+	init_sub(); 	
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -75,14 +77,22 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 }   
-
-void lisp_call_addinplace(Tensor* summand, Tensor* sumend) { 
-	addinplace(summand, sumend);
+ 
+void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
+	addinplace(summand, addend);
 }
 
-void lisp_call_subinplace(Tensor* summand, Tensor* sumend) {
-	subinplace(summand, sumend);
+void lisp_call_subinplace(Tensor* summand, Tensor* addend) {
+	subinplace(summand, addend);
 }
+
+Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
+	return add(summand, addend); 
+}
+
+Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) {
+	return sub(summand, addend); 
+}    
  
 void debug_implementation(Implementation* implementation, char* name, size_t size) {
 	printf("Implementation: %s\n", name);
@@ -96,5 +106,5 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
-}
-        
+}		
+		

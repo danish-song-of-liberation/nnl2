@@ -1433,7 +1433,7 @@ void avx_addinplace(Tensor* summand, const Tensor* addend) {
 #endif
 
 Implementation addinplace_backends[] = {
-	{naive_addinplace, 40, true, "NAIVE"},
+	{naive_addinplace, 10, true, "NAIVE"},
 	
 	#ifdef __AVX__
 	{avx_addinplace, 70, true, "AVX"}
@@ -1582,7 +1582,7 @@ void avx_subinplace(Tensor* minuend, const Tensor* subtrahend) {
 #endif
 
 Implementation subinplace_backends[] = {
-	{naive_subinplace, 40, true, "NAIVE"},
+	{naive_subinplace, 10, true, "NAIVE"},
 	
 	#ifdef __AVX__
 	{avx_subinplace, 70, true, "AVX"},
@@ -1608,5 +1608,342 @@ int get_size(Tensor* tensor) {
 int get_size_in_bytes(Tensor* tensor) {
 	return product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
 }
+
+Tensor* naive_add(const Tensor* summand, const Tensor* addend) {
+	size_t len = product(summand->shape, summand->rank);
+	
+	TensorType dtype_summand = summand->dtype;
+	TensorType dtype_addend = addend->dtype;
+	
+	if(dtype_summand != dtype_addend) {
+		fprintf(stderr, "Error (Hello from C!): In sub (in-place) data-types are other\n");
+		return NULL;
+	}
+	
+	Tensor* amount = zeros(summand->shape, summand->rank, dtype_summand);
+	
+	switch(dtype_summand) {
+		case FLOAT64: {
+			volatile double* data_summand = (double*)summand->data;
+			volatile double* data_addend = (double*)addend->data;
+			volatile double* data_amount = (double*)amount->data;
+	
+			for(size_t i = 0; i < len; i++) {
+				data_amount[i] = data_summand[i] + data_addend[i];
+			}
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			volatile float* data_summand = (float*)summand->data;
+			volatile float* data_addend = (float*)addend->data;
+			volatile float* data_amount = (float*)amount->data;
+	
+			for(size_t i = 0; i < len; i++) {
+				data_amount[i] = data_summand[i] + data_addend[i];
+			}
+			
+			break;
+		}
+		
+		case INT32: {
+			volatile int32_t* data_summand = (int32_t*)summand->data;
+			volatile int32_t* data_addend = (int32_t*)addend->data;
+			volatile int32_t* data_amount = (int32_t*)amount->data;
+	
+			for(size_t i = 0; i < len; i++) {
+				data_amount[i] = data_summand[i] + data_addend[i];
+			}
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data type (sub in-place)");
+			return NULL;
+		}
+	}
+	
+	return amount;
+}
+
+#ifdef __AVX__
+Tensor* avx_add(const Tensor* summand, const Tensor* addend) {
+    size_t len = product(summand->shape, summand->rank);
+    
+    TensorType dtype_summand = summand->dtype;
+    TensorType dtype_addend = addend->dtype;
+    
+    if(dtype_summand != dtype_addend) {
+        fprintf(stderr, "Error (Hello from C!): In add (in-place) data-types are other\n");
+        return NULL;
+    }
+    
+    Tensor* sum = zeros(summand->shape, summand->rank, dtype_summand);
+    
+    switch(dtype_summand) {
+        case FLOAT64: {
+            double* data_summand = (double*)summand->data;
+            double* data_addend = (double*)addend->data;
+            double* data_sum = (double*)sum->data;
+
+            size_t i = 0;
+			
+            for(; i + 3 < len; i += 4) {
+                __m256d v_summand = _mm256_loadu_pd(&data_summand[i]);
+                __m256d v_addend = _mm256_loadu_pd(&data_addend[i]);
+				
+                __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+				
+                _mm256_storeu_pd(&data_sum[i], v_result);
+            }
+			
+            for(; i < len; i++) {
+                data_sum[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+        
+        case FLOAT32: {
+            float* data_summand = (float*)summand->data;
+            float* data_addend = (float*)addend->data;
+            float* data_sum = (float*)sum->data;
+
+            size_t i = 0;
+			
+            for(; i + 7 < len; i += 8) {
+                __m256 v_summand = _mm256_loadu_ps(&data_summand[i]);
+                __m256 v_addend = _mm256_loadu_ps(&data_addend[i]);
+				
+                __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+				
+                _mm256_storeu_ps(&data_sum[i], v_result);
+            }
+			
+            for(; i < len; i++) {
+                data_sum[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+        
+        case INT32: {
+            int32_t* data_summand = (int32_t*)summand->data;
+            int32_t* data_addend = (int32_t*)addend->data;
+            int32_t* data_sum = (int32_t*)sum->data;
+
+            size_t i = 0;
+            for(; i + 7 < len; i += 8) {
+                __m256i v_summand = _mm256_loadu_si256((__m256i*)&data_summand[i]);
+                __m256i v_addend = _mm256_loadu_si256((__m256i*)&data_addend[i]);
+				
+                __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+				
+                _mm256_storeu_si256((__m256i*)&data_sum[i], v_result);
+            }
+			
+            for(; i < len; i++) {
+                data_sum[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+        
+        default: {
+            fprintf(stderr, "Error (Hello from C!): Bad data type (add in-place)");
+            return NULL;
+        }
+    }
+    
+    return sum;
+}
+#endif
+
+Implementation add_backends[] = {
+	{naive_add, 65, true, "NAIVE"},
+	
+	#ifdef __AVX__
+	{avx_add, 70, true, "AVX"},
+	#endif
+};
+
+addfn add; 
+
+void init_add() {
+	for(size_t i = 0; i < sizeof(add_backends) / sizeof(add_backends[0]); i++) {
+		if (add_backends[i].available) add = add_backends[i].fn;
+	}
+}
+
+Tensor* naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
+	size_t len = product(minuend->shape, minuend->rank);
+	
+	TensorType dtype_minuend = minuend->dtype;
+	TensorType dtype_subtrahend = subtrahend->dtype;
+	
+	if(dtype_minuend != dtype_subtrahend) {
+		fprintf(stderr, "Error (Hello from C!): In sub (in-place) data-types are other\n");
+		return NULL;
+	}
+	
+	Tensor* difference = zeros(minuend->shape, minuend->rank, dtype_minuend);
+	
+	switch(dtype_minuend) {
+		case FLOAT64: {
+			volatile double* data_minuend = (double*)minuend->data;
+			volatile double* data_subtrahend = (double*)subtrahend->data;
+			volatile double* data_difference = (double*)difference->data;
+	
+			for(size_t i = 0; i < len; i++) {
+				data_difference[i] = data_minuend[i] - data_subtrahend[i];
+			}
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			volatile float* data_minuend = (float*)minuend->data;
+			volatile float* data_subtrahend = (float*)subtrahend->data;
+			volatile float* data_difference = (float*)difference->data;
+	
+			for(size_t i = 0; i < len; i++) {
+				data_difference[i] = data_minuend[i] - data_subtrahend[i];
+			}
+			
+			break;
+		}
+		
+		case INT32: {
+			volatile int32_t* data_minuend = (int32_t*)minuend->data;
+			volatile int32_t* data_subtrahend = (int32_t*)subtrahend->data;
+			volatile int32_t* data_difference = (int32_t*)difference->data;
+	
+			for(size_t i = 0; i < len; i++) {
+				data_difference[i] = data_minuend[i] - data_subtrahend[i];
+			}
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data type (sub in-place)");
+			return NULL;
+		}
+	}
+	
+	return difference;
+}
+
+#ifdef __AVX__
+Tensor* avx_sub(const Tensor* minuend, const Tensor* subtrahend) {
+    size_t len = product(minuend->shape, minuend->rank);
+    
+    TensorType dtype_minuend = minuend->dtype;
+    TensorType dtype_subtrahend = subtrahend->dtype;
+    
+    if(dtype_minuend != dtype_subtrahend) {
+        fprintf(stderr, "Error (Hello from C!): In sub data-types are other\n");
+        return NULL;
+    }
+    
+    Tensor* difference = zeros(minuend->shape, minuend->rank, dtype_minuend);
+    
+    switch(dtype_minuend) {
+        case FLOAT64: {
+            double* data_minuend = (double*)minuend->data;
+            double* data_subtrahend = (double*)subtrahend->data;
+            double* data_difference = (double*)difference->data;
+
+            size_t i = 0;
+			
+            for(; i + 3 < len; i += 4) {
+                __m256d v_minuend = _mm256_loadu_pd(&data_minuend[i]);
+                __m256d v_subtrahend = _mm256_loadu_pd(&data_subtrahend[i]);
+				
+                __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+				
+                _mm256_storeu_pd(&data_difference[i], v_result);
+            }
+			
+            for(; i < len; i++) {
+                data_difference[i] = data_minuend[i] - data_subtrahend[i];
+            }
+			
+            break;
+        }
+        
+        case FLOAT32: {
+            float* data_minuend = (float*)minuend->data;
+            float* data_subtrahend = (float*)subtrahend->data;
+            float* data_difference = (float*)difference->data;
+
+            size_t i = 0;
+			
+            for(; i + 7 < len; i += 8) {
+                __m256 v_minuend = _mm256_loadu_ps(&data_minuend[i]);
+                __m256 v_subtrahend = _mm256_loadu_ps(&data_subtrahend[i]);
+				
+                __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+				
+                _mm256_storeu_ps(&data_difference[i], v_result);
+            }
+			
+            for(; i < len; i++) {
+                data_difference[i] = data_minuend[i] - data_subtrahend[i];
+            }
+			
+            break;
+        }
+        
+        case INT32: {
+            int32_t* data_minuend = (int32_t*)minuend->data;
+            int32_t* data_subtrahend = (int32_t*)subtrahend->data;
+            int32_t* data_difference = (int32_t*)difference->data;
+
+            size_t i = 0;
+            for(; i + 7 < len; i += 8) {
+                __m256i v_minuend = _mm256_loadu_si256((__m256i*)&data_minuend[i]);
+                __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&data_subtrahend[i]);
+				
+                __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+				
+                _mm256_storeu_si256((__m256i*)&data_difference[i], v_result);
+            }
+			
+            for(; i < len; i++) {
+                data_difference[i] = data_minuend[i] - data_subtrahend[i];
+            }
+			
+            break;
+        }
+        
+        default: {
+            fprintf(stderr, "Error (Hello from C!): Bad data type (sub)");
+            return NULL;
+        }
+    }
+    
+    return difference;
+}
+#endif
+
+Implementation sub_backends[] = {
+	{naive_sub, 65, true, "NAIVE"},
+	
+	#ifdef __AVX__
+	{avx_sub, 70, true, "AVX"},
+	#endif
+};
+
+addfn sub; 
+
+void init_sub() {
+	for(size_t i = 0; i < sizeof(sub_backends) / sizeof(sub_backends[0]); i++) {
+		if (sub_backends[i].available) sub = sub_backends[i].fn;
+	}
+}
+
 	
 #endif

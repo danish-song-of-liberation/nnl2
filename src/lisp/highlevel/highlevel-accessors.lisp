@@ -124,7 +124,13 @@
   `(nnl2.ffi:%+= ,summand ,sumend))  
   
 (defmacro -= (summand sumend) 
-  `(nnl2.ffi:%-= ,summand ,sumend))  
+  `(nnl2.ffi:%-= ,summand ,sumend))  ;sry for the naming like summand sumend i  remake the after
+  
+(defmacro + (summand addend)
+  `(nnl2.ffi:%+ ,summand ,addend))  
+  
+(defmacro - (minuend subtrahend)
+  `(nnl2.ffi:%- ,minuend ,subtrahend))     
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))

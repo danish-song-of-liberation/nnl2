@@ -108,6 +108,14 @@
   (summand :pointer)
   (sumend :pointer))  
   
+(cffi:defcfun ("lisp_call_add" %+) :pointer
+  (summand :pointer)
+  (addend :pointer))  
+  
+(cffi:defcfun ("lisp_call_sub" %-) :pointer
+  (summand :pointer)
+  (addend :pointer))    
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   
