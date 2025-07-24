@@ -60,14 +60,18 @@ So far, there are only **3** types of tensors:
 
 *All nnl2 functions in the table will be from the :nnl2.hli.ts package*
 
+*I would also like to inform you that the table is very extensive.*
+
 
 |  nnl2               | Magicl            | MATLAB          | NumPy                         | Description |
 |:-------------------:|:-----------------:|:---------------:|:-----------------------------:|:------------|
 | ```(rank a)```  | ```(order a)```   | ```ndims(a)```  | ```ndim(a)``` or ```a.ndim``` | Get the number of dimensions of the array. |
 | ```(size a)```      | ```(size a)```    | ```numel(a)```  | ```size(a)``` or ```a.size```  | Get the number of elements of the array. |
+| ```(size-in-bytes a)``` | ??? | It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | Gets the dimensions of the tensor in bytes |
 | ```(shape a)``` | ```(shape a)```   | ```size(a)```   | ```shape(a)``` or ```a.shape``` | Get the shape of the array. |
-| yet nope ffi        | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | Get the element in the second row, fifth column of the array. |
 | ```(dtype a)``` | ??? | ```class(a)``` | ```a.dtype``` | Gets the data type of the array. |
+| yet nope ffi        | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | Get the element in the second row, fifth column of the array. |
+
 
 ### Constructors 
 
@@ -75,7 +79,8 @@ So far, there are only **3** types of tensors:
 |------|--------|--------|-------|-------------|
 | yet nope | ```(from-list '(1d0 2d0 3d0 4d0 5d0 6d0) '(2 3))``` | ```[ 1 2 3; 4 5 6 ]``` | ```array([[1.,2.,3.], [4.,5.,6.]])``` | Create a 2x3 matrix from given elements. |
 | ```(zeros #(2 3 4))```| ```(zeros '(2 3 4)) or (const 0d0 '(2 3 4))``` | ```zeros(2,3,4)``` | ```zeros((2,3,4))``` |  Create a 2x3x4 dimensional array of zeroes of double-float element type. |
-| ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | Create a 3x4 dimensional array of ones of double-float element type.}
+| ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | Create a 3x4 dimensional array of ones of double-float element type. |
+| ```(full #(6 9) :filler 2.0d0)``` | ```(const 2.0d0 '(6 9))``` | ```repmat(6, 9, 2)``` | ```full((6, 9), 2)``` | Create a 6x9 dimensional array of a double-float element-type filled with 2. |
 
 ###  Basic Operations 
 
@@ -84,4 +89,3 @@ So far, there are only **3** types of tensors:
 | ```(gemm a b)``` | ```(@ a b)``` | ```a * b``` | ```a @ b``` | Matrix multiplication |
 | ```(+ a b)``` | ```(.+ a b)``` | ```a + b``` | ```a + b``` | 	Element-wise add |
 | ```(- a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | Element-wise subtract |
-

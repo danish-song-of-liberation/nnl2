@@ -38,7 +38,7 @@
 
 (defmacro zeros (indices &key (dtype nnl2.system:*default-tensor-type*))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    `(nnl2.ffi:%zeros ,shape ,rank ,dtype))) 
+    `(nnl2.ffi:%zeros ,shape ,rank ,dtype)))	 
 
 (defmacro zeros-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%zeros ,shape-pntr ,rank ,dtype))
