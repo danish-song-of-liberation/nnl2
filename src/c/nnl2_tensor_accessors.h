@@ -591,6 +591,8 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			float filler = *(float*)value;
 			float* data = (float*)tensor->data;
 			
+			printf("%f", filler);
+			
 			__m256 avx_filler = _mm256_set1_ps(filler);
 			
 			size_t avx_iters = total_elems / 8; // there are ghosts in my code
@@ -629,7 +631,7 @@ Implementation inplace_fill_backends[] = {
 	{naive_inplace_fill, 10, true, "NAIVE"},
 	
 	#ifdef __AVX__
-	{avx_inplace_fill, 70, true, "AVX"}
+	{avx_inplace_fill, 70, true, "AVX"},
 	#endif
 };
 
@@ -1945,5 +1947,132 @@ void init_sub() {
 	}
 }
 
+void naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
+	size_t len = product(multiplicand->shape, multiplicand->rank);
+	
+	TensorType dtype_multiplicand = multiplicand->dtype;
+	TensorType dtype_multiplier = multiplier->dtype;
+	
+	if(dtype_multiplicand != dtype_multiplier) {
+		fprintf(stderr, "Error (Hello from C!): In mul (in-place) data-types are other\n");
+		return;
+	}
+	
+	switch(dtype_multiplicand) {
+		case FLOAT64: {
+			volatile double* multiplicand_data = (double*)multiplicand->data;
+			volatile double* multiplier_data = (double*)multiplier->data;
+			
+			for(size_t it = 0; it < len; it++) {
+				multiplicand_data[it] *= multiplier_data[it];
+			}
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			volatile float* multiplicand_data = (float*)multiplicand->data;
+			volatile float* multiplier_data = (float*)multiplier->data;
+			
+			for(size_t it = 0; it < len; it++) {
+				multiplicand_data[it] *= multiplier_data[it];
+			}
+			
+			break;
+		}
+		
+		case INT32: {
+			volatile int32_t* multiplicand_data = (int32_t*)multiplicand->data;
+			volatile int32_t* multiplier_data = (int32_t*)multiplier->data;
+			
+			for(size_t it = 0; it < len; it++) {
+				multiplicand_data[it] *= multiplier_data[it];
+			}
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data type (mul in-place)");
+			return;
+		}
+	}
+}
+
+Implementation mulinplace_backends[] = {
+	{naive_mulinplace, 10, true, "NAIVE"},
+};
+
+mulinplacefn mulinplace; 
+
+void init_mulinplace() {
+	for(size_t i = 0; i < sizeof(mulinplace_backends) / sizeof(mulinplace_backends[0]); i++) {
+		if (mulinplace_backends[i].available) mulinplace = mulinplace_backends[i].fn;
+	}
+}
+
+void naive_divinplace(Tensor* dividend, const Tensor* divisor) {
+	size_t len = product(dividend->shape, dividend->rank);
+	
+	TensorType dtype_dividend = dividend->dtype;
+	TensorType dtype_divisor = divisor->dtype;
+	
+	if(dtype_dividend != dtype_divisor) {
+		fprintf(stderr, "Error (Hello from C!): In div (in-place) data-types are other\n");
+		return;
+	}
+	
+	switch(dtype_dividend) {
+		case FLOAT64: {
+			volatile double* dividend_data = (double*)dividend->data;
+			volatile double* divisor_data = (double*)divisor->data;
+			
+			for(size_t it = 0; it < len; it++) {
+				dividend_data[it] /= divisor_data[it];
+			}
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			volatile float* dividend_data = (float*)dividend->data;
+			volatile float* divisor_data = (float*)divisor->data;
+			
+			for(size_t it = 0; it < len; it++) {
+				dividend_data[it] /= divisor_data[it];
+			}
+			
+			break;
+		}
+		
+		case INT32: {
+			volatile int32_t* dividend_data = (int32_t*)dividend->data;
+			volatile int32_t* divisor_data = (int32_t*)divisor->data;
+			
+			for(size_t it = 0; it < len; it++) {
+				dividend_data[it] /= divisor_data[it];
+			}
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data type (mul in-place)");
+			return;
+		}
+	}
+}
+
+Implementation divinplace_backends[] = {
+	{naive_divinplace, 10, true, "NAIVE"},
+};
+
+divinplacefn divinplace; 
+
+void init_divinplace() {
+	for(size_t i = 0; i < sizeof(divinplace_backends) / sizeof(divinplace_backends[0]); i++) {
+		if (divinplace_backends[i].available) divinplace = divinplace_backends[i].fn;
+	}
+}
 	
 #endif

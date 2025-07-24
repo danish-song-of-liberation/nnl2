@@ -38,12 +38,14 @@ void init_system() {
 	init_ones();
 	init_sgemminplace();
 	init_dgemminplace();
-	init_sgemm();
+	init_sgemm();  
 	init_dgemm();
 	init_addinplace();
 	init_subinplace();
 	init_add();    
-	init_sub(); 	
+	init_sub(); 
+	init_mulinplace();
+	init_divinplace(); 
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -51,17 +53,17 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 }
  
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
-	return zeros(shape, rank, dtype);
+	return zeros(shape, rank, dtype); 
 } 
 
 Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) { 
-	return ones(shape, rank, dtype);
+	return ones(shape, rank, dtype);   
 }                     
     
-Tensor* lisp_call_full(const int* shape, int rank, TensorType  dtype, void* filler) {
+Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
-
+      
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const double alpha, const Tensor* a, const int lda,
@@ -80,7 +82,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
  
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
-}
+}  
 
 void lisp_call_subinplace(Tensor* summand, Tensor* addend) {
 	subinplace(summand, addend);
@@ -93,6 +95,14 @@ Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
 Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) {
 	return sub(summand, addend); 
 }    
+
+void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
+	mulinplace(multiplicand, multiplier);
+}
+
+void lisp_call_divinplace(Tensor* dividend, Tensor* divisor) {
+	divinplace(dividend, divisor);
+}
  
 void debug_implementation(Implementation* implementation, char* name, size_t size) {
 	printf("Implementation: %s\n", name);

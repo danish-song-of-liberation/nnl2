@@ -4,8 +4,8 @@
   
 (defpackage :nnl2.hli.ts
   (:use :cl)
-  (:shadow + -)
+  (:shadow + - /=)
   (:export :make-shape-pntr :empty :empty-with-pntr :zeros :zeros-with-pntr :ones :ones-with-pntr :tlet
    :full :full-with-pntr :print-tensor :rank :dtype :int-dtype :shape-pointer :shape
-   :gemm :gemm! :+= :-= :size :size-in-bytes :+ :-))
+   :gemm :gemm! :+= :-= :size :size-in-bytes :+ :- :*= :/=))
   

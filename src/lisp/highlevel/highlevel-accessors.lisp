@@ -130,7 +130,13 @@
   `(nnl2.ffi:%+ ,summand ,addend))  
   
 (defmacro - (minuend subtrahend)
-  `(nnl2.ffi:%- ,minuend ,subtrahend))     
+  `(nnl2.ffi:%- ,minuend ,subtrahend))    
+
+(defmacro *= (multiplicand multiplier)
+  `(nnl2.ffi:%*= ,multiplicand ,multiplier))  
+
+(defmacro /= (dividend divisor)
+  `(nnl2.ffi:%/= ,dividend ,divisor))  
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))

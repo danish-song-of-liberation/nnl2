@@ -116,6 +116,14 @@
   (summand :pointer)
   (addend :pointer))    
   
+(cffi:defcfun ("lisp_call_mulinplace" %*=) :void
+  (multiplicand :pointer)
+  (multiplier :pointer))  
+  
+(cffi:defcfun ("lisp_call_divinplace" %/=) :void
+  (dividend :pointer)
+  (divisor :pointer))  
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   
