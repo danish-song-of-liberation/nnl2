@@ -38,7 +38,7 @@ void init_system() {
 	init_ones();
 	init_sgemminplace();
 	init_dgemminplace();
-	init_sgemm();  
+	init_sgemm();   
 	init_dgemm();
 	init_addinplace();
 	init_subinplace();
@@ -48,6 +48,8 @@ void init_system() {
 	init_divinplace(); 
 	init_mul();
 	init_div();
+	init_powinplace();
+	init_pow();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -69,7 +71,7 @@ Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* fille
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const double alpha, const Tensor* a, const int lda,
-						const Tensor* b, const int ldb, const double beta) {   
+						const Tensor* b, const int ldb, const double beta) {    
 							    
 	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 }     
@@ -112,6 +114,14 @@ Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) {
 
 Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
 	return nnl2_div(dividend, divisor); 
+} 
+
+void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
+	powinplace(base, exponent);
+}
+
+Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {
+	return nnl2_pow(base, exponent);
 }
  
 void debug_implementation(Implementation* implementation, char* name, size_t size) {

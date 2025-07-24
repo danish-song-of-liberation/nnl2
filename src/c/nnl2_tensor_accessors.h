@@ -2,6 +2,7 @@
 #include "nnl2_tensor_backend.h"
 
 #include <string.h>
+#include <math.h>
 
 #ifndef NNL2_TENSOR_ACCESSORS
 #define NNL2_TENSOR_ACCESSORS
@@ -2233,5 +2234,141 @@ void init_div() {
 		if (div_backends[i].available) nnl2_div = div_backends[i].fn;
 	}
 }
+
+void naive_powinplace(Tensor* base, const Tensor* exponent) {
+	size_t len = product(base->shape, base->rank);
+    
+    TensorType dtype_base = base->dtype;
+    TensorType dtype_exponent = exponent->dtype;
+    
+    if(dtype_base != dtype_exponent) {
+        fprintf(stderr, "Error (Hello from C!): In pow (in-place) data-types are different\n");
+        return;
+    }
+    
+    switch(dtype_base) {
+        case FLOAT64: {
+            volatile double* base_data = (double*)base->data;
+            volatile double* exponent_data = (double*)exponent->data;
+            
+            for(size_t it = 0; it < len; it++) {
+                base_data[it] = pow(base_data[it], exponent_data[it]);
+            }
+            
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* base_data = (float*)base->data;
+            volatile float* exponent_data = (float*)exponent->data;
+            
+            for(size_t it = 0; it < len; it++) {
+                base_data[it] = powf(base_data[it], exponent_data[it]);
+            }
+            
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* base_data = (int32_t*)base->data;
+            volatile int32_t* exponent_data = (int32_t*)exponent->data;
+            
+            for(size_t it = 0; it < len; it++) {
+                base_data[it] = (int32_t)pow(base_data[it], exponent_data[it]);
+            }
+            
+            break;
+        }
+        
+        default: {
+            fprintf(stderr, "Error (Hello from C!): Bad data type (pow in-place)");
+            return;
+        }
+    }
+}
+	
+Implementation powinplace_backends[] = {
+	{naive_powinplace, 10, true, "NAIVE"}
+};	
+	
+powinplacefn powinplace;	
+
+void init_powinplace() {
+	for(size_t i = 0; i < sizeof(powinplace_backends) / sizeof(powinplace_backends[0]); i++) {
+		if (powinplace_backends[i].available) powinplace = powinplace_backends[i].fn;
+	}
+}
+	
+Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
+    size_t len = product(base->shape, base->rank);
+    
+    TensorType dtype_base = base->dtype;
+    TensorType dtype_exponent = exponent->dtype;
+    
+    if(dtype_base != dtype_exponent) {
+        fprintf(stderr, "Error (Hello from C!): In pow data-types are different\n");
+        return NULL;
+    }
+    
+    Tensor* result = zeros(base->shape, base->rank, dtype_base);
+    
+    switch(dtype_base) {
+        case FLOAT64: {
+            volatile double* data_base = (double*)base->data;
+            volatile double* data_exponent = (double*)exponent->data;
+            volatile double* data_result = (double*)result->data;
+    
+            for(size_t i = 0; i < len; i++) {
+                data_result[i] = pow(data_base[i], data_exponent[i]);
+            }
+            
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_base = (float*)base->data;
+            volatile float* data_exponent = (float*)exponent->data;
+            volatile float* data_result = (float*)result->data;
+    
+            for(size_t i = 0; i < len; i++) {
+                data_result[i] = powf(data_base[i], data_exponent[i]);
+            }
+            
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_base = (int32_t*)base->data;
+            volatile int32_t* data_exponent = (int32_t*)exponent->data;
+            volatile int32_t* data_result = (int32_t*)result->data;
+    
+            for(size_t i = 0; i < len; i++) {
+                data_result[i] = (int32_t)pow(data_base[i], data_exponent[i]);
+            }
+            
+            break;
+        }
+        
+        default: {
+            fprintf(stderr, "Error (Hello from C!): Bad data type (pow)");
+            return NULL;
+        }
+    }
+    
+    return result;
+}
+
+Implementation pow_backends[] = {
+	{naive_pow, 10, true, "NAIVE"}
+};	
+	
+powfn nnl2_pow;	
+
+void init_pow() {
+	for(size_t i = 0; i < sizeof(pow_backends) / sizeof(pow_backends[0]); i++) {
+		if (pow_backends[i].available) nnl2_pow = pow_backends[i].fn;
+	}
+}
+		
 	
 #endif

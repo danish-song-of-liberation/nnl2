@@ -132,6 +132,14 @@
   (dividend :pointer)
   (divisor :pointer))
   
+(cffi:defcfun ("lisp_call_powinplace" %^=) :void
+  (base :pointer)
+  (exponent :pointer))  
+  
+(cffi:defcfun ("lisp_call_pow" %.^) :pointer
+  (base :pointer)
+  (exponent :pointer))    
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   

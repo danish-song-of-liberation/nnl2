@@ -143,6 +143,12 @@
   
 (defmacro ./ (dividend divisor)
   `(nnl2.ffi:%/ ,dividend ,divisor))  
+  
+(defmacro ^= (base exponent)
+  `(nnl2.ffi:%^= ,base ,exponent))
+
+(defmacro .^ (base exponent)
+  `(nnl2.ffi:%.^ ,base ,exponent))  
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))
