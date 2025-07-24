@@ -148,7 +148,13 @@
   `(nnl2.ffi:%^= ,base ,exponent))
 
 (defmacro .^ (base exponent)
-  `(nnl2.ffi:%.^ ,base ,exponent))  
+  `(nnl2.ffi:%.^ ,base ,exponent))
+
+(defmacro .exp! (tensor)
+  `(nnl2.ffi:%.exp! ,tensor))
+
+(defmacro .exp (tensor)
+  `(nnl2.ffi:%.exp ,tensor))  
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))

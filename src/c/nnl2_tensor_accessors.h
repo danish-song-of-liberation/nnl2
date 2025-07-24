@@ -2369,6 +2369,95 @@ void init_pow() {
 		if (pow_backends[i].available) nnl2_pow = pow_backends[i].fn;
 	}
 }
-		
+
+void naive_expinplace(Tensor* tensor) {
+	size_t len = product(tensor->shape, tensor->rank);
 	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			volatile double* tensor_data = (double*)tensor->data;		
+			for(size_t it = 0; it < len; it++) tensor_data[it] = exp(tensor_data[it]);
+			break;
+		}
+			
+		case FLOAT32: {
+			volatile float* tensor_data = (float*)tensor->data;		
+			for(size_t it = 0; it < len; it++) tensor_data[it] = expf(tensor_data[it]);
+			break;	
+		}
+			
+		case INT32: {
+			volatile int32_t* tensor_data = (int32_t*)tensor->data;		
+			for(size_t it = 0; it < len; it++) tensor_data[it] = (int32_t)exp((double)tensor_data[it]);
+			break;	
+		}
+			
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (exp in-place)");
+			return;
+		}
+	}
+}	
+
+Implementation expinplace_backends[] = {
+	{naive_expinplace, 10, true, "NAIVE"}
+};	
+
+expinplacefn expinplace;
+
+void init_expinplace() {
+	for(size_t i = 0; i < sizeof(expinplace_backends) / sizeof(expinplace_backends[0]); i++) {
+		if (expinplace_backends[i].available) expinplace = expinplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_exp(const Tensor* tensor) {
+	size_t len = product(tensor->shape, tensor->rank);
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			volatile double* tensor_data = (double*)tensor->data;
+			volatile double* result_data = (double*)tensor->data;
+			for(size_t it = 0; it < len; it++) result_data[it] = exp(tensor_data[it]);
+			break;
+		}
+		
+		case FLOAT32: {
+			volatile float* tensor_data = (float*)tensor->data;
+			volatile float* result_data = (float*)tensor->data;
+			for(size_t it = 0; it < len; it++) result_data[it] = expf(tensor_data[it]);
+			break;
+		}
+		
+		case INT32: {
+			volatile int32_t* tensor_data = (int32_t*)tensor->data;
+			volatile int32_t* result_data = (int32_t*)tensor->data;
+			for(size_t it = 0; it < len; it++) result_data[it] = (int32_t)exp((double)tensor_data[it]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (exp)");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation exp_backends[] = {
+	{naive_exp, 10, true, "NAIVE"}
+};	
+
+expfn nnl2_exp;
+
+void init_exp() {
+	for(size_t i = 0; i < sizeof(exp_backends) / sizeof(exp_backends[0]); i++) {
+		if (exp_backends[i].available) nnl2_exp = exp_backends[i].fn;
+	}
+}
+
+
 #endif

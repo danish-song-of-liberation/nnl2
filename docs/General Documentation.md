@@ -92,3 +92,4 @@ So far, there are only **3** types of tensors:
 | ```(.* a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | Element-wise multiply |
 | ```(./ a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | Element-wise divide |
 | ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | Element-wise exponentiation |
+| ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | Element-wise exponential |

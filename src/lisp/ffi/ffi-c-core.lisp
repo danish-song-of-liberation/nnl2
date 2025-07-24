@@ -136,9 +136,15 @@
   (base :pointer)
   (exponent :pointer))  
   
+(cffi:defcfun ("lisp_call_expinplace" %.exp!) :void
+  (tensor :pointer))
+  
 (cffi:defcfun ("lisp_call_pow" %.^) :pointer
   (base :pointer)
   (exponent :pointer))    
+  
+(cffi:defcfun ("lisp_call_exp" %.exp) :pointer
+  (tensor :pointer))  
   
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     

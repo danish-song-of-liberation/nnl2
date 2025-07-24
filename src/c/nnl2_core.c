@@ -49,7 +49,9 @@ void init_system() {
 	init_mul();
 	init_div();
 	init_powinplace();
+	init_expinplace();
 	init_pow();
+	init_exp(); 
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -120,8 +122,16 @@ void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 	powinplace(base, exponent);
 }
 
+void lisp_call_expinplace(Tensor* tensor) {
+	expinplace(tensor);
+}
+
 Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {
 	return nnl2_pow(base, exponent);
+} 
+
+Tensor* lisp_call_exp(Tensor* tensor) {
+	return nnl2_exp(tensor);
 }
  
 void debug_implementation(Implementation* implementation, char* name, size_t size) {
