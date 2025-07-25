@@ -144,6 +144,12 @@
   (exponent :pointer))    
   
 (cffi:defcfun ("lisp_call_exp" %.exp) :pointer
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_loginplace" %.log!) :void
+  (tensor :pointer))  
+
+(cffi:defcfun ("lisp_call_log" %.log) :pointer
   (tensor :pointer))  
   
 (cffi:defcfun ("free_tensor" free-tensor) :void

@@ -97,6 +97,8 @@ typedef void (*powinplacefn)(Tensor*, const Tensor*);
 typedef void (*expinplacefn)(Tensor*);
 typedef Tensor* (*powfn)(const Tensor*, const Tensor*);
 typedef Tensor* (*expfn)(const Tensor*);
+typedef void (*loginplacefn)(Tensor*);
+typedef Tensor* (*logfn)(const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

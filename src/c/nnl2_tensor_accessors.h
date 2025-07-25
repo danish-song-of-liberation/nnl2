@@ -2459,5 +2459,93 @@ void init_exp() {
 	}
 }
 
+void naive_loginplace(Tensor* tensor) {
+	size_t len = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			volatile double* tensor_data = (double*)tensor->data;		
+			for(size_t it = 0; it < len; it++) tensor_data[it] = log(tensor_data[it]);
+			break;
+		}
+			
+		case FLOAT32: {
+			volatile float* tensor_data = (float*)tensor->data;		
+			for(size_t it = 0; it < len; it++) tensor_data[it] = logf(tensor_data[it]);
+			break;	
+		}
+			
+		case INT32: {
+			volatile int32_t* tensor_data = (int32_t*)tensor->data;		
+			for(size_t it = 0; it < len; it++) tensor_data[it] = (int32_t)log((double)tensor_data[it]);
+			break;	
+		}
+			
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (log in-place)");
+			return;
+		}
+	}
+}
+
+Implementation loginplace_backends[] = {
+	{naive_loginplace, 10, true, "NAIVE"},
+};	
+
+loginplacefn loginplace;
+
+void init_loginplace() {
+	for(size_t i = 0; i < sizeof(loginplace_backends) / sizeof(loginplace_backends[0]); i++) {
+		if (loginplace_backends[i].available) loginplace = loginplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_log(const Tensor* tensor) {
+	size_t len = product(tensor->shape, tensor->rank);
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			volatile double* tensor_data = (double*)tensor->data;
+			volatile double* result_data = (double*)result->data;
+			for(size_t it = 0; it < len; it++) result_data[it] = log(tensor_data[it]);
+			break;
+		}
+		
+		case FLOAT32: {
+			volatile float* tensor_data = (float*)tensor->data;
+			volatile float* result_data = (float*)result->data;
+			for(size_t it = 0; it < len; it++) result_data[it] = logf(tensor_data[it]);
+			break;
+		}
+		
+		case INT32: {
+			volatile int32_t* tensor_data = (int32_t*)tensor->data;
+			volatile int32_t* result_data = (int32_t*)result->data;
+			for(size_t it = 0; it < len; it++) result_data[it] = (int32_t)log((double)tensor_data[it]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (log)");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation log_backends[] = {
+	{naive_log, 10, true, "NAIVE"},
+};	
+
+logfn nnl2_log;
+
+void init_log() {
+	for(size_t i = 0; i < sizeof(log_backends) / sizeof(log_backends[0]); i++) {
+		if (log_backends[i].available) nnl2_log = log_backends[i].fn;
+	}
+}
 
 #endif

@@ -67,9 +67,9 @@ So far, there are only **3** types of tensors:
 |:-------------------:|:-----------------:|:---------------:|:-----------------------------:|:------------|
 | ```(rank a)```  | ```(order a)```   | ```ndims(a)```  | ```ndim(a)``` or ```a.ndim``` | Get the number of dimensions of the array. |
 | ```(size a)```      | ```(size a)```    | ```numel(a)```  | ```size(a)``` or ```a.size```  | Get the number of elements of the array. |
-| ```(size-in-bytes a)``` | ??? | It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | Gets the dimensions of the tensor in bytes |
+| ```(size-in-bytes a)``` | 	| It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | Gets the dimensions of the tensor in bytes |
 | ```(shape a)``` | ```(shape a)```   | ```size(a)```   | ```shape(a)``` or ```a.shape``` | Get the shape of the array. |
-| ```(dtype a)``` | ??? | ```class(a)``` | ```a.dtype``` | Gets the data type of the array. |
+| ```(dtype a)``` | 	 | ```class(a)``` | ```a.dtype``` | Gets the data type of the array. |
 | yet nope ffi        | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | Get the element in the second row, fifth column of the array. |
 
 
@@ -93,3 +93,4 @@ So far, there are only **3** types of tensors:
 | ```(./ a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | Element-wise divide |
 | ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | Element-wise exponentiation |
 | ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | Element-wise exponential |
+| ```(.log a)``` | ```(.log a)``` | ```log(a)``` | ```np.log(a)``` | Element-wise natural logarithm |

@@ -155,6 +155,12 @@
 
 (defmacro .exp (tensor)
   `(nnl2.ffi:%.exp ,tensor))  
+  
+(defmacro .log! (tensor)
+  `(nnl2.ffi:%.log! ,tensor))  
+  
+(defmacro .log (tensor)
+  `(nnl2.ffi:%.log ,tensor))    
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))
