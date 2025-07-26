@@ -70,7 +70,7 @@ So far, there are only **3** types of tensors:
 | ```(size-in-bytes a)``` | 	| It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | Gets the dimensions of the tensor in bytes |
 | ```(shape a)``` | ```(shape a)```   | ```size(a)```   | ```shape(a)``` or ```a.shape``` | Get the shape of the array. |
 | ```(dtype a)``` | 	 | ```class(a)``` | ```a.dtype``` | Gets the data type of the array. |
-| yet nope ffi        | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | Get the element in the second row, fifth column of the array. |
+| ```(tref a 1 4```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | Get the element in the second row, fifth column of the array. |
 
 
 ### Constructors 

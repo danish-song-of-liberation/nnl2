@@ -1,16 +1,18 @@
 (in-package :nnl2.hli.ts)
 
 (defun make-shape-pntr (shape)
-  (declare (type vector shape))
-
   (let* ((len (the (integer 0 *) (length shape)))
 	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
 		
 	(declare (type (integer 0 *) len))
 	(declare (type cffi:foreign-pointer shape-pntr))
 		
-    (loop for i from 0 below len
-          do (setf (cffi:mem-aref shape-pntr :int i) (aref shape i)))
+	(if (typep shape 'vector)	
+      (loop for i from 0 below len
+            do (setf (cffi:mem-aref shape-pntr :int i) (aref shape i)))
+			
+	  (loop for i from 0 below len
+		    do (setf (cffi:mem-aref shape-pntr :int i) (nth i shape))))
 		  
     (values shape-pntr len)))
 	
@@ -135,7 +137,7 @@
 (defmacro *= (multiplicand multiplier)
   `(nnl2.ffi:%*= ,multiplicand ,multiplier))  
 
-(defmacro /= (dividend divisor)
+(defmacro /! (dividend divisor)
   `(nnl2.ffi:%/= ,dividend ,divisor))  
   
 (defmacro .* (multiplicand multiplier)
@@ -168,3 +170,40 @@
 (defmacro size-in-bytes (tensor)
   `(nnl2.ffi:%get-size-in-bytes ,tensor))  
   
+(defun tref (tensor &rest shape)
+  (declare (optimize (speed 3)))
+
+  (let* ((tensor-rank (rank tensor))
+	     (tensor-dtype (dtype tensor))
+		 (shape (make-shape-pntr shape))
+		 (void-ptr (nnl2.ffi:%tref tensor shape tensor-rank)))
+		 
+	(case tensor-dtype
+	  (:float64 (cffi:mem-ref void-ptr :double))	 
+      (:float32 (cffi:mem-ref void-ptr :float))
+	  (:int32 (cffi:mem-ref void-ptr :int)))))
+	  
+; (let ((filler-pntr (cffi:foreign-alloc :double)))
+	;  (setf (cffi:mem-ref filler-pntr :double) filler)	  
+	  
+(defun (setf tref) (change-to tensor &rest shape)
+  (let* ((tensor-rank (rank tensor))
+	     (tensor-dtype (dtype tensor))
+		 (shape (make-shape-pntr shape)))
+		 
+	(case tensor-dtype
+	  (:float64 
+	    (let ((changer (cffi:foreign-alloc :double)))
+		  (setf (cffi:mem-ref changer :double) change-to)
+		  (nnl2.ffi:%tref-setter tensor shape tensor-rank changer)))
+		  
+	  (:float32
+	    (let ((changer (cffi:foreign-alloc :float)))
+		  (setf (cffi:mem-ref changer :float) change-to)
+		  (nnl2.ffi:%tref-setter tensor shape tensor-rank changer)))
+
+	  (:int32
+	    (let ((changer (cffi:foreign-alloc :int)))
+		  (setf (cffi:mem-ref changer :int) change-to)
+		  (nnl2.ffi:%tref-setter tensor shape tensor-rank changer))))))
+	

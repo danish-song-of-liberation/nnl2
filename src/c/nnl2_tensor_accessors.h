@@ -139,13 +139,6 @@ inline size_t product(const int* lst, int len) {
  *
  **/
 Tensor* cpu64_empty(const int* shape, int rank, TensorType dtype) {	
-	/** @brief
-     * organicist technospecialization, pedagogical 
-	 * authoritarianism, and territorial sectorization 
-	 * end in numerical illiteracy and mass innumeracy
-	 * (Nick Land)
-	 */
-	 
 	// checks the input parameters for correctness
 	
 	if (shape == NULL) {
@@ -372,23 +365,11 @@ void init_zeros() {
  *
  */
 void free_tensor(Tensor* tensor) {
-	/** @brief
-	 * in fact, my fascination with ML and framework creation
-	 * is nothing more than an act of selfishness and escapism
-	 */
-	
 	if (tensor == NULL) return;
 	
 	free(tensor->shape); 
 	FREE_ALIGNED(tensor->data); 
 	free(tensor);
-	
-	/** @brief
-	 * life in general is a miserable, miserable thing, 
-	 * it has always been miserable and unhappy, and it will always 
-	 * be miserable and unhappy, and nonexistence is better than existence 
-	 * (Philipp Mainländer)
-	 */
 }
 
 /** @brief
@@ -426,7 +407,7 @@ void free_tensor(Tensor* tensor) {
  *
  * printf("%f\n", *element);
  *
- ** second example:
+ ** second example (WARNING ITS NOT WORKING I WILL FIX THIS SOON):
  * int shape[] = {2, 3, 4};
  * Tensor* my_tensor = zeros(shape, 3, FLOAT32);
  *
@@ -592,8 +573,6 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			float filler = *(float*)value;
 			float* data = (float*)tensor->data;
 			
-			printf("%f", filler);
-			
 			__m256 avx_filler = _mm256_set1_ps(filler);
 			
 			size_t avx_iters = total_elems / 8; // there are ghosts in my code
@@ -632,7 +611,7 @@ Implementation inplace_fill_backends[] = {
 	{naive_inplace_fill, 10, true, "NAIVE"},
 	
 	#ifdef __AVX__
-	{avx_inplace_fill, 70, true, "AVX"},
+	// todo {avx_inplace_fill, 70, true, "AVX"},
 	#endif
 };
 
@@ -654,7 +633,7 @@ Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
             break;
         }
         
-        case FLOAT32: {
+        case FLOAT32: {		
             float filler = 1.0;
             inplace_fill(tensor_t, &filler, dtype);
             break;
@@ -2545,6 +2524,57 @@ logfn nnl2_log;
 void init_log() {
 	for(size_t i = 0; i < sizeof(log_backends) / sizeof(log_backends[0]); i++) {
 		if (log_backends[i].available) nnl2_log = log_backends[i].fn;
+	}
+}
+
+void change_elem_at(Tensor* tensor, int* shape, int rank, void* change_with) {
+	TensorType tensor_dtype = tensor->dtype;
+	
+	switch(tensor_dtype) {
+		case FLOAT64: {
+			double* change_elem = (double*)change_with;
+			double* elem = (double*)at(tensor, shape, rank);
+			
+			*elem = *change_elem;
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float* change_elem = (float*)change_with;
+			float* elem = (float*)at(tensor, shape, rank);
+			
+			*elem = *change_elem;
+			
+			break;
+		}
+		
+		case INT32: {
+			int32_t* change_elem = (int32_t*)change_with;
+			int32_t* elem = (int32_t*)at(tensor, shape, rank);
+			
+			*elem = *change_elem;
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+			return;
+		}
+	}
+}
+
+void change_subtensor_at() {
+	printf("DEBUG");
+	return;
+}
+
+void at_set(Tensor* tensor, int* shape, int rank, void* change_with) {
+	if(tensor->rank == rank) {
+		change_elem_at(tensor, shape, rank, change_with);
+	} else {
+		change_subtensor_at();
 	}
 }
 

@@ -99,6 +99,8 @@ typedef Tensor* (*powfn)(const Tensor*, const Tensor*);
 typedef Tensor* (*expfn)(const Tensor*);
 typedef void (*loginplacefn)(Tensor*);
 typedef Tensor* (*logfn)(const Tensor*);
+typedef void (*transposeinplacefn)(Tensor*);
+typedef void (*transposefn)(const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

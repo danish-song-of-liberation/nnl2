@@ -41,6 +41,17 @@
   (rank :int)
   (dtype tensor-type)
   (filler :pointer))  
+
+(cffi:defcfun ("at" %tref) :pointer
+  (tensor :pointer)
+  (shape :pointer)
+  (rank :int))
+  
+(cffi:defcfun ("at_set" %tref-setter) :void
+  (tensor :pointer)
+  (shape :pointer)
+  (rank :int)
+  (change-to :pointer))  
   
 (cffi:defcfun ("lisp_call_sgemm" %sgemm) :pointer
   (order nnl2-order)

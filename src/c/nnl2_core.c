@@ -11,9 +11,9 @@
 #endif
 
 #ifdef __SSE3__
-#include <pmmintrin.h>
+#include <pmmintrin.h>   
 #endif
-
+  
 #ifdef __SSSE3__
 #include <tmmintrin.h>
 #endif
@@ -50,7 +50,7 @@ void init_system() {
 	init_div();
 	init_powinplace();
 	init_expinplace();
-	init_pow();
+	init_pow(); 
 	init_exp(); 
 	init_loginplace();
 	init_log(); 
@@ -113,7 +113,7 @@ void lisp_call_divinplace(Tensor* dividend, Tensor* divisor) {
 }
 
 Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) {
-	return mul(multiplicand, multiplier); 
+	return mul(multiplicand, multiplier);    
 }
 
 Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
@@ -137,7 +137,7 @@ Tensor* lisp_call_exp(Tensor* tensor) {
 }
 
 void lisp_call_loginplace(Tensor* tensor) {
-	loginplace(tensor);     
+	loginplace(tensor);      
 }
   
 Tensor* lisp_call_log(Tensor* tensor) {
@@ -157,4 +157,4 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
 }		
-		
+		 
