@@ -2527,55 +2527,50 @@ void init_log() {
 	}
 }
 
-void change_elem_at(Tensor* tensor, int* shape, int rank, void* change_with) {
+void at_set(Tensor* tensor, int* shape, int rank, void* change_with) {
 	TensorType tensor_dtype = tensor->dtype;
 	
-	switch(tensor_dtype) {
-		case FLOAT64: {
-			double* change_elem = (double*)change_with;
-			double* elem = (double*)at(tensor, shape, rank);
-			
-			*elem = *change_elem;
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			float* change_elem = (float*)change_with;
-			float* elem = (float*)at(tensor, shape, rank);
-			
-			*elem = *change_elem;
-			
-			break;
-		}
-		
-		case INT32: {
-			int32_t* change_elem = (int32_t*)change_with;
-			int32_t* elem = (int32_t*)at(tensor, shape, rank);
-			
-			*elem = *change_elem;
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
-			return;
-		}
-	}
-}
-
-void change_subtensor_at() {
-	printf("DEBUG");
-	return;
-}
-
-void at_set(Tensor* tensor, int* shape, int rank, void* change_with) {
 	if(tensor->rank == rank) {
-		change_elem_at(tensor, shape, rank, change_with);
-	} else {
-		change_subtensor_at();
+		switch(tensor_dtype) {
+			case FLOAT64: {
+				double* change_elem = (double*)change_with;
+				double* elem = (double*)at(tensor, shape, rank);
+				
+				*elem = *change_elem;
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				float* change_elem = (float*)change_with;
+				float* elem = (float*)at(tensor, shape, rank);
+				
+				*elem = *change_elem;
+				
+				break;
+			}
+			
+			case INT32: {
+				int32_t* change_elem = (int32_t*)change_with;
+				int32_t* elem = (int32_t*)at(tensor, shape, rank);
+				
+				*elem = *change_elem;
+				
+				break;
+			}
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+				return;
+			}
+		}
+	} else {		
+		for(int i = 0; i < tensor->shape[rank]; i++) {
+			int* shape_aggreg = append_int_arr(shape, rank, i);
+			at_set(tensor, shape_aggreg, rank + 1, change_with);
+		}
 	}
 }
+
 
 #endif

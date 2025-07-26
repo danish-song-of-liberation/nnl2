@@ -131,7 +131,7 @@ void lisp_call_expinplace(Tensor* tensor) {
 Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {
 	return nnl2_pow(base, exponent);
 } 
-
+        
 Tensor* lisp_call_exp(Tensor* tensor) {
 	return nnl2_exp(tensor);
 }
@@ -157,4 +157,4 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
 }		
-		 
+		  

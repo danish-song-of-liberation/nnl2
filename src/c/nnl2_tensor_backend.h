@@ -3,6 +3,9 @@
 #ifndef NNL2_TENSOR_BACKEND
 #define NNL2_TENSOR_BACKEND
 
+#include <string.h>
+#include <stdlib.h>
+
 // NNL2
 
 /**
@@ -117,5 +120,35 @@ char* get_tensortype_name(TensorType dtype) {
 			return "BAD DATA TYPE";
 	}	
 }
+
+int* concat_int_arr(int* arr1, int size1, int* arr2, int size2) {
+	int* result = malloc((size1 + size2) * sizeof(int));
+	
+	if(!result) {
+		fprintf(stderr, "Error (Hello from C!): Memory Allocation Error (concat_int_arr)\n");
+		return NULL;
+	}
+	
+	int* p = result;
+	
+	for(int i = 0; i < size1; ++i) *p++ = arr1[i];
+	for(int i = 0; i < size2; ++i) *p++ = arr2[i];
+	
+	return result;
+}
+
+int* append_int_arr(int* arr, int size, int new_element) {
+    int* new_arr = (int*)realloc(arr, (size + 1) * sizeof(int));
+
+    if (new_arr == NULL) {
+        fprintf(stderr, "Error (Hello from C!): Failed to realloc (append_int_arr)\n");
+        return NULL;
+    }
+
+    new_arr[size] = new_element;
+
+    return new_arr; 
+}
+
 
 #endif

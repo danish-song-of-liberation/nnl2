@@ -187,7 +187,7 @@
 	;  (setf (cffi:mem-ref filler-pntr :double) filler)	  
 	  
 (defun (setf tref) (change-to tensor &rest shape)
-  (let* ((tensor-rank (rank tensor))
+  (let* ((shape-rank (length shape))
 	     (tensor-dtype (dtype tensor))
 		 (shape (make-shape-pntr shape)))
 		 
@@ -195,15 +195,15 @@
 	  (:float64 
 	    (let ((changer (cffi:foreign-alloc :double)))
 		  (setf (cffi:mem-ref changer :double) change-to)
-		  (nnl2.ffi:%tref-setter tensor shape tensor-rank changer)))
+		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer)))
 		  
 	  (:float32
 	    (let ((changer (cffi:foreign-alloc :float)))
 		  (setf (cffi:mem-ref changer :float) change-to)
-		  (nnl2.ffi:%tref-setter tensor shape tensor-rank changer)))
+		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer)))
 
 	  (:int32
 	    (let ((changer (cffi:foreign-alloc :int)))
 		  (setf (cffi:mem-ref changer :int) change-to)
-		  (nnl2.ffi:%tref-setter tensor shape tensor-rank changer))))))
+		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer))))))
 	
