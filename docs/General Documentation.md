@@ -117,6 +117,16 @@ So far, there are only **3** types of tensors:
 
 | nnl2 | MAGICL | MATLAB | NumPy | Description |
 |------|--------|--------|-------|-------------|
+| ```(empty-like a)``` | | ```empty(size(a))``` | ```np.empty_like(a)``` | Creates an uninitialized tensor with shape and type of a |
 | ```(zeros-like a)``` | | ```zeros(size(a))``` | ```np.zeros_like(a)``` | Creates a tensor of zeros with shape and type of a |
 | ```(ones-like a)``` | | ```ones(size(a))``` | ```np.ones_like(a)``` | Creates a tensor of ones with shape and type of a | 
 | ```(full-like a)``` | | ```x * ones(size(a))``` | ```np.full_like(a, x)``` | Creates a tensor filled with x as a |
+
+### Mapping Operations
+
+*Please note that nnl2, unlike magicl, can accept an unlimited number of arguments and an unlimited number of arguments in a lambda list.*
+
+| nnl2 | MAGICL | MATLAB | NumPy | Description |
+|------|--------|--------|-------|-------------|
+| ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```	np.vectorize(fn)(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
+| ```(.map! #'fn a b ...)``` | ```(map! #'fn a)``` | | | Applies fn elementwise, writing the result to the first tensor (a). |
