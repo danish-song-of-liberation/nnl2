@@ -94,7 +94,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const float beta) {
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}   
+}    
  
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
@@ -151,7 +151,7 @@ void lisp_call_loginplace(Tensor* tensor) {
 Tensor* lisp_call_log(Tensor* tensor) {
 	return nnl2_log(tensor);
 } 
-
+ 
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 	scaleinplace(tensor, multiplier);  
 }

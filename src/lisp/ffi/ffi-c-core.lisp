@@ -171,6 +171,9 @@
 (cffi:defcfun ("lisp_call_log" %.log) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("empty_like" %empty-like) :pointer
+  (tensor :pointer))   
+  
 (cffi:defcfun ("zeros_like" %zeros-like) :pointer
   (tensor :pointer)) 
 
@@ -220,6 +223,9 @@
 
 (cffi:defcfun ("get_tensor_shape" get-pointer-to-tensor-shape) :pointer
   (tensor :pointer))        
+  
+(cffi:defcfun ("get_tensor_data" get-tensor-data) :pointer
+  (tensor :pointer))  
   
 (cffi:defcfun ("lisp_call_debug_blas_sgemminplace" %%internal-debug-sgemm!) :void
   (check-to :unsigned-long))  

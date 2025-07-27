@@ -2668,6 +2668,10 @@ void init_scale() {
 	}
 }
 
+Tensor* empty_like(const Tensor* tensor) {
+	return empty(tensor->shape, tensor->rank, tensor->dtype);
+}
+
 Tensor* zeros_like(const Tensor* tensor) {
 	return zeros(tensor->shape, tensor->rank, tensor->dtype);
 }
@@ -3027,6 +3031,10 @@ void init_abs() {
 	for(size_t i = 0; i < sizeof(abs_backends) / sizeof(abs_backends[0]); i++) {
 		if (abs_backends[i].available) nnl2_abs = abs_backends[i].fn;
 	}
+}
+
+void* get_tensor_data(Tensor* tensor) {
+	return tensor->data;
 }
 
 #endif

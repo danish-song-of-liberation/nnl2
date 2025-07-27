@@ -210,6 +210,9 @@
 (defmacro scale (tensor multiplier)
   `(nnl2.ffi:%scale ,tensor (float ,multiplier)))  
   
+(defmacro empty-like (tensor)
+  `(nnl2.ffi:%empty-like ,tensor))  
+  
 (defmacro zeros-like (tensor)
   `(nnl2.ffi:%zeros-like ,tensor))  
 	
@@ -239,3 +242,37 @@
 (defmacro .abs (tensor)
   `(nnl2.ffi:%.abs ,tensor))    
   
+;; (setf (aref vec i) (cffi:mem-aref shape-pointer :int i)
+
+(defun .map! (funct &rest tensors &aux (first-tensor (car tensors)))
+  (let ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
+		(numel (size first-tensor))
+		(type-t (case (dtype first-tensor)
+				  (:float64 :double)
+				  (:float32 :float)
+				  (:int32 :int))))
+		
+	(loop for i from 0 below 9
+		  do (setf
+        	   (cffi:mem-aref (car aggreg-data) type-t i) (apply funct (loop for it in aggreg-data 
+																			 collect (cffi:mem-aref it type-t i)))))))  
+																			 
+(defun .map (funct &rest tensors &aux (first-tensor (car tensors)))
+  (let* ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
+		 (numel (size (car tensors)))
+		
+		 (type-t (case (dtype first-tensor)
+				   (:float64 :double)
+				   (:float32 :float)
+				   (:int32 :int)))
+				  
+		 (new-tensor (empty-like first-tensor))
+		 (new-tensor-data (nnl2.ffi:get-tensor-data new-tensor)))
+		
+	(loop for i from 0 below 9
+		  do (setf
+        	   (cffi:mem-aref new-tensor-data type-t i) (apply funct (loop for it in aggreg-data 
+																           collect (cffi:mem-aref it type-t i)))))
+
+	new-tensor))
+																			 
