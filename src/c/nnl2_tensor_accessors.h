@@ -2680,4 +2680,260 @@ Tensor* full_like(const Tensor* tensor, void* filler) {
 	return full(tensor->shape, tensor->rank, tensor->dtype, filler);
 }
 
+void naive_maxinplace(Tensor* tensora, const Tensor* tensorb) {
+	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
+	
+	if(typea != typeb) {
+		fprintf(stderr, "Error (Hello from C!): Data types are different (max in-place)\n");
+		return;
+	}
+	
+	int total_elems = product(tensora->shape, tensora->rank);
+	
+	void* data_a = tensora->data;
+	void* data_b = tensorb->data;
+	
+	switch(typea) {
+		case FLOAT64: {
+			double* cast_data_a = (double*)data_a;
+			double* cast_data_b = (double*)data_b;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MAX(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_a = (float*)data_a;
+			float* cast_data_b = (float*)data_b;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MAX(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_a = (int32_t*)data_a;
+			int32_t* cast_data_b = (int32_t*)data_b;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MAX(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (max in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation maxinplace_backends[] = {
+	{naive_maxinplace, 10, true, "NAIVE"},
+};	
+
+maxinplacefn maxinplace;
+
+void init_maxinplace() {
+	for(size_t i = 0; i < sizeof(maxinplace_backends) / sizeof(maxinplace_backends[0]); i++) {
+		if (maxinplace_backends[i].available) maxinplace = maxinplace_backends[i].fn;
+	}
+}
+
+void naive_mininplace(Tensor* tensora, const Tensor* tensorb) {
+	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
+	
+	if(typea != typeb) {
+		fprintf(stderr, "Error (Hello from C!): Data types are different (min in-place)\n");
+		return;
+	}
+	
+	int total_elems = product(tensora->shape, tensora->rank);
+	
+	void* data_a = tensora->data;
+	void* data_b = tensorb->data;
+	
+	switch(typea) {
+		case FLOAT64: {
+			double* cast_data_a = (double*)data_a;
+			double* cast_data_b = (double*)data_b;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MIN(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_a = (float*)data_a;
+			float* cast_data_b = (float*)data_b;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MIN(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_a = (int32_t*)data_a;
+			int32_t* cast_data_b = (int32_t*)data_b;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MIN(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (min in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation mininplace_backends[] = {
+	{naive_mininplace, 10, true, "NAIVE"},
+};	
+
+mininplacefn mininplace;
+
+void init_mininplace() {
+	for(size_t i = 0; i < sizeof(mininplace_backends) / sizeof(mininplace_backends[0]); i++) {
+		if (mininplace_backends[i].available) mininplace = mininplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
+	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
+	
+	if(typea != typeb) {
+		fprintf(stderr, "Error (Hello from C!): Data types are different (max in-place)\n");
+		return NULL;
+	}
+	
+	int total_elems = product(tensora->shape, tensora->rank);
+	
+	Tensor* result = empty(tensora->shape, tensora->rank, typea);
+	
+	void* data_a = tensora->data;
+	void* data_b = tensorb->data;
+	void* data_result = result->data;
+	
+	switch(typea) {
+		case FLOAT64: {
+			double* cast_data_a = (double*)data_a;
+			double* cast_data_b = (double*)data_b;
+			double* cast_data_result = (double*)data_result;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_a = (float*)data_a;
+			float* cast_data_b = (float*)data_b;
+			float* cast_data_result = (float*)data_result;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_a = (int32_t*)data_a;
+			int32_t* cast_data_b = (int32_t*)data_b;
+			int32_t* cast_data_result = (int32_t*)data_result;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (max in-place)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation max_backends[] = {
+	{naive_max, 10, true, "NAIVE"},
+};	
+
+maxfn nnl2_max;
+
+void init_max() {
+	for(size_t i = 0; i < sizeof(max_backends) / sizeof(max_backends[0]); i++) {
+		if (max_backends[i].available) nnl2_max = max_backends[i].fn;
+	}
+}
+
+Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
+	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
+	
+	if(typea != typeb) {
+		fprintf(stderr, "Error (Hello from C!): Data types are different (min in-place)\n");
+		return NULL;
+	}
+	
+	int total_elems = product(tensora->shape, tensora->rank);
+	
+	Tensor* result = empty(tensora->shape, tensora->rank, typea);
+	
+	void* data_a = tensora->data;
+	void* data_b = tensorb->data;
+	void* data_result = result->data;
+	
+	switch(typea) {
+		case FLOAT64: {
+			double* cast_data_a = (double*)data_a;
+			double* cast_data_b = (double*)data_b;
+			double* cast_data_result = (double*)data_result;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_a = (float*)data_a;
+			float* cast_data_b = (float*)data_b;
+			float* cast_data_result = (float*)data_result;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_a = (int32_t*)data_a;
+			int32_t* cast_data_b = (int32_t*)data_b;
+			int32_t* cast_data_result = (int32_t*)data_result;
+			
+			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_a[i], cast_data_b[i]);
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (min in-place)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation min_backends[] = {
+	{naive_min, 10, true, "NAIVE"},
+};	
+
+minfn nnl2_min;
+
+void init_min() {
+	for(size_t i = 0; i < sizeof(min_backends) / sizeof(min_backends[0]); i++) {
+		if (min_backends[i].available) nnl2_min = min_backends[i].fn;
+	}
+}
+
 #endif

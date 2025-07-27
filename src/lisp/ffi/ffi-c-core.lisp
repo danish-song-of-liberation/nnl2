@@ -179,7 +179,23 @@
   
 (cffi:defcfun ("full_like" %full-like) :pointer
   (tensor :pointer)
-  (filler :pointer))     
+  (filler :pointer))
+									  
+(cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
+  (tensora :pointer)
+  (tensorb :pointer))  
+  
+(cffi:defcfun ("lisp_call_mininplace" %.min!) :void
+  (tensora :pointer)
+  (tensorb :pointer))  
+
+(cffi:defcfun ("lisp_call_max" %.max) :pointer
+  (tensora :pointer)
+  (tensorb :pointer))    
+  
+(cffi:defcfun ("lisp_call_min" %.min) :pointer
+  (tensora :pointer)
+  (tensorb :pointer))    
   
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     

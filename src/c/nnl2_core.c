@@ -56,6 +56,10 @@ void init_system() {
 	init_log(); 
 	init_scaleinplace();
 	init_scale();
+	init_maxinplace();
+	init_mininplace();
+	init_max();
+	init_min();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -141,17 +145,33 @@ Tensor* lisp_call_exp(Tensor* tensor) {
 void lisp_call_loginplace(Tensor* tensor) { 
 	loginplace(tensor);      
 }
-  
+   
 Tensor* lisp_call_log(Tensor* tensor) {
 	return nnl2_log(tensor);
 } 
 
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
-	scaleinplace(tensor, multiplier); 
+	scaleinplace(tensor, multiplier);  
 }
 
 Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {
 	return scale(tensor, multiplier); 
+}
+
+void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
+	maxinplace(tensora, tensorb);
+}
+
+void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
+	mininplace(tensora, tensorb);
+}
+
+Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
+	return nnl2_max(tensora, tensorb);
+}
+
+Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) {
+	return nnl2_min(tensora, tensorb);
 }
     
 void debug_implementation(Implementation* implementation, char* name, size_t size) {

@@ -3,6 +3,9 @@
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 uint32_t __nnl2_test_1(void);
 uint32_t __nnl2_test_2(void);
 

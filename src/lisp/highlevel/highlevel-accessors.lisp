@@ -181,10 +181,7 @@
 	(case tensor-dtype
 	  (:float64 (cffi:mem-ref void-ptr :double))	 
       (:float32 (cffi:mem-ref void-ptr :float))
-	  (:int32 (cffi:mem-ref void-ptr :int)))))
-	  
-; (let ((filler-pntr (cffi:foreign-alloc :double)))
-	;  (setf (cffi:mem-ref filler-pntr :double) filler)	  
+	  (:int32 (cffi:mem-ref void-ptr :int))))) 
 	  
 (defun (setf tref) (change-to tensor &rest shape)
   (let* ((shape-rank (length shape))
@@ -223,4 +220,16 @@
   (let ((filler-pntr (cffi:foreign-alloc :double)))
     (setf (cffi:mem-ref filler-pntr :double) filler)
 	`(nnl2.ffi:%full-like ,tensor ,filler-pntr)))
-		
+	
+(defmacro .max! (tensora tensorb)
+  `(nnl2.ffi:%.max! ,tensora ,tensorb))	
+	
+(defmacro .min! (tensora tensorb)
+  `(nnl2.ffi:%.min! ,tensora ,tensorb))
+  
+(defmacro .max (tensora tensorb)
+  `(nnl2.ffi:%.max ,tensora ,tensorb))
+  
+(defmacro .min (tensora tensorb)
+  `(nnl2.ffi:%.min ,tensora ,tensorb)) 
+  

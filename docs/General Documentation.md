@@ -102,6 +102,14 @@ So far, there are only **3** types of tensors:
 | ```(-= a b)``` | | ```a -= b``` | ```a -= b``` | In-place subtraction |
 | ```(*= a b)``` | | ```a *= b``` | ```a * b``` | In-place multiplication |
 | ```(/! a b)``` | | ```a /= b``` | ```a /= b``` | In-place division (using /! instead of /=) |
+| ```(.max a b)``` | ```(.max a b)``` | ```max(a, b)``` | ```np.maximum(a, b)``` | Element-wise maximum |
+| ```(.max! a b)``` | | | ```np.maximum(a, b, out=a)``` | In-place element-wise maximum |
+| ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | Element-wise minimum |
+| ```(.min! a b)``` |  |  | ```np.minimum(a, b, out=a)``` | In-place element-wise minimum |
+| | ```(.realpart a)``` | | ```np.real(a)``` | Element-wise real part |
+| | ```(.imagpart a)``` | | ```np.imag(a)``` | Element-wise imaginary part |
+| | ```(.complex a b)``` | | | Complex matrix from rectangular parts |
+
 
 ### Like-Constructors 
 
