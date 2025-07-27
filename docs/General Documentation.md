@@ -63,7 +63,7 @@ So far, there are only **3** types of tensors:
 *I would also like to inform you that the table is very extensive.*
 
 
-|  nnl2               | Magicl            | MATLAB          | NumPy                         | Description |
+|  nnl2               | MAGICL            | MATLAB          | NumPy                         | Description |
 |:-------------------:|:-----------------:|:---------------:|:-----------------------------:|:------------|
 | ```(rank a)```  | ```(order a)```   | ```ndims(a)```  | ```ndim(a)``` or ```a.ndim``` | Get the number of dimensions of the array. |
 | ```(size a)```      | ```(size a)```    | ```numel(a)```  | ```size(a)``` or ```a.size```  | Get the number of elements of the array. |
@@ -93,4 +93,20 @@ So far, there are only **3** types of tensors:
 | ```(./ a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | Element-wise divide |
 | ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | Element-wise exponentiation |
 | ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | Element-wise exponential |
+| ```(.exp! a)``` | | | ```np.exp(a, out=a)``` | In-place exponential |
 | ```(.log a)``` | ```(.log a)``` | ```log(a)``` | ```np.log(a)``` | Element-wise natural logarithm |
+| ```(.log! a)``` | | | ```np.log(a, out=a)``` | 	In-place logarithm |
+| ```(scale a x)``` | ```(scale a x)``` | ```a * x``` | ```a * x``` | 	Scale tensor by scalar |
+| ```(scale! a x)``` | ```(scale! a x)``` | ```a = a * x``` | ```np.multiply(a, x, out=a)``` | In-place scaling |
+| ```(+= a b)``` | | ```a += b``` | ```a += b``` | In-place addition |
+| ```(-= a b)``` | | ```a -= b``` | ```a -= b``` | In-place subtraction |
+| ```(*= a b)``` | | ```a *= b``` | ```a * b``` | In-place multiplication |
+| ```(/! a b)``` | | ```a /= b``` | ```a /= b``` | In-place division (using /! instead of /=) |
+
+### Like-Constructors 
+
+| nnl2 | MAGICL | MATLAB | NumPy | Description |
+|------|--------|--------|-------|-------------|
+| ```(zeros-like a)``` | | ```zeros(size(a))``` | ```np.zeros_like(a)``` | Creates a tensor of zeros with shape and type of a |
+| ```(ones-like a)``` | | ```ones(size(a))``` | ```np.ones_like(a)``` | Creates a tensor of ones with shape and type of a | 
+| ```(full-like a)``` | | ```x * ones(size(a))``` | ```np.full_like(a, x)``` | Creates a tensor filled with x as a |

@@ -99,8 +99,8 @@
 	(otherwise (error "Unknown type: ~a~%" as))))
 
 (defun gemm (a b &key (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb)
-  (let* ((shape-a (get-shape a :as :vector :rank 2))
-		 (shape-b (get-shape b :as :vector :rank 2))
+  (let* ((shape-a (shape a :as :vector :rank 2))
+		 (shape-b (shape b :as :vector :rank 2))
 		 (m (if m m (aref shape-a 0)))
 		 (n (if n n (aref shape-b 1)))
 		 (k (if k k (aref shape-a 1)))
@@ -110,9 +110,9 @@
 	(nnl2.ffi:%gemm order transa transb m n k alpha a lda b ldb beta)))
   
 (defun gemm! (a b &key out (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb ldc)
-  (let* ((shape-a (get-shape a :as :vector :rank 2))
-		 (shape-b (get-shape b :as :vector :rank 2))
-		 (shape-out (get-shape out :as :vector :rank 2))
+  (let* ((shape-a (shape a :as :vector :rank 2))
+		 (shape-b (shape b :as :vector :rank 2))
+		 (shape-out (shape out :as :vector :rank 2))
 		 (m (if m m (aref shape-a 0)))
 		 (n (if n n (aref shape-b 1)))
 		 (k (if k k (aref shape-a 1)))
@@ -188,8 +188,8 @@
 	  
 (defun (setf tref) (change-to tensor &rest shape)
   (let* ((shape-rank (length shape))
-	     (tensor-dtype (dtype tensor))
-		 (shape (make-shape-pntr shape)))
+		 (shape (make-shape-pntr (subst -1 '* shape)))
+	     (tensor-dtype (dtype tensor)))
 		 
 	(case tensor-dtype
 	  (:float64 
@@ -206,4 +206,21 @@
 	    (let ((changer (cffi:foreign-alloc :int)))
 		  (setf (cffi:mem-ref changer :int) change-to)
 		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer))))))
+		  
+(defmacro scale! (tensor multiplier)
+  `(nnl2.ffi:%scale! ,tensor (float ,multiplier)))
+
+(defmacro scale (tensor multiplier)
+  `(nnl2.ffi:%scale ,tensor (float ,multiplier)))  
+  
+(defmacro zeros-like (tensor)
+  `(nnl2.ffi:%zeros-like ,tensor))  
 	
+(defmacro ones-like (tensor)
+  `(nnl2.ffi:%ones-like ,tensor))  
+		
+(defmacro full-like (tensor &key (filler 0.0d0))
+  (let ((filler-pntr (cffi:foreign-alloc :double)))
+    (setf (cffi:mem-ref filler-pntr :double) filler)
+	`(nnl2.ffi:%full-like ,tensor ,filler-pntr)))
+		

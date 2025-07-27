@@ -104,6 +104,8 @@ typedef void (*loginplacefn)(Tensor*);
 typedef Tensor* (*logfn)(const Tensor*);
 typedef void (*transposeinplacefn)(Tensor*);
 typedef void (*transposefn)(const Tensor*);
+typedef void (*scaleinplacefn)(Tensor*, float);
+typedef Tensor* (*scalefn)(const Tensor*, float);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

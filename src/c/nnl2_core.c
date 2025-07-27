@@ -42,7 +42,7 @@ void init_system() {
 	init_dgemm();
 	init_addinplace();
 	init_subinplace();
-	init_add();    
+	init_add();       
 	init_sub(); 
 	init_mulinplace();
 	init_divinplace(); 
@@ -54,6 +54,8 @@ void init_system() {
 	init_exp(); 
 	init_loginplace();
 	init_log(); 
+	init_scaleinplace();
+	init_scale();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -79,7 +81,7 @@ Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa,
 							    
 	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 }     
-
+  
 Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const float alpha, const Tensor* a, const int lda,
@@ -131,19 +133,27 @@ void lisp_call_expinplace(Tensor* tensor) {
 Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {
 	return nnl2_pow(base, exponent);
 } 
-        
+         
 Tensor* lisp_call_exp(Tensor* tensor) {
 	return nnl2_exp(tensor);
 }
-
-void lisp_call_loginplace(Tensor* tensor) {
+ 
+void lisp_call_loginplace(Tensor* tensor) { 
 	loginplace(tensor);      
 }
   
 Tensor* lisp_call_log(Tensor* tensor) {
 	return nnl2_log(tensor);
+} 
+
+void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
+	scaleinplace(tensor, multiplier); 
 }
- 
+
+Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {
+	return scale(tensor, multiplier); 
+}
+    
 void debug_implementation(Implementation* implementation, char* name, size_t size) {
 	printf("Implementation: %s\n", name);
 	

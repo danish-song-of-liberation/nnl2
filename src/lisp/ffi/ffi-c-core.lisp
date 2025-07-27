@@ -29,7 +29,7 @@
 (cffi:defcfun ("lisp_call_zeros" %zeros) :pointer
   (shape :pointer)
   (rank :int)
-  (dtype tensor-type))  
+  (dtype tensor-type))   
   
 (cffi:defcfun ("lisp_call_ones" %ones) :pointer
   (shape :pointer)
@@ -52,6 +52,14 @@
   (shape :pointer)
   (rank :int)
   (change-to :pointer))  
+  
+(cffi:defcfun ("lisp_call_scaleinplace" %scale!) :void
+  (tensor :pointer)
+  (multiplier :float))  
+   
+(cffi:defcfun ("lisp_call_scale" %scale) :pointer
+  (tensor :pointer)
+  (multiplier :float))   
   
 (cffi:defcfun ("lisp_call_sgemm" %sgemm) :pointer
   (order nnl2-order)
@@ -162,6 +170,16 @@
 
 (cffi:defcfun ("lisp_call_log" %.log) :pointer
   (tensor :pointer))  
+  
+(cffi:defcfun ("zeros_like" %zeros-like) :pointer
+  (tensor :pointer)) 
+
+(cffi:defcfun ("ones_like" %ones-like) :pointer
+  (tensor :pointer))   
+  
+(cffi:defcfun ("full_like" %full-like) :pointer
+  (tensor :pointer)
+  (filler :pointer))     
   
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     

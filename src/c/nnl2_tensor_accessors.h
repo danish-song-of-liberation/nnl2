@@ -2530,47 +2530,154 @@ void init_log() {
 void at_set(Tensor* tensor, int* shape, int rank, void* change_with) {
 	TensorType tensor_dtype = tensor->dtype;
 	
-	if(tensor->rank == rank) {
-		switch(tensor_dtype) {
-			case FLOAT64: {
-				double* change_elem = (double*)change_with;
-				double* elem = (double*)at(tensor, shape, rank);
-				
-				*elem = *change_elem;
-				
-				break;
+	for(int i = 0; i < rank; i++) {
+		if(shape[i] == -1) {
+			for(int shape_i = 0; shape_i < tensor->shape[i]; shape_i++) {
+				shape[i] = shape_i;
+				at_set(tensor, shape, rank, change_with);
 			}
 			
-			case FLOAT32: {
-				float* change_elem = (float*)change_with;
-				float* elem = (float*)at(tensor, shape, rank);
-				
-				*elem = *change_elem;
-				
-				break;
-			}
-			
-			case INT32: {
-				int32_t* change_elem = (int32_t*)change_with;
-				int32_t* elem = (int32_t*)at(tensor, shape, rank);
-				
-				*elem = *change_elem;
-				
-				break;
-			}
-			
-			default: {
-				fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
-				return;
-			}
+			shape[i] = -1;
+			return;
 		}
-	} else {		
-		for(int i = 0; i < tensor->shape[rank]; i++) {
-			int* shape_aggreg = append_int_arr(shape, rank, i);
-			at_set(tensor, shape_aggreg, rank + 1, change_with);
+	}
+	
+	switch(tensor_dtype) {
+		case FLOAT64: {
+			double* change_elem = (double*)change_with;
+			double* elem = (double*)at(tensor, shape, rank);
+			
+			*elem = *change_elem;
+				
+			break;
+		}
+			
+		case FLOAT32: {
+			float* change_elem = (float*)change_with;
+			float* elem = (float*)at(tensor, shape, rank);
+				
+			*elem = *change_elem;
+				
+			break;
+		}
+			
+		case INT32: {
+			int32_t* change_elem = (int32_t*)change_with;
+			int32_t* elem = (int32_t*)at(tensor, shape, rank);
+				
+			*elem = *change_elem;
+				
+			break;
+		}
+			
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+			return;
 		}
 	}
 }
 
+void naive_scaleinplace(Tensor* tensor, float multiplier) {
+	void* data = tensor->data;
+	int num_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* data_t = (double*)data;
+			for(int i = 0; i < num_elems; i++) data_t[i] *= (double)multiplier;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* data_t = (float*)data;
+			for(int i = 0; i < num_elems; i++) data_t[i] *= multiplier;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* data_t = (int32_t*)data;
+			for(int i = 0; i < num_elems; i++) data_t[i] = (int32_t)round(data_t[i] * multiplier);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive scale in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation scaleinplace_backends[] = {
+	{naive_scaleinplace, 10, true, "NAIVE"},
+};	
+
+scaleinplacefn scaleinplace;
+
+void init_scaleinplace() {
+	for(size_t i = 0; i < sizeof(scaleinplace_backends) / sizeof(scaleinplace_backends[0]); i++) {
+		if (scaleinplace_backends[i].available) scaleinplace = scaleinplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_scale(const Tensor* tensor, float multiplier) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	void* data_original = tensor->data;
+	void* data_result = result->data;
+	int num_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* data_t = (double*)data_original;
+			double* data_o = (double*)data_result;
+			for(int i = 0; i < num_elems; i++) data_o[i] = data_t[i] * (double)multiplier;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* data_t = (float*)data_original;
+			float* data_o = (float*)data_result;
+			for(int i = 0; i < num_elems; i++) data_o[i] = data_t[i] * multiplier;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* data_t = (int32_t*)data_original;
+			int32_t* data_o = (int32_t*)data_result;
+			for(int i = 0; i < num_elems; i++) data_o[i] = (int32_t)round(data_t[i] * multiplier);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive scale in-place)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation scale_backends[] = {
+	{naive_scale, 10, true, "NAIVE"},
+};	
+
+scalefn scale;
+
+void init_scale() {
+	for(size_t i = 0; i < sizeof(scale_backends) / sizeof(scale_backends[0]); i++) {
+		if (scale_backends[i].available) scale = scale_backends[i].fn;
+	}
+}
+
+Tensor* zeros_like(const Tensor* tensor) {
+	return zeros(tensor->shape, tensor->rank, tensor->dtype);
+}
+
+Tensor* ones_like(const Tensor* tensor) {
+	return ones(tensor->shape, tensor->rank, tensor->dtype);
+}
+
+Tensor* full_like(const Tensor* tensor, void* filler) {
+	return full(tensor->shape, tensor->rank, tensor->dtype, filler);
+}
 
 #endif
