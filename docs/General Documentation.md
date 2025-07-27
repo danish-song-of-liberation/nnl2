@@ -78,6 +78,7 @@ So far, there are only **3** types of tensors:
 | nnl2 | MAGICL | MATLAB | NumPy | Desctiption |
 |------|--------|--------|-------|-------------|
 | yet nope | ```(from-list '(1d0 2d0 3d0 4d0 5d0 6d0) '(2 3))``` | ```[ 1 2 3; 4 5 6 ]``` | ```array([[1.,2.,3.], [4.,5.,6.]])``` | Create a 2x3 matrix from given elements. |
+| ```(empty #(3 2 1)``` | ```(empty '(3 2 1))``` | ```empty(3,2,1)``` | ```empty((3,2,1))``` | Create an uninitialized 3x2x1 array |
 | ```(zeros #(2 3 4))```| ```(zeros '(2 3 4)) or (const 0d0 '(2 3 4))``` | ```zeros(2,3,4)``` | ```zeros((2,3,4))``` |  Create a 2x3x4 dimensional array of zeroes of double-float element type. |
 | ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | Create a 3x4 dimensional array of ones of double-float element type. |
 | ```(full #(6 9) :filler 2.0d0)``` | ```(const 2.0d0 '(6 9))``` | ```2 * ones(6,9)``` | ```full((6, 9), 2)``` | Create a 6x9 dimensional array of a double-float element-type filled with 2. |
@@ -128,5 +129,5 @@ So far, there are only **3** types of tensors:
 
 | nnl2 | MAGICL | MATLAB | NumPy | Description |
 |------|--------|--------|-------|-------------|
-| ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```	np.vectorize(fn)(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
+| ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```np.vectorize(fn)(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
 | ```(.map! #'fn a b ...)``` | ```(map! #'fn a)``` | | | Applies fn elementwise, writing the result to the first tensor (a). |
