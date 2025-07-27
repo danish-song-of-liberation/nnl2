@@ -110,6 +110,8 @@ typedef void (*maxinplacefn)(Tensor*, const Tensor*);
 typedef void (*mininplacefn)(Tensor*, const Tensor*);
 typedef Tensor* (*maxfn)(const Tensor*, const Tensor*);
 typedef Tensor* (*minfn)(const Tensor*, const Tensor*);
+typedef void (*absinplacefn)(Tensor*);
+typedef Tensor* (*absfn)(const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

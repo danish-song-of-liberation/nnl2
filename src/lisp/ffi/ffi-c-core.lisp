@@ -197,6 +197,12 @@
   (tensora :pointer)
   (tensorb :pointer))    
   
+(cffi:defcfun ("lisp_call_absinplace" %.abs!) :void
+  (tensora :pointer))
+  
+(cffi:defcfun ("lisp_call_abs" %.abs) :pointer
+  (tensora :pointer))
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   

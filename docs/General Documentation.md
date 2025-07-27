@@ -106,6 +106,8 @@ So far, there are only **3** types of tensors:
 | ```(.max! a b)``` | | | ```np.maximum(a, b, out=a)``` | In-place element-wise maximum |
 | ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | Element-wise minimum |
 | ```(.min! a b)``` |  |  | ```np.minimum(a, b, out=a)``` | In-place element-wise minimum |
+| ```(.abs a)``` | | ```abs(a)``` | ```np.abs(a)``` | 	Element-wise absolute value |
+| ```(.abs! a)``` | | | ```np.abs(a, out=a)	``` | In-place absolute value |
 | | ```(.realpart a)``` | | ```np.real(a)``` | Element-wise real part |
 | | ```(.imagpart a)``` | | ```np.imag(a)``` | Element-wise imaginary part |
 | | ```(.complex a b)``` | | | Complex matrix from rectangular parts |

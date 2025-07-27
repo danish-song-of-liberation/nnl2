@@ -233,3 +233,9 @@
 (defmacro .min (tensora tensorb)
   `(nnl2.ffi:%.min ,tensora ,tensorb)) 
   
+(defmacro .abs! (tensor)
+  `(nnl2.ffi:%.abs! ,tensor))  
+  
+(defmacro .abs (tensor)
+  `(nnl2.ffi:%.abs ,tensor))    
+  

@@ -2936,4 +2936,97 @@ void init_min() {
 	}
 }
 
+void naive_absinplace(Tensor* tensor) {	
+	int total_elems = product(tensor->shape, tensor->rank);	
+	void* data = tensor->data;
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)data;	
+			for(int i = 0; i < total_elems; i++) cast_data[i] = fabs(cast_data[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)data;	
+			for(int i = 0; i < total_elems; i++) cast_data[i] = fabsf(cast_data[i]);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)data;	
+			for(int i = 0; i < total_elems; i++) cast_data[i] = abs(cast_data[i]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (abs in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation absinplace_backends[] = {
+	{naive_absinplace, 10, true, "NAIVE"},
+};	
+
+absinplacefn absinplace;
+
+void init_absinplace() {
+	for(size_t i = 0; i < sizeof(absinplace_backends) / sizeof(absinplace_backends[0]); i++) {
+		if (absinplace_backends[i].available) absinplace = absinplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_abs(Tensor* tensor) {	
+	int total_elems = product(tensor->shape, tensor->rank);	
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	
+	void* data_t = tensor->data;
+	void* data_r = result->data;
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_t = (double*)data_t;	
+			double* cast_data_r = (double*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = fabs(cast_data_t[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_t = (float*)data_t;	
+			float* cast_data_r = (float*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = fabsf(cast_data_t[i]);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_t = (int32_t*)data_t;	
+			int32_t* cast_data_r = (int32_t*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = abs(cast_data_t[i]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (abs)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation abs_backends[] = {
+	{naive_abs, 10, true, "NAIVE"},
+};	
+
+absfn nnl2_abs;
+
+void init_abs() {
+	for(size_t i = 0; i < sizeof(abs_backends) / sizeof(abs_backends[0]); i++) {
+		if (abs_backends[i].available) nnl2_abs = abs_backends[i].fn;
+	}
+}
+
 #endif
