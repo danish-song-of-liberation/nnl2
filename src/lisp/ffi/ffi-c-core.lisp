@@ -183,6 +183,10 @@
 (cffi:defcfun ("full_like" %full-like) :pointer
   (tensor :pointer)
   (filler :pointer))
+  
+(cffi:defcfun ("lisp_call_hstack" %hstack) :pointer
+  (tensora :pointer)
+  (tensorb :pointer))
 									  
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)
@@ -237,5 +241,8 @@
   (tensor :pointer))  
   
 (cffi:defcfun ("get_mem_alignment" %%%internal-lisp-call-get-mem-alignment) :int)
-  
+
+(cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
+  (tensor :pointer))
+
 (nnl-init-system)

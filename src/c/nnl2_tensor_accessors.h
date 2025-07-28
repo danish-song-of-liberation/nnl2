@@ -3037,4 +3037,112 @@ void* get_tensor_data(Tensor* tensor) {
 	return tensor->data;
 }
 
+float* internal_get_float_data_tensor(Tensor* tensor) {
+	return (float*)tensor->data;
+}
+
+Tensor* naive_hstack(const Tensor* tensora, const Tensor* tensorb) {
+	TensorType typea = tensora->dtype;
+	TensorType typeb = tensorb->dtype;
+	
+	int ranka = tensora->rank;
+	int rankb = tensorb->rank;
+	
+	if(typea != typeb) {
+		fprintf(stderr, "Error (Hello from C!): Data types are different (naive-hstack)\n");
+		return NULL;
+	}
+	
+	if(ranka != rankb) {
+		fprintf(stderr, "Error (Hello from C!): Tensors ranks are different (naive-hstack)\n");
+		return NULL;
+	}
+	
+    size_t sizea = product(tensora->shape, tensora->rank);
+	size_t sizeb = product(tensorb->shape, tensorb->rank);
+	
+	int* shapea = tensora->shape;
+	int* shapeb = tensorb->shape;
+	
+	Tensor* result;
+	
+	if(ranka == 1) {
+		int* shapec = malloc(sizeof(int));
+		
+		if (shapec == NULL) {
+			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-hstack)\n");
+			return NULL; 
+		}
+		
+		shapec[0] = shapea[0] + shapeb[0];
+		result = empty(shapec, 1, typea);
+		free(shapec); 
+		
+		size_t item_size = get_dtype_size(typea);
+		
+		size_t total_size_a = sizea * item_size;
+        size_t total_size_b = sizeb * item_size;
+		
+		void* dataa = tensora->data;
+		void* datab = tensorb->data;
+		
+		memcpy(result->data, dataa, total_size_a);
+		memcpy((char*)result->data + total_size_a, datab, total_size_b); 
+	} else {
+		int* shapec = malloc(ranka * sizeof(int));
+		
+		if (shapec == NULL) {
+			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-hstack)\n");
+			return NULL; 
+		}
+		
+		for(int i = 0; i < ranka; i++) {
+			if(i == 1) {
+				shapec[i] = shapea[i] + shapeb[i];
+			} else {
+				shapec[i] = shapea[i];
+			}
+		}
+
+		result = empty(shapec, ranka, typea);
+		free(shapec); 
+		
+		size_t item_size = get_dtype_size(typea);
+		
+		size_t outer_dim = shapea[0];  
+
+		size_t row_size_a = product(shapea + 1, ranka - 1) * item_size;
+        size_t row_size_b = product(shapeb + 1, rankb - 1) * item_size;	
+		
+		char* src_a = tensora->data;
+        char* src_b = tensorb->data;
+        char* dst = result->data;
+		
+		for(size_t i = 0; i < outer_dim; i++) {
+            memcpy(dst, src_a, row_size_a);
+            src_a += row_size_a;
+            dst += row_size_a;
+            
+            memcpy(dst, src_b, row_size_b);
+            src_b += row_size_b;
+            dst += row_size_b;
+        }
+	}
+	
+	return result;
+}
+
+Implementation hstack_backends[] = {
+	{naive_hstack, 10, true, "NAIVE"},
+};	
+
+hstackfn hstack;
+
+void init_hstack() {
+	for(size_t i = 0; i < sizeof(hstack_backends) / sizeof(hstack_backends[0]); i++) {
+		if (hstack_backends[i].available) hstack = hstack_backends[i].fn;
+	}
+}
+
+
 #endif

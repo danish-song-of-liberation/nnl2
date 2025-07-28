@@ -99,6 +99,8 @@
 	(otherwise (error "Unknown type: ~a~%" as))))
 
 (defun gemm (a b &key (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb)
+  (declare (optimize (speed 3) (safety 0)))
+
   (let* ((shape-a (shape a :as :vector :rank 2))
 		 (shape-b (shape b :as :vector :rank 2))
 		 (m (if m m (aref shape-a 0)))
@@ -275,4 +277,9 @@
 																           collect (cffi:mem-aref it type-t i)))))
 
 	new-tensor))
+	
+(defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
+																			 
+(declaim (inline gemm))
+(declaim (inline gemm!))																			 
 																			 

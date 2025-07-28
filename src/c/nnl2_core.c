@@ -62,6 +62,7 @@ void init_system() {
 	init_min();
 	init_absinplace();
 	init_abs();
+	init_hstack();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -87,7 +88,7 @@ Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa,
 							    
 	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 }     
-  
+   
 Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const float alpha, const Tensor* a, const int lda,
@@ -130,7 +131,7 @@ Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
 
 void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 	powinplace(base, exponent);
-}
+} 
 
 void lisp_call_expinplace(Tensor* tensor) {
 	expinplace(tensor);
@@ -151,7 +152,7 @@ void lisp_call_loginplace(Tensor* tensor) {
 Tensor* lisp_call_log(Tensor* tensor) {
 	return nnl2_log(tensor);
 } 
- 
+  
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 	scaleinplace(tensor, multiplier);  
 }
@@ -159,7 +160,7 @@ void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {
 	return scale(tensor, multiplier); 
 }
-
+ 
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 	maxinplace(tensora, tensorb);
 }
@@ -170,21 +171,25 @@ void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
 
 Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
 	return nnl2_max(tensora, tensorb);  
-}
-
+} 
+  
 Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) {
-	return nnl2_min(tensora, tensorb); 
-}
-
+	return nnl2_min(tensora, tensorb);   
+}  
+  
 void lisp_call_absinplace(Tensor* tensor) {
-	absinplace(tensor);
+	absinplace(tensor); 
 }
-
+  
 Tensor* lisp_call_abs(Tensor* tensor) {
-	return nnl2_abs(tensor);
+	return nnl2_abs(tensor); 
+} 
+
+Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
+	return hstack(tensora, tensorb);
 }
-    
-void debug_implementation(Implementation* implementation, char* name, size_t size) {
+     
+void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);
 	
 	for(size_t i = 0; i < size; i++) {

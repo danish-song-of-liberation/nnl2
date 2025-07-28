@@ -112,6 +112,7 @@ typedef Tensor* (*maxfn)(const Tensor*, const Tensor*);
 typedef Tensor* (*minfn)(const Tensor*, const Tensor*);
 typedef void (*absinplacefn)(Tensor*);
 typedef Tensor* (*absfn)(const Tensor*);
+typedef Tensor* (*hstackfn)(const Tensor*, const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {
@@ -123,26 +124,29 @@ char* get_tensortype_name(TensorType dtype) {
 			
 		case FLOAT64:
 			return "FLOAT64";
-			
+			 
 		default:
 			return "BAD DATA TYPE";
 	}	
 }
 
-int* concat_int_arr(int* arr1, int size1, int* arr2, int size2) {
-	int* result = malloc((size1 + size2) * sizeof(int));
+void* concat_arr(const void* arr1, size_t size1, const void* arr2, size_t size2, size_t element_size) {
+	if (!arr1 || !arr2 || element_size == 0) {
+        fprintf(stderr, "Error (Hello from C!): Invalid input parameters (concat_arr)\n");
+        return NULL;
+    }
+	
+	void* result = malloc((size1 + size2) * element_size);
 	
 	if(!result) {
-		fprintf(stderr, "Error (Hello from C!): Memory Allocation Error (concat_int_arr)\n");
+		fprintf(stderr, "Error (Hello from C!): Memory Allocation Error (concat_arr)\n");
 		return NULL;
 	}
 	
-	int* p = result;
-	
-	for(int i = 0; i < size1; ++i) *p++ = arr1[i];
-	for(int i = 0; i < size2; ++i) *p++ = arr2[i];
-	
-	return result;
+	memcpy(result, arr1, size1 * element_size);
+    memcpy((char*)result + size1 * element_size, arr2, size2 * element_size);
+
+    return result;
 }
 
 int* append_int_arr(int* arr, int size, int new_element) {
