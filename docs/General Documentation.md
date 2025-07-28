@@ -71,7 +71,6 @@ So far, there are only **3** types of tensors:
 | ```(dtype a)``` | 	 | ```class(a)``` | ```a.dtype``` | ```a.dtype``` |  Gets the data type of the array. |
 | ```(tref a 1 4)```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | ```a[1, 4]``` | Get the element in the second row, fifth column of the array. |
 
-
 ### Constructors 
 
 | nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Desctiption |
@@ -147,4 +146,8 @@ So far, there are only **3** types of tensors:
 | ```(.relu! a)``` | | | ```np.maximum(0, a, out=a)``` | ```torch.relu_(a)``` | In-place element-wise ReLU |
 | ```(.leaky-relu a :alpha 0.01)``` | | ```max(0.01*a, a)``` | ```np.where(a > 0, a, 0.01*a)``` | ```torch.nn.functional.leaky_relu(a,0.01)``` | Wise-element Leaky ReLU with optional alpha parameter (usually 0.01) |
 | ```(.leaky-relu! a :alpha 0.01)``` | | | ```np.maximum(0.01*a, a, out=a)``` | ```torch.nn.functional.leaky_relu_(a, negative_slope=0.01)``` or ```a.leaky_relu_(negative_slope=0.01)``` | Wise-element In-place Leaky ReLU with optional alpha parameter (usually 0.01) | 
+| ```(.sigmoid a)``` | | ```1 ./ (1 + exp(-a))``` | ```1 / (1 + np.exp(-a))``` | ```torch.sigmoid(a)``` | Wise-element Sigmoid |
+| ```(.sigmoid! a)``` | | | ```np.reciprocal(1 + np.exp(-a), out=a)``` | ```torch.sigmoid_(a)``` or ```a.sigmoid_()``` | Wise-element In-place Sigmoid |
 
+
+ 

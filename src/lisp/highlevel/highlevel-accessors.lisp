@@ -303,7 +303,13 @@
   
 (defmacro .leaky-relu (tensor &key (alpha 0.01))
   `(nnl2.ffi:%.leaky-relu ,tensor ,alpha))  
-																			 
+  
+(defmacro .sigmoid! (tensor)
+  `(nnl2.ffi:%.sigmoid! ,tensor))  
+  
+(defmacro .sigmoid (tensor)
+  `(nnl2.ffi:%.sigmoid ,tensor))  
+																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
 																			 

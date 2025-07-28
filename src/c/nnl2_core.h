@@ -77,6 +77,22 @@ static inline void nnl2_leaky_relu_float64_inplace(double* a, float alpha) {
 	if(*a < 0.0f) *a = (*a * alpha);
 }
 
+static inline float nnl2_sigmoid_float32(float x) {
+	return 1.0f / (1.0f + expf(-x));
+}
+
+static inline double nnl2_sigmoid_float64(double x) {
+	return 1.0 / (1.0 + exp(-x));
+}
+
+static inline void nnl2_sigmoid_float32_inplace(float* x) {
+	*x = 1.0f / (1.0f + expf(-(*x)));
+}
+
+static inline void nnl2_sigmoid_float64_inplace(double* x) {
+	*x = 1.0 / (1.0 + exp(-(*x)));
+}
+
 uint32_t __nnl2_test_1(void);
 uint32_t __nnl2_test_2(void);
 

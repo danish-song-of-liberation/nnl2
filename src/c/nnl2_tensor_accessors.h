@@ -3490,4 +3490,102 @@ void init_leakyrelu() {
 	}
 }
 
+void naive_sigmoidinplace(Tensor* tensor) {
+	int total_elems = product(tensor->shape, tensor->rank);	
+	void* data = tensor->data;
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)data;	
+			for(int i = 0; i < total_elems; i++) nnl2_sigmoid_float64_inplace(&cast_data[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)data;	
+			for(int i = 0; i < total_elems; i++) nnl2_sigmoid_float32_inplace(&cast_data[i]);
+			break;
+		}
+		
+		case INT32: {
+			fprintf(stderr, "Error (Hello from C!): Sigmoid in-place cannot be applied to the provided tensor\n");
+			exit(EXIT_FAILURE);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (sigmoid in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation sigmoidinplace_backends[] = {
+	{naive_sigmoidinplace, 10, true, "NAIVE"},
+};	
+
+sigmoidinplacefn sigmoidinplace;
+
+void init_sigmoidinplace() {
+	for(size_t i = 0; i < sizeof(sigmoidinplace_backends) / sizeof(sigmoidinplace_backends[0]); i++) {
+		if (sigmoidinplace_backends[i].available) sigmoidinplace = sigmoidinplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_sigmoid(Tensor* tensor) {	
+	int total_elems = product(tensor->shape, tensor->rank);	
+	
+	TensorType dtype = tensor->dtype;
+	
+	if(dtype == INT32) dtype = FLOAT64;
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, dtype);
+	
+	void* data_t = tensor->data;
+	void* data_r = result->data;
+	
+	switch(tensor->dtype) {
+		case INT32: {
+			int32_t* cast_data_t = (int32_t*)data_t;
+			double* cast_data_r = (double*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float64((double)cast_data_t[i]); 
+			break;
+		}
+		
+		case FLOAT64: {
+			double* cast_data_t = (double*)data_t;	
+			double* cast_data_r = (double*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float64(cast_data_t[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_t = (float*)data_t;	
+			float* cast_data_r = (float*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float32(cast_data_t[i]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (sigmoid)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+
+Implementation sigmoid_backends[] = {
+	{naive_sigmoid, 10, true, "NAIVE"},
+};	
+
+sigmoidfn sigmoid;
+
+void init_sigmoid() {
+	for(size_t i = 0; i < sizeof(sigmoid_backends) / sizeof(sigmoid_backends[0]); i++) {
+		if (sigmoid_backends[i].available) sigmoid = sigmoid_backends[i].fn;
+	}
+}
+
 #endif

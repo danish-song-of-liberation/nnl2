@@ -9,5 +9,6 @@
    :full :full-with-pntr :print-tensor :rank :dtype :int-dtype :shape-pointer :shape :.log! :.log
    :gemm :gemm! :+= :-= :size :size-in-bytes :.+ :.- :*= :/! :.* :./ :^= :.^ :.exp! :.exp :tref
    :scale! :scale :zeros-like :ones-like :full-like :.max! :.min! :.max :.min :.abs! :.abs
-   :.map! :empty-like :.map :hstack :vstack :tlet* :.relu! :.relu :.leaky-relu! :.leaky-relu))
+   :.map! :empty-like :.map :hstack :vstack :tlet* :.relu! :.relu :.leaky-relu! :.leaky-relu
+   :.sigmoid! :.sigmoid))
   

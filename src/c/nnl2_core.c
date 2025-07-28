@@ -68,6 +68,8 @@ void init_system() {
 	init_relu(); 
 	init_leakyreluinplace();
 	init_leakyrelu();
+	init_sigmoidinplace();
+	init_sigmoid();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -188,7 +190,7 @@ void lisp_call_absinplace(Tensor* tensor) {
   
 Tensor* lisp_call_abs(Tensor* tensor) {
 	return nnl2_abs(tensor); 
-} 
+}  
 
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
@@ -205,13 +207,21 @@ void lisp_call_reluinplace(Tensor* tensor) {
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
 }
-
+ 
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha); 
 }
 
 Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha) {
-	return leakyrelu(tensor, alpha); 
+	return leakyrelu(tensor, alpha);  
+}
+
+void lisp_call_sigmoidinplace(Tensor* tensor) {
+	sigmoidinplace(tensor);
+}
+
+Tensor* lisp_call_sigmoid(Tensor* tensor) {
+	return sigmoid(tensor);
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
