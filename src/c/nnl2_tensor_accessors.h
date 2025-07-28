@@ -3144,5 +3144,132 @@ void init_hstack() {
 	}
 }
 
+Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
+	TensorType typea = tensora->dtype;
+	TensorType typeb = tensorb->dtype;
+	
+	int ranka = tensora->rank;
+	int rankb = tensorb->rank;
+	
+	if(typea != typeb) {
+		fprintf(stderr, "Error (Hello from C!): Data types are different (naive-vstack)\n");
+		return NULL;
+	}
+	
+    size_t sizea = product(tensora->shape, tensora->rank);
+	size_t sizeb = product(tensorb->shape, tensorb->rank);
+	
+	void* dataa = tensora->data;
+	void* datab = tensorb->data;
+	
+	int* shapea = tensora->shape;
+	int* shapeb = tensorb->shape;
+	
+	Tensor* result = NULL;
+	
+	if(ranka == 1 && rankb == 1) {
+		int* shapec = malloc(2 * sizeof(int));
+		
+		if (shapec == NULL) {
+			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
+			return NULL; 
+		}
+		
+		shapec[1] = shapea[0];
+		shapec[0] = 2;
+		result = empty(shapec, 2, typea);
+		free(shapec); 
+		
+		size_t item_size = get_dtype_size(typea);
+		
+		size_t total_size_a = sizea * item_size;
+        size_t total_size_b = sizeb * item_size;
+		
+		memcpy(result->data, dataa, total_size_a);
+		memcpy((char*)result->data + total_size_a, datab, total_size_b); 
+	} 
+	
+	else if(ranka == 2 && rankb == 1) {
+		int* shapec = malloc(2 * sizeof(int));
+		
+		if (shapec == NULL) {
+            fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
+            return NULL; 
+        }
+		
+		shapec[0] = shapea[0] + 1;
+        shapec[1] = shapea[1];
+		
+		result = empty(shapec, 2, typea);
+        free(shapec);
+        
+        size_t item_size = get_dtype_size(typea);
+        size_t row_size = shapea[1] * item_size;
+		
+		memcpy(result->data, dataa, shapea[0] * row_size);
+		memcpy((char*)result->data + shapea[0] * row_size, datab, row_size);
+	} 
+	
+	else if(ranka == 1 && rankb == 2) {
+		int* shapec = malloc(2 * sizeof(int));
+        
+        if (shapec == NULL) {
+            fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
+            return NULL; 
+        }
+		
+		shapec[0] = shapeb[0] + 1;
+        shapec[1] = shapeb[1];
+		
+		result = empty(shapec, 2, typea);
+        free(shapec);
+		
+		size_t item_size = get_dtype_size(typea);
+        size_t row_size = shapeb[1] * item_size;
+		
+		memcpy(result->data, dataa, row_size);
+		memcpy((char*)result->data + row_size, datab, shapeb[0] * row_size);
+	} 
+	
+	else {
+		int* shapec = malloc(ranka * sizeof(int));
+		
+		if (shapec == NULL) {
+			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
+			return NULL; 
+		}
+		
+		shapec[0] = shapea[0] + shapeb[0];
+		
+		for(int i = 1; i < ranka; i++) {
+			shapec[i] = shapea[i];
+		}
+
+		result = empty(shapec, ranka, typea);
+		free(shapec); 
+		
+		size_t item_size = get_dtype_size(typea);
+		
+		size_t total_size_a = sizea * item_size;
+        size_t total_size_b = sizeb * item_size;
+
+		memcpy(result->data, dataa, total_size_a); 
+        memcpy((char*)result->data + total_size_a, datab, total_size_b); 
+	}
+	
+	return result;
+}
+
+Implementation vstack_backends[] = {
+	{naive_vstack, 10, true, "NAIVE"},
+};	
+
+vstackfn vstack;
+
+void init_vstack() {
+	for(size_t i = 0; i < sizeof(vstack_backends) / sizeof(vstack_backends[0]); i++) {
+		if (vstack_backends[i].available) vstack = vstack_backends[i].fn;
+	}
+}
 
 #endif

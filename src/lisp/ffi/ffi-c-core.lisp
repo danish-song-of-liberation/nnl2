@@ -187,6 +187,10 @@
 (cffi:defcfun ("lisp_call_hstack" %hstack) :pointer
   (tensora :pointer)
   (tensorb :pointer))
+  
+(cffi:defcfun ("lisp_call_vstack" %vstack) :pointer
+  (tensora :pointer)
+  (tensorb :pointer))  
 									  
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)

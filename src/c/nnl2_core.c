@@ -47,13 +47,13 @@ void init_system() {
 	init_mulinplace();
 	init_divinplace(); 
 	init_mul();
-	init_div();
-	init_powinplace();
+	init_div(); 
+	init_powinplace(); 
 	init_expinplace();
 	init_pow(); 
 	init_exp(); 
 	init_loginplace();
-	init_log(); 
+	init_log();  
 	init_scaleinplace();
 	init_scale();
 	init_maxinplace();
@@ -63,6 +63,7 @@ void init_system() {
 	init_absinplace();
 	init_abs();
 	init_hstack();
+	init_vstack();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -75,8 +76,8 @@ Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 
 Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) { 
 	return ones(shape, rank, dtype);   
-}                     
-    
+}                        
+        
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
@@ -87,7 +88,7 @@ Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const double beta) {    
 							    
 	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}     
+}          
    
 Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
@@ -95,7 +96,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const float beta) {
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}    
+}          
  
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
@@ -187,6 +188,10 @@ Tensor* lisp_call_abs(Tensor* tensor) {
 
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
+}
+
+Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
+	return vstack(tensora, tensorb);
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

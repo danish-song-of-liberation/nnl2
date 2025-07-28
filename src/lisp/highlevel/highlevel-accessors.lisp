@@ -279,6 +279,7 @@
 	new-tensor))
 	
 (defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
+(defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
 																			 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
