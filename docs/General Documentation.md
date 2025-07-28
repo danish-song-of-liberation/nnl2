@@ -63,88 +63,89 @@ So far, there are only **3** types of tensors:
 *I would also like to inform you that the table is very extensive.*
 
 
-|  nnl2               | MAGICL            | MATLAB          | NumPy                         | Description |
+|  nnl2               | MAGICL            | MATLAB          | NumPy                         | PyTorch | Description |
 |:-------------------:|:-----------------:|:---------------:|:-----------------------------:|:------------|
-| ```(rank a)```  | ```(order a)```   | ```ndims(a)```  | ```ndim(a)``` or ```a.ndim``` | Get the number of dimensions of the array. |
-| ```(size a)```      | ```(size a)```    | ```numel(a)```  | ```size(a)``` or ```a.size```  | Get the number of elements of the array. |
-| ```(size-in-bytes a)``` | 	| It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | Gets the dimensions of the tensor in bytes |
-| ```(shape a)``` | ```(shape a)```   | ```size(a)```   | ```shape(a)``` or ```a.shape``` | Get the shape of the array. |
-| ```(dtype a)``` | 	 | ```class(a)``` | ```a.dtype``` | Gets the data type of the array. |
-| ```(tref a 1 4)```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | Get the element in the second row, fifth column of the array. |
+| ```(rank a)```  | ```(order a)```   | ```ndims(a)```  | ```ndim(a)``` or ```a.ndim``` | ```a.dim()``` | Get the number of dimensions of the array. |
+| ```(size a)```      | ```(size a)```    | ```numel(a)```  | ```size(a)``` or ```a.size```  | ```a.numel()``` | Get the number of elements of the array. |
+| ```(size-in-bytes a)``` | 	| It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | ```a.element_size() * a.numel()``` | Gets the dimensions of the tensor in bytes |
+| ```(shape a)``` | ```(shape a)```   | ```size(a)```   | ```shape(a)``` or ```a.shape``` | ```a.shape``` or ```a.size()``` | Get the shape of the array. |
+| ```(dtype a)``` | 	 | ```class(a)``` | ```a.dtype``` | ```a.dtype``` |  Gets the data type of the array. |
+| ```(tref a 1 4)```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | ```a[1, 4]``` | Get the element in the second row, fifth column of the array. |
 
 
 ### Constructors 
 
-| nnl2 | MAGICL | MATLAB | NumPy | Desctiption |
-|------|--------|--------|-------|-------------|
-| yet nope | ```(from-list '(1d0 2d0 3d0 4d0 5d0 6d0) '(2 3))``` | ```[ 1 2 3; 4 5 6 ]``` | ```array([[1.,2.,3.], [4.,5.,6.]])``` | Create a 2x3 matrix from given elements. |
-| ```(empty #(3 2 1)``` | ```(empty '(3 2 1))``` | ```empty(3,2,1)``` | ```empty((3,2,1))``` | Create an uninitialized 3x2x1 array |
-| ```(zeros #(2 3 4))```| ```(zeros '(2 3 4)) or (const 0d0 '(2 3 4))``` | ```zeros(2,3,4)``` | ```zeros((2,3,4))``` |  Create a 2x3x4 dimensional array of zeroes of double-float element type. |
-| ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | Create a 3x4 dimensional array of ones of double-float element type. |
-| ```(full #(6 9) :filler 2.0d0)``` | ```(const 2.0d0 '(6 9))``` | ```2 * ones(6,9)``` | ```full((6, 9), 2)``` | Create a 6x9 dimensional array of a double-float element-type filled with 2. |
+| nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Desctiption |
+|------|--------|--------|-------|---------|-------------|
+| yet nope | ```(from-list '(1d0 2d0 3d0 4d0 5d0 6d0) '(2 3))``` | ```[ 1 2 3; 4 5 6 ]``` | ```np.array([[1.,2.,3.], [4.,5.,6.]])``` | ```torch.tensor([[1,2,3],[4,5,6]])``` | Create a 2x3 matrix from given elements. |
+| ```(empty #(3 2 1)``` | ```(empty '(3 2 1))``` | ```empty(3,2,1)``` | ```empty((3,2,1))``` | ```torch.empty(3,2,1)``` | Create an uninitialized 3x2x1 array |
+| ```(zeros #(2 3 4))```| ```(zeros '(2 3 4)) or (const 0d0 '(2 3 4))``` | ```zeros(2,3,4)``` | ```zeros((2,3,4))``` | ```torch.zeros(2,3,4)``` |  Create a 2x3x4 dimensional array of zeroes of double-float element type. |
+| ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | ```torch.ones(3,4)``` | Create a 3x4 dimensional array of ones of double-float element type. |
+| ```(full #(6 9) :filler 2.0d0)``` | ```(const 2.0d0 '(6 9))``` | ```2 * ones(6,9)``` | ```full((6, 9), 2)``` | ```torch.full((6,9),2.0)``` | Create a 6x9 dimensional array of a double-float element-type filled with 2. |
 
 ###  Basic Operations 
 
-| nnl2 | MAGICL | MATLAB | NumPy | Description |
-|------|--------|--------|-------|-------------|
-| ```(gemm a b)``` | ```(@ a b)``` | ```a * b``` | ```a @ b``` | Matrix multiplication |
-| ```(.+ a b)``` | ```(.+ a b)``` | ```a + b``` | ```a + b``` | 	Element-wise add |
-| ```(.- a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | Element-wise subtract |
-| ```(.* a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | Element-wise multiply |
-| ```(./ a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | Element-wise divide |
-| ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | Element-wise exponentiation |
-| ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | Element-wise exponential |
-| ```(.exp! a)``` | | | ```np.exp(a, out=a)``` | In-place exponential |
-| ```(.log a)``` | ```(.log a)``` | ```log(a)``` | ```np.log(a)``` | Element-wise natural logarithm |
-| ```(.log! a)``` | | | ```np.log(a, out=a)``` | 	In-place logarithm |
-| ```(scale a x)``` | ```(scale a x)``` | ```a * x``` | ```a * x``` | 	Scale tensor by scalar |
-| ```(scale! a x)``` | ```(scale! a x)``` | ```a = a * x``` | ```np.multiply(a, x, out=a)``` | In-place scaling |
-| ```(+= a b)``` | | ```a += b``` | ```a += b``` | In-place addition |
-| ```(-= a b)``` | | ```a -= b``` | ```a -= b``` | In-place subtraction |
-| ```(*= a b)``` | | ```a *= b``` | ```a * b``` | In-place multiplication |
-| ```(/! a b)``` | | ```a /= b``` | ```a /= b``` | In-place division (using /! instead of /=) |
-| ```(.max a b)``` | ```(.max a b)``` | ```max(a, b)``` | ```np.maximum(a, b)``` | Element-wise maximum |
-| ```(.max! a b)``` | | | ```np.maximum(a, b, out=a)``` | In-place element-wise maximum |
-| ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | Element-wise minimum |
-| ```(.min! a b)``` |  |  | ```np.minimum(a, b, out=a)``` | In-place element-wise minimum |
-| ```(.abs a)``` | | ```abs(a)``` | ```np.abs(a)``` | 	Element-wise absolute value |
-| ```(.abs! a)``` | | | ```np.abs(a, out=a)	``` | In-place absolute value |
-| | ```(.realpart a)``` | | ```np.real(a)``` | Element-wise real part |
-| | ```(.imagpart a)``` | | ```np.imag(a)``` | Element-wise imaginary part |
-| | ```(.complex a b)``` | | | Complex matrix from rectangular parts |
+| nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Description |
+|------|--------|--------|-------|---------|-------------|
+| ```(gemm a b)``` | ```(@ a b)``` | ```a * b``` | ```a @ b``` | ```a @ b``` or ```torch.mm(a, b)``` | Matrix multiplication |
+| ```(.+ a b)``` | ```(.+ a b)``` | ```a + b``` | ```a + b``` | ```a + b``` or ```torch.add(a, b)``` |	Element-wise add |
+| ```(.- a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | ```a - b``` or ```torch.sub(a, b)``` | Element-wise subtract |
+| ```(.* a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | ```a * b``` or ```torch.mul(a, b)``` | Element-wise multiply |
+| ```(./ a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | ```a / b``` or ```torch.div(a, b)``` | Element-wise divide |
+| ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | ```a ** b``` or ```torch.pow(a,b)``` | Element-wise exponentiation |
+| ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | ```torch.exp(a)``` | Element-wise exponential |
+| ```(.exp! a)``` | | | ```np.exp(a, out=a)``` | ```a.exp_()``` | In-place exponential |
+| ```(.log a)``` | ```(.log a)``` | ```log(a)``` | ```np.log(a)``` | ```torch.log(a)``` | Element-wise natural logarithm |
+| ```(.log! a)``` | | | ```np.log(a, out=a)``` | ```a.log_()``` |	In-place logarithm |
+| ```(scale a x)``` | ```(scale a x)``` | ```a * x``` | ```a * x``` | ```a * b``` or ```torch.mul(a, b)``` | Scale tensor by scalar |
+| ```(scale! a x)``` | ```(scale! a x)``` | ```a = a * x``` | ```np.multiply(a, x, out=a)``` | ```a.mul_(x)``` | In-place scaling |
+| ```(+= a b)``` | | ```a += b``` | ```a += b``` | ```a.add_(b)``` | In-place addition |
+| ```(-= a b)``` | | ```a -= b``` | ```a -= b``` | ```a.sub_(b)``` | In-place subtraction |
+| ```(*= a b)``` | | ```a *= b``` | ```a * b``` | ```a.mul_(b)``` | In-place multiplication |
+| ```(/! a b)``` | | ```a /= b``` | ```a /= b``` | ```a.div_(b)``` | In-place division (using /! instead of /=) |
+| ```(.max a b)``` | ```(.max a b)``` | ```max(a, b)``` | ```np.maximum(a, b)``` | ```torch.maximum(a, b)``` | Element-wise maximum |
+| ```(.max! a b)``` | | | ```np.maximum(a, b, out=a)``` | ```a.set_(torch.maximum(a, b))``` | In-place element-wise maximum |
+| ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | ```	torch.minimum(a, b)``` | Element-wise minimum |
+| ```(.min! a b)``` |  |  | ```np.minimum(a, b, out=a)``` | ```a.set_(torch.minimum(a, b))``` | In-place element-wise minimum |
+| ```(.abs a)``` | | ```abs(a)``` | ```np.abs(a)``` | ```torch.abs(a)``` | Element-wise absolute value |
+| ```(.abs! a)``` | | | ```np.abs(a, out=a)	``` | ```a.abs_()``` | In-place absolute value |
+| yet nope | ```(.realpart a)``` | | ```np.real(a)``` | ```a.real``` | Element-wise real part |
+| yet nope | ```(.imagpart a)``` | | ```np.imag(a)``` | ```a.imag``` | Element-wise imaginary part |
+| yet nope | ```(.complex a b)``` | | | ```torch.complex(a, b)``` | Complex matrix from rectangular parts |
 
 ### Block Matrix Constructors
 
-| nnl2 | MAGICL | MATLAB | NumPy | Description |
-|------|--------|--------|-------|-------------|
-| yet nope | ```(block-matrix (list A B C D) '(2 2))``` | ```[A B; C D]``` | ```block([[A,B], [C, D]])``` | Create a block matrix from matrices A,B,C,D. |
-| yet nope | ```(block-diag (list A B C))``` | ```blkdiag(A,B,C)``` | ```scipy.linalg.block_diag([A,B,C])``` | 	Create a block diagonal matrix from matrices A,B,C. |
-| ```(hstack A B C)``` | ```(hstack (list A B C))``` | ```[A B C]``` | ```hstack((A,B,C))``` | Concatenate matrices A,B,C horizontally (column-wise). |
-| ```(vstack A B C)``` | ```(vstack (list A B C))``` | ```[A; B; C]``` | ```vstack((A,B,C))``` | Concatenate matrices A,B,C vertically (row-wise). |	
+| nnl2 | MAGICL | MATLAB | NumPy | Pytorch | Description |
+|------|--------|--------|-------|---------|-------------|
+| yet nope | ```(block-matrix (list A B C D) '(2 2))``` | ```[A B; C D]``` | ```block([[A,B], [C, D]])``` | ```torch.cat((torch.cat((A,B), dim=1), torch.cat((C,D), dim=1)), dim=0)``` | Create a block matrix from matrices A,B,C,D. |
+| yet nope | ```(block-diag (list A B C))``` | ```blkdiag(A,B,C)``` | ```scipy.linalg.block_diag([A,B,C])``` | ```torch.block_diag(A, B, C)``` | Create a block diagonal matrix from matrices A,B,C. |
+| ```(hstack A B C)``` | ```(hstack (list A B C))``` | ```[A B C]``` | ```hstack((A,B,C))``` | ```np.hstack((A,B,C))``` | Concatenate matrices A,B,C horizontally (column-wise). |
+| ```(vstack A B C)``` | ```(vstack (list A B C))``` | ```[A; B; C]``` | ```vstack((A,B,C))``` | ```np.vstack((A,B,C))``` | Concatenate matrices A,B,C vertically (row-wise). |	
 
 ### Like-Constructors 
 
-| nnl2 | MAGICL | MATLAB | NumPy | Description |
-|------|--------|--------|-------|-------------|
-| ```(empty-like a)``` | | ```empty(size(a))``` | ```np.empty_like(a)``` | Creates an uninitialized tensor with shape and type of a |
-| ```(zeros-like a)``` | | ```zeros(size(a))``` | ```np.zeros_like(a)``` | Creates a tensor of zeros with shape and type of a |
-| ```(ones-like a)``` | | ```ones(size(a))``` | ```np.ones_like(a)``` | Creates a tensor of ones with shape and type of a | 
-| ```(full-like a)``` | | ```x * ones(size(a))``` | ```np.full_like(a, x)``` | Creates a tensor filled with x as a |
+| nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Description |
+|------|--------|--------|-------|---------|-------------|
+| ```(empty-like a)``` | | ```empty(size(a))``` | ```np.empty_like(a)``` | ```torch.empty_like(a)``` | Creates an uninitialized tensor with shape and type of a |
+| ```(zeros-like a)``` | | ```zeros(size(a))``` | ```np.zeros_like(a)``` | ```torch.zeros_like(a)``` | Creates a tensor of zeros with shape and type of a |
+| ```(ones-like a)``` | | ```ones(size(a))``` | ```np.ones_like(a)``` | ```torch.ones_like(a)``` | Creates a tensor of ones with shape and type of a | 
+| ```(full-like a)``` | | ```x * ones(size(a))``` | ```np.full_like(a, x)``` | ```torch.full_like(a, x)``` | Creates a tensor filled with x as a |
 
 ### Mapping Operations
 
 *Please note that nnl2, unlike magicl, can accept an unlimited number of arguments and an unlimited number of arguments in a lambda list.*
 
-| nnl2 | MAGICL | MATLAB | NumPy | Description |
-|------|--------|--------|-------|-------------|
-| ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```np.vectorize(fn)(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
-| ```(.map! #'fn a b ...)``` | ```(map! #'fn a)``` | | | Applies fn elementwise, writing the result to the first tensor (a). |
+| nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Description |
+|------|--------|--------|-------|---------|-------------|
+| ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```np.vectorize(fn)(a, b, ...)``` | ```torch.vmap(fn)(a, b, ...)``` or ```fn(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
+| ```(.map! #'fn a b ...)``` | ```(map! #'fn a)``` | | | ```a.set_(fn(a, b, ...))``` | Applies fn elementwise, writing the result to the first tensor (a). |
 
 ### Activation Functions
 
-| nnl2 | MAGICL | MATLAB | NumPy | Description |
-|------|--------|--------|-------|-------------|
-| ```(.relu a)``` | | ```max(0, a)``` | ```np.maximum(0, a)``` | Wise-element Rectified Linear Unit (ReLU) |
-| ```(.relu! a)``` | | | ```np.maximum(0, a, out=a)``` | In-place element-wise ReLU |
-| ```(.leaky-relu a :alpha 0.01)``` | | ```max(0.01*a, a)``` | ```np.where(a > 0, a, 0.01*a)``` | Wise-element Leaky ReLU with optional alpha parameter (usually 0.01) |
-| ```(.leaky-relu! a :alpha 0.01)``` | | | ```np.maximum(0.01*a, a, out=a)``` | Wise-element In-place Leaky ReLU with optional alpha parameter (usually 0.01) | 
+| nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Description |
+|------|--------|--------|-------|---------|-------------|
+| ```(.relu a)``` | | ```max(0, a)``` | ```np.maximum(0, a)``` | ```torch.relu(a)``` | Wise-element Rectified Linear Unit (ReLU) |
+| ```(.relu! a)``` | | | ```np.maximum(0, a, out=a)``` | ```torch.relu_(a)``` | In-place element-wise ReLU |
+| ```(.leaky-relu a :alpha 0.01)``` | | ```max(0.01*a, a)``` | ```np.where(a > 0, a, 0.01*a)``` | ```torch.nn.functional.leaky_relu(a,0.01)``` | Wise-element Leaky ReLU with optional alpha parameter (usually 0.01) |
+| ```(.leaky-relu! a :alpha 0.01)``` | | | ```np.maximum(0.01*a, a, out=a)``` | ```torch.nn.functional.leaky_relu_(a, negative_slope=0.01)``` or ```a.leaky_relu_(negative_slope=0.01)``` | Wise-element In-place Leaky ReLU with optional alpha parameter (usually 0.01) | 
+

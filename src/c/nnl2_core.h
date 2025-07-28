@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <math.h>
+#include <stdio.h>
 
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H
@@ -55,7 +57,16 @@ static inline double nnl2_leaky_relu_float64(double a, float alpha) {
 }
 
 static inline void nnl2_leaky_relu_int32_inplace(int32_t* a, float alpha) {
-	if(*a < 0) *a = (int32_t)(*a * alpha);
+	if(*a < 0) {
+		float result = (*a * alpha);
+		
+		if(fmodf(result, 1.0f) != 0.0f) {
+			fprintf(stderr, "Error (Hello from C!): Leaky ReLU cannot be applied to the provided tensor\n");
+			exit(EXIT_FAILURE);
+		} else {
+			*a = (int32_t)result;
+		}
+	}
 }
 
 static inline void nnl2_leaky_relu_float32_inplace(float* a, float alpha) {

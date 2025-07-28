@@ -3407,7 +3407,6 @@ void init_leakyreluinplace() {
 	}
 }
 
-
 Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
 	
@@ -3415,6 +3414,8 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
+	
+	bool float64_conversion = false;
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -3434,13 +3435,43 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {
 		case INT32: {
 			int32_t* cast_data_t = (int32_t*)data_t;	
 			int32_t* cast_data_r = (int32_t*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_leaky_relu_int32(cast_data_t[i], alpha);
+			
+			for(int i = 0; i < total_elems; i++) {
+				if(cast_data_t[i] < 0) {
+					float result_val = cast_data_t[i] * alpha;
+					
+					if(fmodf(result_val, 1.0f) != 0.0f) {
+						float64_conversion = true;
+						break;
+					}
+				}
+			}
+			
+			if(float64_conversion) {
+				free_tensor(result);
+				
+				result = empty(tensor->shape, tensor->rank, FLOAT64);
+				data_r = result->data;
+				
+				double* cast_data_r_f64 = (double*)data_r;
+				
+				for(int i = 0; i < total_elems; i++) {
+					if(cast_data_t[i] >= 0) {
+						cast_data_r_f64[i] = (double)cast_data_t[i];
+					} else {
+						cast_data_r_f64[i] = (double)(cast_data_t[i] * alpha);
+					}
+				}
+			} else {
+				for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_leaky_relu_int32(cast_data_t[i], alpha);
+			}
+			
 			break;
 		}
 		
 		default: {
 			fprintf(stderr, "Error (Hello from C!): Bad data-type (leaky-relu)\n");
-			return NULL;
+			return NULL;	
 		}
 	}
 	

@@ -45,7 +45,7 @@ void init_system() {
 	init_add();       
 	init_sub(); 
 	init_mulinplace();
-	init_divinplace(); 
+	init_divinplace();            
 	init_mul();
 	init_div(); 
 	init_powinplace(); 
