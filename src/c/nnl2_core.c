@@ -66,6 +66,8 @@ void init_system() {
 	init_vstack();
 	init_reluinplace(); 
 	init_relu(); 
+	init_leakyreluinplace();
+	init_leakyrelu();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -202,6 +204,14 @@ void lisp_call_reluinplace(Tensor* tensor) {
 
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
+}
+
+void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
+	leakyreluinplace(tensor, alpha); 
+}
+
+Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha) {
+	return leakyrelu(tensor, alpha); 
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

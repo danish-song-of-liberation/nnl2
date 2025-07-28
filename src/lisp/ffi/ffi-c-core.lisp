@@ -218,7 +218,15 @@
   (tensor :pointer))  
   
 (cffi:defcfun ("lisp_call_relu" %.relu) :pointer
-  (tensor :pointer))    
+  (tensor :pointer)) 
+
+(cffi:defcfun ("lisp_call_leakyreluinplace" %.leaky-relu!) :void
+  (tensor :pointer)
+  (alpha :float))  
+  
+(cffi:defcfun ("lisp_call_leakyrelu" %.leaky-relu) :pointer
+  (tensor :pointer)
+  (alpha :float))    
   
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     

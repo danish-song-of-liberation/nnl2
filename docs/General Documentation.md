@@ -146,5 +146,5 @@ So far, there are only **3** types of tensors:
 |------|--------|--------|-------|-------------|
 | ```(.relu a)``` | | ```max(0, a)``` | ```np.maximum(0, a)``` | Wise-element Rectified Linear Unit (ReLU) |
 | ```(.relu! a)``` | | | ```np.maximum(0, a, out=a)``` | In-place element-wise ReLU |
-
- 
+| ```(.leaky-relu a :alpha 0.01)``` | | ```max(0.01*a, a)``` | ```np.where(a > 0, a, 0.01*a)``` | Wise-element Leaky ReLU with optional alpha parameter (usually 0.01) |
+| ```(.leaky-relu! a :alpha 0.01)``` | | | ```np.maximum(0.01*a, a, out=a)``` | Wise-element In-place Leaky ReLU with optional alpha parameter (usually 0.01) | 

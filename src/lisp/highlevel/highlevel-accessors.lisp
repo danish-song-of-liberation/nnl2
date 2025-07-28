@@ -297,6 +297,12 @@
   
 (defmacro .relu (tensor)
   `(nnl2.ffi:%.relu ,tensor))  
+  
+(defmacro .leaky-relu! (tensor &key (alpha 0.01))
+  `(nnl2.ffi:%.leaky-relu! ,tensor ,alpha))  
+  
+(defmacro .leaky-relu (tensor &key (alpha 0.01))
+  `(nnl2.ffi:%.leaky-relu ,tensor ,alpha))  
 																			 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
