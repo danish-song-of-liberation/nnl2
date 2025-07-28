@@ -31,6 +31,17 @@
 		   ,@(loop for var in vars
 		           collect `(free ,var)))))))
 
+(defmacro tlet* ((&rest bindings) &body body)
+  (if (null bindings)
+   `(progn ,@body)
+    (let* ((binding (first bindings))
+           (var (if (consp binding) (car binding) binding))
+           (value (if (consp binding) (cadr binding) nil)))
+     `(let (,binding)
+        (unwind-protect
+          (tlet* ,(rest bindings) ,@body)
+          (free ,var))))))
+
 (defmacro empty (indices &key (dtype nnl2.system:*default-tensor-type*))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
     `(nnl2.ffi:%empty ,shape ,rank ,dtype))) 
