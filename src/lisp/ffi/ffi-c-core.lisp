@@ -214,6 +214,12 @@
 (cffi:defcfun ("lisp_call_abs" %.abs) :pointer
   (tensora :pointer))
   
+(cffi:defcfun ("lisp_call_reluinplace" %.relu!) :void
+  (tensor :pointer))  
+  
+(cffi:defcfun ("lisp_call_relu" %.relu) :pointer
+  (tensor :pointer))    
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   

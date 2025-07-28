@@ -64,6 +64,8 @@ void init_system() {
 	init_abs();
 	init_hstack();
 	init_vstack();
+	init_reluinplace(); 
+	init_relu(); 
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -107,7 +109,7 @@ void lisp_call_subinplace(Tensor* summand, Tensor* addend) {
 }
 
 Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
-	return add(summand, addend); 
+	return add(summand, addend);  
 }
 
 Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) {
@@ -192,6 +194,14 @@ Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 
 Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 	return vstack(tensora, tensorb);
+}
+
+void lisp_call_reluinplace(Tensor* tensor) {
+	reluinplace(tensor);
+}
+
+Tensor* lisp_call_relu(Tensor* tensor) {
+	return relu(tensor);
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

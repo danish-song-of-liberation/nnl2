@@ -139,3 +139,12 @@ So far, there are only **3** types of tensors:
 |------|--------|--------|-------|-------------|
 | ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```np.vectorize(fn)(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
 | ```(.map! #'fn a b ...)``` | ```(map! #'fn a)``` | | | Applies fn elementwise, writing the result to the first tensor (a). |
+
+### Activation Functions
+
+| nnl2 | MAGICL | MATLAB | NumPy | Description |
+|------|--------|--------|-------|-------------|
+| ```(.relu a)``` | | ```max(0, a)``` | ```np.maximum(0, a)``` | Wise-element Rectified Linear Unit (ReLU) |
+| ```(.relu! a)``` | | | ```np.maximum(0, a, out=a)``` | In-place element-wise ReLU |
+
+ 

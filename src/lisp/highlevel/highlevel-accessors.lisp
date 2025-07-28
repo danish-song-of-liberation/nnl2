@@ -291,6 +291,12 @@
 	
 (defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
 (defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
+
+(defmacro .relu! (tensor)
+  `(nnl2.ffi:%.relu! ,tensor))
+  
+(defmacro .relu (tensor)
+  `(nnl2.ffi:%.relu ,tensor))  
 																			 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
