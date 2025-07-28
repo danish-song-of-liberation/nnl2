@@ -62,9 +62,8 @@ So far, there are only **3** types of tensors:
 
 *I would also like to inform you that the table is very extensive.*
 
-
 |  nnl2               | MAGICL            | MATLAB          | NumPy                         | PyTorch | Description |
-|:-------------------:|:-----------------:|:---------------:|:-----------------------------:|:------------|
+|:-------------------:|:-----------------:|:---------------:|:-----------------------------:|:-------:|:-----------:|
 | ```(rank a)```  | ```(order a)```   | ```ndims(a)```  | ```ndim(a)``` or ```a.ndim``` | ```a.dim()``` | Get the number of dimensions of the array. |
 | ```(size a)```      | ```(size a)```    | ```numel(a)```  | ```size(a)``` or ```a.size```  | ```a.numel()``` | Get the number of elements of the array. |
 | ```(size-in-bytes a)``` | 	| It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | ```a.element_size() * a.numel()``` | Gets the dimensions of the tensor in bytes |
