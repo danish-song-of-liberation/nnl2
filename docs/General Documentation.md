@@ -104,7 +104,7 @@ So far, there are only **3** types of tensors:
 | ```(/! a b)``` | | ```a /= b``` | ```a /= b``` | ```a.div_(b)``` | In-place division (using /! instead of /=) |
 | ```(.max a b)``` | ```(.max a b)``` | ```max(a, b)``` | ```np.maximum(a, b)``` | ```torch.maximum(a, b)``` | Element-wise maximum |
 | ```(.max! a b)``` | | | ```np.maximum(a, b, out=a)``` | ```a.set_(torch.maximum(a, b))``` | In-place element-wise maximum |
-| ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | ```	torch.minimum(a, b)``` | Element-wise minimum |
+| ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | ```torch.minimum(a, b)``` | Element-wise minimum |
 | ```(.min! a b)``` |  |  | ```np.minimum(a, b, out=a)``` | ```a.set_(torch.minimum(a, b))``` | In-place element-wise minimum |
 | ```(.abs a)``` | | ```abs(a)``` | ```np.abs(a)``` | ```torch.abs(a)``` | Element-wise absolute value |
 | ```(.abs! a)``` | | | ```np.abs(a, out=a)	``` | ```a.abs_()``` | In-place absolute value |
