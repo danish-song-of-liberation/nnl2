@@ -120,6 +120,8 @@ typedef void (*leakyreluinplacefn)(Tensor*, float);
 typedef Tensor* (*leakyrelufn)(const Tensor*, float);
 typedef void (*sigmoidinplacefn)(Tensor*);
 typedef Tensor* (*sigmoidfn)(const Tensor*);
+typedef void (*tanhinplacefn)(Tensor*);
+typedef Tensor* (*tanhfn)(const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

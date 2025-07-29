@@ -148,6 +148,7 @@ So far, there are only **3** types of tensors:
 | ```(.leaky-relu! a :alpha 0.01)``` | | | ```np.maximum(0.01*a, a, out=a)``` | ```torch.nn.functional.leaky_relu_(a, negative_slope=0.01)``` or ```a.leaky_relu_(negative_slope=0.01)``` | Wise-element In-place Leaky ReLU with optional alpha parameter (usually 0.01) | 
 | ```(.sigmoid a)``` | | ```1 ./ (1 + exp(-a))``` | ```1 / (1 + np.exp(-a))``` | ```torch.sigmoid(a)``` | Wise-element Sigmoid |
 | ```(.sigmoid! a)``` | | | ```np.reciprocal(1 + np.exp(-a), out=a)``` | ```torch.sigmoid_(a)``` or ```a.sigmoid_()``` | Wise-element In-place Sigmoid |
-
+| ```(.tanh a)``` | | ```tanh(a)``` | ```np.tanh(a)``` | ```torch.tanh(a)``` | Wise-element Hyperbolic Tangent |
+| ```(.tanh! a)``` | | | ```np.tanh(a, out=a)``` | ```torch.tanh_(a)``` or ```a.tanh_()``` | Wise-element In-place Hyperbolic Tangent |
 
  

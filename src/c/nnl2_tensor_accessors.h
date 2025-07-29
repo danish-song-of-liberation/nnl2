@@ -3588,4 +3588,102 @@ void init_sigmoid() {
 	}
 }
 
+void naive_tanhinplace(Tensor* tensor) {
+	int total_elems = product(tensor->shape, tensor->rank);	
+	void* data = tensor->data;
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)data;	
+			for(int i = 0; i < total_elems; i++) cast_data[i] = tanh(cast_data[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)data;	
+			for(int i = 0; i < total_elems; i++) cast_data[i] = tanhf(cast_data[i]);
+			break;
+		}
+		
+		case INT32: {
+			fprintf(stderr, "Error (Hello from C!): Tanh in-place cannot be applied to the provided tensor\n");
+			exit(EXIT_FAILURE);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (tanh in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation tanhinplace_backends[] = {
+	{naive_tanhinplace, 10, true, "NAIVE"},
+};	
+
+tanhinplacefn tanhinplace;
+
+void init_tanhinplace() {
+	for(size_t i = 0; i < sizeof(tanhinplace_backends) / sizeof(tanhinplace_backends[0]); i++) {
+		if (tanhinplace_backends[i].available) tanhinplace = tanhinplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_tanh(Tensor* tensor) {	
+	int total_elems = product(tensor->shape, tensor->rank);	
+	
+	TensorType dtype = tensor->dtype;
+	
+	if(dtype == INT32) dtype = FLOAT64;
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, dtype);
+	
+	void* data_t = tensor->data;
+	void* data_r = result->data;
+	
+	switch(tensor->dtype) {
+		case INT32: {
+			int32_t* cast_data_t = (int32_t*)data_t;
+			double* cast_data_r = (double*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = tanh((double)cast_data_t[i]); 
+			break;
+		}
+		
+		case FLOAT64: {
+			double* cast_data_t = (double*)data_t;	
+			double* cast_data_r = (double*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = tanh(cast_data_t[i]);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_t = (float*)data_t;	
+			float* cast_data_r = (float*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = tanhf(cast_data_t[i]);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (tanh)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation tanh_backends[] = {
+	{naive_tanh, 10, true, "NAIVE"},
+};	
+
+tanhfn nnl2_tanh;
+
+void init_tanh() {
+	for(size_t i = 0; i < sizeof(tanh_backends) / sizeof(tanh_backends[0]); i++) {
+		if (tanh_backends[i].available) nnl2_tanh = tanh_backends[i].fn;
+	}
+}
+
+
 #endif

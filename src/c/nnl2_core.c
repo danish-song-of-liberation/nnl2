@@ -70,6 +70,8 @@ void init_system() {
 	init_leakyrelu();
 	init_sigmoidinplace();
 	init_sigmoid();
+	init_tanhinplace();
+	init_tanh();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -222,6 +224,14 @@ void lisp_call_sigmoidinplace(Tensor* tensor) {
 
 Tensor* lisp_call_sigmoid(Tensor* tensor) {
 	return sigmoid(tensor);
+}
+ 
+void lisp_call_tanhinplace(Tensor* tensor) {
+	tanhinplace(tensor);
+}
+
+Tensor* lisp_call_tanh(Tensor* tensor) {
+	return nnl2_tanh(tensor);
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

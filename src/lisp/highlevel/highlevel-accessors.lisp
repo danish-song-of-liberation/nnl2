@@ -309,6 +309,12 @@
   
 (defmacro .sigmoid (tensor)
   `(nnl2.ffi:%.sigmoid ,tensor))  
+  
+(defmacro .tanh! (tensor)
+  `(nnl2.ffi:%.tanh! ,tensor))  
+  
+(defmacro .tanh (tensor)
+  `(nnl2.ffi:%.tanh ,tensor))    
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

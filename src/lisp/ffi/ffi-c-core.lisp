@@ -234,6 +234,12 @@
 (cffi:defcfun ("lisp_call_sigmoid" %.sigmoid) :pointer
   (tensor :pointer))    
   
+(cffi:defcfun ("lisp_call_tanhinplace" %.tanh!) :void
+  (tensor :pointer))
+  
+(cffi:defcfun ("lisp_call_tanh" %.tanh) :pointer
+  (tensor :pointer))  
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   
