@@ -72,6 +72,7 @@ void init_system() {
 	init_sigmoid();
 	init_tanhinplace();
 	init_tanh();
+	init_concat();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -196,7 +197,7 @@ Tensor* lisp_call_abs(Tensor* tensor) {
 
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
-}
+}  
 
 Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 	return vstack(tensora, tensorb);
@@ -233,6 +234,10 @@ void lisp_call_tanhinplace(Tensor* tensor) {
 Tensor* lisp_call_tanh(Tensor* tensor) {
 	return nnl2_tanh(tensor);
 }
+
+Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
+	return nnl2_concat(tensora, tensorb, axis);
+}      
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);
@@ -247,4 +252,4 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
 }		
-		  
+		       

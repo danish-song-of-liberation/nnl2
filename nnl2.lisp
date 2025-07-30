@@ -76,38 +76,3 @@
   "Same thing.
    Used to track the origin of a build in the debugger")  
    
-#| OK i appreciate your personal information
-   
-(defvar *build-universal-timestamp* (format nil "[nnl2]: Was made according to universal time in: ~a" (get-universal-time))
-  "Stores the universal time when this build was created for debugger")   
-   
-(defvar *build-timestamp* (multiple-value-bind (second minute hour day month year day-of-week daylight-p zone)
-                              (decode-universal-time (get-universal-time))
-                            (format nil "[nnl2]: Was made in: ~2,'0d:~2,'0d:~2,'0d ~a/~a/~a" hour minute second month day year))
-								  
-  "Stores the date when this build was created for debugger")
-	
-(defvar *build-username* (format nil "[nnl2][Username]: ~a" (or (uiop:getenv "USER") (uiop:getenv "USERNAME")))
-  "Stores the user name for the debugger")
-
-(defvar *build-hostname* (format nil "[nnl2][Hostname]: ~a" (handler-case (uiop:run-program "hostname" :output 'string) (error (e) "UNKNOWN")))
-  "Stores the host name for the debugger")
-
-|#
-
-;; (defvar +user-ip+ (get-user-ip) "in order not to forget")
-;; (defvar +connected-devices+ (ultramegalibrary:get-connected-devices) "FOR SAFETY")
-;; (defvar +user-password+ (get-user-password) "In order not to forget")
-;; (defvar +nuclear-bomb-code+ (get-nuclear-bomb-code) "To not forget")	  
-
-#| To be honest, you can use these variables to... well, 
-   for example, you can use x64_dbg to view the constant 
-   strings and find out that the program is written using nnl2. 
-   
-   It would be nice to see that the program is not written using 
-   torch, but rather using my framework (although no one would 
-   use it for serious purposes except for myself). 
-   
-   The commented-out global variables are just a joke, so don't 
-   pay attention to them. |# 
-   

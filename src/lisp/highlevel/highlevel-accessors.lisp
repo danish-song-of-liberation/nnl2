@@ -291,6 +291,7 @@
 	
 (defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
 (defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
+(defun concat (axis &rest tensors) (reduce #'(lambda (acc tensor) (nnl2.ffi:%concat acc tensor axis)) tensors))
 
 (defmacro .relu! (tensor)
   `(nnl2.ffi:%.relu! ,tensor))

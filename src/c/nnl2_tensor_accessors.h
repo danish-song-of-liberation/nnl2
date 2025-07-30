@@ -3685,5 +3685,99 @@ void init_tanh() {
 	}
 }
 
+Tensor* naive_concat(const Tensor* tensora, const Tensor* tensorb, int axis) {
+    TensorType typea = tensora->dtype;
+    TensorType typeb = tensorb->dtype;
+
+    int ranka = tensora->rank;
+    int rankb = tensorb->rank;
+    
+    if (typea != typeb) {
+        fprintf(stderr, "Error (Hello from C!): Data types are different (naive-concat)\n");
+        return NULL;
+    }
+
+    if (ranka != rankb) {
+        fprintf(stderr, "Error (Hello from C!): Ranks are different (naive-concat)\n");
+        return NULL;
+    }
+
+    if (axis < 0 || axis >= ranka) {
+        fprintf(stderr, "Error (Hello from C!): Invalid axis (naive-concat)\n");
+        return NULL;
+    }
+
+    for (int i = 0; i < ranka; i++) {
+        if (i != axis && tensora->shape[i] != tensorb->shape[i]) {
+            fprintf(stderr, "Error (Hello from C!): Incompatible shapes along axis %d (naive-concat)\n", i);
+            return NULL;
+        }
+    }
+    
+    int* shapea = tensora->shape;
+    int* shapeb = tensorb->shape;
+
+    int* shapec = malloc(ranka * sizeof(int));
+    if (shapec == NULL) {
+        fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-concat)\n");
+        return NULL;
+    }
+    
+    for (int i = 0; i < ranka; i++) {
+        shapec[i] = (i == axis) ? (shapea[i] + shapeb[i]) : shapea[i];
+    }    
+    
+    Tensor* result = empty(shapec, ranka, typea);
+    
+    if (result == NULL) {
+        free(shapec);
+        return NULL;
+    }
+    
+    free(shapec);
+
+    size_t item_size = get_dtype_size(typea);
+    
+    size_t outer_stride = 1;
+    for (int i = 0; i < axis; i++) {
+        outer_stride *= tensora->shape[i];
+    }
+    
+    size_t inner_stride = 1;
+    for (int i = axis + 1; i < ranka; i++) {
+        inner_stride *= tensora->shape[i];
+    }
+    
+    size_t a_step = tensora->shape[axis] * inner_stride;
+    size_t b_step = tensorb->shape[axis] * inner_stride;
+    
+    char* a_data = (char*)tensora->data;
+    char* b_data = (char*)tensorb->data;
+    char* c_data = (char*)result->data;
+    
+    for (size_t outer = 0; outer < outer_stride; outer++) {
+        memcpy(c_data, a_data, a_step * item_size);
+        c_data += a_step * item_size;
+        a_data += a_step * item_size;
+        
+        memcpy(c_data, b_data, b_step * item_size);
+        c_data += b_step * item_size;
+        b_data += b_step * item_size;
+    }
+
+    return result;
+}
+
+Implementation concat_backends[] = {
+	{naive_concat, 10, true, "NAIVE"},
+};	
+
+concatfn nnl2_concat;
+
+void init_concat() {
+	for(size_t i = 0; i < sizeof(concat_backends) / sizeof(concat_backends[0]); i++) {
+		if (concat_backends[i].available) nnl2_concat = concat_backends[i].fn;
+	}
+}
 
 #endif

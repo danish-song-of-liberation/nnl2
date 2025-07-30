@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define REGISTER_BACKEND(fn, speed, avail, name) { fn, speed, avail, name }
+
 // NNL2
 
 /**
@@ -122,6 +124,7 @@ typedef void (*sigmoidinplacefn)(Tensor*);
 typedef Tensor* (*sigmoidfn)(const Tensor*);
 typedef void (*tanhinplacefn)(Tensor*);
 typedef Tensor* (*tanhfn)(const Tensor*);
+typedef Tensor* (*concatfn)(const Tensor*, const Tensor*, int);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

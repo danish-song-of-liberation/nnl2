@@ -119,6 +119,7 @@ So far, there are only **3** types of tensors:
 | yet nope | ```(block-diag (list A B C))``` | ```blkdiag(A,B,C)``` | ```scipy.linalg.block_diag([A,B,C])``` | ```torch.block_diag(A, B, C)``` | Create a block diagonal matrix from matrices A,B,C. |
 | ```(hstack A B C)``` | ```(hstack (list A B C))``` | ```[A B C]``` | ```hstack((A,B,C))``` | ```np.hstack((A,B,C))``` | Concatenate matrices A,B,C horizontally (column-wise). |
 | ```(vstack A B C)``` | ```(vstack (list A B C))``` | ```[A; B; C]``` | ```vstack((A,B,C))``` | ```np.vstack((A,B,C))``` | Concatenate matrices A,B,C vertically (row-wise). |	
+| ```(concat 2 A B C)``` | | | ```torch.cat((A, B, C), dim=2)``` | Concatenate tensors A, B, and C along the third dimension |
 
 ### Like-Constructors 
 

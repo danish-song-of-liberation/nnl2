@@ -191,6 +191,11 @@
 (cffi:defcfun ("lisp_call_vstack" %vstack) :pointer
   (tensora :pointer)
   (tensorb :pointer))  
+  
+(cffi:defcfun ("lisp_call_concat" %concat) :pointer
+  (tensora :pointer)
+  (tensorb :pointer)
+  (axis :int))  
 									  
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)

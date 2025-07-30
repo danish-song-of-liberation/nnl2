@@ -5,5 +5,5 @@
    :%gemm! :%+= :%-= :%get-size :%get-size-in-bytes :%+ :%- :%*= :%/= :%* :%/ :%^= :%.^ :%.exp! :%.exp :%.log!
    :%.log :%tref :%tref-setter :%scale! :%scale :%zeros-like :%ones-like :%full-like :%.max! :%.min! :%.max :%.min
    :%.abs! :%.abs :get-tensor-data :%empty-like :%hstack :%vstack :%.relu! :%.relu :%.leaky-relu! :%.leaky-relu
-   :%.sigmoid! :%.sigmoid :%.tanh! :%.tanh))
+   :%.sigmoid! :%.sigmoid :%.tanh! :%.tanh :%concat))
 																					 
