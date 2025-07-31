@@ -186,15 +186,19 @@
 (defun tref (tensor &rest shape)
   (declare (optimize (speed 3)))
 
-  (let* ((tensor-rank (rank tensor))
+  (let* ((shape-rank (length shape))
+		 (tensor-rank (rank tensor))
 	     (tensor-dtype (dtype tensor))
-		 (shape (make-shape-pntr shape))
-		 (void-ptr (nnl2.ffi:%tref tensor shape tensor-rank)))
+		 (shape (make-shape-pntr (subst -1 '* shape)))
+		 (void-ptr (nnl2.ffi:%tref tensor shape shape-rank)))	 
 		 
-	(case tensor-dtype
-	  (:float64 (cffi:mem-ref void-ptr :double))	 
-      (:float32 (cffi:mem-ref void-ptr :float))
-	  (:int32 (cffi:mem-ref void-ptr :int))))) 
+	(if (= shape-rank tensor-rank)	 
+	  (case tensor-dtype
+	    (:float64 (cffi:mem-ref void-ptr :double))	 
+        (:float32 (cffi:mem-ref void-ptr :float))
+	    (:int32 (cffi:mem-ref void-ptr :int)))
+	  
+	  void-ptr)))
 	  
 (defun (setf tref) (change-to tensor &rest shape)
   (let* ((shape-rank (length shape))
@@ -265,7 +269,7 @@
 				  (:float32 :float)
 				  (:int32 :int))))
 		
-	(loop for i from 0 below 9
+	(loop for i from 0 below numel
 		  do (setf
         	   (cffi:mem-aref (car aggreg-data) type-t i) (apply funct (loop for it in aggreg-data 
 																			 collect (cffi:mem-aref it type-t i)))))))  
@@ -282,7 +286,7 @@
 		 (new-tensor (empty-like first-tensor))
 		 (new-tensor-data (nnl2.ffi:get-tensor-data new-tensor)))
 		
-	(loop for i from 0 below 9
+	(loop for i from 0 below numel
 		  do (setf
         	   (cffi:mem-aref new-tensor-data type-t i) (apply funct (loop for it in aggreg-data 
 																           collect (cffi:mem-aref it type-t i)))))
@@ -316,6 +320,61 @@
   
 (defmacro .tanh (tensor)
   `(nnl2.ffi:%.tanh ,tensor))    
+  
+(defmacro randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0) (to 1.0))
+  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+    (case dtype
+	  (:float64 `(let ((from-pntr (cffi:foreign-alloc :double))
+					   (to-pntr (cffi:foreign-alloc :double)))
+					   
+				   (setf (cffi:mem-ref from-pntr :double) ,from
+						 (cffi:mem-ref to-pntr :double) ,to)
+						 
+				   (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr)))
+				   
+      (:float32 `(let ((from-pntr (cffi:foreign-alloc :float))
+					   (to-pntr (cffi:foreign-alloc :float)))
+					   
+				   (setf (cffi:mem-ref from-pntr :float) ,from
+						 (cffi:mem-ref to-pntr :float) ,to)
+						 
+				   (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr)))
+
+	  (:int32 `(let ((from-pntr (cffi:foreign-alloc :int))
+					 (to-pntr (cffi:foreign-alloc :int)))
+					   
+				 (setf (cffi:mem-ref from-pntr :int) ,from
+					   (cffi:mem-ref to-pntr :int) ,to)
+						 
+				 (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr))))))
+
+(defun randn-like (tensor &key (from 0.0) (to 0.0) (dtype (dtype tensor)))
+  (case dtype
+    (:float64 (let ((from-pntr (cffi:foreign-alloc :double))
+			    	(to-pntr (cffi:foreign-alloc :double)))
+					   
+			    (setf (cffi:mem-ref from-pntr :double) from
+					  (cffi:mem-ref to-pntr :double) to)
+						 
+				(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
+				
+	(:float32 (let ((from-pntr (cffi:foreign-alloc :float))
+			        (to-pntr (cffi:foreign-alloc :float)))
+					   
+			    (setf (cffi:mem-ref from-pntr :float) from
+					  (cffi:mem-ref to-pntr :float) to)
+						 
+				(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
+				
+	(:int (let ((from-pntr (cffi:foreign-alloc :int))
+			    (to-pntr (cffi:foreign-alloc :int)))
+					   
+		    (setf (cffi:mem-ref from-pntr :int) from
+				  (cffi:mem-ref to-pntr :int) to)
+						 
+			(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))))		
+				 
+			
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

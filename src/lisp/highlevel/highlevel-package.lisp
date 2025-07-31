@@ -10,5 +10,5 @@
    :gemm :gemm! :+= :-= :size :size-in-bytes :.+ :.- :*= :/! :.* :./ :^= :.^ :.exp! :.exp :tref
    :scale! :scale :zeros-like :ones-like :full-like :.max! :.min! :.max :.min :.abs! :.abs
    :.map! :empty-like :.map :hstack :vstack :tlet* :.relu! :.relu :.leaky-relu! :.leaky-relu
-   :.sigmoid! :.sigmoid :.tanh! :.tanh :concat))
+   :.sigmoid! :.sigmoid :.tanh! :.tanh :concat :randn :randn-like))
   

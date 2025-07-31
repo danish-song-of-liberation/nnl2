@@ -424,7 +424,9 @@ void free_tensor(Tensor* tensor) {
  **/
 void* at(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
 	// Checks the input parameters for correctness
-	 
+	
+	// WARNING: i remaded function after docs
+	
 	if (tensor == NULL) {
         fprintf(stderr, "Error (Hello from C!): Bad tensor pointer\n");
         return NULL;
@@ -2542,36 +2544,58 @@ void at_set(Tensor* tensor, int* shape, int rank, void* change_with) {
 		}
 	}
 	
-	switch(tensor_dtype) {
-		case FLOAT64: {
-			double* change_elem = (double*)change_with;
-			double* elem = (double*)at(tensor, shape, rank);
-			
-			*elem = *change_elem;
+	if(rank == tensor->rank) {
+		switch(tensor_dtype) {
+			case FLOAT64: {
+				double* change_elem = (double*)change_with;
+				double* elem = (double*)at(tensor, shape, rank);
 				
-			break;
+				*elem = *change_elem;
+					
+				break;
+			}
+				
+			case FLOAT32: {
+				float* change_elem = (float*)change_with;
+				float* elem = (float*)at(tensor, shape, rank);
+					
+				*elem = *change_elem;
+					
+				break;
+			}
+				
+			case INT32: {
+				int32_t* change_elem = (int32_t*)change_with;
+				int32_t* elem = (int32_t*)at(tensor, shape, rank);
+					
+				*elem = *change_elem;
+					
+				break;
+			}
+				
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+				return;
+			}
 		}
-			
-		case FLOAT32: {
-			float* change_elem = (float*)change_with;
-			float* elem = (float*)at(tensor, shape, rank);
-				
-			*elem = *change_elem;
-				
-			break;
-		}
-			
-		case INT32: {
-			int32_t* change_elem = (int32_t*)change_with;
-			int32_t* elem = (int32_t*)at(tensor, shape, rank);
-				
-			*elem = *change_elem;
-				
-			break;
-		}
-			
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+	} else {
+		for(int i = 0; i < tensor->rank; i++) {
+			int new_rank = rank + 1;
+			int* subshape = (int*)malloc(sizeof(int) * new_rank);  
+
+			if (subshape == NULL) {
+				fprintf(stderr, "Error (Hello from C!): Memory allocation failed (tref-setter)\n");
+				return;
+			}
+
+			memcpy(subshape, shape, sizeof(int) * rank);
+
+			for (int i = 0; i < tensor->shape[rank]; i++) {
+				subshape[rank] = i; 
+				at_set(tensor, subshape, new_rank, change_with); 
+			}
+	
+			free(subshape);
 			return;
 		}
 	}
@@ -3778,6 +3802,61 @@ void init_concat() {
 	for(size_t i = 0; i < sizeof(concat_backends) / sizeof(concat_backends[0]); i++) {
 		if (concat_backends[i].available) nnl2_concat = concat_backends[i].fn;
 	}
+}
+
+Tensor* naive_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
+	Tensor* result = empty(shape, rank, dtype);
+	
+	size_t total_elems = product(shape, rank);
+	
+	switch(dtype) {
+		case FLOAT64: {
+			double from_cast = *((double*)from);
+			double to_cast = *((double*)to);
+			double* data = (double*)result->data;
+			for(size_t i = 0; i < total_elems; i++) data[i] = from_cast + (to_cast - from_cast) * ((double)rand() / RAND_MAX);
+			break;
+		}
+		
+		case FLOAT32: {
+			float from_cast = *((float*)from);
+			float to_cast = *((float*)to);
+			float* data = (float*)result->data;
+			for(size_t i = 0; i < total_elems; i++) data[i] = from_cast + (to_cast - from_cast) * ((float)rand() / RAND_MAX);
+			break;
+		}
+		
+		case INT32: {
+			int32_t from_cast = *((int32_t*)from);
+			int32_t to_cast = *((int32_t*)to);
+			int32_t* data = (int32_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) data[i] = from_cast + rand() % (to_cast - from_cast + 1);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive-randn)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation randn_backends[] = {
+	{naive_randn, 10, true, "NAIVE"},
+};	
+
+randnfn randn;
+
+void init_randn() {
+	for(size_t i = 0; i < sizeof(randn_backends) / sizeof(randn_backends[0]); i++) {
+		if (randn_backends[i].available) randn = randn_backends[i].fn;
+	}
+}
+
+Tensor* randn_like(const Tensor* tensor, void* from, void* to) {
+	return randn(tensor->shape, tensor->rank, tensor->dtype, from, to);
 }
 
 #endif

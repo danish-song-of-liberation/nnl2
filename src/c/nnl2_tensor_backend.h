@@ -125,6 +125,7 @@ typedef Tensor* (*sigmoidfn)(const Tensor*);
 typedef void (*tanhinplacefn)(Tensor*);
 typedef Tensor* (*tanhfn)(const Tensor*);
 typedef Tensor* (*concatfn)(const Tensor*, const Tensor*, int);
+typedef Tensor* (*randnfn)(const int*, int, TensorType, void*, void*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

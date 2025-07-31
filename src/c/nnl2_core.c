@@ -9,29 +9,34 @@
 #ifdef __SSE2__
 #include <emmintrin.h>
 #endif
-
-#ifdef __SSE3__
+ 
+#ifdef __SSE3__ 
 #include <pmmintrin.h>   
 #endif
   
 #ifdef __SSSE3__
 #include <tmmintrin.h>
-#endif
+#endif 
 
-#ifdef __SSE4_1__
+#ifdef __SSE4_1__ 
 #include <smmintrin.h>
 #endif
 
 #ifdef __SSE4_2__
-#include <nmmintrin.h>
+#include <nmmintrin.h> 
 #endif
-
-#include "nnl2_core.h"
-#include "nnl2_ffi_test.h"
-#include "backends_status/nnl2_status.h"
-#include "nnl2_tensor_core.h"
  
-void init_system() {
+#include "nnl2_core.h"
+#include "nnl2_ffi_test.h" 
+#include "backends_status/nnl2_status.h" 
+#include "nnl2_tensor_core.h" 
+
+#include <stdlib.h>
+#include <time.h>
+ 
+void init_system() {   
+	srand(time(NULL)); 
+
 	init_inplace_fill();
 	init_empty();
 	init_zeros();
@@ -41,7 +46,7 @@ void init_system() {
 	init_sgemm();   
 	init_dgemm();
 	init_addinplace();
-	init_subinplace();
+	init_subinplace();  
 	init_add();       
 	init_sub(); 
 	init_mulinplace();
@@ -59,7 +64,7 @@ void init_system() {
 	init_maxinplace();
 	init_mininplace();
 	init_max();
-	init_min();
+	init_min(); 
 	init_absinplace();
 	init_abs();
 	init_hstack();
@@ -73,6 +78,7 @@ void init_system() {
 	init_tanhinplace();
 	init_tanh();
 	init_concat();
+	init_randn();
 }    
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -199,13 +205,13 @@ Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
 }  
 
-Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
+Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {  
 	return vstack(tensora, tensorb);
 }
-
+ 
 void lisp_call_reluinplace(Tensor* tensor) {
 	reluinplace(tensor);
-}
+}  	
 
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
@@ -229,7 +235,7 @@ Tensor* lisp_call_sigmoid(Tensor* tensor) {
  
 void lisp_call_tanhinplace(Tensor* tensor) {
 	tanhinplace(tensor);
-}
+}   
 
 Tensor* lisp_call_tanh(Tensor* tensor) {
 	return nnl2_tanh(tensor);
@@ -237,7 +243,11 @@ Tensor* lisp_call_tanh(Tensor* tensor) {
 
 Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
 	return nnl2_concat(tensora, tensorb, axis);
-}      
+}       
+
+Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
+	return randn(shape, rank, dtype, from, to);
+}
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);
@@ -246,7 +256,7 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 		printf("	Backend: %s\n", implementation[i].name);
 		printf("		Speed: %d\n", implementation[i].speed_priority);
 		printf("		Availble?: %d\n", implementation[i].available);
-	}
+	} 
 }	           
 
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {

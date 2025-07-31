@@ -184,6 +184,11 @@
   (tensor :pointer)
   (filler :pointer))
   
+(cffi:defcfun ("randn_like" %randn-like) :pointer
+  (tensor :pointer)
+  (from :pointer)
+  (to :pointer))  
+  
 (cffi:defcfun ("lisp_call_hstack" %hstack) :pointer
   (tensora :pointer)
   (tensorb :pointer))
@@ -195,8 +200,15 @@
 (cffi:defcfun ("lisp_call_concat" %concat) :pointer
   (tensora :pointer)
   (tensorb :pointer)
-  (axis :int))  
-									  
+  (axis :int))
+
+(cffi:defcfun ("lisp_call_randn" %randn) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (from :pointer)
+  (to :pointer))  
+
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)
   (tensorb :pointer))  
