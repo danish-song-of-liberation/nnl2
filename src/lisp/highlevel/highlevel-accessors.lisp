@@ -391,6 +391,31 @@
   
 (defmacro transpose (tensor)
   `(nnl2.ffi:%transpose ,tensor))	  
+  
+(defun sum (tensor &key (axes #(0)) &aux (dtype (dtype tensor)))
+  (let* ((type-t (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (axes-pntr (make-shape-pntr axes))
+		 (axes-len (length axes))
+		 (out (cffi:foreign-alloc type-t)))
+					
+	(nnl2.ffi:%sum tensor axes-pntr axes-len out)
+				
+	(cffi:mem-ref out type-t)))
+	
+(defun l2-norm (tensor &key (axes #(0)) &aux (dtype (dtype tensor)))
+  (let* ((type-t (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (axes-pntr (make-shape-pntr axes))
+		 (axes-len (length axes))
+		 (out (cffi:foreign-alloc type-t)))
+					
+	(nnl2.ffi:%l2norm tensor axes-pntr axes-len out)
+				
+	(cffi:mem-ref out type-t)))
+	
+(defmacro norm (tensor &key (axes #(0)) (p :l2))
+  (case p
+    (:l2 `(l2-norm ,tensor :axes ,axes))
+	(otherwise (error "Incorrect :p key in norm~%"))))
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

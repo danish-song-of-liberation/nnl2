@@ -4095,4 +4095,130 @@ void init_transpose() {
 	}
 }
 
+void naive_sum(const Tensor* tensor, int* axes, int num_axes, void* result) {
+	bool reduce_all = false;
+	
+	if(num_axes == 1 && axes[0] == 0) {
+		reduce_all = true;
+	} 
+	
+	if(reduce_all) {
+		size_t total_elems = product(tensor->shape, tensor->rank);
+		
+		switch(tensor->dtype) {
+			case FLOAT64: {
+                double* cast_data = (double*)tensor->data;
+                double acc = 0.0;
+                for (size_t it = 0; it < total_elems; it++) acc += cast_data[it];
+                *((double*)result) = acc; 
+                break;
+            }
+	
+			case FLOAT32: {
+                float* cast_data = (float*)tensor->data;
+                float acc = 0.0f;
+                for (size_t it = 0; it < total_elems; it++) acc += cast_data[it];
+                *((float*)result) = acc; 
+                break;
+            }
+			
+			case INT32: {
+                int32_t* cast_data = (int32_t*)tensor->data;
+                int32_t acc = 0;
+                for (size_t it = 0; it < total_elems; it++) acc += cast_data[it];
+                *((int32_t*)result) = acc; 
+                break;
+            }
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive-sum)\n");
+				return;
+			}
+		}
+		
+	} else {
+		fprintf(stderr, "Error (Hello from C!): Sum axes in development\n");
+		return;
+	}
+}
+
+Implementation sum_backends[] = {
+	{naive_sum, 10, true, "NAIVE"},
+};	
+
+sumfn nnl2_sum;
+
+void init_sum() {
+	for(size_t i = 0; i < sizeof(sum_backends) / sizeof(sum_backends[0]); i++) {
+		if (sum_backends[i].available) nnl2_sum = sum_backends[i].fn;
+	}
+}
+
+void naive_l2norm(const Tensor* tensor, int* axes, int num_axes, void* result) {
+	bool reduce_all = false;
+	
+	if(num_axes == 1 && axes[0] == 0) {
+		reduce_all = true;
+	} 
+	
+	if(reduce_all) {
+		size_t total_elems = product(tensor->shape, tensor->rank);
+		
+		switch(tensor->dtype) {
+			case FLOAT64: {
+                double* cast_data = (double*)tensor->data;
+                double acc = 0.0;
+                for (size_t it = 0; it < total_elems; it++) {
+                    double val = cast_data[it];
+                    acc += val * val;
+                }
+                *((double*)result) = sqrt(acc);
+                break;
+            }
+    
+            case FLOAT32: {
+                float* cast_data = (float*)tensor->data;
+                float acc = 0.0f;
+                for (size_t it = 0; it < total_elems; it++) {
+                    float val = cast_data[it];
+                    acc += val * val;
+                }
+                *((float*)result) = sqrtf(acc); 
+                break;
+            }
+            
+            case INT32: {
+                int32_t* cast_data = (int32_t*)tensor->data;
+                int32_t acc = 0;
+                for (size_t it = 0; it < total_elems; it++) {
+                    int32_t val = cast_data[it];
+                    acc += val * val; 
+                }
+                *((int32_t*)result) = (int32_t)sqrt(acc);  
+                break;
+            }
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive l2-norm)\n");
+				return;
+			}
+		}
+	} else {
+		fprintf(stderr, "Error (Hello from C!): Norm axes in development\n");
+		return;
+	}
+}
+
+Implementation l2norm_backends[] = {
+	{naive_l2norm, 10, true, "NAIVE"},
+};	
+
+l2normfn l2norm;
+
+void init_l2norm() {
+	for(size_t i = 0; i < sizeof(l2norm_backends) / sizeof(l2norm_backends[0]); i++) {
+		if (l2norm_backends[i].available) l2norm = l2norm_backends[i].fn;
+	}
+}
+
 #endif

@@ -82,6 +82,8 @@ void init_system() {
 	init_xavier(); 
 	init_transposeinplace();
 	init_transpose();
+	init_sum();
+	init_l2norm();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -262,6 +264,14 @@ void lisp_call_transposeinplace(Tensor* tensor) {
 
 Tensor* lisp_call_transpose(Tensor* tensor) {
 	return transpose(tensor);  
+}
+
+void lisp_call_sum(Tensor* tensor, int* axes, int num_axes) {
+	nnl2_sum(tensor, axes, num_axes);
+}
+
+void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
+	l2norm(tensor, axes, num_axes);
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

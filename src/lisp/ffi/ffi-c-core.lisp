@@ -272,6 +272,18 @@
 (cffi:defcfun ("lisp_call_transpose" %transpose) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("lisp_call_sum" %sum) :void
+  (tensor :pointer)
+  (axes :pointer)
+  (num-axes :int)
+  (out :pointer))  
+  
+(cffi:defcfun ("lisp_call_l2norm" %l2norm) :void
+  (tensor :pointer)
+  (axes :pointer)
+  (num-axes :int)
+  (out :pointer))    
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   
