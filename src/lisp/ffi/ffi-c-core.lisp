@@ -282,7 +282,10 @@
   (tensor :pointer)
   (axes :pointer)
   (num-axes :int)
-  (out :pointer))    
+  (out :pointer))   
+
+(cffi:defcfun ("lisp_call_copy" %copy) :pointer
+  (tensor :pointer))  
   
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     

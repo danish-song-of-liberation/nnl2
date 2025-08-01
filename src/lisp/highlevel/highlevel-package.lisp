@@ -11,5 +11,5 @@
    :scale! :scale :zeros-like :ones-like :full-like :.max! :.min! :.max :.min :.abs! :.abs
    :.map! :empty-like :.map :hstack :vstack :tlet* :.relu! :.relu :.leaky-relu! :.leaky-relu
    :.sigmoid! :.sigmoid :.tanh! :.tanh :concat :randn :randn-like :xavier :transpose! :transpose
-   :sum :norm))
+   :sum :norm :copy))
   

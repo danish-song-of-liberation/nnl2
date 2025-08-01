@@ -129,6 +129,7 @@ typedef Tensor* (*randnfn)(const int*, int, TensorType, void*, void*);
 typedef Tensor* (*xavierfn)(int*, int, TensorType, int, int, float, float);
 typedef void (*sumfn)(const Tensor*, int*, int);
 typedef void (*l2normfn)(const Tensor*, int*, int);
+typedef Tensor* (*copyfn)(const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

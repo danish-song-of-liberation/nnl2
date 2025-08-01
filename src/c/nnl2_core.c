@@ -84,6 +84,7 @@ void init_system() {
 	init_transpose();
 	init_sum();
 	init_l2norm();
+	init_copy();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -273,6 +274,10 @@ void lisp_call_sum(Tensor* tensor, int* axes, int num_axes) {
 void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
 	l2norm(tensor, axes, num_axes);
 }
+
+Tensor* lisp_call_copy(Tensor* tensor) {
+	return nnl2_copy(tensor);
+} 
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);

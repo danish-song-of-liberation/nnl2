@@ -416,6 +416,9 @@
   (case p
     (:l2 `(l2-norm ,tensor :axes ,axes))
 	(otherwise (error "Incorrect :p key in norm~%"))))
+	
+(defmacro copy (tensor)
+  `(nnl2.ffi:%copy ,tensor))	
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

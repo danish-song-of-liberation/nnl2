@@ -4221,4 +4221,53 @@ void init_l2norm() {
 	}
 }
 
+Tensor* naive_copy(const Tensor* tensor) {
+	TensorType dtype = tensor->dtype;
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_copy = (double*)result->data;	
+			for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_copy = (float*)result->data;	
+			for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_copy = (int32_t*)result->data;	
+			for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
+			break;
+		} 
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (copy)\n");
+			return NULL;
+		}
+	}
+
+	return result;
+}
+
+Implementation copy_backends[] = {
+	{naive_copy, 10, true, "NAIVE"},
+};	
+
+copyfn nnl2_copy;
+
+void init_copy() {
+	for(size_t i = 0; i < sizeof(copy_backends) / sizeof(copy_backends[0]); i++) {
+		if (copy_backends[i].available) nnl2_copy = copy_backends[i].fn;
+	}
+}
+
 #endif
