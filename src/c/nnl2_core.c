@@ -80,7 +80,9 @@ void init_system() {
 	init_concat();
 	init_randn();
 	init_xavier(); 
-}    
+	init_transposeinplace();
+	init_transpose();
+}     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return empty(shape, rank, dtype);
@@ -240,7 +242,7 @@ void lisp_call_tanhinplace(Tensor* tensor) {
 
 Tensor* lisp_call_tanh(Tensor* tensor) {
 	return nnl2_tanh(tensor);
-}
+}   
 
 Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
 	return nnl2_concat(tensora, tensorb, axis);
@@ -252,6 +254,14 @@ Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
+}
+
+void lisp_call_transposeinplace(Tensor* tensor) {
+	transposeinplace(tensor);  
+}
+
+Tensor* lisp_call_transpose(Tensor* tensor) {
+	return transpose(tensor);  
 }
      
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

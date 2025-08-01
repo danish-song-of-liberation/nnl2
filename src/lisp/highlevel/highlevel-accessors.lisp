@@ -292,6 +292,7 @@
 																           collect (cffi:mem-aref it type-t i)))))
 
 	new-tensor))
+
 	
 (defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
 (defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
@@ -321,7 +322,7 @@
 (defmacro .tanh (tensor)
   `(nnl2.ffi:%.tanh ,tensor))    
   
-(defmacro randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0) (to 1.0))
+(defmacro randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
     (case dtype
 	  (:float64 `(let ((from-pntr (cffi:foreign-alloc :double))
@@ -348,7 +349,7 @@
 						 
 				 (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr))))))
 
-(defun randn-like (tensor &key (from 0.0) (to 0.0) (dtype (dtype tensor)))
+(defun randn-like (tensor &key (from 0.0d0) (to 1.0d0) (dtype (dtype tensor)))
   (case dtype
     (:float64 (let ((from-pntr (cffi:foreign-alloc :double))
 			    	(to-pntr (cffi:foreign-alloc :double)))
@@ -384,6 +385,12 @@
 	    (:normal `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 2.0s0))
 	    (:uniform `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 6.0s0))
 	    (otherwise (error "Unknown xavier-distribution: ~a%" distribution))))))
+		
+(defmacro transpose! (tensor)
+  `(nnl2.ffi:%transpose! ,tensor))		
+  
+(defmacro transpose (tensor)
+  `(nnl2.ffi:%transpose ,tensor))	  
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

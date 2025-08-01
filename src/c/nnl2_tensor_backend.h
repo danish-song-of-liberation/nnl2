@@ -105,7 +105,7 @@ typedef Tensor* (*expfn)(const Tensor*);
 typedef void (*loginplacefn)(Tensor*);
 typedef Tensor* (*logfn)(const Tensor*);
 typedef void (*transposeinplacefn)(Tensor*);
-typedef void (*transposefn)(const Tensor*);
+typedef Tensor* (*transposefn)(const Tensor*);
 typedef void (*scaleinplacefn)(Tensor*, float);
 typedef Tensor* (*scalefn)(const Tensor*, float);
 typedef void (*maxinplacefn)(Tensor*, const Tensor*);

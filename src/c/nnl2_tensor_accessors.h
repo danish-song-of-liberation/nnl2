@@ -3903,4 +3903,196 @@ void init_xavier() {
 	}
 }
 
+void naive_transposeinplace(Tensor* tensor) {
+	if(tensor->rank < 2) {
+		fprintf(stderr, "Error (Hello from C!): Provided an incorrect tensor at transpose in-place\n");
+		return;
+	}
+	
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	int* shape = tensor->shape;
+	
+	int rows = shape[0];
+	int cols = shape[1];
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			size_t total_bytes = total_elems * sizeof(double);
+			
+			double* trans_data = (double*)malloc(total_bytes);
+			double* cast_data = (double*)tensor->data;
+			
+			if (trans_data == NULL) {
+				fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+				return;
+			}
+			
+			for(int i = 0; i < rows; i++) {
+				for(int j = 0; j < cols; j++) {
+					int orig_index = i * cols + j;
+					int trans_index = j * rows + i;
+					
+					trans_data[trans_index] = cast_data[orig_index];
+				}
+			}
+			
+			memcpy(cast_data, trans_data, total_bytes);
+			free(trans_data);
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			size_t total_bytes = total_elems * sizeof(float);
+			
+			float* trans_data = (float*)malloc(total_bytes);
+			float* cast_data = (float*)tensor->data;
+			
+			if (trans_data == NULL) {
+				fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+				return;
+			}
+			
+			for(int i = 0; i < rows; i++) {
+				for(int j = 0; j < cols; j++) { 
+					int orig_index = i * cols + j;
+					int trans_index = j * rows + i;
+					
+					trans_data[trans_index] = cast_data[orig_index];
+				}
+			}
+			
+			memcpy(cast_data, trans_data, total_bytes);
+			free(trans_data);
+			
+			break;
+		}
+		
+		case INT32: {
+			size_t total_bytes = total_elems * sizeof(int32_t);
+			
+			int32_t* trans_data = (int32_t*)malloc(total_bytes);
+			int32_t* cast_data = (int32_t*)tensor->data;
+			
+			if (trans_data == NULL) {
+				fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+				return;
+			}
+			
+			for(int i = 0; i < rows; i++) {
+				for(int j = 0; j < cols; j++) { 
+					int orig_index = i * cols + j;
+					int trans_index = j * rows + i;
+					
+					trans_data[trans_index] = cast_data[orig_index];
+				}
+			}
+			
+			memcpy(cast_data, trans_data, total_bytes);
+			free(trans_data);
+			
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (transpose in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation transposeinplace_backends[] = {
+	{naive_transposeinplace, 10, true, "NAIVE"},
+};	
+
+transposeinplacefn transposeinplace;
+
+void init_transposeinplace() {
+	for(size_t i = 0; i < sizeof(transposeinplace_backends) / sizeof(transposeinplace_backends[0]); i++) {
+		if (transposeinplace_backends[i].available) transposeinplace = transposeinplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_transpose(const Tensor* tensor) {
+	if(tensor->rank < 2) {
+		fprintf(stderr, "Error (Hello from C!): Provided an incorrect tensor at transpose in-place\n");
+		return NULL;
+	}
+	
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+
+	int rows = tensor->shape[0];
+	int cols = tensor->shape[1];
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* src_data = (double*)tensor->data;
+			double* dest_data = (double*)result->data;
+
+			for(int i = 0; i < rows; i++) {
+				for(int j = 0; j < cols; j++) {
+					int orig_index = i * cols + j;
+					int trans_index = j * rows + i;
+
+					dest_data[trans_index] = src_data[orig_index];
+				}
+			}
+
+			break;
+		}
+		
+		case FLOAT32: {
+			float* src_data = (float*)tensor->data;
+			float* dest_data = (float*)result->data;
+
+			for(int i = 0; i < rows; i++) {
+				for(int j = 0; j < cols; j++) {
+					int orig_index = i * cols + j;
+					int trans_index = j * rows + i;
+
+					dest_data[trans_index] = src_data[orig_index];
+				}
+			}
+
+			break;
+		}
+		
+		case INT32: {
+			int32_t* src_data = (int32_t*)tensor->data;
+			int32_t* dest_data = (int32_t*)result->data;
+
+			for(int i = 0; i < rows; i++) {
+				for(int j = 0; j < cols; j++) {
+					int orig_index = i * cols + j;
+					int trans_index = j * rows + i;
+
+					dest_data[trans_index] = src_data[orig_index];
+				}
+			}
+
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (transpose)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation transpose_backends[] = {
+	{naive_transpose, 10, true, "NAIVE"},
+};	
+
+transposefn transpose;
+
+void init_transpose() {
+	for(size_t i = 0; i < sizeof(transpose_backends) / sizeof(transpose_backends[0]); i++) {
+		if (transpose_backends[i].available) transpose = transpose_backends[i].fn;
+	}
+}
+
 #endif

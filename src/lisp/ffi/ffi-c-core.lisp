@@ -266,6 +266,12 @@
 (cffi:defcfun ("lisp_call_tanh" %.tanh) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("lisp_call_transposeinplace" %transpose!) :void
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_transpose" %transpose) :pointer
+  (tensor :pointer))  
+  
 (cffi:defcfun ("free_tensor" free-tensor) :void
   (tensor :pointer))     
   
