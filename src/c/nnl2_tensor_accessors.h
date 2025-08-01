@@ -3859,4 +3859,48 @@ Tensor* randn_like(const Tensor* tensor, void* from, void* to) {
 	return randn(tensor->shape, tensor->rank, tensor->dtype, from, to);
 }
 
+Tensor* naive_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
+	if(dtype == INT32) {
+		fprintf(stderr, "Error (Hello from C!): Provided an not supported type (xavier-naive)\n");
+		return NULL;
+	}
+	
+	Tensor* result = empty(shape, rank, dtype);
+	size_t total_elems = product(shape, rank);
+	float stddev = gain * sqrt(distribution / (in + out));
+	
+	switch(dtype) {
+		case FLOAT64: {
+			double* data = (double*)result->data;
+			for(size_t i = 0; i < total_elems; i++) data[i] = -stddev + (stddev - -stddev) * ((float)rand() / RAND_MAX);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* data = (float*)result->data;
+			for(size_t i = 0; i < total_elems; i++) data[i] = -stddev + (stddev - -stddev) * ((float)rand() / RAND_MAX);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (xavier-naive)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation xavier_backends[] = {
+	{naive_xavier, 10, true, "NAIVE"},
+};	
+
+xavierfn xavier;
+
+void init_xavier() {
+	for(size_t i = 0; i < sizeof(xavier_backends) / sizeof(xavier_backends[0]); i++) {
+		if (xavier_backends[i].available) xavier = xavier_backends[i].fn;
+	}
+}
+
 #endif

@@ -187,7 +187,16 @@
 (cffi:defcfun ("randn_like" %randn-like) :pointer
   (tensor :pointer)
   (from :pointer)
-  (to :pointer))  
+  (to :pointer))
+
+(cffi:defcfun ("lisp_call_xavier" %xavier) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (in :int)
+  (out :int)
+  (gain :float)
+  (distribution :float))  
   
 (cffi:defcfun ("lisp_call_hstack" %hstack) :pointer
   (tensora :pointer)

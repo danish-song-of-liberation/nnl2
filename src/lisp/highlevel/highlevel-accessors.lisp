@@ -374,7 +374,16 @@
 						 
 			(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))))		
 				 
-			
+(defmacro xavier (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal))
+  (progn
+    (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier")
+	(assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to xavier")
+  
+    (multiple-value-bind (shape rank) (make-shape-pntr indices)
+      (case distribution
+	    (:normal `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 2.0s0))
+	    (:uniform `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 6.0s0))
+	    (otherwise (error "Unknown xavier-distribution: ~a%" distribution))))))
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
