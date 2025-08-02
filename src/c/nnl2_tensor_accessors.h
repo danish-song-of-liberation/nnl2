@@ -4928,4 +4928,48 @@ void init_min_minf() {
 	}
 }
 
+void naive_add_broadcasting_inplace(Tensor* summand, const Tensor* sumend) {
+	size_t numel_summand = product(summand->shape, summand->rank);
+	size_t numel_sumend = product(sumend->shape, sumend->rank);
+	
+	if((numel_summand % numel_sumend) == 0) {
+		switch(summand->dtype) {
+			case FLOAT64: {
+				double* cast_summand_data = (double*)summand->data;
+				double* cast_sumend_data = (double*)sumend->data;
+				
+				for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+					for(size_t j = 0; j < numel_sumend; j++) {
+						cast_summand_data[i * numel_sumend + j] += cast_sumend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-add)\n");
+				return;
+			}
+		}	
+	} 
+	
+	else {
+		fprintf(stderr, "Error (Hello from C!): Can't broadcast sumend-tensor (naive broadcasting-add)\n");
+		return;
+	}
+}
+
+Implementation add_broadcasting_inplace_backends[] = {
+	{naive_add_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+addbroadcastinginplacefn add_broadcasting_inplace;
+
+void init_add_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(add_broadcasting_inplace_backends) / sizeof(add_broadcasting_inplace_backends[0]); i++) {
+		if (add_broadcasting_inplace_backends[i].available) add_broadcasting_inplace = add_broadcasting_inplace_backends[i].fn;
+	}
+}
+
 #endif

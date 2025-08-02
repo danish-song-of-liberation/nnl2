@@ -144,6 +144,7 @@ typedef void (*maxmaxfinplacefn)(Tensor*, void*);
 typedef Tensor* (*maxmaxffn)(Tensor*, void*);
 typedef void (*minminfinplacefn)(Tensor*, void*);
 typedef Tensor* (*minminffn)(Tensor*, void*);
+typedef void (*addbroadcastinginplacefn)(Tensor*, const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

@@ -135,6 +135,10 @@
   (tensor :pointer)
   (increment :pointer))    
   
+(cffi:defcfun ("lisp_call_add_broadcasting_inplace" %.+/broadcasting!) :void  
+  (summand :pointer)
+  (sumend :pointer))
+  
 (cffi:defcfun ("lisp_call_add" %+) :pointer
   (summand :pointer)
   (addend :pointer))  

@@ -561,6 +561,9 @@
 	(setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce minf lisp-dtype))
 	
 	(nnl2.ffi:%.min/minf tensor minf-pntr)))	
+	
+(defmacro .+/broadcasting! (summand sumend)
+  `(nnl2.ffi:%.+/broadcasting! ,summand ,sumend))
 
 (defun .+/gnrl (a b)
   (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
@@ -568,10 +571,28 @@
 		(t (.+ a b))))
 		
 (defun .+/gnrl! (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (.+/incf! a b))
-		(t (+= a b))))		
+  (let ((scalar-a-p (typep a 'real))
+		(scalar-b-p (typep b 'real)))
 		
+	(if (or scalar-a-p scalar-b-p)
+	  (cond ((and scalar-a-p scalar-b-p) (setq a (+ a b)))
+			(scalar-b-p (.+/incf! a b))
+			(t (error "You can't apply a tensor function to a scalar~%")))
+			
+	  (let ((shapea (shape a :as :list))
+            (shapeb (shape b :as :list))
+            (ranka (rank a))
+            (rankb (rank b)))
+			
+		(if (or (not (equal shapea shapeb)) (not (= ranka rankb)))
+          (cond ((> ranka rankb) (.+/broadcasting! a b))
+                ((< ranka rankb) (.+/broadcasting! b a))
+                (t (.+/broadcasting! a b)))
+					
+		  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
+                ((and (typep a 'nnl2-tensor) (typep b 'real)) (.+/incf! a b))
+                (t (+= a b))))))))	 
+
 (defun .-/gnrl (a b)
   (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
 		((and (typep a 'nnl2-tensor) (typep b 'real)) (.-/decf a b))

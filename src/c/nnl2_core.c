@@ -99,6 +99,7 @@ void init_system() {
 	init_max_maxf();
 	init_min_minf_inplace();
 	init_min_minf();
+	init_add_broadcasting_inplace();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -347,6 +348,10 @@ void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
 
 Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 	return min_minf(tensor, minf);
+} 
+
+void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
+	return add_broadcasting_inplace(summand, sumend);
 }
 	 
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
