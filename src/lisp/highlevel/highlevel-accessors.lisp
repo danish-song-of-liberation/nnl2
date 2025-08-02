@@ -569,29 +569,22 @@
   (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
 		((and (typep a 'nnl2-tensor) (typep b 'real)) (.+/incf a b))
 		(t (.+ a b))))
-		
+
 (defun .+/gnrl! (a b)
-  (let ((scalar-a-p (typep a 'real))
-		(scalar-b-p (typep b 'real)))
-		
-	(if (or scalar-a-p scalar-b-p)
-	  (cond ((and scalar-a-p scalar-b-p) (setq a (+ a b)))
-			(scalar-b-p (.+/incf! a b))
-			(t (error "You can't apply a tensor function to a scalar~%")))
-			
-	  (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list))
-            (ranka (rank a))
-            (rankb (rank b)))
-			
-		(if (or (not (equal shapea shapeb)) (not (= ranka rankb)))
-          (cond ((> ranka rankb) (.+/broadcasting! a b))
-                ((< ranka rankb) (.+/broadcasting! b a))
-                (t (.+/broadcasting! a b)))
-					
-		  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
-                ((and (typep a 'nnl2-tensor) (typep b 'real)) (.+/incf! a b))
-                (t (+= a b))))))))	 
+  (let ((scalar-a-p (typep a 'real)))
+    (if (or scalar-a-p (typep b 'real))
+      (if scalar-a-p
+        (if (typep b 'real)
+          (+ a b)
+          (error "You can't apply a tensor function to a scalar"))
+        (.+/incf! a b))
+      (let ((shapea (shape a :as :list))
+            (shapeb (shape b :as :list)))
+        (if (equal shapea shapeb)
+		  (+= a b)
+          (if (> (rank a) (rank b))
+            (.+/broadcasting! a b)
+            (.+/broadcasting! b a)))))))
 
 (defun .-/gnrl (a b)
   (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (error "You can't apply a tensor function to a scalar"))
