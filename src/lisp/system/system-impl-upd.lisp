@@ -35,5 +35,3 @@
 									 :if-does-not-exist :create)
 									  
 	    (format out "~a~%" data)))))
-
- 

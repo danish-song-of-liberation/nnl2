@@ -4270,4 +4270,380 @@ void init_copy() {
 	}
 }
 
+void naive_add_incf_inplace(Tensor* tensor, void* inc) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double increment = *((double*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] += increment;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float increment = *((float*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] += increment;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t increment = *((int32_t*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] += increment;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive add-incf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation add_incf_inplace_backends[] = {
+	{naive_add_incf_inplace, 10, true, "NAIVE"},
+};	
+
+addincfinplacefn add_incf_inplace;
+
+void init_add_incf_inplace() {
+	for(size_t i = 0; i < sizeof(add_incf_inplace_backends) / sizeof(add_incf_inplace_backends[0]); i++) {
+		if (add_incf_inplace_backends[i].available) add_incf_inplace = add_incf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_add_incf(const Tensor* tensor, void* inc) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double increment = *((double*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] + increment;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float increment = *((float*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] + increment;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t increment = *((int32_t*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] + increment;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive add-incf-inplace)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation add_incf_backends[] = {
+	{naive_add_incf, 10, true, "NAIVE"},
+};	
+
+addincffn add_incf;
+
+void init_add_incf() {
+	for(size_t i = 0; i < sizeof(add_incf_backends) / sizeof(add_incf_backends[0]); i++) {
+		if (add_incf_backends[i].available) add_incf = add_incf_backends[i].fn;
+	}
+}
+
+void naive_sub_decf_inplace(Tensor* tensor, void* inc) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double increment = *((double*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] -= increment;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float increment = *((float*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] -= increment;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t increment = *((int32_t*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] -= increment;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive sub-incf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation sub_decf_inplace_backends[] = {
+	{naive_sub_decf_inplace, 10, true, "NAIVE"},
+};	
+
+subdecfinplacefn sub_decf_inplace;
+
+void init_sub_decf_inplace() {
+	for(size_t i = 0; i < sizeof(sub_decf_inplace_backends) / sizeof(sub_decf_inplace_backends[0]); i++) {
+		if (sub_decf_inplace_backends[i].available) sub_decf_inplace = sub_decf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_sub_decf(const Tensor* tensor, void* inc) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double increment = *((double*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] - increment;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float increment = *((float*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] - increment;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t increment = *((int32_t*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] - increment;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive sub-decf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation sub_decf_backends[] = {
+	{naive_sub_decf, 10, true, "NAIVE"},
+};	
+
+subdecffn sub_decf;
+
+void init_sub_decf() {
+	for(size_t i = 0; i < sizeof(sub_decf_backends) / sizeof(sub_decf_backends[0]); i++) {
+		if (sub_decf_backends[i].available) sub_decf = sub_decf_backends[i].fn;
+	}
+}
+
+void naive_mul_mulf_inplace(Tensor* tensor, void* mulf) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double multiply = *((double*)mulf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] *= multiply;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float multiply = *((float*)mulf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] *= multiply;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t multiply = *((int32_t*)mulf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] *= multiply;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive mul-mulf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation mul_mulf_inplace_backends[] = {
+	{naive_mul_mulf_inplace, 10, true, "NAIVE"},
+};	
+
+mulmulfinplacefn mul_mulf_inplace;
+
+void init_mul_mulf_inplace() {
+	for(size_t i = 0; i < sizeof(mul_mulf_inplace_backends) / sizeof(mul_mulf_inplace_backends[0]); i++) {
+		if (mul_mulf_inplace_backends[i].available) mul_mulf_inplace = mul_mulf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_mul_mulf(const Tensor* tensor, void* mulf) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double multiply = *((double*)mulf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] * multiply;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float multiply = *((float*)mulf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] * multiply;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t multiply = *((int32_t*)mulf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] * multiply;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive mul-mulf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation mul_mulf_backends[] = {
+	{naive_mul_mulf, 10, true, "NAIVE"},
+};	
+
+mulmulffn mul_mulf;
+
+void init_mul_mulf() {
+	for(size_t i = 0; i < sizeof(mul_mulf_backends) / sizeof(mul_mulf_backends[0]); i++) {
+		if (mul_mulf_backends[i].available) mul_mulf = mul_mulf_backends[i].fn;
+	}
+}
+
+void naive_div_divf_inplace(Tensor* tensor, void* divf) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double dif = *((double*)divf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] /= dif;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float dif = *((float*)divf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] /= dif;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t dif = *((int32_t*)divf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] /= dif;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive div-divf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation div_divf_inplace_backends[] = {
+	{naive_div_divf_inplace, 10, true, "NAIVE"},
+};	
+
+divdivfinplacefn div_divf_inplace;
+
+void init_div_divf_inplace() {
+	for(size_t i = 0; i < sizeof(div_divf_inplace_backends) / sizeof(div_divf_inplace_backends[0]); i++) {
+		if (div_divf_inplace_backends[i].available) div_divf_inplace = div_divf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_div_divf(const Tensor* tensor, void* divf) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double dif = *((double*)divf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] / dif;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float dif = *((float*)divf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] / dif;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t dif = *((int32_t*)divf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] / dif;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive div-divf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation div_divf_backends[] = {
+	{naive_div_divf, 10, true, "NAIVE"},
+};	
+
+divdivffn div_divf;
+
+void init_div_divf() {
+	for(size_t i = 0; i < sizeof(div_divf_backends) / sizeof(div_divf_backends[0]); i++) {
+		if (div_divf_backends[i].available) div_divf = div_divf_backends[i].fn;
+	}
+}
+
 #endif

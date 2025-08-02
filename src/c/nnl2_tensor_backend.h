@@ -130,6 +130,14 @@ typedef Tensor* (*xavierfn)(int*, int, TensorType, int, int, float, float);
 typedef void (*sumfn)(const Tensor*, int*, int);
 typedef void (*l2normfn)(const Tensor*, int*, int);
 typedef Tensor* (*copyfn)(const Tensor*);
+typedef void (*addincfinplacefn)(Tensor*, void*);
+typedef Tensor* (*addincffn)(const Tensor*, void*);
+typedef void (*subdecfinplacefn)(Tensor*, void*);
+typedef Tensor* (*subdecffn)(const Tensor*, void*);
+typedef void (*mulmulfinplacefn)(Tensor*, void*);
+typedef Tensor* (*mulmulffn)(const Tensor*, void*);
+typedef void (*divdivfinplacefn)(Tensor*, void*);
+typedef Tensor* (*divdivffn)(const Tensor*, void*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

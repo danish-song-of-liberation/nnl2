@@ -11,5 +11,6 @@
    :scale! :scale :zeros-like :ones-like :full-like :.max! :.min! :.max :.min :.abs! :.abs
    :.map! :empty-like :.map :hstack :vstack :tlet* :.relu! :.relu :.leaky-relu! :.leaky-relu
    :.sigmoid! :.sigmoid :.tanh! :.tanh :concat :randn :randn-like :xavier :transpose! :transpose
-   :sum :norm :copy))
+   :sum :norm :copy :+/incf! :+/incf :-/decf! :-/decf :.+/gnrl :.+/gnrl! :.-/gnrl :.-/gnrl!
+   :*/mulf! :*/mulf ://divf! ://divf :.*/gnrl! :.*/gnrl :.//gnrl! :.//gnrl))
   

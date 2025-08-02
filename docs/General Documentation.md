@@ -86,10 +86,10 @@ So far, there are only **3** types of tensors:
 | nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Description |
 |------|--------|--------|-------|---------|-------------|
 | ```(gemm a b)``` | ```(@ a b)``` | ```a * b``` | ```a @ b``` | ```a @ b``` or ```torch.mm(a, b)``` | Matrix multiplication |
-| ```(.+ a b)``` | ```(.+ a b)``` | ```a + b``` | ```a + b``` | ```a + b``` or ```torch.add(a, b)``` |	Element-wise add |
-| ```(.- a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | ```a - b``` or ```torch.sub(a, b)``` | Element-wise subtract |
-| ```(.* a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | ```a * b``` or ```torch.mul(a, b)``` | Element-wise multiply |
-| ```(./ a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | ```a / b``` or ```torch.div(a, b)``` | Element-wise divide |
+| ```(.+ a b)``` or ```(.+/gnrl a b)``` | ```(.+ a b)``` | ```a + b``` | ```a + b``` | ```a + b``` or ```torch.add(a, b)``` |	Element-wise add |
+| ```(.- a b)``` or ```(.-/gnrl a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | ```a - b``` or ```torch.sub(a, b)``` | Element-wise subtract |
+| ```(.* a b)``` or ```(.*/gnrl a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | ```a * b``` or ```torch.mul(a, b)``` | Element-wise multiply |
+| ```(./ a b)``` or ```(.//gnrl a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | ```a / b``` or ```torch.div(a, b)``` | Element-wise divide |
 | ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | ```a ** b``` or ```torch.pow(a,b)``` | Element-wise exponentiation |
 | ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | ```torch.exp(a)``` | Element-wise exponential |
 | ```(.exp! a)``` | | | ```np.exp(a, out=a)``` | ```a.exp_()``` | In-place exponential |

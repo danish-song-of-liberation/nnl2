@@ -117,7 +117,7 @@
   (ldb :int)
   (beta :double)
   (c :pointer)
-  (ldc :int))  
+  (ldc :int))    
   
 (cffi:defcfun ("lisp_call_addinplace" %+=) :void
   (summand :pointer)
@@ -127,29 +127,61 @@
   (summand :pointer)
   (sumend :pointer))  
   
+(cffi:defcfun ("lisp_call_add_incf_inplace" %+/incf!) :void
+  (tensor :pointer)
+  (increment :pointer))  
+  
+(cffi:defcfun ("lisp_call_sub_decf_inplace" %-/decf!) :void
+  (tensor :pointer)
+  (increment :pointer))    
+  
 (cffi:defcfun ("lisp_call_add" %+) :pointer
   (summand :pointer)
   (addend :pointer))  
   
+(cffi:defcfun ("lisp_call_add_incf" %+/incf) :pointer
+  (tensor :pointer)
+  (increment :pointer))  
+  
 (cffi:defcfun ("lisp_call_sub" %-) :pointer
   (summand :pointer)
   (addend :pointer))    
+ 
+(cffi:defcfun ("lisp_call_sub_decf" %-/decf) :pointer
+  (tensor :pointer)
+  (increment :pointer))  
   
 (cffi:defcfun ("lisp_call_mulinplace" %*=) :void
   (multiplicand :pointer)
+  (multiplier :pointer))  
+  
+(cffi:defcfun ("lisp_call_mul_mulf_inplace" %*/mulf!) :void
+  (tensor :pointer)
   (multiplier :pointer))  
   
 (cffi:defcfun ("lisp_call_divinplace" %/=) :void
   (dividend :pointer)
   (divisor :pointer))  
   
+(cffi:defcfun ("lisp_call_div_divf" %//divf) :pointer
+  (tensor :pointer)
+  (dif :pointer))    
+  
 (cffi:defcfun ("lisp_call_mul" %*) :pointer
   (multiplicand :pointer)
   (multiplier :pointer))
+  
+(cffi:defcfun ("lisp_call_mul_mulf" %*/mulf) :pointer
+  (tensor :pointer)
+  (multiplier :pointer))    
 
 (cffi:defcfun ("lisp_call_div" %/) :pointer
   (dividend :pointer)
   (divisor :pointer))
+  
+(cffi:defcfun ("lisp_call_div_divf_inplace" %//divf!) :void
+  (tensor :pointer)
+  (dif :pointer))
   
 (cffi:defcfun ("lisp_call_powinplace" %^=) :void
   (base :pointer)

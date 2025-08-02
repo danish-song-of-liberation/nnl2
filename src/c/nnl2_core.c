@@ -80,11 +80,19 @@ void init_system() {
 	init_concat();
 	init_randn();
 	init_xavier(); 
-	init_transposeinplace();
+	init_transposeinplace(); 
 	init_transpose();
 	init_sum();
 	init_l2norm();
 	init_copy();
+	init_add_incf_inplace();
+	init_add_incf();
+	init_sub_decf_inplace();
+	init_sub_decf();
+	init_mul_mulf_inplace();
+	init_mul_mulf();
+	init_div_divf_inplace();
+	init_div_divf();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -278,7 +286,39 @@ void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
 Tensor* lisp_call_copy(Tensor* tensor) {
 	return nnl2_copy(tensor);
 } 
+
+void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {
+	add_incf_inplace(tensor, inc);
+}
+
+Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {
+	return add_incf(tensor, inc);
+}
+
+void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {
+	sub_decf_inplace(tensor, dec);
+}
+
+Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
+	return sub_decf(tensor, dec);
+}
      
+void lisp_call_mul_mulf_inplace(Tensor* tensor, void* mulf) {
+	mul_mulf_inplace(tensor, mulf);
+}	
+
+Tensor* lisp_call_mul_mulf(Tensor* tensor, void* mulf) {
+	return mul_mulf(tensor, mulf);
+}
+
+void lisp_call_div_divf_inplace(Tensor* tensor, void* divf) {
+	div_divf_inplace(tensor, divf);
+}
+
+Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) {
+	return div_divf(tensor, divf);
+}
+	 
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);
 	
