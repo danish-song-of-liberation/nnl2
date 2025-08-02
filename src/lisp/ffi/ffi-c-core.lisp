@@ -127,11 +127,11 @@
   (summand :pointer)
   (sumend :pointer))  
   
-(cffi:defcfun ("lisp_call_add_incf_inplace" %+/incf!) :void
+(cffi:defcfun ("lisp_call_add_incf_inplace" %.+/incf!) :void
   (tensor :pointer)
   (increment :pointer))  
   
-(cffi:defcfun ("lisp_call_sub_decf_inplace" %-/decf!) :void
+(cffi:defcfun ("lisp_call_sub_decf_inplace" %.-/decf!) :void
   (tensor :pointer)
   (increment :pointer))    
   
@@ -139,7 +139,7 @@
   (summand :pointer)
   (addend :pointer))  
   
-(cffi:defcfun ("lisp_call_add_incf" %+/incf) :pointer
+(cffi:defcfun ("lisp_call_add_incf" %.+/incf) :pointer
   (tensor :pointer)
   (increment :pointer))  
   
@@ -147,7 +147,7 @@
   (summand :pointer)
   (addend :pointer))    
  
-(cffi:defcfun ("lisp_call_sub_decf" %-/decf) :pointer
+(cffi:defcfun ("lisp_call_sub_decf" %.-/decf) :pointer
   (tensor :pointer)
   (increment :pointer))  
   
@@ -155,7 +155,7 @@
   (multiplicand :pointer)
   (multiplier :pointer))  
   
-(cffi:defcfun ("lisp_call_mul_mulf_inplace" %*/mulf!) :void
+(cffi:defcfun ("lisp_call_mul_mulf_inplace" %.*/mulf!) :void
   (tensor :pointer)
   (multiplier :pointer))  
   
@@ -163,7 +163,7 @@
   (dividend :pointer)
   (divisor :pointer))  
   
-(cffi:defcfun ("lisp_call_div_divf" %//divf) :pointer
+(cffi:defcfun ("lisp_call_div_divf" %.//divf) :pointer
   (tensor :pointer)
   (dif :pointer))    
   
@@ -171,7 +171,7 @@
   (multiplicand :pointer)
   (multiplier :pointer))
   
-(cffi:defcfun ("lisp_call_mul_mulf" %*/mulf) :pointer
+(cffi:defcfun ("lisp_call_mul_mulf" %.*/mulf) :pointer
   (tensor :pointer)
   (multiplier :pointer))    
 
@@ -179,7 +179,7 @@
   (dividend :pointer)
   (divisor :pointer))
   
-(cffi:defcfun ("lisp_call_div_divf_inplace" %//divf!) :void
+(cffi:defcfun ("lisp_call_div_divf_inplace" %.//divf!) :void
   (tensor :pointer)
   (dif :pointer))
   
@@ -187,12 +187,20 @@
   (base :pointer)
   (exponent :pointer))  
   
+(cffi:defcfun ("lisp_call_pow_powf_inplace" %.^/powf!) :void
+  (tensor :pointer)
+  (powf :pointer))  
+  
 (cffi:defcfun ("lisp_call_expinplace" %.exp!) :void
   (tensor :pointer))
   
 (cffi:defcfun ("lisp_call_pow" %.^) :pointer
   (base :pointer)
   (exponent :pointer))    
+  
+(cffi:defcfun ("lisp_call_pow_powf" %.^/powf) :pointer
+  (tensor :pointer)
+  (powf :pointer))  
   
 (cffi:defcfun ("lisp_call_exp" %.exp) :pointer
   (tensor :pointer))

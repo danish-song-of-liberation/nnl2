@@ -6,5 +6,6 @@
    :%.log :%tref :%tref-setter :%scale! :%scale :%zeros-like :%ones-like :%full-like :%.max! :%.min! :%.max :%.min
    :%.abs! :%.abs :get-tensor-data :%empty-like :%hstack :%vstack :%.relu! :%.relu :%.leaky-relu! :%.leaky-relu
    :%.sigmoid! :%.sigmoid :%.tanh! :%.tanh :%concat :%randn :%randn-like :%xavier :%transpose! :%transpose :%sum
-   :%l2norm :%copy :%+/incf! :%+/incf :%-/decf! :%-/decf :%*/mulf! :%*/mulf :%//divf! :%//divf))
+   :%l2norm :%copy :%.+/incf! :%.+/incf :%.-/decf! :%.-/decf :%.*/mulf! :%.*/mulf :%.//divf! :%.//divf :%.^/powf! 
+   :%.^/powf))
 																					 

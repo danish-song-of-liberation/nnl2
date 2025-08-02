@@ -93,6 +93,8 @@ void init_system() {
 	init_mul_mulf();
 	init_div_divf_inplace();
 	init_div_divf();
+	init_pow_powf_inplace();
+	init_pow_powf();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -303,7 +305,7 @@ Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
 	return sub_decf(tensor, dec);
 }
      
-void lisp_call_mul_mulf_inplace(Tensor* tensor, void* mulf) {
+void lisp_call_mul_mulf_inplace(Tensor* tensor, void* mulf) {	
 	mul_mulf_inplace(tensor, mulf);
 }	
 
@@ -317,6 +319,14 @@ void lisp_call_div_divf_inplace(Tensor* tensor, void* divf) {
 
 Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) {
 	return div_divf(tensor, divf);
+}
+
+void lisp_call_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
+	pow_powf_inplace(tensor, powf_arg);
+}
+
+Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
+	return pow_powf(tensor, powf);
 }
 	 
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

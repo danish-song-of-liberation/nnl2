@@ -90,17 +90,18 @@ So far, there are only **3** types of tensors:
 | ```(.- a b)``` or ```(.-/gnrl a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | ```a - b``` or ```torch.sub(a, b)``` | Element-wise subtract |
 | ```(.* a b)``` or ```(.*/gnrl a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | ```a * b``` or ```torch.mul(a, b)``` | Element-wise multiply |
 | ```(./ a b)``` or ```(.//gnrl a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | ```a / b``` or ```torch.div(a, b)``` | Element-wise divide |
-| ```(.^ a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | ```a ** b``` or ```torch.pow(a,b)``` | Element-wise exponentiation |
+| ```(.^ a b)``` or ```(.^/gnrl a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | ```a ** b``` or ```torch.pow(a,b)``` | Element-wise exponentiation |
 | ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | ```torch.exp(a)``` | Element-wise exponential |
 | ```(.exp! a)``` | | | ```np.exp(a, out=a)``` | ```a.exp_()``` | In-place exponential |
 | ```(.log a)``` | ```(.log a)``` | ```log(a)``` | ```np.log(a)``` | ```torch.log(a)``` | Element-wise natural logarithm |
 | ```(.log! a)``` | | | ```np.log(a, out=a)``` | ```a.log_()``` |	In-place logarithm |
 | ```(scale a x)``` | ```(scale a x)``` | ```a * x``` | ```a * x``` | ```a * b``` or ```torch.mul(a, b)``` | Scale tensor by scalar |
 | ```(scale! a x)``` | ```(scale! a x)``` | ```a = a * x``` | ```np.multiply(a, x, out=a)``` | ```a.mul_(x)``` | In-place scaling |
-| ```(+= a b)``` | | ```a += b``` | ```a += b``` | ```a.add_(b)``` | In-place addition |
-| ```(-= a b)``` | | ```a -= b``` | ```a -= b``` | ```a.sub_(b)``` | In-place subtraction |
-| ```(*= a b)``` | | ```a *= b``` | ```a * b``` | ```a.mul_(b)``` | In-place multiplication |
-| ```(/! a b)``` | | ```a /= b``` | ```a /= b``` | ```a.div_(b)``` | In-place division (using /! instead of /=) |
+| ```(+= a b)``` or ```(.+/gnrl! a b)``` | | ```a += b``` | ```a += b``` | ```a.add_(b)``` | In-place addition |
+| ```(-= a b)``` or ```(.-/gnrl! a b)``` | | ```a -= b``` | ```a -= b``` | ```a.sub_(b)``` | In-place subtraction |
+| ```(*= a b)``` or ```(.*/gnrl! a b)``` | | ```a *= b``` | ```a * b``` | ```a.mul_(b)``` | In-place multiplication |
+| ```(/! a b)``` or ```(.//gnrl! a b)``` | | ```a /= b``` | ```a /= b``` | ```a.div_(b)``` | In-place division (using /! instead of /=) |
+| ```(^= a b)``` or ```(.^/gnrl! a b)``` | | ```a ** b``` | ```a ** b``` | ```a.pow_(b)``` | In-place exponentiation |
 | ```(.max a b)``` | ```(.max a b)``` | ```max(a, b)``` | ```np.maximum(a, b)``` | ```torch.maximum(a, b)``` | Element-wise maximum |
 | ```(.max! a b)``` | | | ```np.maximum(a, b, out=a)``` | ```a.set_(torch.maximum(a, b))``` | In-place element-wise maximum |
 | ```(.min a b)``` | ```(.min a b)``` | ```min(a,b)``` | ```np.minimum(a, b)``` | ```torch.minimum(a, b)``` | Element-wise minimum |

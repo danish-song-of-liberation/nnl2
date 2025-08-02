@@ -4646,4 +4646,98 @@ void init_div_divf() {
 	}
 }
 
+void naive_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double pof = *((double*)powf_arg);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = pow(cast_data[i], pof);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float pof = *((float*)powf_arg);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = powf(cast_data[i], pof);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t pof = *((int32_t*)powf_arg);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = (int32_t)pow((double)cast_data[i], pof);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive pow-powf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation pow_powf_inplace_backends[] = {
+	{naive_pow_powf_inplace, 10, true, "NAIVE"},
+};	
+
+powpowfinplacefn pow_powf_inplace;
+
+void init_pow_powf_inplace() {
+	for(size_t i = 0; i < sizeof(pow_powf_inplace_backends) / sizeof(pow_powf_inplace_backends[0]); i++) {
+		if (pow_powf_inplace_backends[i].available) pow_powf_inplace = pow_powf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_pow_powf(const Tensor* tensor, void* powf_arg) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double pof = *((double*)powf_arg);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = pow(cast_data_original[i], pof);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float pof = *((float*)powf_arg);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = powf(cast_data_original[i], pof);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t pof = *((int32_t*)powf_arg);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = (int32_t)pow((double)cast_data_original[i], pof);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive pow-powf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation pow_powf_backends[] = {
+	{naive_pow_powf, 10, true, "NAIVE"},
+};	
+
+powpowffn pow_powf;
+
+void init_pow_powf() {
+	for(size_t i = 0; i < sizeof(pow_powf_backends) / sizeof(pow_powf_backends[0]); i++) {
+		if (pow_powf_backends[i].available) pow_powf = pow_powf_backends[i].fn;
+	}
+}
+
 #endif

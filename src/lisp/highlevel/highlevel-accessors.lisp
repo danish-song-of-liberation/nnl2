@@ -422,7 +422,7 @@
 (defmacro copy (tensor)
   `(nnl2.ffi:%copy ,tensor))	
   
-(defun +/incf! (tensor increment)
+(defun .+/incf! (tensor increment)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -430,9 +430,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
 	
-	(nnl2.ffi:%+/incf! tensor incf-pntr)))
+	(nnl2.ffi:%.+/incf! tensor incf-pntr)))
 
-(defun +/incf (tensor increment)
+(defun .+/incf (tensor increment)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -440,9 +440,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
 	
-	(nnl2.ffi:%+/incf tensor incf-pntr)))
+	(nnl2.ffi:%.+/incf tensor incf-pntr)))
 	
-(defun -/decf! (tensor decrement)
+(defun .-/decf! (tensor decrement)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -450,9 +450,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce decrement lisp-dtype))
 	
-	(nnl2.ffi:%-/decf! tensor incf-pntr)))	
+	(nnl2.ffi:%.-/decf! tensor incf-pntr)))	
 	
-(defun -/decf (tensor decrement)
+(defun .-/decf (tensor decrement)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -460,9 +460,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce decrement lisp-dtype))
 	
-	(nnl2.ffi:%-/decf tensor incf-pntr)))	
+	(nnl2.ffi:%.-/decf tensor incf-pntr)))	
 	
-(defun */mulf! (tensor multiplier)
+(defun .*/mulf! (tensor multiplier)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -470,9 +470,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
 	
-	(nnl2.ffi:%*/mulf! tensor incf-pntr)))		
+	(nnl2.ffi:%.*/mulf! tensor incf-pntr)))		
 	
-(defun */mulf (tensor multiplier)
+(defun .*/mulf (tensor multiplier)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -480,9 +480,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
 	
-	(nnl2.ffi:%*/mulf tensor incf-pntr)))	
+	(nnl2.ffi:%.*/mulf tensor incf-pntr)))	
 
-(defun //divf! (tensor divf)
+(defun .//divf! (tensor divf)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -490,9 +490,9 @@
 		 
 	(setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divf lisp-dtype))
 	
-	(nnl2.ffi:%//divf! tensor divf-pntr)))		
+	(nnl2.ffi:%.//divf! tensor divf-pntr)))		
 
-(defun //divf (tensor divf)
+(defun .//divf (tensor divf)
   (let* ((dtype (dtype tensor))
 		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
@@ -500,47 +500,77 @@
 		 
 	(setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divf lisp-dtype))
 	
-	(nnl2.ffi:%//divf tensor divf-pntr)))		
+	(nnl2.ffi:%.//divf tensor divf-pntr)))	
+
+(defun .^/powf! (tensor powf)
+  (let* ((dtype (dtype tensor))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (powf-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce powf lisp-dtype))
+	
+	(nnl2.ffi:%.^/powf! tensor powf-pntr)))
+
+(defun .^/powf (tensor powf)
+  (let* ((dtype (dtype tensor))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (powf-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce powf lisp-dtype))
+	
+	(nnl2.ffi:%.^/powf tensor powf-pntr)))	
 
 (defun .+/gnrl (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (+/incf b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (+/incf a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.+/incf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.+/incf a b))
 		(t (.+ a b))))
 		
 (defun .+/gnrl! (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (+/incf! b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (+/incf! a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.+/incf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.+/incf! a b))
 		(t (+= a b))))		
 		
 (defun .-/gnrl (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (-/decf b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (-/decf a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.-/decf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.-/decf a b))
 		(t (.- a b))))
 
 (defun .-/gnrl! (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (-/decf! b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (-/decf! a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.-/decf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.-/decf! a b))
 		(t (-= a b))))				
 		
 (defun .*/gnrl! (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (*/mulf! b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (*/mulf! a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.*/mulf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.*/mulf! a b))
 		(t (*= a b))))		
 
 (defun .*/gnrl (a b)
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (*/mulf b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (*/mulf a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.*/mulf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.*/mulf a b))
 		(t (.* a b))))	
 
 (defun .//gnrl! (a b)	
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (*/divf! b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (*/divf! a b))
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.*/divf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.*/divf! a b))
 		(t (/! a b))))	
 
 (defun .//gnrl (a b)	
-  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (*/divf b a))
-		((and (typep a 'nnl2-tensor) (typep b 'real)) (*/divf a b))
-		(t (./ a b))))				
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.*/divf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.*/divf a b))
+		(t (./ a b))))	
+
+(defun .^/gnrl! (a b)	
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.^/powf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.^/powf! a b))
+		(t (^= a b))))	
+		
+(defun .^/gnrl (a b)	
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.^/powf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.^/powf a b))
+		(t (.^ a b))))			
 																				
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
