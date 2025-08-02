@@ -4740,4 +4740,192 @@ void init_pow_powf() {
 	}
 }
 
+void naive_max_maxf_inplace(Tensor* tensor, void* maxf) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double mxf = *((double*)maxf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = MAX(cast_data[i], mxf);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float mxf = *((float*)maxf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = MAX(cast_data[i], mxf);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t mxf = *((int32_t*)maxf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = MAX(cast_data[i], mxf);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive max-maxf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation max_maxf_inplace_backends[] = {
+	{naive_max_maxf_inplace, 10, true, "NAIVE"},
+};	
+
+maxmaxfinplacefn max_maxf_inplace;
+
+void init_max_maxf_inplace() {
+	for(size_t i = 0; i < sizeof(max_maxf_inplace_backends) / sizeof(max_maxf_inplace_backends[0]); i++) {
+		if (max_maxf_inplace_backends[i].available) max_maxf_inplace = max_maxf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_max_maxf(const Tensor* tensor, void* maxf) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double mxf = *((double*)maxf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_original[i], mxf);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float mxf = *((float*)maxf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_original[i], mxf);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t mxf = *((int32_t*)maxf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_original[i], mxf);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive pow-maxf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation max_maxf_backends[] = {
+	{naive_max_maxf, 10, true, "NAIVE"},
+};	
+
+maxmaxffn max_maxf;
+
+void init_max_maxf() {
+	for(size_t i = 0; i < sizeof(max_maxf_backends) / sizeof(max_maxf_backends[0]); i++) {
+		if (max_maxf_backends[i].available) max_maxf = max_maxf_backends[i].fn;
+	}
+}
+
+void naive_min_minf_inplace(Tensor* tensor, void* minf) {
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data = (double*)tensor->data;
+			double mnf = *((double*)minf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = MIN(cast_data[i], mnf);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data = (float*)tensor->data;
+			float mnf = *((float*)minf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = MIN(cast_data[i], mnf);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data = (int32_t*)tensor->data;
+			int32_t mnf = *((int32_t*)minf);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = MIN(cast_data[i], mnf);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive min-minf-inplace)\n");
+			return;
+		}
+	}
+}	
+
+Implementation min_minf_inplace_backends[] = {
+	{naive_min_minf_inplace, 10, true, "NAIVE"},
+};	
+
+minminfinplacefn min_minf_inplace;
+
+void init_min_minf_inplace() {
+	for(size_t i = 0; i < sizeof(min_minf_inplace_backends) / sizeof(min_minf_inplace_backends[0]); i++) {
+		if (min_minf_inplace_backends[i].available) min_minf_inplace = min_minf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_min_minf(const Tensor* tensor, void* minf) {
+	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)tensor->data;
+			double* cast_data_result = (double*)result->data;
+			double mnf = *((double*)minf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_original[i], mnf);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)tensor->data;
+			float* cast_data_result = (float*)result->data;
+			float mnf = *((float*)minf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_original[i], mnf);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)tensor->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t mnf = *((int32_t*)minf);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_original[i], mnf);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive min-minf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation min_minf_backends[] = {
+	{naive_min_minf, 10, true, "NAIVE"},
+};	
+
+minminffn min_minf;
+
+void init_min_minf() {
+	for(size_t i = 0; i < sizeof(min_minf_backends) / sizeof(min_minf_backends[0]); i++) {
+		if (min_minf_backends[i].available) min_minf = min_minf_backends[i].fn;
+	}
+}
+
 #endif

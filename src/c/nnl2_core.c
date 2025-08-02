@@ -95,6 +95,10 @@ void init_system() {
 	init_div_divf();
 	init_pow_powf_inplace();
 	init_pow_powf();
+	init_max_maxf_inplace();
+	init_max_maxf();
+	init_min_minf_inplace();
+	init_min_minf();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -327,6 +331,22 @@ void lisp_call_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
 
 Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
 	return pow_powf(tensor, powf);
+}
+	 
+void lisp_call_max_maxf_inplace(Tensor* tensor, void* maxf) {
+	max_maxf_inplace(tensor, maxf);
+}
+
+Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
+	return max_maxf(tensor, maxf);
+}
+
+void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
+	min_minf_inplace(tensor, minf);
+}
+
+Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
+	return min_minf(tensor, minf);
 }
 	 
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  

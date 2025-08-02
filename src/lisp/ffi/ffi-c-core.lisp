@@ -260,19 +260,35 @@
 
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)
-  (tensorb :pointer))  
+  (tensorb :pointer))    
+  
+(cffi:defcfun ("lisp_call_max_maxf_inplace" %.max/maxf!) :void
+  (tensor :pointer)
+  (maxf :pointer))    
   
 (cffi:defcfun ("lisp_call_mininplace" %.min!) :void
   (tensora :pointer)
   (tensorb :pointer))  
+  
+(cffi:defcfun ("lisp_call_min_minf_inplace" %.min/minf!) :void
+  (tensor :pointer)
+  (minf :pointer))  
 
 (cffi:defcfun ("lisp_call_max" %.max) :pointer
   (tensora :pointer)
-  (tensorb :pointer))    
+  (tensorb :pointer))   
+
+(cffi:defcfun ("lisp_call_max_maxf" %.max/maxf) :pointer
+  (tensor :pointer)
+  (maxf :pointer))  
   
 (cffi:defcfun ("lisp_call_min" %.min) :pointer
   (tensora :pointer)
-  (tensorb :pointer))    
+  (tensorb :pointer)) 
+
+(cffi:defcfun ("lisp_call_min_minf" %.min/minf) :pointer
+  (tensor :pointer)
+  (minf :pointer))    
   
 (cffi:defcfun ("lisp_call_absinplace" %.abs!) :void
   (tensora :pointer))

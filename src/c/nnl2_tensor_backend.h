@@ -140,6 +140,10 @@ typedef void (*divdivfinplacefn)(Tensor*, void*);
 typedef Tensor* (*divdivffn)(const Tensor*, void*);
 typedef void (*powpowfinplacefn)(Tensor*, void*);
 typedef Tensor* (*powpowffn)(const Tensor*, void*);
+typedef void (*maxmaxfinplacefn)(Tensor*, void*);
+typedef Tensor* (*maxmaxffn)(Tensor*, void*);
+typedef void (*minminfinplacefn)(Tensor*, void*);
+typedef Tensor* (*minminffn)(Tensor*, void*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

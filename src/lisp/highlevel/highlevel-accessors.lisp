@@ -521,6 +521,46 @@
 	(setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce powf lisp-dtype))
 	
 	(nnl2.ffi:%.^/powf tensor powf-pntr)))	
+	
+(defun .max/maxf! (tensor maxf)
+  (let* ((dtype (dtype tensor))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (maxf-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce maxf lisp-dtype))
+	
+	(nnl2.ffi:%.max/maxf! tensor maxf-pntr)))
+	
+(defun .max/maxf (tensor maxf)
+  (let* ((dtype (dtype tensor))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (maxf-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce maxf lisp-dtype))
+	
+	(nnl2.ffi:%.max/maxf tensor maxf-pntr)))	
+	
+(defun .min/minf! (tensor minf)
+  (let* ((dtype (dtype tensor))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (minf-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce minf lisp-dtype))
+	
+	(nnl2.ffi:%.min/minf! tensor minf-pntr)))	
+	
+(defun .min/minf (tensor minf)
+  (let* ((dtype (dtype tensor))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (minf-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce minf lisp-dtype))
+	
+	(nnl2.ffi:%.min/minf tensor minf-pntr)))	
 
 (defun .+/gnrl (a b)
   (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.+/incf b a))
@@ -571,7 +611,27 @@
   (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.^/powf b a))
 		((and (typep a 'nnl2-tensor) (typep b 'real)) (.^/powf a b))
 		(t (.^ a b))))			
-																				
+			
+(defun .max/gnrl! (a b)	
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.max/maxf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.max/maxf! a b))
+		(t (.max! a b))))		
+
+(defun .max/gnrl (a b)	
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.max/maxf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.max/maxf a b))
+		(t (.max a b))))	
+
+(defun .min/gnrl! (a b)	
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.min/minf! b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.min/minf! a b))
+		(t (.min! a b))))		
+
+(defun .min/gnrl (a b)	
+  (cond ((and (typep a 'real) (typep b 'nnl2-tensor)) (.min/minf b a))
+		((and (typep a 'nnl2-tensor) (typep b 'real)) (.min/minf a b))
+		(t (.min a b))))			
+			
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
 																			 

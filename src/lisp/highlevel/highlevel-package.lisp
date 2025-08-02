@@ -13,5 +13,6 @@
    :.sigmoid! :.sigmoid :.tanh! :.tanh :concat :randn :randn-like :xavier :transpose! :transpose
    :sum :norm :copy :.+/incf! :.+/incf :.-/decf! :.-/decf :.+/gnrl :.+/gnrl! :.-/gnrl :.-/gnrl!
    :.*/mulf! :.*/mulf :.//divf! :.//divf :.*/gnrl! :.*/gnrl :.//gnrl! :.//gnrl :.^/powf! :.^/powf
-   :.^/gnrl! :.^/gnrl))
+   :.^/gnrl! :.^/gnrl :.max/maxf! :.max/gnrl! :.max/maxf :.max/gnrl :.min/minf! :.min/gnrl!
+   :.min/minf :.min/gnrl))
   
