@@ -61,6 +61,11 @@
 							  :serial t
 							  :components ((:file "system-tests-package" :type "lisp")
 										   (:file "system-utils-tests" :type "lisp")))
+										   
+							 (:module "ts"
+							  :serial t
+							  :components ((:file "ts-tests-package" :type "lisp")
+										   (:file "ts-tests-basic-tensors" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 
