@@ -100,6 +100,19 @@ void init_system() {
 	init_min_minf_inplace();
 	init_min_minf();
 	init_add_broadcasting_inplace();
+	init_add_broadcasting();
+	init_sub_broadcasting_inplace();
+	init_sub_broadcasting();
+	init_mul_broadcasting_inplace();
+	init_mul_broadcasting();
+	init_div_broadcasting_inplace();
+	init_div_broadcasting();
+	init_pow_broadcasting_inplace();
+	init_pow_broadcasting();
+	init_max_broadcasting_inplace();
+	init_min_broadcasting_inplace();
+	init_max_broadcasting();
+	init_min_broadcasting();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -341,7 +354,7 @@ void lisp_call_max_maxf_inplace(Tensor* tensor, void* maxf) {
 Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
 	return max_maxf(tensor, maxf);
 }
-
+ 
 void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
 	min_minf_inplace(tensor, minf);
 }
@@ -353,7 +366,59 @@ Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return add_broadcasting_inplace(summand, sumend);
 }
+
+Tensor* lisp_call_add_broadcasting(Tensor* summand, Tensor* sumend) {
+	return add_broadcasting(summand, sumend);
+}
+
+void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
+	return sub_broadcasting_inplace(summand, sumend);
+}
+
+Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) { 
+	return sub_broadcasting(minuend, subtrahend);
+}
+
+void lisp_call_mul_broadcasting_inplace(Tensor* multiplicand, Tensor* multiplier) {
+	return mul_broadcasting_inplace(multiplicand, multiplier);
+}
+
+Tensor* lisp_call_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) { 
+	return mul_broadcasting(multiplicand, multiplier);
+}
+
+void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
+	return div_broadcasting_inplace(dividend, divisor);
+}
+
+Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
+	return div_broadcasting(dividend, divisor);
+}
+
+void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
+	return pow_broadcasting_inplace(base, exponent);
+}
+
+Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) { 
+	return pow_broadcasting(base, exponent);
+}
 	 
+void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {
+	return max_broadcasting_inplace(a, b);
+}
+
+void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {
+	return min_broadcasting_inplace(a, b);
+}
+
+Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) { 
+	return max_broadcasting(a, b);
+}
+
+Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) { 
+	return min_broadcasting(a, b);
+}
+
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);
 	

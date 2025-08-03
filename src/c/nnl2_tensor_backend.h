@@ -145,6 +145,19 @@ typedef Tensor* (*maxmaxffn)(Tensor*, void*);
 typedef void (*minminfinplacefn)(Tensor*, void*);
 typedef Tensor* (*minminffn)(Tensor*, void*);
 typedef void (*addbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef Tensor* (*addbroadcastingfn)(const Tensor*, const Tensor*);
+typedef void (*subbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef Tensor* (*subbroadcastingfn)(const Tensor*, const Tensor*);
+typedef void (*mulbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef Tensor* (*mulbroadcastingfn)(const Tensor*, const Tensor*);
+typedef void (*divbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef Tensor* (*divbroadcastingfn)(const Tensor*, const Tensor*);
+typedef void (*powbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef Tensor* (*powbroadcastingfn)(const Tensor*, const Tensor*);
+typedef void (*maxbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef void (*minbroadcastinginplacefn)(Tensor*, const Tensor*);
+typedef Tensor* (*maxbroadcastingfn)(const Tensor*, const Tensor*);
+typedef Tensor* (*minbroadcastingfn)(const Tensor*, const Tensor*);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

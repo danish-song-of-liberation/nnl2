@@ -4947,15 +4947,41 @@ void naive_add_broadcasting_inplace(Tensor* summand, const Tensor* sumend) {
 				break;
 			}
 			
+			case FLOAT32: {
+				float* cast_summand_data = (float*)summand->data;
+				float* cast_sumend_data = (float*)sumend->data;
+				
+				for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+					for(size_t j = 0; j < numel_sumend; j++) {
+						cast_summand_data[i * numel_sumend + j] += cast_sumend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				int32_t* cast_summand_data = (int32_t*)summand->data;
+				int32_t* cast_sumend_data = (int32_t*)sumend->data;
+				
+				for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+					for(size_t j = 0; j < numel_sumend; j++) {
+						cast_summand_data[i * numel_sumend + j] += cast_sumend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
 			default: {
-				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-add)\n");
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-add inplace)\n");
 				return;
 			}
 		}	
 	} 
 	
 	else {
-		fprintf(stderr, "Error (Hello from C!): Can't broadcast sumend-tensor (naive broadcasting-add)\n");
+		fprintf(stderr, "Error (Hello from C!): Can't broadcast sumend-tensor (naive broadcasting-add inplace)\n");
 		return;
 	}
 }
@@ -4969,6 +4995,965 @@ addbroadcastinginplacefn add_broadcasting_inplace;
 void init_add_broadcasting_inplace() {
 	for(size_t i = 0; i < sizeof(add_broadcasting_inplace_backends) / sizeof(add_broadcasting_inplace_backends[0]); i++) {
 		if (add_broadcasting_inplace_backends[i].available) add_broadcasting_inplace = add_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_add_broadcasting(const Tensor* summand, const Tensor* sumend) {
+	size_t numel_summand = product(summand->shape, summand->rank);
+	size_t numel_sumend = product(sumend->shape, sumend->rank);
+	
+	if((numel_summand % numel_sumend) == 0) {
+		Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+		
+		switch(summand->dtype) {
+			case FLOAT64: {
+				double* cast_summand_data = (double*)summand->data;
+				double* cast_sumend_data = (double*)sumend->data;
+				double* cast_result_data = (double*)result->data;
+				
+				for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+					for(size_t j = 0; j < numel_sumend; j++) {
+						cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + cast_sumend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				float* cast_summand_data = (float*)summand->data;
+				float* cast_sumend_data = (float*)sumend->data;
+				float* cast_result_data = (float*)result->data;
+				
+				for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+					for(size_t j = 0; j < numel_sumend; j++) {
+						cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + cast_sumend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				int32_t* cast_summand_data = (int32_t*)summand->data;
+				int32_t* cast_sumend_data = (int32_t*)sumend->data;
+				int32_t* cast_result_data = (int32_t*)result->data;
+				
+				for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+					for(size_t j = 0; j < numel_sumend; j++) {
+						cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + cast_sumend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-add)\n");
+				return NULL;
+			}
+		}
+		
+		return result;
+	}
+	
+	else {
+		fprintf(stderr, "Error (Hello from C!): Can't broadcast sumend-tensor (naive broadcasting-add)\n");
+		return NULL;
+	}
+}
+
+Implementation add_broadcasting_backends[] = {
+	{naive_add_broadcasting, 10, true, "NAIVE"},
+};	
+
+addbroadcastingfn add_broadcasting;
+
+void init_add_broadcasting() {
+	for(size_t i = 0; i < sizeof(add_broadcasting_backends) / sizeof(add_broadcasting_backends[0]); i++) {
+		if (add_broadcasting_backends[i].available) add_broadcasting = add_broadcasting_backends[i].fn;
+	}
+}
+
+void naive_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend) {
+	size_t numel_minuend = product(minuend->shape, minuend->rank);
+	size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
+	
+	if((numel_minuend % numel_subtrahend) == 0) {
+		switch(minuend->dtype) {
+			case FLOAT64: {
+				double* cast_minuend_data = (double*)minuend->data;
+				double* cast_subtrahend_data = (double*)subtrahend->data;
+				
+				for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+					for(size_t j = 0; j < numel_subtrahend; j++) {
+						cast_minuend_data[i * numel_subtrahend + j] -= cast_subtrahend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				float* cast_minuend_data = (float*)minuend->data;
+				float* cast_subtrahend_data = (float*)subtrahend->data;
+				
+				for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+					for(size_t j = 0; j < numel_subtrahend; j++) {
+						cast_minuend_data[i * numel_subtrahend + j] -= cast_subtrahend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				int32_t* cast_minuend_data = (int32_t*)minuend->data;
+				int32_t* cast_subtrahend_data = (int32_t*)subtrahend->data;
+				
+				for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+					for(size_t j = 0; j < numel_subtrahend; j++) {
+						cast_minuend_data[i * numel_subtrahend + j] -= cast_subtrahend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-sub inplace)\n");
+				return;
+			}
+		}	
+	} 
+	
+	else {
+		fprintf(stderr, "Error (Hello from C!): Can't broadcast subtrahend-tensor (naive broadcasting-sub inplace)\n");
+		return;
+	}
+}
+
+Implementation sub_broadcasting_inplace_backends[] = {
+	{naive_sub_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+subbroadcastinginplacefn sub_broadcasting_inplace;
+
+void init_sub_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(sub_broadcasting_inplace_backends) / sizeof(sub_broadcasting_inplace_backends[0]); i++) {
+		if (sub_broadcasting_inplace_backends[i].available) sub_broadcasting_inplace = sub_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_sub_broadcasting(const Tensor* minuend, const Tensor* subtrahend) {
+	size_t numel_minuend = product(minuend->shape, minuend->rank);
+	size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
+	
+	if((numel_minuend % numel_subtrahend) == 0) {
+		Tensor* result = empty(minuend->shape, minuend->rank, minuend->dtype);
+		
+		switch(minuend->dtype) {
+			case FLOAT64: {
+				double* cast_minuend_data = (double*)minuend->data;
+				double* cast_subtrahend_data = (double*)subtrahend->data;
+				double* cast_result_data = (double*)result->data;
+				
+				for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+					for(size_t j = 0; j < numel_subtrahend; j++) {
+						cast_result_data[i * numel_subtrahend + j] = cast_minuend_data[i * numel_subtrahend + j] - cast_subtrahend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				float* cast_minuend_data = (float*)minuend->data;
+				float* cast_subtrahend_data = (float*)subtrahend->data;
+				float* cast_result_data = (float*)result->data;
+				
+				for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+					for(size_t j = 0; j < numel_subtrahend; j++) {
+						cast_result_data[i * numel_subtrahend + j] = cast_minuend_data[i * numel_subtrahend + j] - cast_subtrahend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				int32_t* cast_minuend_data = (int32_t*)minuend->data;
+				int32_t* cast_subtrahend_data = (int32_t*)subtrahend->data;
+				int32_t* cast_result_data = (int32_t*)result->data;
+				
+				for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+					for(size_t j = 0; j < numel_subtrahend; j++) {
+						cast_result_data[i * numel_subtrahend + j] = cast_minuend_data[i * numel_subtrahend + j] - cast_subtrahend_data[j];
+					}
+				}
+				
+				break;
+			}
+			
+			default: {
+				fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-sub)\n");
+				return NULL;
+			}
+		}
+		
+		return result;
+	}
+	
+	else {
+		fprintf(stderr, "Error (Hello from C!): Can't broadcast subtrahend-tensor (naive broadcasting-sub)\n");
+		return NULL;
+	}
+}
+
+Implementation sub_broadcasting_backends[] = {
+	{naive_sub_broadcasting, 10, true, "NAIVE"},
+};	
+
+subbroadcastingfn sub_broadcasting;
+
+void init_sub_broadcasting() {
+	for(size_t i = 0; i < sizeof(sub_broadcasting_backends) / sizeof(sub_broadcasting_backends[0]); i++) {
+		if (sub_broadcasting_backends[i].available) sub_broadcasting = sub_broadcasting_backends[i].fn;
+	}
+}
+
+void naive_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multiplier) {
+    size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
+    size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
+
+    if((numel_multiplicand % numel_multiplier) == 0) {
+        switch(multiplicand->dtype) {
+            case FLOAT64: {
+                double* cast_multiplicand_data = (double*)multiplicand->data;
+                double* cast_multiplier_data = (double*)multiplier->data;
+
+                for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                    for(size_t j = 0; j < numel_multiplier; j++) {
+                        cast_multiplicand_data[i * numel_multiplier + j] *= cast_multiplier_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_multiplicand_data = (float*)multiplicand->data;
+                float* cast_multiplier_data = (float*)multiplier->data;
+
+                for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                    for(size_t j = 0; j < numel_multiplier; j++) {
+                        cast_multiplicand_data[i * numel_multiplier + j] *= cast_multiplier_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_multiplicand_data = (int32_t*)multiplicand->data;
+                int32_t* cast_multiplier_data = (int32_t*)multiplier->data;
+
+                for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                    for(size_t j = 0; j < numel_multiplier; j++) {
+                        cast_multiplicand_data[i * numel_multiplier + j] *= cast_multiplier_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-mul inplace)\n");
+                return;
+            }
+        }
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast multiplier-tensor (naive broadcasting-mul inplace)\n");
+        return;
+    }
+}
+
+Implementation mul_broadcasting_inplace_backends[] = {
+	{naive_mul_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+mulbroadcastinginplacefn mul_broadcasting_inplace;
+
+void init_mul_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(mul_broadcasting_inplace_backends) / sizeof(mul_broadcasting_inplace_backends[0]); i++) {
+		if (mul_broadcasting_inplace_backends[i].available) mul_broadcasting_inplace = mul_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_mul_broadcasting(const Tensor* multiplicand, const Tensor* multiplier) {
+    size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
+    size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
+
+    if((numel_multiplicand % numel_multiplier) == 0) {
+        Tensor* result = empty(multiplicand->shape, multiplicand->rank, multiplicand->dtype);
+
+        switch(multiplicand->dtype) {
+            case FLOAT64: {
+                double* cast_multiplicand_data = (double*)multiplicand->data;
+                double* cast_multiplier_data = (double*)multiplier->data;
+                double* cast_result_data = (double*)result->data;
+
+                for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                    for(size_t j = 0; j < numel_multiplier; j++) {
+                        cast_result_data[i * numel_multiplier + j] = cast_multiplicand_data[i * numel_multiplier + j] * cast_multiplier_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_multiplicand_data = (float*)multiplicand->data;
+                float* cast_multiplier_data = (float*)multiplier->data;
+                float* cast_result_data = (float*)result->data;
+
+                for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                    for(size_t j = 0; j < numel_multiplier; j++) {
+                        cast_result_data[i * numel_multiplier + j] = cast_multiplicand_data[i * numel_multiplier + j] * cast_multiplier_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_multiplicand_data = (int32_t*)multiplicand->data;
+                int32_t* cast_multiplier_data = (int32_t*)multiplier->data;
+                int32_t* cast_result_data = (int32_t*)result->data;
+
+                for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                    for(size_t j = 0; j < numel_multiplier; j++) {
+                        cast_result_data[i * numel_multiplier + j] = cast_multiplicand_data[i * numel_multiplier + j] * cast_multiplier_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-mul)\n");
+                return NULL;
+            }
+        }
+
+        return result;
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast multiplier-tensor (naive broadcasting-mul)\n");
+        return NULL;
+    }
+}
+
+Implementation mul_broadcasting_backends[] = {
+	{naive_mul_broadcasting, 10, true, "NAIVE"},
+};	
+
+mulbroadcastingfn mul_broadcasting;
+
+void init_mul_broadcasting() {
+	for(size_t i = 0; i < sizeof(mul_broadcasting_backends) / sizeof(mul_broadcasting_backends[0]); i++) {
+		if (mul_broadcasting_backends[i].available) mul_broadcasting = mul_broadcasting_backends[i].fn;
+	}
+}
+
+void naive_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) {
+    size_t numel_dividend = product(dividend->shape, dividend->rank);
+    size_t numel_divisor = product(divisor->shape, divisor->rank);
+
+    if((numel_dividend % numel_divisor) == 0) {
+        switch(dividend->dtype) {
+            case FLOAT64: {
+                double* cast_dividend_data = (double*)dividend->data;
+                double* cast_divisor_data = (double*)divisor->data;
+
+                for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                    for(size_t j = 0; j < numel_divisor; j++) {
+                        cast_dividend_data[i * numel_divisor + j] /= cast_divisor_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_dividend_data = (float*)dividend->data;
+                float* cast_divisor_data = (float*)divisor->data;
+
+                for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                    for(size_t j = 0; j < numel_divisor; j++) {
+                        cast_dividend_data[i * numel_divisor + j] /= cast_divisor_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_dividend_data = (int32_t*)dividend->data;
+                int32_t* cast_divisor_data = (int32_t*)divisor->data;
+
+                for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                    for(size_t j = 0; j < numel_divisor; j++) {
+                        cast_dividend_data[i * numel_divisor + j] /= cast_divisor_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-div inplace)\n");
+                return;
+            }
+        }
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast divisor-tensor (naive broadcasting-div inplace)\n");
+        return;
+    }
+}
+
+Implementation div_broadcasting_inplace_backends[] = {
+	{naive_div_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+divbroadcastinginplacefn div_broadcasting_inplace;
+
+void init_div_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(div_broadcasting_inplace_backends) / sizeof(div_broadcasting_inplace_backends[0]); i++) {
+		if (div_broadcasting_inplace_backends[i].available) div_broadcasting_inplace = div_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_div_broadcasting(const Tensor* dividend, const Tensor* divisor) {
+    size_t numel_dividend = product(dividend->shape, dividend->rank);
+    size_t numel_divisor = product(divisor->shape, divisor->rank);
+
+    if((numel_dividend % numel_divisor) == 0) {
+        Tensor* result = empty(dividend->shape, dividend->rank, dividend->dtype);
+
+        switch(dividend->dtype) {
+            case FLOAT64: {
+                double* cast_dividend_data = (double*)dividend->data;
+                double* cast_divisor_data = (double*)divisor->data;
+                double* cast_result_data = (double*)result->data;
+
+                for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                    for(size_t j = 0; j < numel_divisor; j++) {
+                        cast_result_data[i * numel_divisor + j] = cast_dividend_data[i * numel_divisor + j] / cast_divisor_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_dividend_data = (float*)dividend->data;
+                float* cast_divisor_data = (float*)divisor->data;
+                float* cast_result_data = (float*)result->data;
+
+                for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                    for(size_t j = 0; j < numel_divisor; j++) {
+                        cast_result_data[i * numel_divisor + j] = cast_dividend_data[i * numel_divisor + j] / cast_divisor_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_dividend_data = (int32_t*)dividend->data;
+                int32_t* cast_divisor_data = (int32_t*)divisor->data;
+                int32_t* cast_result_data = (int32_t*)result->data;
+
+                for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                    for(size_t j = 0; j < numel_divisor; j++) {
+                        cast_result_data[i * numel_divisor + j] = cast_dividend_data[i * numel_divisor + j] / cast_divisor_data[j];
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-div)\n");
+                return NULL;
+            }
+        }
+
+        return result;
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast divisor-tensor (naive broadcasting-div)\n");
+        return NULL;
+    }
+}
+
+Implementation div_broadcasting_backends[] = {
+	{naive_div_broadcasting, 10, true, "NAIVE"},
+};	
+
+divbroadcastingfn div_broadcasting;
+
+void init_div_broadcasting() {
+	for(size_t i = 0; i < sizeof(div_broadcasting_backends) / sizeof(div_broadcasting_backends[0]); i++) {
+		if (div_broadcasting_backends[i].available) div_broadcasting = div_broadcasting_backends[i].fn;
+	}
+}
+
+void naive_pow_broadcasting_inplace(Tensor* base, const Tensor* exponent) {
+    size_t numel_base = product(base->shape, base->rank);
+    size_t numel_exponent = product(exponent->shape, exponent->rank);
+
+    if((numel_base % numel_exponent) == 0) {
+        switch(base->dtype) {
+            case FLOAT64: {
+                double* cast_base_data = (double*)base->data;
+                double* cast_exponent_data = (double*)exponent->data;
+
+                for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                    for(size_t j = 0; j < numel_exponent; j++) {
+                        cast_base_data[i * numel_exponent + j] = pow(cast_base_data[i * numel_exponent + j], cast_exponent_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_base_data = (float*)base->data;
+                float* cast_exponent_data = (float*)exponent->data;
+
+                for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                    for(size_t j = 0; j < numel_exponent; j++) {
+                        cast_base_data[i * numel_exponent + j] = powf(cast_base_data[i * numel_exponent + j], cast_exponent_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_base_data = (int32_t*)base->data;
+                int32_t* cast_exponent_data = (int32_t*)exponent->data;
+
+                for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                    for(size_t j = 0; j < numel_exponent; j++) {
+                        cast_base_data[i * numel_exponent + j] = (int32_t)pow((double)cast_base_data[i * numel_exponent + j], (double)cast_exponent_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-pow inplace)\n");
+                return;
+            }
+        }
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast exponent-tensor (naive broadcasting-pow inplace)\n");
+        return;
+    }
+}
+
+Implementation pow_broadcasting_inplace_backends[] = {
+	{naive_pow_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+powbroadcastinginplacefn pow_broadcasting_inplace;
+
+void init_pow_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(pow_broadcasting_inplace_backends) / sizeof(pow_broadcasting_inplace_backends[0]); i++) {
+		if (pow_broadcasting_inplace_backends[i].available) pow_broadcasting_inplace = pow_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_pow_broadcasting(const Tensor* base, const Tensor* exponent) {
+    size_t numel_base = product(base->shape, base->rank);
+    size_t numel_exponent = product(exponent->shape, exponent->rank);
+
+    if((numel_base % numel_exponent) == 0) {
+        Tensor* result = empty(base->shape, base->rank, base->dtype);
+
+        switch(base->dtype) {
+            case FLOAT64: {
+                double* cast_base_data = (double*)base->data;
+                double* cast_exponent_data = (double*)exponent->data;
+                double* cast_result_data = (double*)result->data;
+
+                for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                    for(size_t j = 0; j < numel_exponent; j++) {
+                        cast_result_data[i * numel_exponent + j] = pow(cast_base_data[i * numel_exponent + j], cast_exponent_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_base_data = (float*)base->data;
+                float* cast_exponent_data = (float*)exponent->data;
+                float* cast_result_data = (float*)result->data;
+
+                for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                    for(size_t j = 0; j < numel_exponent; j++) {
+                        cast_result_data[i * numel_exponent + j] = powf(cast_base_data[i * numel_exponent + j], cast_exponent_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_base_data = (int32_t*)base->data;
+                int32_t* cast_exponent_data = (int32_t*)exponent->data;
+                int32_t* cast_result_data = (int32_t*)result->data;
+
+                for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                    for(size_t j = 0; j < numel_exponent; j++) {
+                        cast_result_data[i * numel_exponent + j] = (int32_t)pow((double)cast_base_data[i * numel_exponent + j], (double)cast_exponent_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-pow)\n");
+                return NULL;
+            }
+        }
+
+        return result;
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast exponent-tensor (naive broadcasting-pow)\n");
+        return NULL;
+    }
+}
+
+Implementation pow_broadcasting_backends[] = {
+	{naive_pow_broadcasting, 10, true, "NAIVE"},
+};	
+
+powbroadcastingfn pow_broadcasting;
+
+void init_pow_broadcasting() {
+	for(size_t i = 0; i < sizeof(pow_broadcasting_backends) / sizeof(pow_broadcasting_backends[0]); i++) {
+		if (pow_broadcasting_backends[i].available) pow_broadcasting = pow_broadcasting_backends[i].fn;
+	}
+}
+
+void naive_max_broadcasting_inplace(Tensor* x, const Tensor* y) {
+    size_t numel_x = product(x->shape, x->rank);
+    size_t numel_y = product(y->shape, y->rank);
+
+    if((numel_x % numel_y) == 0) {
+        switch(x->dtype) {
+            case FLOAT64: {
+                double* cast_x_data = (double*)x->data;
+                double* cast_y_data = (double*)y->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_x_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_x_data = (float*)x->data;
+                float* cast_y_data = (float*)y->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_x_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_x_data = (int32_t*)x->data;
+                int32_t* cast_y_data = (int32_t*)y->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_x_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-max inplace)\n");
+                return;
+            }
+        }
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast y-tensor (naive broadcasting-max inplace)\n");
+        return;
+    }
+}
+
+Implementation max_broadcasting_inplace_backends[] = {
+	{naive_max_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+maxbroadcastinginplacefn max_broadcasting_inplace;
+
+void init_max_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(max_broadcasting_inplace_backends) / sizeof(max_broadcasting_inplace_backends[0]); i++) {
+		if (max_broadcasting_inplace_backends[i].available) max_broadcasting_inplace = max_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+void naive_min_broadcasting_inplace(Tensor* x, const Tensor* y) {
+    size_t numel_x = product(x->shape, x->rank);
+    size_t numel_y = product(y->shape, y->rank);
+
+    if((numel_x % numel_y) == 0) {
+        switch(x->dtype) {
+            case FLOAT64: {
+                double* cast_x_data = (double*)x->data;
+                double* cast_y_data = (double*)y->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_x_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_x_data = (float*)x->data;
+                float* cast_y_data = (float*)y->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_x_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_x_data = (int32_t*)x->data;
+                int32_t* cast_y_data = (int32_t*)y->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_x_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-min inplace)\n");
+                return;
+            }
+        }
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast y-tensor (naive broadcasting-min inplace)\n");
+        return;
+    }
+}	
+
+Implementation min_broadcasting_inplace_backends[] = {
+	{naive_min_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+minbroadcastinginplacefn min_broadcasting_inplace;
+
+void init_min_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(min_broadcasting_inplace_backends) / sizeof(min_broadcasting_inplace_backends[0]); i++) {
+		if (min_broadcasting_inplace_backends[i].available) min_broadcasting_inplace = min_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_max_broadcasting(const Tensor* x, const Tensor* y) {
+    size_t numel_x = product(x->shape, x->rank);
+    size_t numel_y = product(y->shape, y->rank);
+
+    if((numel_x % numel_y) == 0) {
+        Tensor* result = empty(x->shape, x->rank, x->dtype);
+
+        switch(x->dtype) {
+            case FLOAT64: {
+                double* cast_x_data = (double*)x->data;
+                double* cast_y_data = (double*)y->data;
+                double* cast_result_data = (double*)result->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_result_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_x_data = (float*)x->data;
+                float* cast_y_data = (float*)y->data;
+                float* cast_result_data = (float*)result->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_result_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_x_data = (int32_t*)x->data;
+                int32_t* cast_y_data = (int32_t*)y->data;
+                int32_t* cast_result_data = (int32_t*)result->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_result_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-max)\n");
+                return NULL;
+            }
+        }
+
+        return result;
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast y-tensor (naive broadcasting-max)\n");
+        return NULL;
+    }
+}
+
+Implementation max_broadcasting_backends[] = {
+	{naive_max_broadcasting, 10, true, "NAIVE"},
+};	
+
+maxbroadcastingfn max_broadcasting;
+
+void init_max_broadcasting() {
+	for(size_t i = 0; i < sizeof(max_broadcasting_backends) / sizeof(max_broadcasting_backends[0]); i++) {
+		if (max_broadcasting_backends[i].available) max_broadcasting = max_broadcasting_backends[i].fn;
+	}
+}
+
+Tensor* naive_min_broadcasting(const Tensor* x, const Tensor* y) {
+    size_t numel_x = product(x->shape, x->rank);
+    size_t numel_y = product(y->shape, y->rank);
+
+    if((numel_x % numel_y) == 0) {
+        Tensor* result = empty(x->shape, x->rank, x->dtype);
+
+        switch(x->dtype) {
+            case FLOAT64: {
+                double* cast_x_data = (double*)x->data;
+                double* cast_y_data = (double*)y->data;
+                double* cast_result_data = (double*)result->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_result_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_x_data = (float*)x->data;
+                float* cast_y_data = (float*)y->data;
+                float* cast_result_data = (float*)result->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_result_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_x_data = (int32_t*)x->data;
+                int32_t* cast_y_data = (int32_t*)y->data;
+                int32_t* cast_result_data = (int32_t*)result->data;
+
+                for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                    for(size_t j = 0; j < numel_y; j++) {
+                        cast_result_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting-min)\n");
+                return NULL;
+            }
+        }
+
+        return result;
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast y-tensor (naive broadcasting-min)\n");
+        return NULL;
+    }
+}
+
+Implementation min_broadcasting_backends[] = {
+	{naive_min_broadcasting, 10, true, "NAIVE"},
+};	
+
+minbroadcastingfn min_broadcasting;
+
+void init_min_broadcasting() {
+	for(size_t i = 0; i < sizeof(min_broadcasting_backends) / sizeof(min_broadcasting_backends[0]); i++) {
+		if (min_broadcasting_backends[i].available) min_broadcasting = min_broadcasting_backends[i].fn;
 	}
 }
 

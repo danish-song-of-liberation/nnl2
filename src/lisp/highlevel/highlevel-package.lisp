@@ -14,5 +14,7 @@
    :sum :norm :copy :.+/incf! :.+/incf :.-/decf! :.-/decf :.+/gnrl :.+/gnrl! :.-/gnrl :.-/gnrl!
    :.*/mulf! :.*/mulf :.//divf! :.//divf :.*/gnrl! :.*/gnrl :.//gnrl! :.//gnrl :.^/powf! :.^/powf
    :.^/gnrl! :.^/gnrl :.max/maxf! :.max/gnrl! :.max/maxf :.max/gnrl :.min/minf! :.min/gnrl!
-   :.min/minf :.min/gnrl :.+/broadcasting!))
+   :.min/minf :.min/gnrl :.+/broadcasting! :.+/broadcasting :.-/broadcasting :.-/broadcasting!
+   :.*/broadcasting! :.*/broadcasting :.//broadcasting! :.//broadcasting :.^/broadcasting!
+   :.^/broadcasting))
   
