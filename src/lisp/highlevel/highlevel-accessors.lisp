@@ -148,11 +148,11 @@
 (defmacro -= (summand sumend) 
   `(nnl2.ffi:%-= ,summand ,sumend))  ;sry for the naming like summand sumend i  remake the after
   
-(defmacro .+ (summand addend)
-  `(nnl2.ffi:%+ ,summand ,addend))  
+(defun .+ (summand addend)
+  (nnl2.ffi:%+ summand addend))  
   
-(defmacro .- (minuend subtrahend)
-  `(nnl2.ffi:%- ,minuend ,subtrahend))    
+(defun .- (minuend subtrahend)
+  (nnl2.ffi:%- minuend subtrahend))    
 
 (defmacro *= (multiplicand multiplier)
   `(nnl2.ffi:%*= ,multiplicand ,multiplier))  
@@ -160,11 +160,11 @@
 (defmacro /! (dividend divisor)
   `(nnl2.ffi:%/= ,dividend ,divisor))  
   
-(defmacro .* (multiplicand multiplier)
-  `(nnl2.ffi:%* ,multiplicand ,multiplier))  
+(defun .* (multiplicand multiplier)
+  (nnl2.ffi:%* multiplicand multiplier))  
   
-(defmacro ./ (dividend divisor)
-  `(nnl2.ffi:%/ ,dividend ,divisor))  
+(defun ./ (dividend divisor)
+  (nnl2.ffi:%/ dividend divisor))  
   
 (defmacro ^= (base exponent)
   `(nnl2.ffi:%^= ,base ,exponent))
