@@ -146,7 +146,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 }          
- 
+  
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
 }  

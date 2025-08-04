@@ -44,32 +44,37 @@
           (tlet* ,(rest bindings) ,@body)
           (free ,var))))))
 
-(defmacro empty (indices &key (dtype nnl2.system:*default-tensor-type*))
+(defun empty (indices &key (dtype nnl2.system:*default-tensor-type*))
+  (declare (speed 3))
+  
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    `(nnl2.ffi:%empty ,shape ,rank ,dtype))) 
+    (nnl2.ffi:%empty shape rank dtype))) 
 	
 (defmacro empty-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%empty ,shape-pntr ,rank ,dtype))
 
-(defmacro zeros (indices &key (dtype nnl2.system:*default-tensor-type*))
+(defun zeros (indices &key (dtype nnl2.system:*default-tensor-type*))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    `(nnl2.ffi:%zeros ,shape ,rank ,dtype)))	 
+    (nnl2.ffi:%zeros shape rank dtype)))	 
 
 (defmacro zeros-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%zeros ,shape-pntr ,rank ,dtype))
 
-(defmacro ones (indices &key (dtype nnl2.system:*default-tensor-type*))
+(defun ones (indices &key (dtype nnl2.system:*default-tensor-type*))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    `(nnl2.ffi:%ones ,shape ,rank ,dtype))) 
+    (nnl2.ffi:%ones shape rank dtype))) 
 
 (defmacro ones-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%ones ,shape-pntr ,rank ,dtype))
 
-(defmacro full (indices &key (dtype nnl2.system:*default-tensor-type*) (filler 0.0d0))
+(defun full (indices &key (dtype nnl2.system:*default-tensor-type*) (filler 0.0d0))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    (let ((filler-pntr (cffi:foreign-alloc :double)))
-	  (setf (cffi:mem-ref filler-pntr :double) filler)
-     `(nnl2.ffi:%full ,shape ,rank ,dtype ,filler-pntr))))
+    (let* ((cffi-type (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		   (filler-pntr (cffi:foreign-alloc cffi-type)))
+		  
+	  (setf (cffi:mem-ref filler-pntr cffi-type) filler)
+	  
+      (nnl2.ffi:%full shape rank dtype filler-pntr))))
 	 
 (defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 

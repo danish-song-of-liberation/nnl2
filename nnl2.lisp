@@ -49,7 +49,12 @@
 							  
 			   (:module "tests"
 			    :serial t
-				:components ((:module "ffi"
+				:components ((:module "utils"
+							  :serial t
+							  :components ((:file "utils-package" :type "lisp")
+										   (:file "utils-trivial-errors" :type "lisp")))
+							  
+							 (:module "ffi"
 							  :serial t
 							  :components ((:file "ffi-tests-package" :type "lisp")
 										   (:file "ffi-tests-defcf" :type "lisp")

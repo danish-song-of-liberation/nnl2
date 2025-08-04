@@ -613,7 +613,7 @@ Implementation inplace_fill_backends[] = {
 	{naive_inplace_fill, 10, true, "NAIVE"},
 	
 	#ifdef __AVX__
-	// todo {avx_inplace_fill, 70, true, "AVX"},
+	{avx_inplace_fill, 70, true, "AVX"},
 	#endif
 };
 
