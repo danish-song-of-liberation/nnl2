@@ -71,7 +71,8 @@
 							  :serial t
 							  :components ((:file "ts-tests-package" :type "lisp")
 										   (:file "ts-tests-basic-tensors" :type "lisp")
-										   (:file "ts-tests-basic-operations" :type "lisp")))
+										   (:file "ts-tests-basic-operations" :type "lisp")
+										   (:file "ts-tests-basic-operations-inplace" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

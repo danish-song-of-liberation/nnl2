@@ -114,7 +114,7 @@
 (fiveam:test nnl2.hli.ts/empty/float64
   (check-nnl2.hli.ts/empty :dtype :float64 :int-dtype nnl2.hli.ts.tests:+enum-float64+ :shape *default-empty-test-shape*))
 	  
-(fiveam:test nnl2.hli.ts/empty/float32
+(fiveam:test nnl2.hli.ts/empty/float32	
   (check-nnl2.hli.ts/empty :dtype :float32 :int-dtype nnl2.hli.ts.tests:+enum-float32+ :shape *default-empty-test-shape*))
   
 (fiveam:test nnl2.hli.ts/empty/int32

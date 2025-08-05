@@ -2,6 +2,8 @@
 
 (deftype nnl2-tensor () 'sb-sys:system-area-pointer)
 
+(defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer)))
+
 (defun make-shape-pntr (shape)
   (let* ((len (the (integer 0 *) (length shape)))
 	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
@@ -42,7 +44,7 @@
      `(let (,binding)
         (unwind-protect
           (tlet* ,(rest bindings) ,@body)
-          (free ,var))))))
+          (when (typep ,var 'nnl2-tensor) (free ,var)))))))
 
 (defun empty (indices &key (dtype nnl2.system:*default-tensor-type*))
   (declare (speed 3))
@@ -142,11 +144,11 @@
 		 
 	(nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))  
   
-(defmacro += (summand sumend) 
-  `(nnl2.ffi:%+= ,summand ,sumend))  
+(defun += (summand sumend) 
+  (nnl2.ffi:%+= summand sumend))  
   
-(defmacro -= (summand sumend) 
-  `(nnl2.ffi:%-= ,summand ,sumend))  ;sry for the naming like summand sumend i  remake the after
+(defun -= (minuend subtrahend) 
+  (nnl2.ffi:%-= minuend subtrahend))
   
 (defun .+ (summand addend)
   (nnl2.ffi:%+ summand addend))  
@@ -154,11 +156,11 @@
 (defun .- (minuend subtrahend)
   (nnl2.ffi:%- minuend subtrahend))    
 
-(defmacro *= (multiplicand multiplier)
-  `(nnl2.ffi:%*= ,multiplicand ,multiplier))  
+(defun *= (multiplicand multiplier)
+  (nnl2.ffi:%*= multiplicand multiplier))  
 
-(defmacro /! (dividend divisor)
-  `(nnl2.ffi:%/= ,dividend ,divisor))  
+(defun /! (dividend divisor)
+  (nnl2.ffi:%/= dividend divisor))  
   
 (defun .* (multiplicand multiplier)
   (nnl2.ffi:%* multiplicand multiplier))  
@@ -166,11 +168,11 @@
 (defun ./ (dividend divisor)
   (nnl2.ffi:%/ dividend divisor))  
   
-(defmacro ^= (base exponent)
-  `(nnl2.ffi:%^= ,base ,exponent))
+(defun ^= (base exponent)
+  (nnl2.ffi:%^= base exponent))
 
-(defmacro .^ (base exponent)
-  `(nnl2.ffi:%.^ ,base ,exponent))
+(defun .^ (base exponent)
+  (nnl2.ffi:%.^ base exponent))
 
 (defmacro .exp! (tensor)
   `(nnl2.ffi:%.exp! ,tensor))
@@ -248,25 +250,23 @@
     (setf (cffi:mem-ref filler-pntr :double) filler)
 	`(nnl2.ffi:%full-like ,tensor ,filler-pntr)))
 	
-(defmacro .max! (tensora tensorb)
-  `(nnl2.ffi:%.max! ,tensora ,tensorb))	
+(defun .max! (tensora tensorb)
+  (nnl2.ffi:%.max! tensora tensorb))	
 	
-(defmacro .min! (tensora tensorb)
-  `(nnl2.ffi:%.min! ,tensora ,tensorb))
+(defun .min! (tensora tensorb)
+  (nnl2.ffi:%.min! tensora tensorb))
   
-(defmacro .max (tensora tensorb)
-  `(nnl2.ffi:%.max ,tensora ,tensorb))
+(defun .max (tensora tensorb)
+  (nnl2.ffi:%.max tensora tensorb))
   
-(defmacro .min (tensora tensorb)
-  `(nnl2.ffi:%.min ,tensora ,tensorb)) 
+(defun .min (tensora tensorb)
+  (nnl2.ffi:%.min tensora tensorb)) 
   
 (defmacro .abs! (tensor)
   `(nnl2.ffi:%.abs! ,tensor))  
   
 (defmacro .abs (tensor)
   `(nnl2.ffi:%.abs ,tensor))    
-  
-;; (setf (aref vec i) (cffi:mem-aref shape-pointer :int i)
 
 (defun .map! (funct &rest tensors &aux (first-tensor (car tensors)))
   (let ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
