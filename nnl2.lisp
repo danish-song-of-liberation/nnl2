@@ -79,7 +79,9 @@
 										   (:file "ts-tests-trivial-operations-inplace" :type "lisp")
 										   (:file "ts-tests-activation-functions" :type "lisp")
 										   (:file "ts-tests-activation-functions-inplace" :type "lisp")
-										   (:file "ts-tests-wise-element-map" :type "lisp")))
+										   (:file "ts-tests-wise-element-map" :type "lisp")
+										   (:file "ts-tests-wise-element-map-inplace" :type "lisp")
+										   (:file "ts-tests-concat" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

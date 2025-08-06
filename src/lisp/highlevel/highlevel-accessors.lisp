@@ -832,6 +832,9 @@
           (if (> (rank a) (rank b))
             (.min/broadcasting a b)
             (.min/broadcasting b a)))))))		
+			
+(defun ts-type-to-lisp (tensor-type)
+  (case tensor-type (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))			
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
