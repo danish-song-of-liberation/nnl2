@@ -174,14 +174,14 @@
 (defun .^ (base exponent)
   (nnl2.ffi:%.^ base exponent))
 
-(defmacro .exp! (tensor)
-  `(nnl2.ffi:%.exp! ,tensor))
+(defun .exp! (tensor)
+  (nnl2.ffi:%.exp! tensor))
 
 (defun .exp (tensor)
   (nnl2.ffi:%.exp tensor))  
   
-(defmacro .log! (tensor)
-  `(nnl2.ffi:%.log! ,tensor))  
+(defun .log! (tensor)
+  (nnl2.ffi:%.log! tensor))  
   
 (defun .log (tensor)
   (nnl2.ffi:%.log tensor))    
@@ -262,8 +262,8 @@
 (defun .min (tensora tensorb)
   (nnl2.ffi:%.min tensora tensorb)) 
   
-(defmacro .abs! (tensor)
-  `(nnl2.ffi:%.abs! ,tensor))  
+(defun .abs! (tensor)
+  (nnl2.ffi:%.abs! tensor))  
   
 (defun .abs (tensor)
   (nnl2.ffi:%.abs tensor))    
@@ -308,26 +308,26 @@
 (defmacro .relu! (tensor)
   `(nnl2.ffi:%.relu! ,tensor))
   
-(defmacro .relu (tensor)
-  `(nnl2.ffi:%.relu ,tensor))  
+(defun .relu (tensor)
+  (nnl2.ffi:%.relu tensor))  
   
 (defmacro .leaky-relu! (tensor &key (alpha 0.01))
   `(nnl2.ffi:%.leaky-relu! ,tensor ,alpha))  
   
-(defmacro .leaky-relu (tensor &key (alpha 0.01))
-  `(nnl2.ffi:%.leaky-relu ,tensor ,alpha))  
+(defun .leaky-relu (tensor &key (alpha 0.01))
+  (nnl2.ffi:%.leaky-relu tensor alpha))  
   
 (defmacro .sigmoid! (tensor)
   `(nnl2.ffi:%.sigmoid! ,tensor))  
   
-(defmacro .sigmoid (tensor)
-  `(nnl2.ffi:%.sigmoid ,tensor))  
+(defun .sigmoid (tensor)
+  (nnl2.ffi:%.sigmoid tensor))  
   
 (defmacro .tanh! (tensor)
   `(nnl2.ffi:%.tanh! ,tensor))  
   
-(defmacro .tanh (tensor)
-  `(nnl2.ffi:%.tanh ,tensor))    
+(defun .tanh (tensor)
+  (nnl2.ffi:%.tanh tensor))    
   
 (defmacro randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)

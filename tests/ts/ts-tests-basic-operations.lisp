@@ -12,7 +12,7 @@
 
 (fiveam:in-suite nnl2.hli.ts-suite)
 
-(defun check-nnl2.hli.ts/operation (&key dtype shape first-value second-value expected-value function inplace)
+(defun check-nnl2.hli.ts/operation (&key dtype shape first-value second-value expected-value function inplace (tolerance 0.0))
   "Checks the selected operation (like .+) for correctness.
    it also supports inplace functions by specifying a key.	
 	
@@ -35,6 +35,7 @@
    expected-value - Value that is expected in the new tensor
    function - A function used to create a result tensor
    inplace - A predicate that determines whether the passed function is in-place or not
+   tolerance - Ignore the spread
    
    How ironic, isn't it? 
    Docstring is bigger than the function itself"
@@ -48,7 +49,8 @@
 		  (nnl2.hli.ts.tests:check-tensor-data 
 		    :tensor (if inplace first-tensor result-tensor)
 		    :shape shape
-		    :expected-value expected-value)))
+		    :expected-value expected-value
+			:tolerance tolerance)))
 
 	(error (e)
 	  (nnl2.tests.utils:throw-error 

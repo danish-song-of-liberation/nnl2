@@ -1,6 +1,7 @@
 (defpackage :nnl2.tests.utils
   (:use :cl)
-  (:export #:throw-error))
+  (:export #:throw-error
+		   #:approximately-equal))
   
 ;; NNL2
 

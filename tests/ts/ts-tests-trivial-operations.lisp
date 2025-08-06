@@ -13,7 +13,7 @@
 
 (fiveam:in-suite nnl2.hli.ts-suite)
 
-(defun check-nnl2.hli.ts/trivial-operation (&key dtype shape val expected op inplace)
+(defun check-nnl2.hli.ts/trivial-operation (&key dtype shape val expected op inplace (tolerance 0.0))
   "Checks the correctness of a trivial operation, that 
    is, one that either does not require any arguments 
    other than the tensor
@@ -28,7 +28,8 @@
 		  (nnl2.hli.ts.tests:check-tensor-data 
 		    :tensor (if inplace tensor result-tensor)
 		    :shape shape
-		    :expected-value expected)))
+		    :expected-value expected
+			:tolerance tolerance)))
 	  
 	(error (e)
 	  (nnl2.tests.utils:throw-error 
@@ -46,7 +47,7 @@
 ;; -- `.exp` tests section --		
 	
 (fiveam:test nnl2.hli.ts/.exp/float64
-  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.exp-operation-shape* :val 2.0d0 :expected 7.3d89 :op #'nnl2.hli.ts:.exp))					
+  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.exp-operation-shape* :val 2.0d0 :expected 7.38d9 :op #'nnl2.hli.ts:.exp))					
 	
 (fiveam:test nnl2.hli.ts/.exp/float32
   (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.exp-operation-shape* :val 2.0s0 :expected 7.389 :op #'nnl2.hli.ts:.exp))			

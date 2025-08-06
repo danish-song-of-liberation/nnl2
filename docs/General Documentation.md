@@ -75,7 +75,7 @@ So far, there are only **3** types of tensors:
 
 | nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Desctiption |
 |------|--------|--------|-------|---------|-------------|
-| yet nope | ```(from-list '(1d0 2d0 3d0 4d0 5d0 6d0) '(2 3))``` | ```[ 1 2 3; 4 5 6 ]``` | ```np.array([[1.,2.,3.], [4.,5.,6.]])``` | ```torch.tensor([[1,2,3],[4,5,6]])``` | Create a 2x3 matrix from given elements. |
+| W.I.P. | ```(from-list '(1d0 2d0 3d0 4d0 5d0 6d0) '(2 3))``` | ```[ 1 2 3; 4 5 6 ]``` | ```np.array([[1.,2.,3.], [4.,5.,6.]])``` | ```torch.tensor([[1,2,3],[4,5,6]])``` | Create a 2x3 matrix from given elements. |
 | ```(empty #(3 2 1)``` | ```(empty '(3 2 1))``` | ```empty(3,2,1)``` | ```empty((3,2,1))``` | ```torch.empty(3,2,1)``` | Create an uninitialized 3x2x1 array |
 | ```(zeros #(2 3 4))```| ```(zeros '(2 3 4)) or (const 0d0 '(2 3 4))``` | ```zeros(2,3,4)``` | ```zeros((2,3,4))``` | ```torch.zeros(2,3,4)``` |  Create a 2x3x4 dimensional array of zeroes of double-float element type. |
 | ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | ```torch.ones(3,4)``` | Create a 3x4 dimensional array of ones of double-float element type. |
@@ -88,7 +88,7 @@ So far, there are only **3** types of tensors:
 | ```(gemm a b)``` | ```(@ a b)``` | ```a * b``` | ```a @ b``` | ```a @ b``` or ```torch.mm(a, b)``` | Matrix multiplication |
 | ```(.+ a b)``` or ```(.+/gnrl a b)``` | ```(.+ a b)``` | ```a + b``` | ```a + b``` | ```a + b``` or ```torch.add(a, b)``` |	Element-wise add |
 | ```(.- a b)``` or ```(.-/gnrl a b)``` | ```(.- a b)``` | ```a - b``` | ```a - b``` | ```a - b``` or ```torch.sub(a, b)``` | Element-wise subtract |
-| ```(.* a b)``` or ```(.*/gnrl a b)``` | ```(.* a b)	``` | ```a .* b``` | ```a * b``` | ```a * b``` or ```torch.mul(a, b)``` | Element-wise multiply |
+| ```(.* a b)``` or ```(.*/gnrl a b)``` | ```(.* a b)``` | ```a .* b``` | ```a * b``` | ```a * b``` or ```torch.mul(a, b)``` | Element-wise multiply |
 | ```(./ a b)``` or ```(.//gnrl a b)``` | ```(./ a b)``` | ```a ./ b ``` | ```a / b``` | ```a / b``` or ```torch.div(a, b)``` | Element-wise divide |
 | ```(.^ a b)``` or ```(.^/gnrl a b)``` | ```(.^ a b)``` | ```a .^ b``` | ```np.power(a,b)``` | ```a ** b``` or ```torch.pow(a,b)``` | Element-wise exponentiation |
 | ```(.exp a)``` | ```(.exp a)``` | ```exp(a)``` | ```np.exp(a)``` | ```torch.exp(a)``` | Element-wise exponential |

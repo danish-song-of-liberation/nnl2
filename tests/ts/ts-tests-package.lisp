@@ -44,14 +44,16 @@
   (fiveam:is (eql (nnl2.hli.ts:dtype tensor) expected-dtype) (format nil "The tensor data type must be ~a" expected-dtype))
   (fiveam:is (= (nnl2.hli.ts:size tensor) expected-size) (format nil "The size of the tensor should be ~a" expected-size)))
   
-(defun check-tensor-data (&key tensor shape (expected-value 0.0d0))
+(defun check-tensor-data (&key tensor shape (expected-value 0.0d0) (tolerance 0.0))
   "The function recursively traverses the tensor data and checks, using fiveam:is, for similarity to the expected-value"
 
   (assert (not (null tensor)) nil (format nil "~%An empty shape was passed to the function ~a~%" #'check-tensor-data))
 
   (let ((length-tensor (length shape)))
     (case length-tensor
-	  (0 (fiveam:is (= tensor expected-value) "Value mismatch in function ~a: ~a != ~a" #'check-tensor-data tensor expected-value))
+	  (0 (fiveam:is (nnl2.tests.utils:approximately-equal tensor expected-value :tolerance tolerance) 
+		   "Value mismatch in function ~a: ~a != ~a" #'check-tensor-data tensor expected-value))
+		   
 	  (1 (dotimes (i (first shape)) 
 		   (let ((current-index (nnl2.hli.ts:tref tensor i)))
 		     (fiveam:is (= current-index expected-value) "Value mismatch at index ~a in function ~a: ~a != ~a" 

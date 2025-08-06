@@ -52,7 +52,8 @@
 				:components ((:module "utils"
 							  :serial t
 							  :components ((:file "utils-package" :type "lisp")
-										   (:file "utils-trivial-errors" :type "lisp")))
+										   (:file "utils-trivial-errors" :type "lisp")
+										   (:file "utils-approx-equal" :type "lisp")))
 							  
 							 (:module "ffi"
 							  :serial t
@@ -73,7 +74,9 @@
 										   (:file "ts-tests-basic-tensors" :type "lisp")
 										   (:file "ts-tests-basic-operations" :type "lisp")
 										   (:file "ts-tests-basic-operations-inplace" :type "lisp")
-										   (:file "ts-tests-trivial-operations" :type "lisp")))
+										   (:file "ts-tests-trivial-operations" :type "lisp")
+										   (:file "ts-tests-trivial-operations-inplace" :type "lisp")
+										   (:file "ts-tests-activation-functions" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 
