@@ -32,7 +32,8 @@
 														 (:file "system-utils" :type "lisp")
 														 (:file "system-impl-upd" :type "lisp")
 														 (:file "system-config" :type "lisp")
-														 (:file "system-greetings" :type "lisp")))
+														 (:file "system-greetings" :type "lisp")
+														 (:file "system-vars" :type "lisp")))
 										   
 										   (:module "ffi"
 											:serial t
@@ -76,7 +77,9 @@
 										   (:file "ts-tests-basic-operations-inplace" :type "lisp")
 										   (:file "ts-tests-trivial-operations" :type "lisp")
 										   (:file "ts-tests-trivial-operations-inplace" :type "lisp")
-										   (:file "ts-tests-activation-functions" :type "lisp")))
+										   (:file "ts-tests-activation-functions" :type "lisp")
+										   (:file "ts-tests-activation-functions-inplace" :type "lisp")
+										   (:file "ts-tests-wise-element-map" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

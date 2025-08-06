@@ -17,6 +17,8 @@
   "Checks that the `nnl2.hli.ts:empty` function creates a tensor with the specified properties.
    It only checks the metadata because there is no tensor to check the contents of"
   
+  (nnl2.tests.utils:start-log-for-test :function #'nnl2.hli.ts:empty :dtype dtype) 
+  
   (handler-case
       (let ((expected-size (apply #'* shape))
 		    (expected-shape (coerce shape 'vector)))
@@ -28,9 +30,13 @@
 			:expected-dtype dtype
 			:expected-shape shape)
 		 
-		  (fiveam:is (= (nnl2.hli.ts:int-dtype tensor) int-dtype) "Checking if the data type matches the enum")))
+		  (fiveam:is (= (nnl2.hli.ts:int-dtype tensor) int-dtype) "Checking if the data type matches the enum")
+		  
+		  (nnl2.tests.utils:end-log-for-test :function #'nnl2.hli.ts:empty :dtype dtype)))
 		
 	(error (e)
+	  (nnl2.tests.utils:fail-log-for-test :function #'nnl2.hli.ts:empty :dtype dtype) 
+	
 	  (nnl2.tests.utils:throw-error 
 	    :documentation "Throws an informative error if an error occurs when creating an `empty` tensor"
 		:error-type :error
@@ -42,6 +48,8 @@
 (defun check-nnl2.hli.ts/check-value (&key dtype int-dtype shape expected-value tensor-func)
   "Checks that the `nnl2.hli.ts:zeros` and `nnl2.hli.ts:ones` function creates a tensor with the specified properties
    Checking `zeros` and `ones` has been moved to a single generalized function to avoid DRY"
+  
+  (nnl2.tests.utils:start-log-for-test :function tensor-func :dtype dtype) 
   
   (handler-case
       (let ((expected-size (apply #'* shape))
@@ -63,9 +71,13 @@
 		  (nnl2.hli.ts.tests:check-tensor-data 
 		    :tensor tensor
 			:shape shape
-			:expected-value expected-value)))
+			:expected-value expected-value)
+			
+		  (nnl2.tests.utils:end-log-for-test :function tensor-func :dtype dtype)))
 	  
 	(error (e)
+	  (nnl2.tests.utils:fail-log-for-test :function tensor-func :dtype dtype) 
+	
 	  (nnl2.tests.utils:throw-error
 	    :documentation "Throws an informative error if an error occurs when creating an `zeros` or `ones` tensor"
 		:error-type :error
@@ -76,6 +88,8 @@
 					
 (defun check-nnl2.hli.ts/full (&key dtype int-dtype shape filler)
   "Checks that the `nnl2.hli.ts:full` function creates a tensor with the specified properties"
+  
+  (nnl2.tests.utils:start-log-for-test :function #'nnl2.hli.ts:full :dtype dtype) 
   
   (handler-case
       (let ((expected-size (apply #'* shape))
@@ -93,9 +107,13 @@
 		  (nnl2.hli.ts.tests:check-tensor-data 
 		    :tensor tensor
 			:shape shape
-			:expected-value filler)))
+			:expected-value filler)
+			
+		  (nnl2.tests.utils:end-log-for-test :function #'nnl2.hli.ts:full :dtype dtype)))
 	  
 	(error (e)
+	  (nnl2.tests.utils:fail-log-for-test :function #'nnl2.hli.ts:full :dtype dtype) 
+	
 	  (nnl2.tests.utils:throw-error
 	    :documentation "Throws an informative error if an error occurs when creating an `full` tensor"
 		:error-type :error

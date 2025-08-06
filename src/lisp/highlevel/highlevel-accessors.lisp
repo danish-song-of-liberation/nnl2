@@ -305,26 +305,26 @@
 (defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
 (defun concat (axis &rest tensors) (reduce #'(lambda (acc tensor) (nnl2.ffi:%concat acc tensor axis)) tensors))
 
-(defmacro .relu! (tensor)
-  `(nnl2.ffi:%.relu! ,tensor))
+(defun .relu! (tensor)
+  (nnl2.ffi:%.relu! tensor))
   
 (defun .relu (tensor)
   (nnl2.ffi:%.relu tensor))  
   
-(defmacro .leaky-relu! (tensor &key (alpha 0.01))
-  `(nnl2.ffi:%.leaky-relu! ,tensor ,alpha))  
+(defun .leaky-relu! (tensor &key (alpha 0.01))
+  (nnl2.ffi:%.leaky-relu! tensor alpha))  
   
 (defun .leaky-relu (tensor &key (alpha 0.01))
   (nnl2.ffi:%.leaky-relu tensor alpha))  
   
-(defmacro .sigmoid! (tensor)
-  `(nnl2.ffi:%.sigmoid! ,tensor))  
+(defun .sigmoid! (tensor)
+  (nnl2.ffi:%.sigmoid! tensor))  
   
 (defun .sigmoid (tensor)
   (nnl2.ffi:%.sigmoid tensor))  
   
-(defmacro .tanh! (tensor)
-  `(nnl2.ffi:%.tanh! ,tensor))  
+(defun .tanh! (tensor)
+  (nnl2.ffi:%.tanh! tensor))  
   
 (defun .tanh (tensor)
   (nnl2.ffi:%.tanh tensor))    

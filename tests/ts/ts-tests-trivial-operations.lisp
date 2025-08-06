@@ -20,6 +20,8 @@
    
    logic is almost the same as the function #'check-nnl2.hli.ts/operation but for one tensor"
    
+  (nnl2.tests.utils:start-log-for-test :function op :dtype dtype) 
+   
   (handler-case
       (let ((tensor-shape (coerce shape 'vector)))
 	    (nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:full shape :dtype dtype :filler val))
@@ -29,14 +31,18 @@
 		    :tensor (if inplace tensor result-tensor)
 		    :shape shape
 		    :expected-value expected
-			:tolerance tolerance)))
+			:tolerance tolerance)
+			
+		  (nnl2.tests.utils:end-log-for-test :function op :dtype dtype)))
 	  
 	(error (e)
+	  (nnl2.tests.utils:fail-log-for-test :function op :dtype dtype)
+	
 	  (nnl2.tests.utils:throw-error 
 	    :documentation "Throws an informative error if an error occurs when you call the function"
 		:error-type :error
 		:message e 
-		:function #'check-nnl2.hli.ts/trivial-operation
+		:function op
 		:addition (format nil "The function caught an error when running the test with the passed arguments:~%dtype - ~a~%shape - ~d~%value - ~a~%expected - ~a"
 					dtype shape val expected)))))
 

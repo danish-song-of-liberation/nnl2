@@ -22,7 +22,7 @@
 								  (cons 'openblas0330woa64static *alist-false*))
 								 
   "Contains an associative list for subsequent conversion 
-   to json format in the format (implementation . *is-it-working-or-not*)")
+   to json format in the format (implementation . *is-it-working-or-not*)")  
 
 (defun get-config-path ()
   (uiop:merge-pathnames*

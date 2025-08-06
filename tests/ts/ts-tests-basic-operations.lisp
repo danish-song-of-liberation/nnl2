@@ -39,6 +39,8 @@
    
    How ironic, isn't it? 
    Docstring is bigger than the function itself"
+   
+  (nnl2.tests.utils:start-log-for-test :function function :dtype dtype)
   
   (handler-case
       (let ((tensor-shape (coerce shape 'vector)))
@@ -50,16 +52,20 @@
 		    :tensor (if inplace first-tensor result-tensor)
 		    :shape shape
 		    :expected-value expected-value
-			:tolerance tolerance)))
+			:tolerance tolerance)
+			
+		  (nnl2.tests.utils:end-log-for-test :function function :dtype dtype)))
 
 	(error (e)
+	  (nnl2.tests.utils:fail-log-for-test :function function :dtype dtype)
+	
 	  (nnl2.tests.utils:throw-error 
 	    :documentation "Throws an informative error if an error occurs when you call the function"
 		:error-type :error
 		:message e 
-		:function #'check-nnl2.hli.ts/operation
+		:function function
 		:addition (format nil "The function caught an error when running the test with the passed arguments:~%dtype - ~a~%shape - ~d~%first-value - ~a~%second-value - ~a~%expected-value - ~a"
-					dtype shape first-value second-value expected-value)))))									
+					dtype shape first-value second-value expected-value)))))
 					
 
 

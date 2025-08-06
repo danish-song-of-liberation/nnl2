@@ -11,4 +11,4 @@
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
 
 (defun approximately-equal (x y &key (tolerance 0.1))
-   (> tolerancy (abs (- x y))))
+   (<= (abs (- x y)) tolerance))
