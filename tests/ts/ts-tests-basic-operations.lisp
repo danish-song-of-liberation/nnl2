@@ -14,19 +14,30 @@
 
 (defun check-nnl2.hli.ts/operation (&key dtype shape first-value second-value expected-value function inplace)
   "Checks the selected operation (like .+) for correctness.
-   it also supports inplace functions by specifying a key.
+   it also supports inplace functions by specifying a key.	
 	
    First, the function creates three tensors, the first one 
    is filled with the first value, the second one is filled 
    with the second value, and the third one is filled with 
    the result of applying the function to them (if the operation 
-   is inplace, then nil will be placed there). 
+   is inplace, then nil will be placed there)
    
    Then, the resulting tensor is passed to 
    nnl2.hli.ts.tests:check-tensor-data, which checks 
    the contents of the tensor. If the operation is 
    inplace, then the resulting tensor will be the 
-   first tensor, otherwise it will be the result variable."
+   first tensor, otherwise it will be the result variable
+   
+   dtype - Type of tensor
+   shape - Tensor shape as a list (e.g. '(3 2 1))
+   first-value - Value that the first tensor will be filled with
+   second-value - Value that the second tensor will be filled with
+   expected-value - Value that is expected in the new tensor
+   function - A function used to create a result tensor
+   inplace - A predicate that determines whether the passed function is in-place or not
+   
+   How ironic, isn't it? 
+   Docstring is bigger than the function itself"
   
   (handler-case
       (let ((tensor-shape (coerce shape 'vector)))
@@ -34,10 +45,10 @@
 						    (second-tensor (nnl2.hli.ts:full shape :dtype dtype :filler second-value))
 							(result-tensor (funcall function first-tensor second-tensor)))		
 										
-		(nnl2.hli.ts.tests:check-tensor-data 
-		  :tensor (if inplace first-tensor result-tensor)
-		  :shape shape
-		  :expected-value expected-value)))
+		  (nnl2.hli.ts.tests:check-tensor-data 
+		    :tensor (if inplace first-tensor result-tensor)
+		    :shape shape
+		    :expected-value expected-value)))
 
 	(error (e)
 	  (nnl2.tests.utils:throw-error 
@@ -46,7 +57,11 @@
 		:message e 
 		:function #'check-nnl2.hli.ts/operation
 		:addition (format nil "The function caught an error when running the test with the passed arguments:~%dtype - ~a~%shape - ~d~%first-value - ~a~%second-value - ~a~%expected-value - ~a"
-					dtype shape first-value second-value expected-value)))))
+					dtype shape first-value second-value expected-value)))))									
+					
+
+
+;; '(5 5) is just a test form; it contains nothing unusual					
 					
 (defparameter *default-.+-operation-shape* '(5 5))
 (defparameter *default-.--operation-shape* '(5 5))
@@ -55,7 +70,6 @@
 (defparameter *default-.^-operation-shape* '(5 5))
 (defparameter *default-.max-operation-shape* '(5 5))
 (defparameter *default-.min-operation-shape* '(5 5))
-
 
 ;; -- `.+` tests section --		
 	

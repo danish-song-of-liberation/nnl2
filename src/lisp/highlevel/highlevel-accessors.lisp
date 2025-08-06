@@ -177,14 +177,14 @@
 (defmacro .exp! (tensor)
   `(nnl2.ffi:%.exp! ,tensor))
 
-(defmacro .exp (tensor)
-  `(nnl2.ffi:%.exp ,tensor))  
+(defun .exp (tensor)
+  (nnl2.ffi:%.exp tensor))  
   
 (defmacro .log! (tensor)
   `(nnl2.ffi:%.log! ,tensor))  
   
-(defmacro .log (tensor)
-  `(nnl2.ffi:%.log ,tensor))    
+(defun .log (tensor)
+  (nnl2.ffi:%.log tensor))    
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))
@@ -265,8 +265,8 @@
 (defmacro .abs! (tensor)
   `(nnl2.ffi:%.abs! ,tensor))  
   
-(defmacro .abs (tensor)
-  `(nnl2.ffi:%.abs ,tensor))    
+(defun .abs (tensor)
+  (nnl2.ffi:%.abs tensor))    
 
 (defun .map! (funct &rest tensors &aux (first-tensor (car tensors)))
   (let ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))

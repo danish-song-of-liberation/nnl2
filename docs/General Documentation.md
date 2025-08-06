@@ -108,16 +108,16 @@ So far, there are only **3** types of tensors:
 | ```(.min! a b)``` or ```(.min/gnrl! a b)``` |  |  | ```np.minimum(a, b, out=a)``` | ```a.set_(torch.minimum(a, b))``` | In-place element-wise minimum |
 | ```(.abs a)``` | | ```abs(a)``` | ```np.abs(a)``` | ```torch.abs(a)``` | Element-wise absolute value |
 | ```(.abs! a)``` | | | ```np.abs(a, out=a)	``` | ```a.abs_()``` | In-place absolute value |
-| yet nope | ```(.realpart a)``` | | ```np.real(a)``` | ```a.real``` | Element-wise real part |
-| yet nope | ```(.imagpart a)``` | | ```np.imag(a)``` | ```a.imag``` | Element-wise imaginary part |
-| yet nope | ```(.complex a b)``` | | | ```torch.complex(a, b)``` | Complex matrix from rectangular parts |
+| W.I.P. | ```(.realpart a)``` | | ```np.real(a)``` | ```a.real``` | Element-wise real part |
+| W.I.P. | ```(.imagpart a)``` | | ```np.imag(a)``` | ```a.imag``` | Element-wise imaginary part |
+| W.I.P. | ```(.complex a b)``` | | | ```torch.complex(a, b)``` | Complex matrix from rectangular parts |
 
 ### Block Matrix Constructors
 
 | nnl2 | MAGICL | MATLAB | NumPy | Pytorch | Description |
 |------|--------|--------|-------|---------|-------------|
-| yet nope | ```(block-matrix (list A B C D) '(2 2))``` | ```[A B; C D]``` | ```block([[A,B], [C, D]])``` | ```torch.cat((torch.cat((A,B), dim=1), torch.cat((C,D), dim=1)), dim=0)``` | Create a block matrix from matrices A,B,C,D. |
-| yet nope | ```(block-diag (list A B C))``` | ```blkdiag(A,B,C)``` | ```scipy.linalg.block_diag([A,B,C])``` | ```torch.block_diag(A, B, C)``` | Create a block diagonal matrix from matrices A,B,C. |
+| YAGNI | ```(block-matrix (list A B C D) '(2 2))``` | ```[A B; C D]``` | ```block([[A,B], [C, D]])``` | ```torch.cat((torch.cat((A,B), dim=1), torch.cat((C,D), dim=1)), dim=0)``` | Create a block matrix from matrices A,B,C,D. |
+| YAGNI | ```(block-diag (list A B C))``` | ```blkdiag(A,B,C)``` | ```scipy.linalg.block_diag([A,B,C])``` | ```torch.block_diag(A, B, C)``` | Create a block diagonal matrix from matrices A,B,C. |
 | ```(hstack A B C)``` | ```(hstack (list A B C))``` | ```[A B C]``` | ```hstack((A,B,C))``` | ```np.hstack((A,B,C))``` | Concatenate matrices A,B,C horizontally (column-wise). |
 | ```(vstack A B C)``` | ```(vstack (list A B C))``` | ```[A; B; C]``` | ```vstack((A,B,C))``` | ```np.vstack((A,B,C))``` | Concatenate matrices A,B,C vertically (row-wise). |	
 | ```(concat 2 A B C)``` | | ```cat(3, A, B, C)``` | ```np.concatenate((A, B, C), axis=2)``` | ```torch.cat((A, B, C), dim=2)``` | Concatenate tensors A, B, and C along the third dimension |
