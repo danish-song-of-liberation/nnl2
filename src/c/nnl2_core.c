@@ -108,7 +108,7 @@ void init_system() {
 	init_div_broadcasting_inplace();
 	init_div_broadcasting();
 	init_pow_broadcasting_inplace();
-	init_pow_broadcasting();
+	init_pow_broadcasting(); 	 
 	init_max_broadcasting_inplace();
 	init_min_broadcasting_inplace();
 	init_max_broadcasting();

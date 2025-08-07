@@ -142,37 +142,7 @@
 		 (ldb (if ldb ldb n))
 		 (ldc (if ldc ldc (aref shape-out 1))))
 		 
-	(nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))  
-  
-(defun += (summand sumend) 
-  (nnl2.ffi:%+= summand sumend))  
-  
-(defun -= (minuend subtrahend) 
-  (nnl2.ffi:%-= minuend subtrahend))
-  
-(defun .+ (summand addend)
-  (nnl2.ffi:%+ summand addend))  
-  
-(defun .- (minuend subtrahend)
-  (nnl2.ffi:%- minuend subtrahend))    
-
-(defun *= (multiplicand multiplier)
-  (nnl2.ffi:%*= multiplicand multiplier))  
-
-(defun /! (dividend divisor)
-  (nnl2.ffi:%/= dividend divisor))  
-  
-(defun .* (multiplicand multiplier)
-  (nnl2.ffi:%* multiplicand multiplier))  
-  
-(defun ./ (dividend divisor)
-  (nnl2.ffi:%/ dividend divisor))  
-  
-(defun ^= (base exponent)
-  (nnl2.ffi:%^= base exponent))
-
-(defun .^ (base exponent)
-  (nnl2.ffi:%.^ base exponent))
+	(nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))         
 
 (defun .exp! (tensor)
   (nnl2.ffi:%.exp! tensor))
@@ -249,18 +219,6 @@
   (let ((filler-pntr (cffi:foreign-alloc :double)))
     (setf (cffi:mem-ref filler-pntr :double) filler)
 	`(nnl2.ffi:%full-like ,tensor ,filler-pntr)))
-	
-(defun .max! (tensora tensorb)
-  (nnl2.ffi:%.max! tensora tensorb))	
-	
-(defun .min! (tensora tensorb)
-  (nnl2.ffi:%.min! tensora tensorb))
-  
-(defun .max (tensora tensorb)
-  (nnl2.ffi:%.max tensora tensorb))
-  
-(defun .min (tensora tensorb)
-  (nnl2.ffi:%.min tensora tensorb)) 
   
 (defun .abs! (tensor)
   (nnl2.ffi:%.abs! tensor))  
@@ -609,7 +567,7 @@
 (defmacro .min/broadcasting (tensora tensorb)
   `(nnl2.ffi:%.min/broadcasting ,tensora ,tensorb))     
 
-(defun .+/gnrl (a b)
+(defun .+ (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -620,12 +578,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.+ a b)
+		  (nnl2.ffi:%+ a b)
           (if (> (rank a) (rank b))
             (.+/broadcasting a b)
-            (.+/broadcasting b a)))))))
+            (.+/broadcasting b a)))))))  
 
-(defun .+/gnrl! (a b)
+(defun += (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -636,12 +594,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (+= a b)
+		  (nnl2.ffi:%+= a b)
           (if (> (rank a) (rank b))
             (.+/broadcasting! a b)
-            (.+/broadcasting! b a)))))))
+            (.+/broadcasting! b a)))))))  
 
-(defun .-/gnrl (a b)
+(defun .- (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -652,12 +610,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.- a b)
+		  (nnl2.ffi:%- a b)
           (if (> (rank a) (rank b))
             (.-/broadcasting a b)
-            (.-/broadcasting b a)))))))
+            (.-/broadcasting b a))))))) 
 
-(defun .-/gnrl! (a b)
+(defun -= (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -668,12 +626,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (-= a b)
+		  (nnl2.ffi:%-= a b)
           (if (> (rank a) (rank b))
             (.-/broadcasting! a b)
-            (.-/broadcasting! b a)))))))				
-
-(defun .*/gnrl (a b)
+            (.-/broadcasting! b a)))))))	
+			
+(defun .* (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -684,12 +642,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.* a b)
+		  (nnl2.ffi:%* a b)
           (if (> (rank a) (rank b))
             (.*/broadcasting a b)
-            (.*/broadcasting b a)))))))		
+            (.*/broadcasting b a)))))))	 	
 		
-(defun .*/gnrl! (a b)
+(defun *= (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -700,12 +658,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (*= a b)
+		  (nnl2.ffi:%*= a b)
           (if (> (rank a) (rank b))
             (.*/broadcasting! a b)
-            (.*/broadcasting! b a)))))))		
-
-(defun .//gnrl (a b)
+            (.*/broadcasting! b a)))))))
+			
+(defun ./ (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -716,12 +674,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (./ a b)
+		  (nnl2.ffi:%/ a b)
           (if (> (rank a) (rank b))
             (.//broadcasting a b)
             (.//broadcasting b a)))))))				
 		
-(defun .//gnrl! (a b)
+(defun /! (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -732,12 +690,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (/! a b)
+		  (nnl2.ffi:%/= a b)
           (if (> (rank a) (rank b))
             (.//broadcasting! a b)
-            (.//broadcasting! b a)))))))				
+            (.//broadcasting! b a)))))))	  			
 		
-(defun .^/gnrl (a b)
+(defun .^ (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -748,12 +706,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.^  a b)
+		  (nnl2.ffi:%.^ a b)
           (if (> (rank a) (rank b))
             (.^/broadcasting a b)
-            (.^/broadcasting b a)))))))	
+            (.^/broadcasting b a)))))))	  
 
-(defun .^/gnrl! (a b)
+(defun ^= (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -764,12 +722,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (^= a b)
+		  (nnl2.ffi:%^= a b)
           (if (> (rank a) (rank b))
             (.^/broadcasting! a b)
-            (.^/broadcasting! b a)))))))		
+            (.^/broadcasting! b a)))))))	
 			
-(defun .max/gnrl (a b)
+(defun .max (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -780,12 +738,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.max a b)
+		  (nnl2.ffi:%.max a b)
           (if (> (rank a) (rank b))
             (.max/broadcasting a b)
-            (.max/broadcasting b a)))))))	
+            (.max/broadcasting b a))))))) 
 
-(defun .max/gnrl! (a b)
+(defun .max! (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -796,28 +754,12 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.max! a b)
+		  (nnl2.ffi:%.max! a b)
           (if (> (rank a) (rank b))
             (.max/broadcasting! a b)
-            (.max/broadcasting! b a)))))))					
+            (.max/broadcasting! b a)))))))	  				
 
-(defun .min/gnrl! (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (min a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.min/minf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (.min! a b)
-          (if (> (rank a) (rank b))
-            (.min/broadcasting! a b)
-            (.min/broadcasting! b a)))))))	
-
-(defun .min/gnrl (a b)
+(defun .min (a b)
   (let ((scalar-a-p (typep a 'real)))
     (if (or scalar-a-p (typep b 'real))
       (if scalar-a-p
@@ -828,10 +770,26 @@
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
-		  (.min a b)
+		  (nnl2.ffi:%.min a b)
           (if (> (rank a) (rank b))
             (.min/broadcasting a b)
-            (.min/broadcasting b a)))))))		
+            (.min/broadcasting b a)))))))	
+
+(defun .min! (a b)
+  (let ((scalar-a-p (typep a 'real)))
+    (if (or scalar-a-p (typep b 'real))
+      (if scalar-a-p
+        (if (typep b 'real)
+          (setq a (min a b))
+          (error "You can't apply a tensor function to a scalar"))
+        (.min/minf! a b))
+      (let ((shapea (shape a :as :list))
+            (shapeb (shape b :as :list)))
+        (if (equal shapea shapeb)
+		  (nnl2.ffi:%.min! a b)
+          (if (> (rank a) (rank b))
+            (.min/broadcasting! a b)
+            (.min/broadcasting! b a)))))))	  
 			
 (defun ts-type-to-lisp (tensor-type)
   (case tensor-type (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))			

@@ -4998,7 +4998,7 @@ void init_add_broadcasting_inplace() {
 	}
 }
 
-Tensor* naive_add_broadcasting(const Tensor* summand, const Tensor* sumend) {
+Tensor* naive_add_broadcasting(const Tensor* summand, const Tensor* sumend) {	
 	size_t numel_summand = product(summand->shape, summand->rank);
 	size_t numel_sumend = product(sumend->shape, sumend->rank);
 	

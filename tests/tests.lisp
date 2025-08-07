@@ -10,10 +10,8 @@
 (defun run-ffi-tests ()
   (fiveam:run 'nnl2.ffi.tests:nnl2.ffi-suite))
   
-(defun run-ts-tests (&key debug)
-  (if debug
-    (fiveam:run! 'nnl2.hli.ts.tests:nnl2.hli.ts-suite)
-    (fiveam:run 'nnl2.hli.ts.tests:nnl2.hli.ts-suite))
+(defun run-ts-tests ()
+  (fiveam:run 'nnl2.hli.ts.tests:nnl2.hli.ts-suite)
 	
   (format t "~%[nnl2]: All tests have been saved to a file ~a~%" nnl2.system:+nnl2-filepath-log-path+)) 	
   

@@ -21,7 +21,7 @@
 
 (fiveam:test nnl2.hli.ts/.map!/float32
   (map-test :dtype :float32 :shape *default-.map!-operation-shape* :op #'nnl2.hli.ts:.map! :inplace t))	
-  
+   
 (fiveam:test nnl2.hli.ts/.map!/int32
   (map-test :dtype :int32 :shape *default-.map!-operation-shape* :op #'nnl2.hli.ts:.map! :inplace t))	
   

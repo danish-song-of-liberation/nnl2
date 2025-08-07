@@ -183,7 +183,7 @@ expected - 7.38d9 }
 [nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP>`: `The following check failed: (=
                                                                                             CURRENT-INDEX
                                                                                             EXPECTED-VALUE)
-Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 5.605194e-45 != 7.389.`
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 1.0 != 7.389.`
 Additional Info: The function caught an error when running the test with the passed arguments:
 dtype - FLOAT32
 shape - (5 5)
@@ -198,7 +198,7 @@ expected - 7.389 }
 [nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP>`: `The following check failed: (=
                                                                                             CURRENT-INDEX
                                                                                             EXPECTED-VALUE)
-Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 0 != 1.`
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 1065353216 != 1.`
 Additional Info: The function caught an error when running the test with the passed arguments:
 dtype - INT32
 shape - (5 5)
@@ -432,4 +432,49 @@ expected - 1.0d98 }
 
 [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: INT32)
 [nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT64)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: INT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT64)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: INT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+[nnl2]: Ended test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
 
