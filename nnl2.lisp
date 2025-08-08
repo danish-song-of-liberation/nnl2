@@ -84,7 +84,9 @@
 										   (:file "ts-tests-concat" :type "lisp")
 										   (:file "ts-tests-correspondence" :type "lisp")
 										   (:file "ts-tests-correspondence-inplace" :type "lisp")
-										   (:file "ts-tests-broadcasting" :type "lisp")))
+										   (:file "ts-tests-broadcasting" :type "lisp")
+										   (:file "ts-tests-broadcasting-inplace" :type "lisp")
+										   (:file "ts-tests-like-constructors" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

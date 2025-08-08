@@ -16,5 +16,5 @@
    :.^/gnrl! :.^/gnrl :.max/maxf! :.max/gnrl! :.max/maxf :.max/gnrl :.min/minf! :.min/gnrl!
    :.min/minf :.min/gnrl :.+/broadcasting! :.+/broadcasting :.-/broadcasting :.-/broadcasting!
    :.*/broadcasting! :.*/broadcasting :.//broadcasting! :.//broadcasting :.^/broadcasting!
-   :.^/broadcasting :*nnl2-tensor-types* :ts-type-to-lisp))
+   :.^/broadcasting :*nnl2-tensor-types* :ts-type-to-lisp :lisp-type-to-ts))
   

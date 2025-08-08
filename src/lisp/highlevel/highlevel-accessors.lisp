@@ -4,6 +4,12 @@
 
 (defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer)))
 
+(defun ts-type-to-lisp (tensor-type)
+  (case tensor-type (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))	
+  
+(defun lisp-type-to-ts (lisp-type)
+  (cond ((eql lisp-type 'double-float) :float64) ((eql lisp-type 'single-float) :float32) ((eql lisp-type 'integer) :int32))) 
+
 (defun make-shape-pntr (shape)
   (let* ((len (the (integer 0 *) (length shape)))
 	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
@@ -206,19 +212,22 @@
 (defmacro scale (tensor multiplier)
   `(nnl2.ffi:%scale ,tensor (float ,multiplier)))  
   
-(defmacro empty-like (tensor)
-  `(nnl2.ffi:%empty-like ,tensor))  
+(defun empty-like (tensor)
+  (nnl2.ffi:%empty-like tensor))  
   
-(defmacro zeros-like (tensor)
-  `(nnl2.ffi:%zeros-like ,tensor))  
+(defun zeros-like (tensor)
+  (nnl2.ffi:%zeros-like tensor))  
 	
-(defmacro ones-like (tensor)
-  `(nnl2.ffi:%ones-like ,tensor))  
+(defun ones-like (tensor)
+  (nnl2.ffi:%ones-like tensor))  
 		
-(defmacro full-like (tensor &key (filler 0.0d0))
-  (let ((filler-pntr (cffi:foreign-alloc :double)))
-    (setf (cffi:mem-ref filler-pntr :double) filler)
-	`(nnl2.ffi:%full-like ,tensor ,filler-pntr)))
+(defun full-like (tensor &key (filler 0.0d0))
+  (let* ((filler-type (type-of filler))
+		 (keyword-type (cond ((eql filler-type 'double-float) :double) ((eql filler-type 'single-float) :float) ((eql filler-type 'integer) :int)))
+		 (filler-pntr (cffi:foreign-alloc keyword-type)))
+		 
+    (setf (cffi:mem-ref filler-pntr keyword-type) filler)
+	  (nnl2.ffi:%full-like tensor filler-pntr)))
   
 (defun .abs! (tensor)
   (nnl2.ffi:%.abs! tensor))  
@@ -789,10 +798,7 @@
 		  (nnl2.ffi:%.min! a b)
           (if (> (rank a) (rank b))
             (.min/broadcasting! a b)
-            (.min/broadcasting! b a)))))))	  
-			
-(defun ts-type-to-lisp (tensor-type)
-  (case tensor-type (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))			
+            (.min/broadcasting! b a)))))))	  		
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
