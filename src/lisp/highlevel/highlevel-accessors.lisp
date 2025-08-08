@@ -606,7 +606,7 @@
         (if (typep b 'real)
           (- a b)
           (error "You can't apply a tensor function to a scalar"))
-        (.-/incf a b))
+        (.-/decf a b))
       (let ((shapea (shape a :as :list))
             (shapeb (shape b :as :list)))
         (if (equal shapea shapeb)
