@@ -34,7 +34,6 @@
 			
 		  (nnl2.tests.utils:end-log-for-test :function op :dtype dtype)))	
 			
-
     (error (e)
       (nnl2.tests.utils:fail-log-for-test :function op :dtype dtype)
 

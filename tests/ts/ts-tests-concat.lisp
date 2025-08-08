@@ -65,6 +65,13 @@
 							
 		  (let ((result-shape (nnl2.hli.ts:shape result :as :list)))
 		    (fiveam:is (equal result-shape expected-shape))
+			
+			;; (nnl2.hli.ts.tests:check-tensor-data ;; <<== POTENTIAL ERROR HERE. MAY RESULT IN A SEGFAULT
+		    ;;   :tensor result
+		    ;;   :shape result-shape
+		    ;;   :expected-value (coerce 1 lisp-type)
+			;;   :debug t)
+			
 			(nnl2.tests.utils:end-log-for-test :function op :dtype dtype))))
 
     (error (e)

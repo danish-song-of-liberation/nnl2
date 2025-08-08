@@ -46,7 +46,7 @@
   
 (defun check-tensor-data (&key tensor shape (expected-value 0.0d0) (tolerance 0.0))
   "The function recursively traverses the tensor data and checks, using fiveam:is, for similarity to the expected-value"
-
+  
   (assert (not (null tensor)) nil (format nil "~%An empty shape was passed to the function ~a~%" #'check-tensor-data))
 
   (let ((length-tensor (length shape)))
@@ -63,4 +63,4 @@
 		(let ((current-dim (first shape)))
 		  (dotimes (i current-dim) ;; Recursive traversal
 			(check-tensor-data :tensor (nnl2.hli.ts:tref tensor i) :shape (rest shape) :expected-value expected-value)))))))
-			
+	

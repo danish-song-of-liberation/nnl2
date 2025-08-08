@@ -357,7 +357,7 @@ Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
  
 void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
 	min_minf_inplace(tensor, minf);
-}
+} 
 
 Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 	return min_minf(tensor, minf);

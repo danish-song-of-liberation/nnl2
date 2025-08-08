@@ -83,7 +83,8 @@
 										   (:file "ts-tests-wise-element-map-inplace" :type "lisp")
 										   (:file "ts-tests-concat" :type "lisp")
 										   (:file "ts-tests-correspondence" :type "lisp")
-										   (:file "ts-tests-correspondence-inplace" :type "lisp")))
+										   (:file "ts-tests-correspondence-inplace" :type "lisp")
+										   (:file "ts-tests-broadcasting" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

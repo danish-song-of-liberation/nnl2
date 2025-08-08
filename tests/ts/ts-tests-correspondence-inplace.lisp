@@ -96,5 +96,5 @@
   (check-nnl2.hli.ts/correspondence-operation :dtype :float32 :shape *default-.min/minf!-operation-shape* :fill 4.0s0 :val 5.0s0 :expected 4.0s0 :op #'nnl2.hli.ts:.min! :inplace t))									
     
 (fiveam:test nnl2.hli.ts/.min/minf!/int32
-  (check-nnl2.hli.ts/correspondence-operation :dtype :int32 :shape *default-.min/minf!-operation-shape* :fill 4 :val 5 :expected 4 :op #'nnl2.hli.ts:.min! :inplace t))									  		 		
+  (check-nnl2.hli.ts/correspondence-operation :dtype :int32 :shape *default-.min/minf!-operation-shape* :fill 4 :val 5 :expected 4 :op #'nnl2.hli.ts:.min! :inplace t))									  		 				
 		
