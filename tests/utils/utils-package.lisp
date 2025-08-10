@@ -4,7 +4,8 @@
 		   #:approximately-equal
 		   #:start-log-for-test
 		   #:end-log-for-test
-		   #:fail-log-for-test))
+		   #:fail-log-for-test
+		   #:make-test))
   
 ;; NNL2
 

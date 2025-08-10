@@ -11,6 +11,7 @@
    The variable contains the full path to nnl2/log/tests/")
    
 (defparameter +nnl2-filepath-log-path+
-  (merge-pathnames "tensor-tests-log" +nnl2-tests-logs-path+)
+  (merge-pathnames "nnl2.hli.ts (TESTS)" +nnl2-tests-logs-path+)
   
   "contains the full path to nnl2/log/tests/tests-log")   
+	

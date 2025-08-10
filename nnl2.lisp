@@ -54,7 +54,8 @@
 							  :serial t
 							  :components ((:file "utils-package" :type "lisp")
 										   (:file "utils-trivial-errors" :type "lisp")
-										   (:file "utils-approx-equal" :type "lisp")))
+										   (:file "utils-approx-equal" :type "lisp")
+										   (:file "utils-log-wrapper" :type "lisp")))
 							  
 							 (:module "ffi"
 							  :serial t
@@ -86,7 +87,8 @@
 										   (:file "ts-tests-correspondence-inplace" :type "lisp")
 										   (:file "ts-tests-broadcasting" :type "lisp")
 										   (:file "ts-tests-broadcasting-inplace" :type "lisp")
-										   (:file "ts-tests-like-constructors" :type "lisp")))
+										   (:file "ts-tests-like-constructors" :type "lisp")
+										   (:file "ts-tests-trans" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

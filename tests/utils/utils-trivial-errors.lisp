@@ -33,7 +33,7 @@
   (log-test-event "Started" :function function :dtype dtype))
 
 (defun end-log-for-test (&key (function "Unknown Function") (dtype "Unknown type"))
-  (log-test-event "Ended" :function function :dtype dtype :additional-newline t))
+  (log-test-event "Succesfully ended" :function function :dtype dtype :additional-newline t))
 
 (defun fail-log-for-test (&key (function "Unknown Function") (dtype "Unknown type"))
   (log-test-event "Failed" :function function :dtype dtype))
