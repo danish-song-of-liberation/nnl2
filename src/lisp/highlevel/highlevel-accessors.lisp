@@ -83,6 +83,25 @@
 	  (setf (cffi:mem-ref filler-pntr cffi-type) filler)
 	  
       (nnl2.ffi:%full shape rank dtype filler-pntr))))
+	  
+(defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
+  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+    (let* ((total-elems (length flatten-data))
+		   (cffi-type (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		   (lisp-type (ts-type-to-lisp dtype))
+		   (data-pntr (cffi:foreign-alloc cffi-type :count total-elems))
+		   (flatten-type (type-of flatten-data)))
+	
+      (cond
+	    ((eq flatten-type 'list)
+	       (dotimes (i total-elems)	  
+	         (setf (cffi:mem-aref data-pntr cffi-type i) (coerce (nth i flatten-data) lisp-type))))
+			 
+		((or (eq flatten-type 'array) (eq flatten-type 'vector))
+		   (dotimes (i total-elems)	  
+	         (setf (cffi:mem-aref data-pntr cffi-type i) (coerce (aref flatten-data i) lisp-type)))))
+	  
+      (nnl2.ffi:%make-tensor-from-flatten data-pntr total-elems shape rank dtype))))	  
 	 
 (defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 

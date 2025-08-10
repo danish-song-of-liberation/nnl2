@@ -158,6 +158,7 @@ typedef void (*maxbroadcastinginplacefn)(Tensor*, const Tensor*);
 typedef void (*minbroadcastinginplacefn)(Tensor*, const Tensor*);
 typedef Tensor* (*maxbroadcastingfn)(const Tensor*, const Tensor*);
 typedef Tensor* (*minbroadcastingfn)(const Tensor*, const Tensor*);
+typedef void (*filltensorwithdatafn)(Tensor* tensor, void* data, size_t num_elems);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

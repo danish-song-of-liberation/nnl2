@@ -9,5 +9,6 @@
    :%l2norm :%copy :%.+/incf! :%.+/incf :%.-/decf! :%.-/decf :%.*/mulf! :%.*/mulf :%.//divf! :%.//divf :%.^/powf! 
    :%.^/powf :%.max/maxf! :%.max/maxf :%.min/minf! :%.min/minf :%.+/broadcasting! :%.+/broadcasting :%.-/broadcasting!
    :%.-/broadcasting :%.*/broadcasting! :%.*/broadcasting :%.//broadcasting! :%.//broadcasting :%.^/broadcasting!
-   :%.^/broadcasting :%.max/broadcasting :%.max/broadcasting! :%.min/broadcasting :%.min/broadcasting!))
+   :%.^/broadcasting :%.max/broadcasting :%.max/broadcasting! :%.min/broadcasting :%.min/broadcasting!
+   :%make-tensor-from-flatten))
 																					 

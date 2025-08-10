@@ -5957,4 +5957,54 @@ void init_min_broadcasting() {
 	}
 }
 
+void naive_fill_tensor_with_data(Tensor* tensor, void* data, size_t num_elems) {
+	switch(tensor->dtype) {
+		case FLOAT64: {
+			double* tensor_data = (double*)tensor->data;
+			double* cast_data = (double*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];			
+			break;
+		}
+		
+		case FLOAT32: {
+			float* tensor_data = (float*)tensor->data;
+			float* cast_data = (float*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];			
+			break;
+		}
+		
+		case INT32: {
+			int32_t* tensor_data = (int32_t*)tensor->data;
+			int32_t* cast_data = (int32_t*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];			
+			break;
+		}
+	}
+}
+
+Implementation fill_tensor_with_data_backends[] = {
+	{naive_fill_tensor_with_data, 10, true, "NAIVE"},
+};	
+
+filltensorwithdatafn fill_tensor_with_data;
+
+void init_fill_tensor_with_data() {
+	for(size_t i = 0; i < sizeof(fill_tensor_with_data_backends) / sizeof(fill_tensor_with_data_backends[0]); i++) {
+		if (fill_tensor_with_data_backends[i].available) fill_tensor_with_data = fill_tensor_with_data_backends[i].fn;
+	}
+}
+
+Tensor* make_tensor_from_flatten(void* arr, size_t num_elems_arr, int* shape, int rank, TensorType dtype) {
+	size_t num_elems_tensor = product(shape, rank);
+	
+	if(num_elems_tensor != num_elems_arr) {
+		fprintf(stderr, "Error (Hello from C!): The number of elements in the specified array does not match the specified shapes\n");
+		return NULL;
+	}
+	
+	Tensor* result = empty(shape, rank, dtype);
+	fill_tensor_with_data(result, arr, num_elems_tensor);
+	return result;
+}
+
 #endif

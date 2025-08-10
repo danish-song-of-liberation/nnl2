@@ -111,8 +111,9 @@ void init_system() {
 	init_pow_broadcasting(); 	 
 	init_max_broadcasting_inplace();
 	init_min_broadcasting_inplace();
-	init_max_broadcasting();
+	init_max_broadcasting(); 
 	init_min_broadcasting();
+	init_fill_tensor_with_data();     
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -182,7 +183,7 @@ Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
 void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 	powinplace(base, exponent);
 } 
-
+  
 void lisp_call_expinplace(Tensor* tensor) {
 	expinplace(tensor);
 }
@@ -362,7 +363,7 @@ void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
 Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 	return min_minf(tensor, minf);
 } 
-
+ 
 void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return add_broadcasting_inplace(summand, sumend);
 }

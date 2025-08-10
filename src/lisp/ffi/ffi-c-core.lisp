@@ -431,6 +431,15 @@
   
 (cffi:defcfun ("get_mem_alignment" %%%internal-lisp-call-get-mem-alignment) :int)
 
+;; make_tensor_from_flatten(void* arr, int* shape, int rank, TensorType dtype)
+
+(cffi:defcfun ("make_tensor_from_flatten" %make-tensor-from-flatten) :pointer
+  (data :pointer)
+  (num-elems-data :int)
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type))
+
 (cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
   (tensor :pointer))
 
