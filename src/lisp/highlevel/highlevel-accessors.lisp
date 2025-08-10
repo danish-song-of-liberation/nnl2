@@ -89,20 +89,45 @@
     (let* ((total-elems (length flatten-data))
 		   (cffi-type (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		   (lisp-type (ts-type-to-lisp dtype))
-		   (data-pntr (cffi:foreign-alloc cffi-type :count total-elems))
-		   (flatten-type (type-of flatten-data)))
+		   (data-pntr (cffi:foreign-alloc cffi-type :count total-elems)))
 	
       (cond
-	    ((eq flatten-type 'list)
+	    ((listp flatten-data)
 	       (dotimes (i total-elems)	  
 	         (setf (cffi:mem-aref data-pntr cffi-type i) (coerce (nth i flatten-data) lisp-type))))
 			 
-		((or (eq flatten-type 'array) (eq flatten-type 'vector))
+		((vectorp flatten-data)
 		   (dotimes (i total-elems)	  
 	         (setf (cffi:mem-aref data-pntr cffi-type i) (coerce (aref flatten-data i) lisp-type)))))
 	  
-      (nnl2.ffi:%make-tensor-from-flatten data-pntr total-elems shape rank dtype))))	  
-	 
+      (nnl2.ffi:%make-tensor-from-flatten data-pntr total-elems shape rank dtype))))
+
+(defun reduce-list-shape (lst)
+  (if (atom lst)
+    nil
+	(cons (length lst) (reduce-list-shape (car lst)))))
+	
+(defun flatten (lst)
+  (loop for elem in lst
+        if (listp elem) append (flatten elem)
+        else collect elem))	
+
+(defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
+  (declare (optimize (speed 3) (safety 0)))
+  
+  (etypecase data
+    (array
+	  (let* ((data-shape (array-dimensions data))
+			 (flat-data (make-array (array-total-size data) :element-type (array-element-type data) :displaced-to data)))
+		 
+	    (from-flatten flat-data data-shape :dtype dtype)))
+		
+	(list
+	  (let* ((data-shape (reduce-list-shape data))
+			 (flat-data (coerce (flatten data) 'vector)))
+
+	    (from-flatten flat-data data-shape)))))
+  
 (defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 
 
@@ -286,7 +311,6 @@
 
 	new-tensor))
 
-	
 (defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
 (defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
 (defun concat (axis &rest tensors) (reduce #'(lambda (acc tensor) (nnl2.ffi:%concat acc tensor axis)) tensors))
