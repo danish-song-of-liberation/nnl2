@@ -6005,4 +6005,339 @@ Tensor* make_tensor_from_flatten(void* arr, size_t num_elems_arr, int* shape, in
 	return result;
 }
 
+void naive_axpy_inplace(Tensor* summand, const Tensor* sumend, float alpha) {
+	size_t total_elems = product(summand->shape, summand->rank);
+	
+	switch(summand->dtype) {
+		case FLOAT64: {
+			double* summand_data = (double*)summand->data;
+			double* sumend_data = (double*)sumend->data;
+			for(size_t it = 0; it < total_elems; it++) summand_data[it] += (sumend_data[it] * alpha);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* summand_data = (float*)summand->data;
+			float* sumend_data = (float*)sumend->data;
+			for(size_t it = 0; it < total_elems; it++) summand_data[it] += (sumend_data[it] * alpha);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* summand_data = (int32_t*)summand->data;
+			int32_t* sumend_data = (int32_t*)sumend->data;
+			for(size_t it = 0; it < total_elems; it++) summand_data[it] += (int32_t)((float)sumend_data[it] * alpha);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (axpy in-place)\n");
+			return;
+		}
+	}
+}
+
+Implementation axpy_inplace_backends[] = {
+	{naive_axpy_inplace, 10, true, "NAIVE"},
+};	
+
+axpyinplacefn axpy_inplace;
+
+void init_axpy_inplace() {
+	for(size_t i = 0; i < sizeof(axpy_inplace_backends) / sizeof(axpy_inplace_backends[0]); i++) {
+		if (axpy_inplace_backends[i].available) axpy_inplace = axpy_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_axpy(const Tensor* summand, const Tensor* sumend, float alpha) {
+	size_t total_elems = product(summand->shape, summand->rank);
+	Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+	
+	switch(summand->dtype) {
+		case FLOAT64: {
+			double* summand_data = (double*)summand->data;
+			double* sumend_data = (double*)sumend->data;
+			double* result_data = (double*)result->data;
+			for(size_t it = 0; it < total_elems; it++) result_data[it] = summand_data[it] + (sumend_data[it] * alpha);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* summand_data = (float*)summand->data;
+			float* sumend_data = (float*)sumend->data;
+			float* result_data = (float*)result->data;
+			for(size_t it = 0; it < total_elems; it++) result_data[it] = summand_data[it] + (sumend_data[it] * alpha);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* summand_data = (int32_t*)summand->data;
+			int32_t* sumend_data = (int32_t*)sumend->data;
+			int32_t* result_data = (int32_t*)result->data;
+			for(size_t it = 0; it < total_elems; it++) result_data[it] = summand_data[it] + (sumend_data[it] * alpha);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (axpy)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation axpy_backends[] = {
+	{naive_axpy, 10, true, "NAIVE"},
+};	
+
+axpyfn axpy;
+
+void init_axpy() {
+	for(size_t i = 0; i < sizeof(axpy_backends) / sizeof(axpy_backends[0]); i++) {
+		if (axpy_backends[i].available) axpy = axpy_backends[i].fn;
+	}
+}
+
+void naive_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
+	size_t total_elems = product(summand->shape, summand->rank);
+	
+	switch(summand->dtype) {
+		case FLOAT64: {
+			double* cast_summand = (double*)summand->data;
+			double cast_sumend = *((double*)sumend);
+			for(size_t i = 0; i < total_elems; i++) cast_summand[i] += cast_sumend * alpha;
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_summand = (float*)summand->data;
+			float cast_sumend = *((float*)sumend);
+			for(size_t i = 0; i < total_elems; i++) cast_summand[i] += cast_sumend * alpha;
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_summand = (int32_t*)summand->data;
+			int32_t cast_sumend = *((int32_t*)sumend);
+			for(size_t i = 0; i < total_elems; i++) cast_summand[i] += cast_sumend * alpha;
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (axpf in-place)\n");
+			return;
+		}
+	}
+}	
+
+Implementation axpf_inplace_backends[] = {
+	{naive_axpf_inplace, 10, true, "NAIVE"},
+};	
+
+axpfinplacefn axpf_inplace;
+
+void init_axpf_inplace() {
+	for(size_t i = 0; i < sizeof(axpf_inplace_backends) / sizeof(axpf_inplace_backends[0]); i++) {
+		if (axpf_inplace_backends[i].available) axpf_inplace = axpf_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_axpf(const Tensor* summand, void* sumend, float alpha) {
+	Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+	size_t total_elems = product(summand->shape, summand->rank);
+	
+	switch(summand->dtype) {
+		case FLOAT64: {
+			double* cast_data_original = (double*)summand->data;
+			double* cast_data_result = (double*)result->data;
+			double cast_sumend = *((double*)sumend);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] + (cast_sumend * alpha);
+			break;
+		}
+		
+		case FLOAT32: {
+			float* cast_data_original = (float*)summand->data;
+			float* cast_data_result = (float*)result->data;
+			float cast_sumend = *((float*)sumend);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] + (cast_sumend * alpha);
+			break;
+		}
+		
+		case INT32: {
+			int32_t* cast_data_original = (int32_t*)summand->data;
+			int32_t* cast_data_result = (int32_t*)result->data;
+			int32_t cast_sumend = *((int32_t*)sumend);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] + (int32_t)((double)cast_sumend * alpha);
+			break;
+		}
+		
+		default: {
+			fprintf(stderr, "Error (Hello from C!): Bad data-type (axpf)\n");
+			return NULL;
+		}
+	}
+	
+	return result;
+}
+
+Implementation axpf_backends[] = {
+	{naive_axpf, 10, true, "NAIVE"},
+};	
+
+axpffn axpf;
+
+void init_axpf() {
+	for(size_t i = 0; i < sizeof(axpf_backends) / sizeof(axpf_backends[0]); i++) {
+		if (axpf_backends[i].available) axpf = axpf_backends[i].fn;
+	}
+}
+
+void naive_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, float alpha) {
+    size_t numel_summand = product(summand->shape, summand->rank);
+    size_t numel_sumend = product(sumend->shape, sumend->rank);
+
+    if((numel_summand % numel_sumend) == 0) {
+        switch(summand->dtype) {
+            case FLOAT64: {
+                double* cast_summand_data = (double*)summand->data;
+                double* cast_sumend_data = (double*)sumend->data;
+
+                for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                    for(size_t j = 0; j < numel_sumend; j++) {
+                        cast_summand_data[i * numel_sumend + j] += cast_sumend_data[j] * alpha;
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_summand_data = (float*)summand->data;
+                float* cast_sumend_data = (float*)sumend->data;
+
+                for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                    for(size_t j = 0; j < numel_sumend; j++) {
+                        cast_summand_data[i * numel_sumend + j] = cast_sumend_data[j] * alpha;
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_summand_data = (int32_t*)summand->data;
+                int32_t* cast_sumend_data = (int32_t*)sumend->data;
+
+                for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                    for(size_t j = 0; j < numel_sumend; j++) {
+                        cast_summand_data[i * numel_sumend + j] = cast_sumend_data[j] * alpha;
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive broadcasting axpy in-place)\n");
+                return;
+            }
+        }
+    }
+
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast y-tensor (naive broadcasting axpy in-place)\n");
+        return;
+    }
+}	
+
+Implementation axpy_broadcasting_inplace_backends[] = {
+	{naive_axpy_broadcasting_inplace, 10, true, "NAIVE"},
+};	
+
+axpybroadcastinginplacefn axpy_broadcasting_inplace;
+
+void init_axpy_broadcasting_inplace() {
+	for(size_t i = 0; i < sizeof(axpy_broadcasting_inplace_backends) / sizeof(axpy_broadcasting_inplace_backends[0]); i++) {
+		if (axpy_broadcasting_inplace_backends[i].available) axpy_broadcasting_inplace = axpy_broadcasting_inplace_backends[i].fn;
+	}
+}
+
+Tensor* naive_axpy_broadcasting(const Tensor* summand, const Tensor* sumend, float alpha) {
+    size_t numel_summand = product(summand->shape, summand->rank);
+    size_t numel_sumend = product(sumend->shape, sumend->rank);
+
+    if((numel_summand % numel_sumend) == 0) {
+        Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+
+        switch(summand->dtype) {
+            case FLOAT64: {
+                double* cast_summand_data = (double*)summand->data;
+                double* cast_sumend_data = (double*)sumend->data;
+                double* cast_result_data = (double*)result->data;
+
+                for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                    for(size_t j = 0; j < numel_sumend; j++) {
+                        cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + (cast_sumend_data[j] * alpha); 
+                    }
+                }
+
+                break;
+            }
+
+            case FLOAT32: {
+                float* cast_summand_data = (float*)summand->data;
+                float* cast_sumend_data = (float*)sumend->data;
+                float* cast_result_data = (float*)result->data;
+
+                for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                    for(size_t j = 0; j < numel_sumend; j++) {
+                        cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + (cast_sumend_data[j] * alpha); 
+                    }
+                }
+
+                break;
+            }
+
+            case INT32: {
+                int32_t* cast_summand_data = (int32_t*)summand->data;
+                int32_t* cast_sumend_data = (int32_t*)sumend->data;
+                int32_t* cast_result_data = (int32_t*)result->data;
+
+                for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                    for(size_t j = 0; j < numel_sumend; j++) {
+                        cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + (cast_sumend_data[j] * alpha); 
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (naive axpy broadcasting)\n");
+                return NULL;
+            }
+        }
+
+        return result;
+    }
+    else {
+        fprintf(stderr, "Error (Hello from C!): Can't broadcast sumend-tensor (naive axpy broadcasting)\n");
+        return NULL;
+    }
+}
+
+Implementation axpy_broadcasting_backends[] = {
+	{naive_axpy_broadcasting, 10, true, "NAIVE"},
+};	
+
+axpybroadcastingfn axpy_broadcasting;
+
+void init_axpy_broadcasting() {
+	for(size_t i = 0; i < sizeof(axpy_broadcasting_backends) / sizeof(axpy_broadcasting_backends[0]); i++) {
+		if (axpy_broadcasting_backends[i].available) axpy_broadcasting = axpy_broadcasting_backends[i].fn;
+	}
+}
+
+
 #endif

@@ -8,7 +8,7 @@
   "Contains the project path")  
 
 (asdf:defsystem "nnl2"
-  :depends-on (:cffi :fiveam :cl-json)
+  :depends-on (:cffi :fiveam)
   :license "MIT"
   :description "Common Lisp (CL) neural networks framework"
   :serial t
@@ -90,7 +90,8 @@
 										   (:file "ts-tests-like-constructors" :type "lisp")
 										   (:file "ts-tests-trans" :type "lisp")
 										   (:file "ts-tests-subtensor-map" :type "lisp")
-										   (:file "ts-tests-subtensor-map-inplace" :type "lisp")))
+										   (:file "ts-tests-subtensor-map-inplace" :type "lisp")
+										   (:file "ts-tests-real" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

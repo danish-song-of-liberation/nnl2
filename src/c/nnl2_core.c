@@ -114,6 +114,12 @@ void init_system() {
 	init_max_broadcasting(); 
 	init_min_broadcasting();
 	init_fill_tensor_with_data();     
+	init_axpy_inplace();
+	init_axpy();
+	init_axpf_inplace();
+	init_axpf();
+	init_axpy_broadcasting_inplace();
+	init_axpy_broadcasting();
 }     
 
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
@@ -124,7 +130,7 @@ Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype); 
 } 
 
-Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) { 
+Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {  
 	return ones(shape, rank, dtype);   
 }                        
         
@@ -171,7 +177,7 @@ void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 void lisp_call_divinplace(Tensor* dividend, Tensor* divisor) {
 	divinplace(dividend, divisor);
 }
-  
+   
 Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) {
 	return mul(multiplicand, multiplier);    
 }
@@ -419,6 +425,30 @@ Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) {
 Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) { 
 	return min_broadcasting(a, b);
 }
+
+void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
+	axpy_inplace(summand, sumend, alpha);    
+}
+
+Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
+	return axpy(summand, sumend, alpha);    
+}
+
+void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
+	axpf_inplace(summand, sumend, alpha); 
+} 
+
+Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
+	return axpf(summand, sumend, alpha); 
+} 
+
+void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float alpha) {
+	axpy_broadcasting_inplace(summand, sumend, alpha); 
+} 
+
+Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
+	return axpy_broadcasting(summand, sumend, alpha); 
+} 
 
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);

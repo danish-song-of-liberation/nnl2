@@ -34,6 +34,9 @@
 (defparameter *default-.min/broadcasting!/a-operation-shape* '(3 4) "Shape for first (a) tensor in broadcasting in-place")
 (defparameter *default-.min/broadcasting!/b-operation-shape* '(4) "Shape for second (b) tensor in broadcasting in-place")	  
 
+(defparameter *default-axpy/broadcasting!/a-operation-shape* '(3 4) "Shape for first (a) tensor in broadcasting in-place")
+(defparameter *default-axpy/broadcasting!/b-operation-shape* '(4) "Shape for second (b) tensor in broadcasting in-place")	  
+
 ;; -- `.+/broadcasting!` tests section --
 
 (fiveam:test nnl2.hli.ts/.+/broadcasting!/float64
@@ -111,3 +114,14 @@
 (fiveam:test nnl2.hli.ts/.min/broadcasting!/int32
   (check-nnl2.hli.ts/broadcasting-operation :dtype :int32 :shape-1 *default-.min/broadcasting!/a-operation-shape* :shape-2 *default-.min/broadcasting!/b-operation-shape* :fill-1 4 :fill-2 3 :op #'nnl2.hli.ts:.min! :expected-val 3 :inplace t))									
     																			
+;; -- `axpy/broadcasting!` tests section --																							
+																				
+(fiveam:test nnl2.hli.ts/axpy/broadcasting!/float64
+  (check-nnl2.hli.ts/broadcasting-operation :dtype :float64 :shape-1 *default-axpy/broadcasting!/a-operation-shape* :shape-2 *default-axpy/broadcasting!/b-operation-shape* :fill-1 4.0d0 :fill-2 3.0d0 :op #'nnl2.hli.ts:axpy! :expected-val 7.0d0 :inplace t))									
+  
+(fiveam:test nnl2.hli.ts/axpy/broadcasting!/float32
+  (check-nnl2.hli.ts/broadcasting-operation :dtype :float32 :shape-1 *default-axpy/broadcasting!/a-operation-shape* :shape-2 *default-axpy/broadcasting!/b-operation-shape* :fill-1 4.0s0 :fill-2 3.0s0 :op #'nnl2.hli.ts:axpy! :expected-val 7.0s0 :inplace t))									
+    
+(fiveam:test nnl2.hli.ts/axpy/broadcasting!/int32
+  (check-nnl2.hli.ts/broadcasting-operation :dtype :int32 :shape-1 *default-axpy/broadcasting!/a-operation-shape* :shape-2 *default-axpy/broadcasting!/b-operation-shape* :fill-1 4 :fill-2 3 :op #'nnl2.hli.ts:axpy! :expected-val 7 :inplace t))																													
+																				

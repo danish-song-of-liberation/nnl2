@@ -20,6 +20,7 @@
 (defparameter *default-^=-operation-shape* '(5 5))
 (defparameter *default-.max!-operation-shape* '(5 5))
 (defparameter *default-.min!-operation-shape* '(5 5))
+(defparameter *default-axpy!-operation-shape* '(5 5))
 
 ;; -- `+=` tests section --		
 	
@@ -97,7 +98,18 @@
 						
 (fiveam:test nnl2.hli.ts/.min!/int32
   (check-nnl2.hli.ts/operation :dtype :int32 :shape *default-.min!-operation-shape* :first-value 5 :second-value 3 :expected-value 3 :function #'nnl2.hli.ts:.min! :inplace t))													
-											
+			
+;; -- `axpy!` tests section -- 
+
+(fiveam:test nnl2.hli.ts/axpy!/float64
+  (check-nnl2.hli.ts/operation :dtype :float64 :shape *default-axpy!-operation-shape* :first-value 2.0d0 :second-value 3.0d0 :expected-value 5.0d0 :function #'nnl2.hli.ts:axpy! :inplace t))
+   
+(fiveam:test nnl2.hli.ts/axpy!/float32
+  (check-nnl2.hli.ts/operation :dtype :float32 :shape *default-axpy!-operation-shape* :first-value 2.0s0 :second-value 3.0s0 :expected-value 5.0s0 :function #'nnl2.hli.ts:axpy! :inplace t))   
+
+(fiveam:test nnl2.hli.ts/axpy!/int32
+  (check-nnl2.hli.ts/operation :dtype :int32 :shape *default-axpy!-operation-shape* :first-value 2 :second-value 3 :expected-value 5 :function #'nnl2.hli.ts:axpy! :inplace t))   
+			
 ;; I'll repeat it just in case. 
 ;;
 ;; I don't consider this part of the code DRY because 

@@ -78,6 +78,7 @@
 (defparameter *default-.^-operation-shape* '(5 5))
 (defparameter *default-.max-operation-shape* '(5 5))
 (defparameter *default-.min-operation-shape* '(5 5))
+(defparameter *default-axpy-operation-shape* '(5 5))
 
 ;; -- `.+` tests section --		
 	
@@ -156,8 +157,24 @@
 (fiveam:test nnl2.hli.ts/.min/int32
   (check-nnl2.hli.ts/operation :dtype :int32 :shape *default-.min-operation-shape* :first-value 2 :second-value 3 :expected-value 2 :function #'nnl2.hli.ts:.min))      
 
+;; -- `axpy` tests section -- 
+
+;; By default, the alpha key for axpy is 1.0, and it would 
+;; be impractical to create a separate test function for this 
+;; purpose, so I decided to include axpy in the existing test 
+;; functions without specifying the key.
+
+(fiveam:test nnl2.hli.ts/axpy/float64
+  (check-nnl2.hli.ts/operation :dtype :float64 :shape *default-axpy-operation-shape* :first-value 2.0d0 :second-value 3.0d0 :expected-value 5.0d0 :function #'nnl2.hli.ts:axpy))
+   
+(fiveam:test nnl2.hli.ts/axpy/float32
+  (check-nnl2.hli.ts/operation :dtype :float32 :shape *default-axpy-operation-shape* :first-value 2.0s0 :second-value 3.0s0 :expected-value 5.0s0 :function #'nnl2.hli.ts:axpy))   
+
+(fiveam:test nnl2.hli.ts/axpy/int32
+  (check-nnl2.hli.ts/operation :dtype :int32 :shape *default-axpy-operation-shape* :first-value 2 :second-value 3 :expected-value 5 :function #'nnl2.hli.ts:axpy))
+   
 ;; This is not exactly a DRY violation, I could create a 
 ;; macro for faster creation, but this is already a KISS violation
 
-;; A continuation of this file is ts-tests-basic-operations.lisp, 
+;; A continuation of this file is ts-tests-basic-operations-inplace.lisp, 
 ;; which does something similar but with in-place operations

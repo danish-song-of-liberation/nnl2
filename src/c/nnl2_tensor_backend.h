@@ -158,7 +158,13 @@ typedef void (*maxbroadcastinginplacefn)(Tensor*, const Tensor*);
 typedef void (*minbroadcastinginplacefn)(Tensor*, const Tensor*);
 typedef Tensor* (*maxbroadcastingfn)(const Tensor*, const Tensor*);
 typedef Tensor* (*minbroadcastingfn)(const Tensor*, const Tensor*);
-typedef void (*filltensorwithdatafn)(Tensor* tensor, void* data, size_t num_elems);
+typedef void (*filltensorwithdatafn)(Tensor*, void*, size_t);
+typedef void (*axpyinplacefn)(Tensor*, const Tensor*, float); 
+typedef Tensor* (*axpyfn)(const Tensor*, const Tensor*, float); 
+typedef void (*axpfinplacefn)(Tensor*, void*, float);
+typedef Tensor* (*axpffn)(const Tensor*, void*, float);
+typedef void (*axpybroadcastinginplacefn)(Tensor*, const Tensor*, float);
+typedef Tensor* (*axpybroadcastingfn)(const Tensor*, const Tensor*, float);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

@@ -252,6 +252,36 @@
 (cffi:defcfun ("lisp_call_log" %.log) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("lisp_call_axpy_inplace" %axpy!) :void
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))  
+  
+(cffi:defcfun ("lisp_call_axpy" %axpy) :pointer
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))    
+  
+(cffi:defcfun ("lisp_call_axpf_inplace" %axpy/axpf!) :void
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))    
+  
+(cffi:defcfun ("lisp_call_axpf" %axpy/axpf) :pointer
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))      
+  
+(cffi:defcfun ("lisp_call_axpy_broadcasting_inplace" %axpy/broadcasting!) :void
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))  
+  
+(cffi:defcfun ("lisp_call_axpy_broadcasting" %axpy/broadcasting) :pointer
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))  
+  
 (cffi:defcfun ("empty_like" %empty-like) :pointer
   (tensor :pointer))   
   

@@ -608,7 +608,27 @@
 		 
 	(setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce minf lisp-dtype))
 	
-	(nnl2.ffi:%.min/minf tensor minf-pntr)))	
+	(nnl2.ffi:%.min/minf tensor minf-pntr)))
+
+(defun axpy/axpf! (summand sumend alpha)
+  (let* ((dtype (dtype summand))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (sumend-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref sumend-pntr cffi-dtype) (coerce sumend lisp-dtype))
+	
+	(nnl2.ffi:%axpy/axpf! summand sumend-pntr alpha)))	
+	
+(defun axpy/axpf (summand sumend alpha)
+  (let* ((dtype (dtype summand))
+		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (sumend-pntr (cffi:foreign-alloc cffi-dtype)))
+		 
+	(setf (cffi:mem-ref sumend-pntr cffi-dtype) (coerce sumend lisp-dtype))
+	
+	(nnl2.ffi:%axpy/axpf summand sumend-pntr alpha)))		
 	
 (defmacro .+/broadcasting! (summand sumend)
   `(nnl2.ffi:%.+/broadcasting! ,summand ,sumend))
@@ -651,6 +671,44 @@
   
 (defmacro .min/broadcasting (tensora tensorb)
   `(nnl2.ffi:%.min/broadcasting ,tensora ,tensorb))     
+  
+(defmacro axpy/broadcasting! (summand sumend alpha)
+  `(nnl2.ffi:%axpy/broadcasting! ,summand ,sumend ,alpha))  
+  
+(defmacro axpy/broadcasting (summand sumend alpha)
+  `(nnl2.ffi:%axpy/broadcasting ,summand ,sumend ,alpha))    
+
+(defun axpy (a b &key (alpha 1.0))
+  (let ((scalar-a-p (typep a 'real)))
+    (if (or scalar-a-p (typep b 'real))
+      (if scalar-a-p
+        (if (typep b 'real)
+          (+ a (* b alpha))
+          (error "You can't apply a tensor function to a scalar"))
+        (axpy/axpf a b alpha))
+      (let ((shapea (shape a :as :list))
+            (shapeb (shape b :as :list)))
+        (if (equal shapea shapeb)
+		  (nnl2.ffi:%axpy a b alpha)
+          (if (> (rank a) (rank b))
+            (axpy/broadcasting a b alpha)
+            (axpy/broadcasting b a alpha)))))))  
+			
+(defun axpy! (a b &key (alpha 1.0))
+  (let ((scalar-a-p (typep a 'real)))
+    (if (or scalar-a-p (typep b 'real))
+      (if scalar-a-p
+        (if (typep b 'real)
+          (setq a (+ a (* b alpha)))
+          (error "You can't apply a tensor function to a scalar"))
+        (axpy/axpf! a b alpha))
+      (let ((shapea (shape a :as :list))
+            (shapeb (shape b :as :list)))
+        (if (equal shapea shapeb)
+		  (nnl2.ffi:%axpy! a b alpha)
+          (if (> (rank a) (rank b))
+            (axpy/broadcasting! a b alpha)
+            (axpy/broadcasting! b a alpha)))))))  			
 
 (defun .+ (a b)
   (let ((scalar-a-p (typep a 'real)))
