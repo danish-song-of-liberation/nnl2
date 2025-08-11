@@ -12,10 +12,10 @@
 
 (fiveam:in-suite nnl2.hli.ts-suite)
 
-(defun map-test (&key shape dtype inplace op)
+(defun .map-test (&key shape dtype inplace op)
   "Makes a test for element-wise application of a function to a tensor"
  
-  (nnl2.tests.utils:start-log-for-test :function #'nnl2.hli.ts:.map :dtype dtype)
+  (nnl2.tests.utils:start-log-for-test :function op :dtype dtype)
 
   (handler-case
 	  (let ((tensor-shape (coerce shape 'vector))
@@ -32,7 +32,7 @@
 		  (nnl2.tests.utils:end-log-for-test :function op :dtype dtype)))	
 							
 	(error (e)
-	  (nnl2.tests.utils:fail-log-for-test :function #'nnl2.hli.ts:.map :dtype dtype)
+	  (nnl2.tests.utils:fail-log-for-test :function op :dtype dtype)
 	  
 	  (nnl2.tests.utils:throw-error 
 	    :documentation "Throws an informative error if an error occurs when you call the function"
@@ -47,13 +47,13 @@
 ;; -- `.map` tests section --	
 
 (fiveam:test nnl2.hli.ts/.map/float64
-  (map-test :dtype :float64 :shape *default-.map-operation-shape* :op #'nnl2.hli.ts:.map))		
+  (.map-test :dtype :float64 :shape *default-.map-operation-shape* :op #'nnl2.hli.ts:.map))		
 
 (fiveam:test nnl2.hli.ts/.map/float32
-  (map-test :dtype :float32 :shape *default-.map-operation-shape* :op #'nnl2.hli.ts:.map))	
+  (.map-test :dtype :float32 :shape *default-.map-operation-shape* :op #'nnl2.hli.ts:.map))	
   
 (fiveam:test nnl2.hli.ts/.map/int32
-  (map-test :dtype :int32 :shape *default-.map-operation-shape* :op #'nnl2.hli.ts:.map))	
+  (.map-test :dtype :int32 :shape *default-.map-operation-shape* :op #'nnl2.hli.ts:.map))	
   
 ;; the continuation of the file is `ts-tests-wise-element-map-inplace.lisp`, which 
 ;; implements the same but in-place  
