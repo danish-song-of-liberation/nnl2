@@ -145,7 +145,7 @@
   
 (defmacro shape-pointer (tensor)
   `(nnl2.ffi:get-pointer-to-tensor-shape ,tensor))
-
+  
 (defun get-shape-as-list (tensor rank)
   (loop with rank-t = (if rank rank (rank tensor))
 		with shape-pointer = (shape-pointer tensor)
@@ -232,23 +232,28 @@
 (defun (setf tref) (change-to tensor &rest shape)
   (let* ((shape-rank (length shape))
 		 (shape (make-shape-pntr (subst -1 '* shape)))
-	     (tensor-dtype (dtype tensor)))
+	     (tensor-dtype (dtype tensor))
+		 (is-tensor-p (typep change-to 'nnl2-tensor)))
 		 
-	(case tensor-dtype
-	  (:float64 
-	    (let ((changer (cffi:foreign-alloc :double)))
-		  (setf (cffi:mem-ref changer :double) change-to)
-		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer)))
-		  
-	  (:float32
-	    (let ((changer (cffi:foreign-alloc :float)))
-		  (setf (cffi:mem-ref changer :float) change-to)
-		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer)))
+	(cond
+	  (is-tensor-p (nnl2.ffi:%tref-setter tensor shape shape-rank change-to t))
+	  
+	  (t	 
+		(case tensor-dtype
+		  (:float64 
+			(let ((changer (cffi:foreign-alloc :double)))
+			  (setf (cffi:mem-ref changer :double) change-to)
+			  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil)))
+			  
+		  (:float32
+			(let ((changer (cffi:foreign-alloc :float)))
+			  (setf (cffi:mem-ref changer :float) change-to)
+			  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil)))
 
-	  (:int32
-	    (let ((changer (cffi:foreign-alloc :int)))
-		  (setf (cffi:mem-ref changer :int) change-to)
-		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer))))))
+		  (:int32
+			(let ((changer (cffi:foreign-alloc :int)))
+			  (setf (cffi:mem-ref changer :int) change-to)
+			  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil))))))))
 		  
 (defmacro scale! (tensor multiplier)
   `(nnl2.ffi:%scale! ,tensor (float ,multiplier)))
@@ -308,6 +313,34 @@
 		  do (setf
         	   (cffi:mem-aref new-tensor-data type-t i) (apply funct (loop for it in aggreg-data 
 																           collect (cffi:mem-aref it type-t i)))))
+
+	new-tensor))
+	
+(defun /map! (funct &rest tensors &aux (first-tensor (car tensors)))
+  (let ((first-shape (aref (shape first-tensor :as :vector) 0))
+		(type-t (case (dtype first-tensor)
+				  (:float64 :double)
+				  (:float32 :float)
+				  (:int32 :int))))
+		
+	(loop for i from 0 below first-shape
+		  do (setf
+        	   (tref first-tensor i) (apply funct (loop for it in tensors
+														collect (tref it i)))))))
+														
+(defun /map (funct &rest tensors &aux (first-tensor (car tensors)))
+  (let ((first-shape (aref (shape first-tensor :as :vector) 0))
+		(type-t (case (dtype first-tensor)
+				  (:float64 :double)
+				  (:float32 :float)
+				  (:int32 :int)))
+		
+		(new-tensor (empty-like first-tensor)))
+		
+	(loop for i from 0 below first-shape
+		  do (setf
+        	   (tref new-tensor i) (apply funct (loop for it in tensors
+														collect (tref it i)))))
 
 	new-tensor))
 

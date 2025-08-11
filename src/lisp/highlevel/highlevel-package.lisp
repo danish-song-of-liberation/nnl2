@@ -17,5 +17,5 @@
    :.min/minf :.min/gnrl :.+/broadcasting! :.+/broadcasting :.-/broadcasting :.-/broadcasting!
    :.*/broadcasting! :.*/broadcasting :.//broadcasting! :.//broadcasting :.^/broadcasting!
    :.^/broadcasting :*nnl2-tensor-types* :ts-type-to-lisp :lisp-type-to-ts :from-flatten
-   :make-tensor))
+   :make-tensor :/map :/map!))
   

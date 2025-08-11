@@ -131,7 +131,7 @@ Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
-      
+         
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const double alpha, const Tensor* a, const int lda,
@@ -171,11 +171,11 @@ void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 void lisp_call_divinplace(Tensor* dividend, Tensor* divisor) {
 	divinplace(dividend, divisor);
 }
-
+  
 Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) {
 	return mul(multiplicand, multiplier);    
 }
-
+      
 Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
 	return nnl2_div(dividend, divisor); 
 } 
@@ -183,7 +183,7 @@ Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
 void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 	powinplace(base, exponent);
 } 
-  
+   
 void lisp_call_expinplace(Tensor* tensor) {
 	expinplace(tensor);
 }

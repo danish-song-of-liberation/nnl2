@@ -51,7 +51,8 @@
   (tensor :pointer)
   (shape :pointer)
   (rank :int)
-  (change-to :pointer))  
+  (change-to :pointer)
+  (is-tensor :bool))  
   
 (cffi:defcfun ("lisp_call_scaleinplace" %scale!) :void
   (tensor :pointer)
@@ -428,10 +429,8 @@
 
 (cffi:defcfun ("get_size_in_bytes" %get-size-in-bytes) :int
   (tensor :pointer))  
-  
-(cffi:defcfun ("get_mem_alignment" %%%internal-lisp-call-get-mem-alignment) :int)
 
-;; make_tensor_from_flatten(void* arr, int* shape, int rank, TensorType dtype)
+(cffi:defcfun ("get_mem_alignment" %%%internal-lisp-call-get-mem-alignment) :int)
 
 (cffi:defcfun ("make_tensor_from_flatten" %make-tensor-from-flatten) :pointer
   (data :pointer)

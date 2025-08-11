@@ -372,151 +372,79 @@ void free_tensor(Tensor* tensor) {
 	free(tensor);
 }
 
-/** @brief
- * Returns a pointer to a tensor element with the specified indices or a subtensor.
- *
- ** @param tensor 
- * Pointer to a tensor
- *
- ** @param indices 
- * Pointer to an array of indices
- *
- ** @param num_indices
- * Number of provided indices.
- *
- ** @details
- * The function firstly:
- *
- *
- *** Checks the input parameters for correctness
- ** then
- *** If num_indices is equal to the rank of the tensor, it calculates the offset of the element in memory and returns a pointer to that element, casting it to the correct data type
- ** then 
- *** If num_indices is less than the rank of the tensor, it creates a new subtenor, copying information about the data type, rank and shape from the original tensor, calculates the offset
- *** in memory, sets the pointer data to the beginning of the subtenor data and returns a pointer to the new subtenor
- ** finally
- *** If num_indices is greater than the rank of the tensor returns null
- *
- *
- ** @code
- * int shape[] = {2, 3, 4};
- * Tensor* my_tensor = zeros(shape, 3, FLOAT32);
- *
- * int shape_2[] = {1, 2, 3};
- * float* element = (float*)at(my_tensor, shape_2, 3);
- *
- * printf("%f\n", *element);
- *
- ** second example (WARNING ITS NOT WORKING I WILL FIX THIS SOON):
- * int shape[] = {2, 3, 4};
- * Tensor* my_tensor = zeros(shape, 3, FLOAT32);
- *
- * int shape_2[] = {1, 2};
- * float* element = (float*)at(my_tensor, shape_2, 2);
- *
- * for(int i = 0; i < 2; i++) {
- *     printf("%f\n", *element[i]);
- * } 
- * 
- ** @return
- * Pointer to a tensor element or subtensor
- *
- **/
 void* at(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
-	// Checks the input parameters for correctness
-	
-	// WARNING: i remaded function after docs
-	
-	if (tensor == NULL) {
-        fprintf(stderr, "Error (Hello from C!): Bad tensor pointer\n");
+    if (tensor == NULL) {
+        fprintf(stderr, "Error (Hello from C!): Null tensor pointer\n");
         return NULL;
     }
-	
-	if (indices == NULL) {
-        fprintf(stderr, "Error (Hello from C!): Bad indices pointer\n");
+    
+    if (indices == NULL) {
+        fprintf(stderr, "Error (Hello from C!): Null indices pointer\n");
         return NULL;
     }
-	
-	const int32_t tensor_rank = tensor->rank;
-	
-	if (tensor_rank <= 0) {
-		fprintf(stderr, "Error (Hello from C!): Bad rank (%d). Rank must be positive\n", tensor_rank);
-		return NULL;
-	}	
-	
-	for (int i = 0; i < tensor_rank; i++) {
-        if (indices[i] < 0) {
-            fprintf(stderr, "Error (Hello from C!): Bad shape dimension at %d (%d). Dimensions must be positive\n",  i, indices[i]);
+    
+    if (tensor->rank <= 0) {
+        fprintf(stderr, "Error (Hello from C!): Invalid tensor rank (%d)\n", tensor->rank);
+        return NULL;
+    }
+    
+    if (num_indices > tensor->rank) {
+        fprintf(stderr, "Error (Hello from C!): Too many indices (%d > %d)\n", num_indices, tensor->rank);
+        return NULL;
+    }
+
+    for (int i = 0; i < num_indices; i++) {
+        if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
+            fprintf(stderr, "Error (Hello from C!): Index %d (%d) out of bounds for dimension %d (size %d)\n",
+                   i, indices[i], i, tensor->shape[i]);
             return NULL;
         }
     }
 	
-	for (int i = 0; i < num_indices; i++) {
-        if (indices[i] < 0 || (i < tensor->rank && indices[i] >= tensor->shape[i])) {
-            fprintf(stderr, "Error (Hello from C!): Index %d (%d) out of bounds for dimension %d (size %d)\n", i, indices[i], i, tensor->shape[i]);
-            return NULL;
+    size_t offset = 0;
+    size_t stride = 1;
+
+    for (int i = tensor->rank - 1; i >= 0; i--) {
+        if (i < num_indices) {
+            offset += indices[i] * stride;
+        }
+        stride *= tensor->shape[i];
+    }
+
+    if (num_indices == tensor->rank) {
+        switch(tensor->dtype) {
+            case FLOAT64: return (double*)tensor->data + offset;
+            case FLOAT32: return (float*)tensor->data + offset;
+            case INT32:   return (int32_t*)tensor->data + offset;
+            default:
+                fprintf(stderr, "Error: Unknown data type\n");
+                return NULL;
         }
     }
-	
-	// If num_indices is equal to the rank of the tensor, it calculates the offset of the element 
-	// in memory and returns a pointer to that element, casting it to the correct data type
-	
-	if (num_indices == tensor_rank) {
-		size_t offset = 0;
-		size_t stride = 1;
-		
-		for(uint32_t i = tensor_rank; i-- > 0;) {
-			offset += indices[i] * stride;
-			stride *= tensor->shape[i];
-		}
-		
-		switch(tensor->dtype) {
-			case INT32:   return (int32_t*)tensor->data + offset;
-			case FLOAT32: return (float*)tensor->data + offset;
-			case FLOAT64: return (double*)tensor->data + offset;
-			default: return NULL;
-		}
-	} else if (num_indices < tensor_rank) {
-		// If num_indices is less than the rank of the tensor, it creates a new subtenor, copying information about the data type, rank and shape from the 
-	    // original tensor, calculates the offset in memory, sets the pointer data to the beginning of the subtenor data and returns a pointer to the new subtenor
-		
-		Tensor* subtensor = (Tensor*)malloc(sizeof(Tensor));
-		
-		if (subtensor == NULL) {
-            fprintf(stderr, "Error (Hello from C!): Failed to allocate subtensor\n");
+
+    else {
+        Tensor* subtensor = (Tensor*)malloc(sizeof(Tensor));
+        if (!subtensor) {
+            fprintf(stderr, "Error: Failed to allocate subtensor\n");
             return NULL;
         }
-		
-		subtensor->dtype = tensor->dtype;
-		subtensor->rank = tensor_rank - num_indices;
-		subtensor->shape = (int*)malloc(subtensor->rank * sizeof(int));
-		
-		if (!subtensor->shape) {
-			fprintf(stderr, "Error (Hello from C!): Failed to allocate subtensor shape\n");
-			free(subtensor);  
-			return NULL;
-		}
-		
-		memcpy(subtensor->shape, tensor->shape + num_indices, subtensor->rank * sizeof(int32_t));
-		
-		size_t offset = 0;
-		size_t stride = 1;
-		
-		for(uint32_t i = num_indices; i-- > 0;) {
-			offset += indices[i] * stride;
-			stride *= tensor->shape[i];
-		}
-		
-		subtensor->data = (uint8_t*)tensor->data + offset * get_dtype_size(tensor->dtype);
-		
-		return subtensor;
-	} else {
-		// If num_indices is greater than the rank of the tensor returns null
-		
-		fprintf(stderr, "Error (Hello from C!): Incorrent indices\n");
-		
-		return NULL;
-	}
+
+        subtensor->dtype = tensor->dtype;
+        subtensor->rank = tensor->rank - num_indices;
+        
+        subtensor->shape = (int*)malloc(subtensor->rank * sizeof(int));
+        if (!subtensor->shape) {
+            fprintf(stderr, "Error: Failed to allocate subtensor shape\n");
+            free(subtensor);
+            return NULL;
+        }
+        memcpy(subtensor->shape, tensor->shape + num_indices, subtensor->rank * sizeof(int));
+
+        size_t element_size = get_dtype_size(tensor->dtype);
+        subtensor->data = (char*)tensor->data + offset * element_size;
+
+        return subtensor;
+    }
 }
 
 void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
@@ -2529,76 +2457,146 @@ void init_log() {
 	}
 }
 
-void at_set(Tensor* tensor, int* shape, int rank, void* change_with) {
-	TensorType tensor_dtype = tensor->dtype;
-	
-	for(int i = 0; i < rank; i++) {
-		if(shape[i] == -1) {
-			for(int shape_i = 0; shape_i < tensor->shape[i]; shape_i++) {
-				shape[i] = shape_i;
-				at_set(tensor, shape, rank, change_with);
-			}
-			
-			shape[i] = -1;
-			return;
-		}
-	}
-	
-	if(rank == tensor->rank) {
-		switch(tensor_dtype) {
-			case FLOAT64: {
-				double* change_elem = (double*)change_with;
-				double* elem = (double*)at(tensor, shape, rank);
-				
-				*elem = *change_elem;
-					
-				break;
-			}
-				
-			case FLOAT32: {
-				float* change_elem = (float*)change_with;
-				float* elem = (float*)at(tensor, shape, rank);
-					
-				*elem = *change_elem;
-					
-				break;
-			}
-				
-			case INT32: {
-				int32_t* change_elem = (int32_t*)change_with;
-				int32_t* elem = (int32_t*)at(tensor, shape, rank);
-					
-				*elem = *change_elem;
-					
-				break;
-			}
-				
-			default: {
-				fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
-				return;
-			}
-		}
-	} else {
-		for(int i = 0; i < tensor->rank; i++) {
-			int new_rank = rank + 1;
-			int* subshape = (int*)malloc(sizeof(int) * new_rank);  
+void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);
 
-			if (subshape == NULL) {
-				fprintf(stderr, "Error (Hello from C!): Memory allocation failed (tref-setter)\n");
-				return;
-			}
+void at_set(Tensor* tensor, int* shape, int rank, void* change_with, bool is_tensor) {
+    TensorType tensor_dtype = tensor->dtype;
 
-			memcpy(subshape, shape, sizeof(int) * rank);
+    if (is_tensor) {
+        Tensor* sub_tensor = (Tensor*)change_with;
 
-			for (int i = 0; i < tensor->shape[rank]; i++) {
-				subshape[rank] = i; 
-				at_set(tensor, subshape, new_rank, change_with); 
-			}
-	
-			free(subshape);
-			return;
-		}
-	}
+        if (tensor->rank - rank != sub_tensor->rank) {
+            fprintf(stderr, "Error (Hello from C!): Rank mismatch in tensor assignment\n");
+            return;
+        }
+        
+        for (int i = 0; i < sub_tensor->rank; i++) {
+            if (tensor->shape[rank + i] != sub_tensor->shape[i]) {
+                fprintf(stderr, "Error (Hello from C!): Shape mismatch in dimension %d\n", i);
+                return;
+            }
+        }
+        
+        if (tensor->dtype != sub_tensor->dtype) {
+            fprintf(stderr, "Error (Hello from C!): Data type mismatch in tensor assignment\n");
+            return;
+        }
+        
+        int* full_dest_shape = malloc(sizeof(int) * tensor->rank);
+        if (!full_dest_shape) {
+            fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+            return;
+        }
+        
+        memcpy(full_dest_shape, shape, sizeof(int) * rank);
+        
+        for (int i = rank; i < tensor->rank; i++) {
+            full_dest_shape[i] = -1;
+        }
+        
+        int* src_iter_shape = malloc(sizeof(int) * sub_tensor->rank);
+        if (!src_iter_shape) {
+            free(full_dest_shape);
+            fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+            return;
+        }
+        
+        for (int i = 0; i < sub_tensor->rank; i++) {
+            src_iter_shape[i] = -1;
+        }
+        
+        tensor_set_subtensor(tensor, full_dest_shape, rank, sub_tensor, src_iter_shape, 0);
+        
+        free(src_iter_shape);
+        free(full_dest_shape);
+        return;
+    }
+    
+    for(int i = 0; i < rank; i++) {
+        if(shape[i] == -1) {
+            for(int shape_i = 0; shape_i < tensor->shape[i]; shape_i++) {
+                shape[i] = shape_i;
+                at_set(tensor, shape, rank, change_with, is_tensor);
+            }
+            
+            shape[i] = -1;
+            return;
+        }
+    }
+    
+    if(rank == tensor->rank) {
+        switch(tensor_dtype) {
+            case FLOAT64: {
+                double* change_elem = (double*)change_with;
+                double* elem = (double*)at(tensor, shape, rank);
+                *elem = *change_elem;
+                break;
+            }
+            case FLOAT32: {
+                float* change_elem = (float*)change_with;
+                float* elem = (float*)at(tensor, shape, rank);
+                *elem = *change_elem;
+                break;
+            }
+            case INT32: {
+                int32_t* change_elem = (int32_t*)change_with;
+                int32_t* elem = (int32_t*)at(tensor, shape, rank);
+                *elem = *change_elem;
+                break;
+            }
+            default: {
+                fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+                return;
+            }
+        }
+    } else {
+        int new_rank = rank + 1;
+        int* subshape = malloc(sizeof(int) * new_rank);
+        if (!subshape) {
+            fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+            return;
+        }
+
+        memcpy(subshape, shape, sizeof(int) * rank);
+
+        for (int i = 0; i < tensor->shape[rank]; i++) {
+            subshape[rank] = i;
+            at_set(tensor, subshape, new_rank, change_with, is_tensor);
+        }
+
+        free(subshape);
+    }
+}
+
+void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank) {
+    if (src_rank == src->rank) {
+        void* dest_ptr = at(dest, dest_shape, dest_rank);
+        void* src_ptr = at(src, src_shape, src_rank);
+        
+        size_t type_size;
+        switch (dest->dtype) {
+            case FLOAT64: type_size = sizeof(double); break;
+            case FLOAT32: type_size = sizeof(float); break;
+            case INT32: type_size = sizeof(int32_t); break;
+            default: fprintf(stderr, "Error (Hello from C!): Unsupported data type\n"); return;
+        }
+        
+        memcpy(dest_ptr, src_ptr, type_size);
+        return;
+    }
+
+    if (src_shape[src_rank] == -1) {
+        for (int i = 0; i < src->shape[src_rank]; i++) {
+            src_shape[src_rank] = i;
+            dest_shape[dest_rank] = i;
+            tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
+        }
+        src_shape[src_rank] = -1;
+        dest_shape[dest_rank] = -1;
+    } else {
+        dest_shape[dest_rank] = src_shape[src_rank];
+        tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
+    }
 }
 
 void naive_scaleinplace(Tensor* tensor, float multiplier) {
