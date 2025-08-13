@@ -83,7 +83,7 @@ void init_system() {
 	init_transposeinplace(); 
 	init_transpose();
 	init_sum();
-	init_l2norm();
+	init_l2norm(); 
 	init_copy();
 	init_add_incf_inplace();
 	init_add_incf();
@@ -217,10 +217,10 @@ void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {
 	return scale(tensor, multiplier); 
 }
- 
+  
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 	maxinplace(tensora, tensorb);
-}
+} 
 
 void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
 	mininplace(tensora, tensorb);
@@ -311,7 +311,7 @@ void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
 }
 
 Tensor* lisp_call_copy(Tensor* tensor) {
-	return nnl2_copy(tensor);
+	return nnl2_copy(tensor); 
 } 
 
 void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {
@@ -369,14 +369,14 @@ void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
 Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 	return min_minf(tensor, minf);
 } 
- 
+  
 void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return add_broadcasting_inplace(summand, sumend);
 }
 
 Tensor* lisp_call_add_broadcasting(Tensor* summand, Tensor* sumend) {
 	return add_broadcasting(summand, sumend);
-}
+}  
 
 void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return sub_broadcasting_inplace(summand, sumend);
@@ -424,7 +424,7 @@ Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) {
 
 Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) { 
 	return min_broadcasting(a, b);
-}
+} 
 
 void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 	axpy_inplace(summand, sumend, alpha);    
@@ -439,7 +439,7 @@ void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 } 
 
 Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
-	return axpf(summand, sumend, alpha); 
+	return axpf(summand, sumend, alpha);  
 } 
 
 void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float alpha) {
@@ -463,4 +463,4 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
 }		
-		       
+		        

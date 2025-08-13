@@ -6,7 +6,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define REGISTER_BACKEND(fn, speed, avail, name) { fn, speed, avail, name }
+#define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name }
+#define INIT_BACKEND(fn_var, backends_array) fn_var = init_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]))
+#define SET_BACKEND_BY_NAME(backend, fn, backend_name) set_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name)
 
 // NNL2
 
@@ -214,5 +216,26 @@ int* append_int_arr(int* arr, int size, int new_element) {
     return new_arr; 
 }
 
+void* init_backend(Implementation* backends, size_t count) {
+    if (count == 0) return NULL;
+    
+    Implementation* best = &backends[0];
+    for (size_t i = 1; i < count; i++) {
+        if (backends[i].speed_priority > best->speed_priority) {
+            best = &backends[i];
+        }
+    }
+	
+    return best->fn;
+}
+
+void set_backend_by_name(Implementation* backends, size_t count, void** target_fn, const char* backend_name) {
+    for (size_t i = 0; i < count; i++) {
+        if (strcmp(backends[i].name, backend_name) == 0) {
+            *target_fn = backends[i].fn;
+            return;
+        }
+    }
+}
 
 #endif

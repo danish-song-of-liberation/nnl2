@@ -471,5 +471,11 @@
 
 (cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
   (tensor :pointer))
+  
+(cffi:defcfun ("set_abs_backend" %set-abs-backend) :void
+  (backend-name :string))
+  
+(cffi:defcfun ("set_abs_inplace_backend" %set-abs-inplace-backend) :void
+  (backend-name :string))  
 
 (nnl-init-system)

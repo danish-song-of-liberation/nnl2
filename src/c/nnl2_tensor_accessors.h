@@ -2993,15 +2993,17 @@ void naive_absinplace(Tensor* tensor) {
 }
 
 Implementation absinplace_backends[] = {
-	{naive_absinplace, 10, true, "NAIVE"},
+	REGISTER_BACKEND(naive_absinplace, 1, "NAIVE"),
 };	
 
 absinplacefn absinplace;
 
 void init_absinplace() {
-	for(size_t i = 0; i < sizeof(absinplace_backends) / sizeof(absinplace_backends[0]); i++) {
-		if (absinplace_backends[i].available) absinplace = absinplace_backends[i].fn;
-	}
+	INIT_BACKEND(absinplace, absinplace_backends);
+}
+
+void set_abs_inplace_backend(const char* backend_name) {
+    SET_BACKEND_BY_NAME(absinplace_backends, absinplace, backend_name);
 }
 
 Tensor* naive_abs(Tensor* tensor) {	
@@ -3044,15 +3046,17 @@ Tensor* naive_abs(Tensor* tensor) {
 }
 
 Implementation abs_backends[] = {
-	{naive_abs, 10, true, "NAIVE"},
+	REGISTER_BACKEND(naive_abs, 1, "NAIVE"),
 };	
 
 absfn nnl2_abs;
 
 void init_abs() {
-	for(size_t i = 0; i < sizeof(abs_backends) / sizeof(abs_backends[0]); i++) {
-		if (abs_backends[i].available) nnl2_abs = abs_backends[i].fn;
-	}
+	INIT_BACKEND(nnl2_abs, abs_backends);
+}
+
+void set_abs_backend(const char* backend_name) {
+    SET_BACKEND_BY_NAME(abs_backends, nnl2_abs, backend_name);
 }
 
 void* get_tensor_data(Tensor* tensor) {
