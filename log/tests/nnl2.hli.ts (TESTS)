@@ -201,7 +201,7 @@ expected - 7.38d9 }
 [nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP>`: `The following check failed: (=
                                                                                             CURRENT-INDEX
                                                                                             EXPECTED-VALUE)
-Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 64.0 != 7.389.`
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 3.0 != 7.389.`
 Additional Info: The function caught an error when running the test with the passed arguments:
 dtype - FLOAT32
 shape - (5 5)
@@ -216,7 +216,7 @@ expected - 7.389 }
 [nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP>`: `The following check failed: (=
                                                                                             CURRENT-INDEX
                                                                                             EXPECTED-VALUE)
-Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 1084227584 != 1.`
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 1077936128 != 1.`
 Additional Info: The function caught an error when running the test with the passed arguments:
 dtype - INT32
 shape - (5 5)

@@ -471,14 +471,242 @@
 
 (cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
   (tensor :pointer))
-  
+ 
 (cffi:defcfun ("set_inplace_fill_backend" %set-inplace-fill-backend) :void
   (backend-name :string))  
-  
-(cffi:defcfun ("set_abs_backend" %set-abs-backend) :void
-  (backend-name :string))
-  
-(cffi:defcfun ("set_abs_inplace_backend" %set-abs-inplace-backend) :void
+
+(cffi:defcfun ("set_empty_backend" %set-empty-backend) :void
   (backend-name :string))  
 
+(cffi:defcfun ("set_zeros_backend" %set-zeros-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_ones_backend" %set-ones-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_sgemminplace_backend" %set-sgemminplace-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_dgemminplace_backend" %set-dgemminplace-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_addinplace_backend" %set-addinplace-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_subinplace_backend" %set-subinplace-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_add_backend" %set-add-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_sub_backend" %set-sub-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_mulinplace_backend" %set-mulinplace-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_divinplace_backend" %set-divinplace-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_mul_backend" %set-mul-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_div_backend" %set-div-backend) :void
+  (backend-name :string))    	
+  
+(cffi:defcfun ("set_powinplace_backend" %set-powinplace-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_expinplace_backend" %set-expinplace-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_pow_backend" %set-pow-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_exp_backend" %set-exp-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_loginplace_backend" %set-loginplace-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_log_backend" %set-log-backend) :void
+  (backend-name :string))  
+ 
+(cffi:defcfun ("set_scaleinplace_backend" %set-scaleinplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_scale_backend" %set-scale-backend) :void
+  (backend-name :string))  
+     
+(cffi:defcfun ("set_maxinplace_backend" %set-maxinplace-backend) :void
+  (backend-name :string))  
+  	 
+(cffi:defcfun ("set_mininplace_backend" %set-mininplace-backend) :void
+  (backend-name :string))  
+  	 
+(cffi:defcfun ("set_max_backend" %set-max-backend) :void
+  (backend-name :string))  
+  	 
+(cffi:defcfun ("set_min_backend" %set-min-backend) :void
+  (backend-name :string))  	 
+  
+(cffi:defcfun ("set_abs_backend" %set-abs-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_abs_inplace_backend" %set-abs-inplace-backend) :void
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_hstack_backend" %set-hstack-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_vstack_backend" %set-vstack-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_reluinplace_backend" %set-reluinplace-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_relu_backend" %set-relu-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_leakyreluinplace_backend" %set-leakyreluinplace-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_leakyrelu_backend" %set-leakyrelu-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_sigmoidinplace_backend" %set-sigmoidinplace-backend) :void
+  (backend-name :string))  
+      
+(cffi:defcfun ("set_sigmoid_backend" %set-sigmoid-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_tanhinplace_backend" %set-tanhinplace-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_tanh_backend" %set-tanh-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_concat_backend" %set-concat-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_randn_backend" %set-randn-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_xavier_backend" %set-xavier-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_transposeinplace_backend" %set-transposeinplace-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_transpose_backend" %set-transpose-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_sum_backend" %set-sum-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_l2norm_backend" %set-l2norm-backend) :void
+  (backend-name :string))  
+  	
+(cffi:defcfun ("set_copy_backend" %set-copy-backend) :void
+  (backend-name :string))  
+ 
+(cffi:defcfun ("set_add_incf_inplace_backend" %set-add-incf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_add_incf_backend" %set-add-incf-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_sub_decf_inplace_backend" %set-sub-decf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_sub_decf_backend" %set-sub-decf-backend) :void
+  (backend-name :string))  
+          
+(cffi:defcfun ("set_mul_mulf_inplace_backend" %set-mul-mulf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_mul_mulf_backend" %set-mul-mulf-backend) :void
+  (backend-name :string))  
+     
+(cffi:defcfun ("set_div_divf_inplace_backend" %set-div-divf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_div_divf_backend" %set-div-divf-backend) :void
+  (backend-name :string))  
+     	 
+(cffi:defcfun ("set_pow_powf_inplace_backend" %set-pow-powf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_pow_powf_backend" %set-pow-powf-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_max_maxf_inplace_backend" %set-max-maxf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_max_maxf_backend" %set-max-maxf-backend) :void
+  (backend-name :string))  
+     	
+(cffi:defcfun ("set_min_minf_inplace_backend" %set-min-minf-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_min_minf_backend" %set-min-minf-backend) :void
+  (backend-name :string))  
+     		
+(cffi:defcfun ("set_add_broadcasting_inplace_backend" %set-add-broadcasting-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_add_broadcasting_backend" %set-add-broadcasting-backend) :void
+  (backend-name :string))  
+ 
+(cffi:defcfun ("set_sub_broadcasting_inplace_backend" %set-sub-broadcasting-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_sub_broadcasting_backend" %set-sub-broadcasting-backend) :void
+  (backend-name :string))   
+
+(cffi:defcfun ("set_mul_broadcasting_inplace_backend" %set-mul-broadcasting-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_mul_broadcasting_backend" %set-mul-broadcasting-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_div_broadcasting_inplace_backend" %set-div-broadcasting-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_div_broadcasting_backend" %set-div-broadcasting-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_pow_broadcasting_inplace_backend" %set-pow-broadcasting-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_pow_broadcasting_backend" %set-pow-broadcasting-backend) :void
+  (backend-name :string))    
+  
+(cffi:defcfun ("set_max_broadcasting_inplace_backend" %set-max-broadcasting-inplace-backend) :void
+  (backend-name :string))  
+   
+(cffi:defcfun ("set_min_broadcasting_backend" %set-min-broadcasting-backend) :void
+  (backend-name :string))    
+  
+(cffi:defcfun ("set_fill_tensor_with_data_backend" %set-fill-tensor-with-data-backend) :void
+  (backend-name :string))  
+  
+(cffi:defcfun ("set_axpy_inplace_backend" %set-axpy-inplace-backend) :void
+  (backend-name :string))    
+  
+(cffi:defcfun ("set_axpy_backend" %set-axpy-backend) :void
+  (backend-name :string))      
+  
+(cffi:defcfun ("set_axpf_inplace_backend" %set-axpf-inplace-backend) :void
+  (backend-name :string))      
+  
+(cffi:defcfun ("set_axpf_backend" %set-axpf-backend) :void
+  (backend-name :string))      
+  
+(cffi:defcfun ("set_axpy_broadcasting_inplace_backend" %set-axpy-broadcasting-inplace-backend) :void
+  (backend-name :string))      
+  
+(cffi:defcfun ("set_axpy_broadcasting_backend" %set-axpy-broadcasting-backend) :void
+  (backend-name :string)) 
+  
 (nnl-init-system)
