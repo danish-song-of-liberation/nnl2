@@ -11,5 +11,5 @@
    :%.-/broadcasting :%.*/broadcasting! :%.*/broadcasting :%.//broadcasting! :%.//broadcasting :%.^/broadcasting!
    :%.^/broadcasting :%.max/broadcasting :%.max/broadcasting! :%.min/broadcasting :%.min/broadcasting!
    :%make-tensor-from-flatten :%axpy/axpf! :%axpy/axpf :%axpy/broadcasting! :%axpy/broadcasting :%axpy :%axpy!
-   :%set-abs-backend :%set-abs-inplace-backend))
+   :%set-abs-backend :%set-abs-inplace-backend :%set-inplace-fill-backend))
 																					 

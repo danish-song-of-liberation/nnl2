@@ -472,6 +472,9 @@
 (cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
   (tensor :pointer))
   
+(cffi:defcfun ("set_inplace_fill_backend" %set-inplace-fill-backend) :void
+  (backend-name :string))  
+  
 (cffi:defcfun ("set_abs_backend" %set-abs-backend) :void
   (backend-name :string))
   
