@@ -29,6 +29,8 @@
    :%set-sub-broadcasting-inplace-backend :%set-sub-broadcasting-backend :%set-mul-broadcasting-inplace-backend
    :%set-mul-broadcasting-backend :%set-div-broadcasting-inplace-backend :%set-div-broadcasting-backend
    :%set-pow-broadcasting-inplace-backend :%set-pow-broadcasting-backend :%set-max-broadcasting-inplace-backend
-   :%set-min-broadcasting-backend :%set-fill-tensor-with-data-backend :%set-axpy-inplace-backend
+   :%set-min-broadcasting-inplace-backend :%set-max-broadcasting-backend
+   :%set-fill-tensor-with-data-backend :%set-axpy-inplace-backend :%set-min-broadcasting-backend
    :%set-axpy-backend :%set-axpf-inplace-backend :%set-axpf-backend :%set-axpy-broadcasting-inplace-backend
-   :%set-axpy-broadcasting-backend)) 
+   :%set-axpy-broadcasting-backend :%get-empty-backend :%get-zeros-backend :%get-ones-backend
+   :%get-full-backend)) 

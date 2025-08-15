@@ -502,10 +502,10 @@
 (cffi:defcfun ("set_sub_backend" %set-sub-backend) :void
   (backend-name :string))  
 
-(cffi:defcfun ("set_mulinplace_backend" %set-mulinplace-backend) :void
+(cffi:defcfun ("set_mul_inplace_backend" %set-mulinplace-backend) :void
   (backend-name :string))  
     
-(cffi:defcfun ("set_divinplace_backend" %set-divinplace-backend) :void
+(cffi:defcfun ("set_div_inplace_backend" %set-divinplace-backend) :void
   (backend-name :string))  
   	
 (cffi:defcfun ("set_mul_backend" %set-mul-backend) :void
@@ -681,12 +681,18 @@
    
 (cffi:defcfun ("set_pow_broadcasting_backend" %set-pow-broadcasting-backend) :void
   (backend-name :string))    
+
+(cffi:defcfun ("set_max_broadcasting_backend" %set-max-broadcasting-backend) :void
+  (backend-name :string))   
   
 (cffi:defcfun ("set_max_broadcasting_inplace_backend" %set-max-broadcasting-inplace-backend) :void
-  (backend-name :string))  
+  (backend-name :string))    
    
 (cffi:defcfun ("set_min_broadcasting_backend" %set-min-broadcasting-backend) :void
   (backend-name :string))    
+
+(cffi:defcfun ("set_min_broadcasting_inplace_backend" %set-min-broadcasting-inplace-backend) :void
+  (backend-name :string))      
   
 (cffi:defcfun ("set_fill_tensor_with_data_backend" %set-fill-tensor-with-data-backend) :void
   (backend-name :string))  
@@ -708,5 +714,10 @@
   
 (cffi:defcfun ("set_axpy_broadcasting_backend" %set-axpy-broadcasting-backend) :void
   (backend-name :string)) 
+  
+(cffi:defcfun ("get_empty_backend" %get-empty-backend) :string)  
+(cffi:defcfun ("get_zeros_backend" %get-zeros-backend) :string)
+(cffi:defcfun ("get_ones_backend" %get-ones-backend) :string)
+(cffi:defcfun ("get_full_backend" %get-full-backend) :string)  
   
 (nnl-init-system)

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name }
+#define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name, "NOT INITIALIZED" }
 #define INIT_BACKEND(fn_var, backends_array) fn_var = init_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]))
 #define SET_BACKEND_BY_NAME(backend, fn, backend_name) set_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name)
 
@@ -59,6 +59,7 @@ typedef struct {
     int speed_priority;
     bool available;
     const char* name;
+	const char* current;
 } Implementation;
 
 typedef enum {
@@ -70,6 +71,13 @@ typedef enum {
 	nnl2NoTrans=111,
 	nnl2Trans=112,
 } nnl2_transpose;
+
+typedef enum {
+	nnl2_naive,
+	nnl2_avx128,
+	nnl2_avx256,
+	nnl2_blas
+} implver;
 
 typedef void (*fn_inplace_fill)(Tensor*, void*, TensorType);
 typedef Tensor* (*fn_empty)(const int*, int, TensorType);
@@ -225,7 +233,7 @@ void* init_backend(Implementation* backends, size_t count) {
             best = &backends[i];
         }
     }
-	
+
     return best->fn;
 }
 
@@ -233,6 +241,7 @@ void set_backend_by_name(Implementation* backends, size_t count, void** target_f
     for (size_t i = 0; i < count; i++) {
         if (strcmp(backends[i].name, backend_name) == 0) {
             *target_fn = backends[i].fn;
+			backends->current = backend_name;
             return;
         }
     }

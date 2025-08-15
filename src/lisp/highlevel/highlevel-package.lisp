@@ -17,5 +17,14 @@
    :.min/minf :.min/gnrl :.+/broadcasting! :.+/broadcasting :.-/broadcasting :.-/broadcasting!
    :.*/broadcasting! :.*/broadcasting :.//broadcasting! :.//broadcasting :.^/broadcasting!
    :.^/broadcasting :*nnl2-tensor-types* :ts-type-to-lisp :lisp-type-to-ts :from-flatten
-   :make-tensor :/map :/map! :axpy :axpy! :use-backend :use-backend/abs :use-backend/inplace-fill))
-  
+   :make-tensor :/map :/map! :axpy :axpy! :use-backend :use-backend/abs :use-backend/inplace-fill
+   :use-backend/+= :use-backend/-= :use-backend/*= :use-backend//! :use-backend/^= 
+   :use-backend/.log! :use-backend/.max! :use-backend/.min! :use-backend/scale! 
+   :use-backend/.+ :use-backend/.- :use-backend/.* :use-backend/./ :use-backend/.^ 
+   :use-backend/.log :use-backend/.min :use-backend/.max :use-backend/scale :use-backend/gemm
+   :use-backend/empty :use-backend/.abs :use-backend/xavier :use-backend/randn 
+   :use-backend/full :use-backend/zeros :use-backend/sum :use-backend/l2norm 
+   :use-backend/copy :use-backend/.relu :use-backend/.relu! :use-backend/.leaky-relu 
+   :use-backend/.leaky-relu! :use-backend/.sigmoid :use-backend/.sigmoid! 
+   :use-backend/.tanh :use-backend/.tanh! :use-backend/transpose :use-backend/transpose!
+   :get-backend/empty :get-backend/zeros :get-backend/ones :get-backend/full))

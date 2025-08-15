@@ -212,13 +212,17 @@ Tensor* cpu64_empty(const int* shape, int rank, TensorType dtype) {
 }
 
 Implementation empty_backends[] = {
-	REGISTER_BACKEND(cpu64_empty, 80, "CPU64")
+	REGISTER_BACKEND(cpu64_empty, nnl2_naive, "NAIVE")
 };
 
 fn_empty empty;
 
 void set_empty_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(empty_backends, empty, backend_name);
+}
+
+const char* get_empty_backend() {
+	return empty_backends->current;
 }
 
 /** @brief
@@ -341,13 +345,17 @@ Tensor* cpu64_zeros(const int* shape, int rank, TensorType dtype) {
 }
 
 Implementation zeros_backends[] = {
-	REGISTER_BACKEND(cpu64_zeros, 80, "CPU64"),
+	REGISTER_BACKEND(cpu64_zeros, nnl2_naive, "NAIVE"),
 };
 
 fn_zeros zeros;
 
 void set_zeros_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(zeros_backends, zeros, backend_name);
+}
+
+const char* get_zeros_backend() {
+	return zeros_backends->current;
 }
 
 /** @brief
@@ -501,8 +509,8 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			
 			__m256 avx_filler = _mm256_set1_ps(filler);
 			
-			size_t avx_iters = total_elems / 8; // there are ghosts in my code
-			for (size_t i = 0; i < avx_iters; i++) { // WHY DOESN'T AVX_ITERS WORK IN LISP, BUT IT WORKS IN C? WHAT IS GOING ON?
+			size_t avx_iters = total_elems / 8; 
+			for (size_t i = 0; i < avx_iters; i++) {
 				_mm256_storeu_ps(data + i * 8, avx_filler);
 			}
 
@@ -521,10 +529,7 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			
 			size_t it = 0;
 			
-			for(; it < total_elems - 3; it += 4) _mm256_storeu_pd(data + it, avx_filler); // I MEAN THIS
-			// wth does fleet64 work with this but not other data types, and only in Lisp wrappers?
-			// I would make such concise loops everywhere, but ghosts don't like it
-			
+			for(; it < total_elems - 3; it += 4) _mm256_storeu_pd(data + it, avx_filler);
 			for(size_t j = it; j < total_elems; j++) data[j] = filler;
 			
 			break;
@@ -534,10 +539,10 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 #endif
 
 Implementation inplace_fill_backends[] = {
-	REGISTER_BACKEND(naive_inplace_fill, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_inplace_fill, nnl2_naive, "NAIVE"),
 	
 	#ifdef __AVX__
-	// REGISTER_BACKEND(avx_inplace_fill, 70, "AVX"), <<== bugs (todo)
+	REGISTER_BACKEND(avx_inplace_fill, nnl2_avx256, "AVX256"),
 	#endif
 };
 
@@ -545,6 +550,14 @@ fn_inplace_fill inplace_fill;
 
 void set_inplace_fill_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(inplace_fill_backends, inplace_fill, backend_name);
+}
+
+const char* get_ones_backend() {
+	return inplace_fill_backends->current;
+}
+
+const char* get_full_backend() {
+	return inplace_fill_backends->current;
 }
 
 Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
@@ -580,7 +593,7 @@ Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
 }
 
 Implementation ones_backends[] = {
-	REGISTER_BACKEND(cpu64_ones, 80, "CPU64"),
+	REGISTER_BACKEND(cpu64_ones, nnl2_naive, "NAIVE"),
 };
 
 fn_ones ones;
@@ -763,11 +776,11 @@ void blas_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
 }
 #endif
 
-Implementation sgemminplace_backends[] = {
-	REGISTER_BACKEND(naive_sgemminplace, 10, "NAIVE"),
+Implementation sgemminplace_backends[] = {	
+	REGISTER_BACKEND(naive_sgemminplace, nnl2_naive, "NAIVE"),
 	
 	#ifdef OPENBLAS_AVAILABLE
-	REGISTER_BACKEND(blas_sgemminplace, 100, "BLAS"),
+	REGISTER_BACKEND(blas_sgemminplace, nnl2_blas, "BLAS"),
 	#endif
 };
 
@@ -946,10 +959,10 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 #endif
 
 Implementation dgemminplace_backends[] = {
-	REGISTER_BACKEND(naive_dgemminplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_dgemminplace, nnl2_naive, "NAIVE"),
 	
 	#ifdef OPENBLAS_AVAILABLE
-	REGISTER_BACKEND(blas_dgemminplace, 100, "OPENBLAS"),
+	REGISTER_BACKEND(blas_dgemminplace, nnl2_blas, "BLAS"),
 	#endif
 };
 
@@ -5132,7 +5145,7 @@ Implementation mul_broadcasting_inplace_backends[] = {
 
 mulbroadcastinginplacefn mul_broadcasting_inplace;
 
-void mul_broadcasting_inplace_backend(const char* backend_name) {
+void set_mul_broadcasting_inplace_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(mul_broadcasting_inplace_backends, mul_broadcasting_inplace, backend_name);
 }
 
@@ -5207,7 +5220,7 @@ Implementation mul_broadcasting_backends[] = {
 
 mulbroadcastingfn mul_broadcasting;
 
-void mul_broadcasting_backend(const char* backend_name) {
+void set_mul_broadcasting_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(mul_broadcasting_backends, mul_broadcasting, backend_name);
 }
 

@@ -47,7 +47,7 @@ void init_system() {
 	INIT_BACKEND(subinplace, subinplace_backends);
 	INIT_BACKEND(add, add_backends);
 	INIT_BACKEND(sub, sub_backends);
-	INIT_BACKEND(mulinplace, mulinplace_backends);
+	INIT_BACKEND(mulinplace, mulinplace_backends); 
 	INIT_BACKEND(divinplace, divinplace_backends);         
 	INIT_BACKEND(mul, mul_backends);   
 	INIT_BACKEND(nnl2_div, div_backends);  
@@ -68,7 +68,7 @@ void init_system() {
 	INIT_BACKEND(hstack, hstack_backends);
 	INIT_BACKEND(vstack, vstack_backends);
 	INIT_BACKEND(reluinplace, reluinplace_backends); 
-	INIT_BACKEND(relu, relu_backends); 
+	INIT_BACKEND(relu, relu_backends);  
 	INIT_BACKEND(leakyreluinplace, leakyreluinplace_backends); 
 	INIT_BACKEND(leakyrelu, leakyrelu_backends); 
 	INIT_BACKEND(sigmoidinplace, sigmoidinplace_backends); 
@@ -93,10 +93,10 @@ void init_system() {
 	INIT_BACKEND(div_divf, div_divf_backends); 
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends); 
-	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends); 
+	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);   
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends); 
-	INIT_BACKEND(min_minf, min_minf_backends); 
+	INIT_BACKEND(min_minf, min_minf_backends);  
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
 	INIT_BACKEND(sub_broadcasting_inplace, sub_broadcasting_inplace_backends);
@@ -119,16 +119,16 @@ void init_system() {
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);
 }     
-
+  
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return empty(shape, rank, dtype);
 }
  
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype); 
-} 
+}  	  	 
 
-Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {  
+Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {   
 	return ones(shape, rank, dtype);   
 }                        
         
@@ -347,7 +347,7 @@ Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) {
 void lisp_call_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
 	pow_powf_inplace(tensor, powf_arg);
 }
-
+ 
 Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
 	return pow_powf(tensor, powf);
 }
@@ -379,7 +379,7 @@ Tensor* lisp_call_add_broadcasting(Tensor* summand, Tensor* sumend) {
 void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return sub_broadcasting_inplace(summand, sumend);
 }
-
+ 
 Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) { 
 	return sub_broadcasting(minuend, subtrahend);
 }
@@ -430,7 +430,7 @@ void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 
 Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 	return axpy(summand, sumend, alpha);    
-}
+} 
 
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 	axpf_inplace(summand, sumend, alpha); 
@@ -442,7 +442,7 @@ Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
 
 void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 	axpy_broadcasting_inplace(summand, sumend, alpha); 
-} 
+}   
 
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
 	return axpy_broadcasting(summand, sumend, alpha); 
