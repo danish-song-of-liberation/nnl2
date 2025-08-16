@@ -49,6 +49,9 @@
 #include <cblas.h>
 #endif
 
+#define current_backend(name) current_##name##_backend_name
+#define make_current_backend(name) static char current_##name##_backend_name[MAX_BACKEND_NAME_LENGTH] = ""
+
 /** @brief
  * Returns the size of the TensorType data type in bytes
  *
@@ -221,8 +224,10 @@ void set_empty_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(empty_backends, empty, backend_name);
 }
 
+make_current_backend(empty);
+
 const char* get_empty_backend() {
-	return empty_backends->current;
+	return current_backend(empty);
 }
 
 /** @brief
@@ -354,8 +359,10 @@ void set_zeros_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(zeros_backends, zeros, backend_name);
 }
 
+make_current_backend(zeros);
+
 const char* get_zeros_backend() {
-	return zeros_backends->current;
+	return current_backend(zeros);
 }
 
 /** @brief
@@ -552,12 +559,10 @@ void set_inplace_fill_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(inplace_fill_backends, inplace_fill, backend_name);
 }
 
-const char* get_ones_backend() {
-	return inplace_fill_backends->current;
-}
+make_current_backend(inplace_fill);
 
-const char* get_full_backend() {
-	return inplace_fill_backends->current;
+const char* get_inplace_fill_backend() {
+	return current_backend(empty);
 }
 
 Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
@@ -601,6 +606,13 @@ fn_ones ones;
 void set_ones_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(ones_backends, ones, backend_name);
 }
+
+make_current_backend(ones);
+
+const char* get_ones_backend() {
+	return current_backend(ones);
+}
+
 
 Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
 	Tensor* tensor_t = empty(shape, rank, dtype);
@@ -967,9 +979,14 @@ Implementation dgemminplace_backends[] = {
 };
 
 dgemminplacefn dgemminplace;
+make_current_backend(gemm);
 
 void set_dgemminplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(dgemminplace_backends, dgemminplace, backend_name);
+    ESET_BACKEND_BY_NAME(dgemminplace_backends, dgemminplace, backend_name, current_backend(gemm));
+}
+
+const char* get_gemm_backend() {
+	return current_backend(gemm);
 }
 
 Tensor* sgemm(const nnl2_order order, const nnl2_transpose transa, 
@@ -1322,17 +1339,22 @@ void avx_addinplace(Tensor* summand, const Tensor* addend) {
 #endif
 
 addinplacefn addinplace;
+make_current_backend(addinplace);
 
 Implementation addinplace_backends[] = {
-	REGISTER_BACKEND(naive_addinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_addinplace, nnl2_naive, "NAIVE"),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_addinplace, 70, "AVX"),
+	REGISTER_BACKEND(avx_addinplace, nnl2_avx256, "AVX256"),
 	#endif
 };
 
 void set_addinplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(addinplace_backends, addinplace, backend_name);
+    ESET_BACKEND_BY_NAME(addinplace_backends, addinplace, backend_name, current_backend(addinplace));
+}
+
+const char* get_addinplace_backend() {
+	return current_backend(addinplace);
 }
 
 void naive_subinplace(Tensor* summand, const Tensor* addend) {
@@ -1469,17 +1491,22 @@ void avx_subinplace(Tensor* minuend, const Tensor* subtrahend) {
 #endif
 
 Implementation subinplace_backends[] = {
-	REGISTER_BACKEND(naive_subinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_subinplace, nnl2_naive, "NAIVE"),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_subinplace, 70, "AVX"),
+	REGISTER_BACKEND(avx_subinplace, nnl2_avx256, "AVX256"),
 	#endif
 };
 
 subinplacefn subinplace;
+make_current_backend(subinplace);
 
 void set_subinplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(subinplace_backends, subinplace, backend_name);
+    ESET_BACKEND_BY_NAME(subinplace_backends, subinplace, backend_name, current_backend(subinplace));
+}
+
+const char* get_subinplace_backend() {
+	return current_backend(subinplace);
 }
 
 int get_mem_alignment() {
@@ -1647,17 +1674,22 @@ Tensor* avx_add(const Tensor* summand, const Tensor* addend) {
 #endif
 
 Implementation add_backends[] = {
-	REGISTER_BACKEND(naive_add, 65, "NAIVE"),
+	REGISTER_BACKEND(naive_add, nnl2_naive, "NAIVE"),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_add, 70, "AVX"),
+	REGISTER_BACKEND(avx_add, nnl2_avx256, "AVX256"),
 	#endif
 };
 
-addfn add; 
+addfn add;
+make_current_backend(add);
 
 void set_add_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(add_backends, add, backend_name);
+    ESET_BACKEND_BY_NAME(add_backends, add, backend_name, current_backend(add));
+}
+
+const char* get_add_backend() {
+	return current_backend(add);
 }
 
 Tensor* naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
@@ -1813,17 +1845,22 @@ Tensor* avx_sub(const Tensor* minuend, const Tensor* subtrahend) {
 #endif
 
 Implementation sub_backends[] = {
-	REGISTER_BACKEND(naive_sub, 65, "NAIVE"),
+	REGISTER_BACKEND(naive_sub, nnl2_naive, "NAIVE"),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_sub, 70, "AVX"),
+	REGISTER_BACKEND(avx_sub, nnl2_avx256, "AVX256"),
 	#endif
 };
 
-addfn sub; 
+subfn sub;
+make_current_backend(sub);
 
 void set_sub_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(sub_backends, sub, backend_name);
+    ESET_BACKEND_BY_NAME(sub_backends, sub, backend_name, current_backend(sub));
+}
+
+const char* get_sub_backend() {
+	return current_backend(sub);
 }
 
 void naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
@@ -1879,13 +1916,18 @@ void naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
 }
 
 Implementation mulinplace_backends[] = {
-	REGISTER_BACKEND(naive_mulinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_mulinplace, nnl2_naive, "NAIVE"),
 };
 
-mulinplacefn mulinplace; 
+mulinplacefn mulinplace;
+make_current_backend(mulinplace);
 
-void set_mul_inplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(mulinplace_backends, mulinplace, backend_name);
+void set_mulinplace_backend(const char* backend_name) {
+    ESET_BACKEND_BY_NAME(mulinplace_backends, mulinplace, backend_name, current_backend(mulinplace));
+}
+
+const char* get_mulinplace_backend() {
+	return current_backend(mulinplace);
 }
 
 void naive_divinplace(Tensor* dividend, const Tensor* divisor) {
@@ -1941,13 +1983,18 @@ void naive_divinplace(Tensor* dividend, const Tensor* divisor) {
 }
 
 Implementation divinplace_backends[] = {
-	REGISTER_BACKEND(naive_divinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_divinplace, nnl2_naive, "NAIVE"),
 };
 
-divinplacefn divinplace; 
+divinplacefn divinplace;
+make_current_backend(divinplace);
 
-void set_div_inplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(divinplace_backends, divinplace, backend_name);
+void set_divinplace_backend(const char* backend_name) {
+    ESET_BACKEND_BY_NAME(divinplace_backends, divinplace, backend_name, current_backend(divinplace));
+}
+
+const char* get_divinplace_backend() {
+	return current_backend(divinplace);
 }
 
 Tensor* naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
@@ -2010,13 +2057,18 @@ Tensor* naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
 }
 
 Implementation mul_backends[] = {
-	REGISTER_BACKEND(naive_mul, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_mul, nnl2_naive, "NAIVE"),
 };
 
-mulfn mul; 
+mulfn mul;
+make_current_backend(mul);
 
 void set_mul_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(mul_backends, mul, backend_name);
+    ESET_BACKEND_BY_NAME(mul_backends, mul, backend_name, current_backend(mul));
+}
+
+const char* get_mul_backend() {
+	return current_backend(mul);
 }
 
 Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
@@ -2100,9 +2152,14 @@ Implementation div_backends[] = {
 };
 
 divfn nnl2_div;
+make_current_backend(div);
 
 void set_div_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(div_backends, div, backend_name);
+    ESET_BACKEND_BY_NAME(div_backends, div, backend_name, current_backend(div));
+}
+
+const char* get_div_backend() {
+	return current_backend(div);
 }
 
 void naive_powinplace(Tensor* base, const Tensor* exponent) {
@@ -2158,13 +2215,18 @@ void naive_powinplace(Tensor* base, const Tensor* exponent) {
 }
 	
 Implementation powinplace_backends[] = {
-	REGISTER_BACKEND(naive_powinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_powinplace, nnl2_naive, "NAIVE"),
 };	
 	
-powinplacefn powinplace;	
+powinplacefn powinplace;
+make_current_backend(powinplace);
 
 void set_powinplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(powinplace_backends, powinplace, backend_name);
+    ESET_BACKEND_BY_NAME(powinplace_backends, powinplace, backend_name, current_backend(powinplace));
+}
+
+const char* get_powinplace_backend() {
+	return current_backend(powinplace);
 }
 
 Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
@@ -2227,13 +2289,18 @@ Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
 }
 
 Implementation pow_backends[] = {
-	REGISTER_BACKEND(naive_pow, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_pow, nnl2_naive, "NAIVE"),
 };	
 	
-powfn nnl2_pow;	
+powfn nnl2_pow;
+make_current_backend(pow);
 
 void set_pow_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(pow_backends, nnl2_pow, backend_name);
+    ESET_BACKEND_BY_NAME(pow_backends, pow, backend_name, current_backend(pow));
+}
+
+const char* get_pow_backend() {
+	return current_backend(pow);
 }
 
 void naive_expinplace(Tensor* tensor) {
@@ -2266,13 +2333,18 @@ void naive_expinplace(Tensor* tensor) {
 }	
 
 Implementation expinplace_backends[] = {
-	REGISTER_BACKEND(naive_expinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_expinplace, nnl2_naive, "NAIVE"),
 };	
 
 expinplacefn expinplace;
+make_current_backend(expinplace);
 
 void set_expinplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(expinplace_backends, expinplace, backend_name);
+    ESET_BACKEND_BY_NAME(expinplace_backends, expinplace, backend_name, current_backend(expinplace));
+}
+
+const char* get_expinplace_backend() {
+	return current_backend(expinplace);
 }
 
 Tensor* naive_exp(const Tensor* tensor) {
@@ -2312,13 +2384,18 @@ Tensor* naive_exp(const Tensor* tensor) {
 }
 
 Implementation exp_backends[] = {
-	REGISTER_BACKEND(naive_exp, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_exp, nnl2_naive, "NAIVE"),
 };	
 
 expfn nnl2_exp;
+make_current_backend(exp);
 
 void set_exp_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(exp_backends, expinplace, backend_name);
+    ESET_BACKEND_BY_NAME(exp_backends, exp, backend_name, current_backend(exp));
+}
+
+const char* get_exp_backend() {
+	return current_backend(exp);
 }
 
 void naive_loginplace(Tensor* tensor) {
@@ -2351,13 +2428,18 @@ void naive_loginplace(Tensor* tensor) {
 }
 
 Implementation loginplace_backends[] = {
-	REGISTER_BACKEND(naive_loginplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_loginplace, nnl2_naive, "NAIVE"),
 };	
 
 loginplacefn loginplace;
+make_current_backend(loginplace);
 
 void set_loginplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(loginplace_backends, loginplace, backend_name);
+    ESET_BACKEND_BY_NAME(loginplace_backends, loginplace, backend_name, current_backend(loginplace));
+}
+
+const char* get_loginplace_backend() {
+	return current_backend(loginplace);
 }
 
 Tensor* naive_log(const Tensor* tensor) {
@@ -2397,13 +2479,18 @@ Tensor* naive_log(const Tensor* tensor) {
 }
 
 Implementation log_backends[] = {
-	REGISTER_BACKEND(naive_log, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_log, nnl2_naive, "NAIVE"),
 };	
 
 logfn nnl2_log;
+make_current_backend(log);
 
 void set_log_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(log_backends, log, backend_name);
+    ESET_BACKEND_BY_NAME(log_backends, log, backend_name, current_backend(log));
+}
+
+const char* get_log_backend() {
+	return current_backend(log);
 }
 
 void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);
@@ -2579,13 +2666,18 @@ void naive_scaleinplace(Tensor* tensor, float multiplier) {
 }
 
 Implementation scaleinplace_backends[] = {
-	REGISTER_BACKEND(naive_scaleinplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_scaleinplace, nnl2_naive, "NAIVE"),
 };	
 
 scaleinplacefn scaleinplace;
+make_current_backend(scaleinplace);
 
 void set_scaleinplace_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(scaleinplace_backends, scaleinplace, backend_name);
+    ESET_BACKEND_BY_NAME(scaleinplace_backends, scaleinplace, backend_name, current_backend(scaleinplace));
+}
+
+const char* get_scaleinplace_backend() {
+	return current_backend(scaleinplace);
 }
 
 Tensor* naive_scale(const Tensor* tensor, float multiplier) {
@@ -2626,13 +2718,18 @@ Tensor* naive_scale(const Tensor* tensor, float multiplier) {
 }
 
 Implementation scale_backends[] = {
-	REGISTER_BACKEND(naive_scale, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_scale, nnl2_naive, "NAIVE"),
 };	
 
 scalefn scale;
+make_current_backend(scale);
 
 void set_scale_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(scale_backends, scale, backend_name);
+    ESET_BACKEND_BY_NAME(scale_backends, scale, backend_name, current_backend(scale));
+}
+
+const char* get_scale_backend() {
+	return current_backend(scale);
 }
 
 Tensor* empty_like(const Tensor* tensor) {

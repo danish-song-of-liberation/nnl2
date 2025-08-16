@@ -32,5 +32,8 @@
    :%set-min-broadcasting-inplace-backend :%set-max-broadcasting-backend
    :%set-fill-tensor-with-data-backend :%set-axpy-inplace-backend :%set-min-broadcasting-backend
    :%set-axpy-backend :%set-axpf-inplace-backend :%set-axpf-backend :%set-axpy-broadcasting-inplace-backend
-   :%set-axpy-broadcasting-backend :%get-empty-backend :%get-zeros-backend :%get-ones-backend
-   :%get-full-backend)) 
+   :%set-axpy-broadcasting-backend :%get-empty-backend :%get-zeros-backend :%get-inplace-fill-backend
+   :%get-ones-backend :%get-gemm-backend :%get-addinplace-backend :%get-subinplace-backend
+   :%get-add-backend :%get-sub-backend :%get-mulinplace-backend :%get-divinplace-backend :%get-mul-backend
+   :%get-div-backend :%get-powinplace-backend :%get-pow-backend :%get-expinplace-backend :%get-exp-backend
+   :%get-loginplace-backend :%get-log-backend :%get-scaleinplace-backend :%get-scale-backend))

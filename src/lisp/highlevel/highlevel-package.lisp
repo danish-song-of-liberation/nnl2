@@ -27,4 +27,8 @@
    :use-backend/copy :use-backend/.relu :use-backend/.relu! :use-backend/.leaky-relu 
    :use-backend/.leaky-relu! :use-backend/.sigmoid :use-backend/.sigmoid! 
    :use-backend/.tanh :use-backend/.tanh! :use-backend/transpose :use-backend/transpose!
-   :get-backend/empty :get-backend/zeros :get-backend/ones :get-backend/full))
+   :get-backend/empty :get-backend/zeros :get-backend/ones :get-backend/full :get-backend/gemm
+   :get-backend/gemm! :get-backend/+= :get-backend/-= :get-backend/.+ :get-backend/.-
+   :get-backend/*= :get-backend//! :get-backend/.* :get-backend/./ :get-backend/^=
+   :get-backend/.^ :get-backend/.exp! :get-backend/.exp :get-backend/.log! :get-backend/.log
+   :get-backend/scale! :get-backend/scale))

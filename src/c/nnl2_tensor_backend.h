@@ -8,7 +8,10 @@
 
 #define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name, "NOT INITIALIZED" }
 #define INIT_BACKEND(fn_var, backends_array) fn_var = init_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]))
+#define EINIT_BACKEND(fn_var, backends_array, cur_pntr) fn_var = einit_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]), cur_pntr)
 #define SET_BACKEND_BY_NAME(backend, fn, backend_name) set_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name)
+#define ESET_BACKEND_BY_NAME(backend, fn, backend_name, cur_pntr) eset_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name, cur_pntr)
+#define MAX_BACKEND_NAME_LENGTH 32
 
 // NNL2
 
@@ -18,7 +21,7 @@
  */
 
 /** @brief 
- * Enumerations of available tensor types (INT32, FLOAT32/FLOAT, FLOAT64/DOUBLE)
+ * Enumerations of available tensor types (INT32/INT, FLOAT32/FLOAT, FLOAT64/DOUBLE)
  *
  */
 typedef enum {
@@ -237,11 +240,37 @@ void* init_backend(Implementation* backends, size_t count) {
     return best->fn;
 }
 
+void* einit_backend(Implementation* backends, size_t count, char* cur_pntr) {
+    if (count == 0) return NULL;
+    
+    Implementation* best = &backends[0];
+    for (size_t i = 1; i < count; i++) {
+        if (backends[i].speed_priority > best->speed_priority) {
+            best = &backends[i];
+        }
+    }
+	
+	strncpy(cur_pntr, best->name, MAX_BACKEND_NAME_LENGTH - 1);
+    cur_pntr[MAX_BACKEND_NAME_LENGTH - 1] = '\0';
+
+    return best->fn;
+}
+
 void set_backend_by_name(Implementation* backends, size_t count, void** target_fn, const char* backend_name) {
     for (size_t i = 0; i < count; i++) {
         if (strcmp(backends[i].name, backend_name) == 0) {
             *target_fn = backends[i].fn;
-			backends->current = backend_name;
+            return;
+        }
+    }
+}
+
+void eset_backend_by_name(Implementation* backends, size_t count, void** target_fn, const char* backend_name, char* cur_pntr) {
+    for (size_t i = 0; i < count; i++) {
+        if (strcmp(backends[i].name, backend_name) == 0) {
+            *target_fn = backends[i].fn;
+			strncpy(cur_pntr, backends[i].name, MAX_BACKEND_NAME_LENGTH - 1);
+			cur_pntr[MAX_BACKEND_NAME_LENGTH - 1] = '\0';
             return;
         }
     }

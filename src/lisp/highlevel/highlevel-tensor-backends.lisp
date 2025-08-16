@@ -262,5 +262,59 @@
   (uppercase-string-to-symbol (nnl2.ffi:%get-ones-backend)))  
   
 (defun get-backend/full ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-full-backend)))  
+  (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
   
+(defun get-backend/gemm ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))  
+    
+(defun get-backend/gemm! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))    
+ 
+(defun get-backend/+= ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-addinplace-backend)))    
+ 
+(defun get-backend/-= ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-subinplace-backend)))    
+  
+(defun get-backend/.+ ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-add-backend)))    
+ 
+(defun get-backend/.- ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-sub-backend)))     
+ 
+(defun get-backend/*= ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-mulinplace-backend)))       
+
+(defun get-backend//! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-divinplace-backend)))  
+
+(defun get-backend/.* ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-mul-backend)))    
+
+(defun get-backend/./ ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-div-backend)))      
+  
+(defun get-backend/^= ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-powinplace-backend)))      
+  
+(defun get-backend/.^ ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-pow-backend)))      
+  
+(defun get-backend/.exp! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-expinplace-backend)))   
+  
+(defun get-backend/.exp ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-exp-backend)))   
+
+(defun get-backend/.log! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-loginplace-backend)))      
+	
+(defun get-backend/.log ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-log-backend)))    	
+	
+(defun get-backend/scale! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-scaleinplace-backend)))    		
+
+(defun get-backend/scale ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-scale-backend)))    		
+		

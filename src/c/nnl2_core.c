@@ -33,33 +33,33 @@
 
 #include <stdlib.h>
 #include <time.h>
- 
+  
 void init_system() {   
-	srand(time(NULL)); 
+	srand(time(NULL));  
 
-	INIT_BACKEND(inplace_fill, inplace_fill_backends);
-	INIT_BACKEND(empty, empty_backends);
-	INIT_BACKEND(zeros, zeros_backends);
-	INIT_BACKEND(ones, ones_backends);
+	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
+	EINIT_BACKEND(empty, empty_backends, current_backend(empty));
+	EINIT_BACKEND(zeros, zeros_backends, current_backend(zeros));
+	EINIT_BACKEND(ones, ones_backends, current_backend(ones));
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);
-	INIT_BACKEND(dgemminplace, dgemminplace_backends);
-	INIT_BACKEND(addinplace, addinplace_backends);
-	INIT_BACKEND(subinplace, subinplace_backends);
-	INIT_BACKEND(add, add_backends);
-	INIT_BACKEND(sub, sub_backends);
-	INIT_BACKEND(mulinplace, mulinplace_backends); 
-	INIT_BACKEND(divinplace, divinplace_backends);         
-	INIT_BACKEND(mul, mul_backends);   
-	INIT_BACKEND(nnl2_div, div_backends);  
-	INIT_BACKEND(powinplace, powinplace_backends);  
-	INIT_BACKEND(expinplace, expinplace_backends);  
-	INIT_BACKEND(nnl2_pow, pow_backends); 
-	INIT_BACKEND(nnl2_exp, exp_backends); 
-	INIT_BACKEND(loginplace, loginplace_backends); 
-	INIT_BACKEND(nnl2_log, log_backends); 
-	INIT_BACKEND(scaleinplace, scaleinplace_backends); 
-	INIT_BACKEND(scale, scale_backends); 
-	INIT_BACKEND(maxinplace, maxinplace_backends); 
+	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
+	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace)); 
+	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));
+	EINIT_BACKEND(add, add_backends, current_backend(add)); 
+	EINIT_BACKEND(sub, sub_backends, current_backend(sub)); 
+	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
+	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
+	EINIT_BACKEND(mul, mul_backends, current_backend(mul));   
+	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));  
+	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));   
+	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));  
+	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow)); 
+	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp)); 
+	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace)); 
+	EINIT_BACKEND(nnl2_log, log_backends, current_backend(log)); 
+	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace)); 
+	EINIT_BACKEND(scale, scale_backends, current_backend(scale)); 
+	INIT_BACKEND(maxinplace, maxinplace_backends);  
 	INIT_BACKEND(mininplace, mininplace_backends); 
 	INIT_BACKEND(nnl2_max, max_backends); 
 	INIT_BACKEND(nnl2_min, min_backends); 
@@ -251,7 +251,7 @@ Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 void lisp_call_reluinplace(Tensor* tensor) {
 	reluinplace(tensor);
 }  	
-
+ 
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
 }
