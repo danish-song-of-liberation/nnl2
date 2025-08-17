@@ -318,3 +318,83 @@
 (defun get-backend/scale ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-scale-backend)))    		
 		
+(defun get-backend/.max! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-maxinplace-backend)))    		
+
+(defun get-backend/.min! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-mininplace-backend)))  
+
+(defun get-backend/.max ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-max-backend)))    		
+
+(defun get-backend/.min ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-min-backend))) 
+
+(defun get-backend/.abs! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-absinplace-backend)))   
+  
+(defun get-backend/.abs ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-abs-backend)))  
+  
+(defun get-backend/hstack ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-hstack-backend)))   
+  
+(defun get-backend/vstack ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-vstack-backend)))    
+  
+(defun get-backend/.relu! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-reluinplace-backend)))     
+  
+(defun get-backend/.relu ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-relu-backend)))       
+  
+(defun get-backend/.leaky-relu! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-leakyreluinplace-backend)))     
+  
+(defun get-backend/.leaky-relu ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-leakyrelu-backend)))   
+  
+(defun get-backend/.sigmoid! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-sigmoidinplace-backend)))     
+  
+(defun get-backend/.sigmoid ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-sigmoid-backend)))     
+  
+(defun get-backend/.tanh! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-tanhinplace-backend)))     
+  
+(defun get-backend/.tanh ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-tanh-backend)))    
+  
+(defun get-backend/concat ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-concat-backend)))   
+  
+(defun get-backend/randn ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-randn-backend)))  
+ 
+(defun get-backend/xavier ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-xavier-backend))) 
+  
+(defun get-backend/transpose! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-transposeinplace-backend))) 
+    
+(defun get-backend/transpose ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-transpose-backend))) 
+    	
+(defun get-backend/sum ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-sum-backend)))	
+  
+(defun get-backend/norm (&key (p :l2))
+  (case p
+    (:l2 (uppercase-string-to-symbol (nnl2.ffi:%get-sum-backend)))
+	(otherwise (error "Incorrect :p key in norm~%"))))
+	
+(defun get-backend/copy ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-copy-backend)))		
+  
+(defun get-backend/axpy! ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-inplace-backend)))
+  
+(defun get-backend/axpy ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-backend)))
+  

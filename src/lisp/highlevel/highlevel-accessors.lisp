@@ -39,7 +39,7 @@
 		   
 		 (progn 
 		   ,@(loop for var in vars
-		           collect `(free ,var)))))))
+		           collect `(when (typep ,var 'nnl2-tensor) (free ,var))))))))
 
 (defmacro tlet* ((&rest bindings) &body body)
   (if (null bindings)

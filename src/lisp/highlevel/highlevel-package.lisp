@@ -31,4 +31,11 @@
    :get-backend/gemm! :get-backend/+= :get-backend/-= :get-backend/.+ :get-backend/.-
    :get-backend/*= :get-backend//! :get-backend/.* :get-backend/./ :get-backend/^=
    :get-backend/.^ :get-backend/.exp! :get-backend/.exp :get-backend/.log! :get-backend/.log
-   :get-backend/scale! :get-backend/scale))
+   :get-backend/scale! :get-backend/scale :get-backend/.max! :get-backend/.max :get-backend/.min!
+   :get-backend/.min :get-backend/.abs! :get-backend/.abs :get-backend/hstack :get-backend/vstack
+   :get-backend/.relu! :get-backend/.relu :get-backend/.leaky-relu! :get-backend/.leaky-relu
+   :get-backend/.sigmoid :get-backend/.sigmoid! :get-backend/.tanh :get-backend/.tanh!
+   :get-backend/concat :get-backend/randn :get-backend/xavier :get-backend/transpose
+   :get-backend/transpose! :get-backend/sum :get-backend/norm :get-backend/copy
+   :get-backend/axpy! :get-backend/axpy))
+   

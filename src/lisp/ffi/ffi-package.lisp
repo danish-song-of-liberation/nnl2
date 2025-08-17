@@ -29,11 +29,16 @@
    :%set-sub-broadcasting-inplace-backend :%set-sub-broadcasting-backend :%set-mul-broadcasting-inplace-backend
    :%set-mul-broadcasting-backend :%set-div-broadcasting-inplace-backend :%set-div-broadcasting-backend
    :%set-pow-broadcasting-inplace-backend :%set-pow-broadcasting-backend :%set-max-broadcasting-inplace-backend
-   :%set-min-broadcasting-inplace-backend :%set-max-broadcasting-backend
+   :%set-min-broadcasting-inplace-backend :%set-max-broadcasting-backend :%get-max-backend
    :%set-fill-tensor-with-data-backend :%set-axpy-inplace-backend :%set-min-broadcasting-backend
    :%set-axpy-backend :%set-axpf-inplace-backend :%set-axpf-backend :%set-axpy-broadcasting-inplace-backend
    :%set-axpy-broadcasting-backend :%get-empty-backend :%get-zeros-backend :%get-inplace-fill-backend
    :%get-ones-backend :%get-gemm-backend :%get-addinplace-backend :%get-subinplace-backend
    :%get-add-backend :%get-sub-backend :%get-mulinplace-backend :%get-divinplace-backend :%get-mul-backend
    :%get-div-backend :%get-powinplace-backend :%get-pow-backend :%get-expinplace-backend :%get-exp-backend
-   :%get-loginplace-backend :%get-log-backend :%get-scaleinplace-backend :%get-scale-backend))
+   :%get-loginplace-backend :%get-log-backend :%get-scaleinplace-backend :%get-scale-backend :%get-maxinplace-backend
+   :%get-mininplace-backend :%get-min-backend :%get-absinplace-backend :%get-abs-backend :%get-hstack-backend
+   :%get-vstack-backend :%get-reluinplace-backend :%get-relu-backend :%get-leakyreluinplace-backend :%get-leakyrelu-backend
+   :%get-sigmoid-backend :%get-sigmoidinplace-backend :%get-tanh-backend :%get-tanhinplace-backend
+   :%get-concat-backend :%get-randn-backend :%get-xavier-backend :%get-transpose-backend :%get-transposeinplace-backend
+   :%get-sum-backend :%get-l2norm-backend :%get-copy-backend :%get-axpy-inplace-backend :%get-axpy-backend))
