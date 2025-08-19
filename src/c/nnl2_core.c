@@ -25,7 +25,7 @@
 #ifdef __SSE4_2__
 #include <nmmintrin.h> 
 #endif
- 
+  
 #include "nnl2_core.h"
 #include "nnl2_ffi_test.h" 
 #include "backends_status/nnl2_status.h" 
@@ -41,7 +41,7 @@ void init_system() {
 	EINIT_BACKEND(empty, empty_backends, current_backend(empty));
 	EINIT_BACKEND(zeros, zeros_backends, current_backend(zeros));
 	EINIT_BACKEND(ones, ones_backends, current_backend(ones));
-	INIT_BACKEND(sgemminplace, sgemminplace_backends);
+	INIT_BACKEND(sgemminplace, sgemminplace_backends); 
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace)); 
 	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));
@@ -49,25 +49,25 @@ void init_system() {
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub)); 
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
-	EINIT_BACKEND(mul, mul_backends, current_backend(mul));   
-	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));  
-	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));   
+	EINIT_BACKEND(mul, mul_backends, current_backend(mul));     
+	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));   
+	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));    
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));  
 	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow)); 
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp)); 
-	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace)); 
+	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));  
 	EINIT_BACKEND(nnl2_log, log_backends, current_backend(log)); 
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace)); 
-	EINIT_BACKEND(scale, scale_backends, current_backend(scale)); 
+	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));  
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace)); 
-	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max)); 
-	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min)); 
+	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));  
+	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));   
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
-	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));
+	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));  
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
-	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace)); 
+	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));  
 	EINIT_BACKEND(relu, relu_backends, current_backend(relu));  
 	EINIT_BACKEND(leakyreluinplace, leakyreluinplace_backends, current_backend(leakyreluinplace)); 
 	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu)); 
@@ -79,23 +79,23 @@ void init_system() {
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn)); 
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier)); 
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
-	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose)); 
-	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum)); 
+	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
+	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum));   
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm)); 
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
-	INIT_BACKEND(add_incf, add_incf_backends); 
+	INIT_BACKEND(add_incf, add_incf_backends);  
 	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends); 
 	INIT_BACKEND(sub_decf, sub_decf_backends); 
-	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends); 
+	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends);  
 	INIT_BACKEND(mul_mulf, mul_mulf_backends); 
-	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends); 
+	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);   
 	INIT_BACKEND(div_divf, div_divf_backends); 
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
-	INIT_BACKEND(pow_powf, pow_powf_backends); 
+	INIT_BACKEND(pow_powf, pow_powf_backends);   
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);   
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
-	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends); 
+	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);  
 	INIT_BACKEND(min_minf, min_minf_backends);  
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
@@ -126,7 +126,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
  
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype); 
-}  	  	 
+}  	  	  
 
 Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {   
 	return ones(shape, rank, dtype);   
@@ -366,22 +366,22 @@ void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
 
 Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 	return min_minf(tensor, minf);
-} 
+}  
   
 void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return add_broadcasting_inplace(summand, sumend);
 }
 
 Tensor* lisp_call_add_broadcasting(Tensor* summand, Tensor* sumend) {
-	return add_broadcasting(summand, sumend);
-}  
-
+	return add_broadcasting(summand, sumend);  
+}    
+  
 void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return sub_broadcasting_inplace(summand, sumend);
-}
+} 
  
 Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) { 
-	return sub_broadcasting(minuend, subtrahend);
+	return sub_broadcasting(minuend, subtrahend); 
 }
 
 void lisp_call_mul_broadcasting_inplace(Tensor* multiplicand, Tensor* multiplier) {

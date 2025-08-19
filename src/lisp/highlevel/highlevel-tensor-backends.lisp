@@ -397,4 +397,345 @@
   
 (defun get-backend/axpy ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-backend)))
+
+(defun get-backends/empty ()
+  (let ((num-backends (nnl2.ffi:%get-empty-num-backends))
+	    (backends (nnl2.ffi:%get-empty-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
   
+(defun get-backends/zeros ()
+  (let ((num-backends (nnl2.ffi:%get-zeros-num-backends))
+	    (backends (nnl2.ffi:%get-zeros-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
+  
+(defun get-backends/full ()
+  (let ((num-backends (nnl2.ffi:%get-inplace-fill-num-backends))
+	    (backends (nnl2.ffi:%get-inplace-fill-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
+  
+(defun get-backends/ones ()
+  (let ((num-backends (nnl2.ffi:%get-ones-num-backends))
+	    (backends (nnl2.ffi:%get-ones-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
+    
+(defun get-backends/gemm ()
+  (let ((num-backends (nnl2.ffi:%get-gemm-num-backends))
+	    (backends (nnl2.ffi:%get-gemm-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
+		  
+(defun get-backends/gemm! ()
+  (let ((num-backends (nnl2.ffi:%get-gemm-num-backends))
+	    (backends (nnl2.ffi:%get-gemm-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))   
+
+(defun get-backends/+= ()
+  (let ((num-backends (nnl2.ffi:%get-addinplace-num-backends))
+	    (backends (nnl2.ffi:%get-addinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))   
+ 
+(defun get-backends/-= ()
+  (let ((num-backends (nnl2.ffi:%get-subinplace-num-backends))
+	    (backends (nnl2.ffi:%get-subinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))   
+ 
+(defun get-backends/.+ ()
+  (let ((num-backends (nnl2.ffi:%get-add-num-backends))
+	    (backends (nnl2.ffi:%get-add-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
+ 
+(defun get-backends/.- ()
+  (let ((num-backends (nnl2.ffi:%get-sub-num-backends))
+	    (backends (nnl2.ffi:%get-sub-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
+		  
+(defun get-backends/*= ()
+  (let ((num-backends (nnl2.ffi:%get-mulinplace-num-backends))
+	    (backends (nnl2.ffi:%get-mulinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
+		  		  
+(defun get-backends//! ()
+  (let ((num-backends (nnl2.ffi:%get-divinplace-num-backends))
+	    (backends (nnl2.ffi:%get-divinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
+		  		  				  
+(defun get-backends/.* ()
+  (let ((num-backends (nnl2.ffi:%get-mul-num-backends))
+	    (backends (nnl2.ffi:%get-mul-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
+		  								  
+(defun get-backends/./ ()
+  (let ((num-backends (nnl2.ffi:%get-div-num-backends))
+	    (backends (nnl2.ffi:%get-div-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  
+(defun get-backends/^= ()
+  (let ((num-backends (nnl2.ffi:%get-powinplace-num-backends))
+	    (backends (nnl2.ffi:%get-powinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+
+(defun get-backends/.^ ()
+  (let ((num-backends (nnl2.ffi:%get-pow-num-backends))
+	    (backends (nnl2.ffi:%get-pow-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  
+(defun get-backends/.exp! ()
+  (let ((num-backends (nnl2.ffi:%get-expinplace-num-backends))
+	    (backends (nnl2.ffi:%get-expinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 		  
+
+(defun get-backends/.exp ()
+  (let ((num-backends (nnl2.ffi:%get-exp-num-backends))
+	    (backends (nnl2.ffi:%get-exp-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+	
+(defun get-backends/.log! ()
+  (let ((num-backends (nnl2.ffi:%get-loginplace-num-backends))
+	    (backends (nnl2.ffi:%get-loginplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 		  
+
+(defun get-backends/.log ()
+  (let ((num-backends (nnl2.ffi:%get-log-num-backends))
+	    (backends (nnl2.ffi:%get-log-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+		  		  
+(defun get-backends/scale! ()
+  (let ((num-backends (nnl2.ffi:%get-scaleinplace-num-backends))
+	    (backends (nnl2.ffi:%get-scaleinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/scale ()
+  (let ((num-backends (nnl2.ffi:%get-scale-num-backends))
+	    (backends (nnl2.ffi:%get-scale-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  
+(defun get-backends/.max! ()
+  (let ((num-backends (nnl2.ffi:%get-maxinplace-num-backends))
+	    (backends (nnl2.ffi:%get-maxinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.min! ()
+  (let ((num-backends (nnl2.ffi:%get-mininplace-num-backends))
+	    (backends (nnl2.ffi:%get-mininplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+
+(defun get-backends/.max ()
+  (let ((num-backends (nnl2.ffi:%get-max-num-backends))
+	    (backends (nnl2.ffi:%get-max-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.min ()
+  (let ((num-backends (nnl2.ffi:%get-min-num-backends))
+	    (backends (nnl2.ffi:%get-min-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+	
+(defun get-backends/.abs! ()
+  (let ((num-backends (nnl2.ffi:%get-absinplace-num-backends))
+	    (backends (nnl2.ffi:%get-absinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.abs ()
+  (let ((num-backends (nnl2.ffi:%get-abs-num-backends))
+	    (backends (nnl2.ffi:%get-abs-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+	
+(defun get-backends/hstack ()
+  (let ((num-backends (nnl2.ffi:%get-hstack-num-backends))
+	    (backends (nnl2.ffi:%get-hstack-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/vstack ()
+  (let ((num-backends (nnl2.ffi:%get-vstack-num-backends))
+	    (backends (nnl2.ffi:%get-vstack-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		
+(defun get-backends/.relu! ()
+  (let ((num-backends (nnl2.ffi:%get-reluinplace-num-backends))
+	    (backends (nnl2.ffi:%get-reluinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.relu ()
+  (let ((num-backends (nnl2.ffi:%get-relu-num-backends))
+	    (backends (nnl2.ffi:%get-relu-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  	  
+(defun get-backends/.leaky-relu! ()
+  (let ((num-backends (nnl2.ffi:%get-leakyreluinplace-num-backends))
+	    (backends (nnl2.ffi:%get-leakyreluinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.leaky-relu ()
+  (let ((num-backends (nnl2.ffi:%get-leakyrelu-num-backends))
+	    (backends (nnl2.ffi:%get-leakyrelu-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  
+(defun get-backends/.sigmoid! ()
+  (let ((num-backends (nnl2.ffi:%get-sigmoidinplace-num-backends))
+	    (backends (nnl2.ffi:%get-sigmoidinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.sigmoid ()
+  (let ((num-backends (nnl2.ffi:%get-sigmoid-num-backends))
+	    (backends (nnl2.ffi:%get-sigmoid-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  		  
+(defun get-backends/.tanh! ()
+  (let ((num-backends (nnl2.ffi:%get-tanhinplace-num-backends))
+	    (backends (nnl2.ffi:%get-tanhinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+
+(defun get-backends/.tanh ()
+  (let ((num-backends (nnl2.ffi:%get-tanh-num-backends))
+	    (backends (nnl2.ffi:%get-tanh-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+		  
+(defun get-backends/concat ()
+  (let ((num-backends (nnl2.ffi:%get-concat-num-backends))
+	    (backends (nnl2.ffi:%get-concat-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  
+(defun get-backends/randn ()
+  (let ((num-backends (nnl2.ffi:%get-randn-num-backends))
+	    (backends (nnl2.ffi:%get-randn-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))		  
+		  
+(defun get-backends/xavier ()
+  (let ((num-backends (nnl2.ffi:%get-xavier-num-backends))
+	    (backends (nnl2.ffi:%get-xavier-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+
+(defun get-backends/transpose! ()
+  (let ((num-backends (nnl2.ffi:%get-transposeinplace-num-backends))
+	    (backends (nnl2.ffi:%get-transposeinplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  		  
+(defun get-backends/transpose ()
+  (let ((num-backends (nnl2.ffi:%get-transpose-num-backends))
+	    (backends (nnl2.ffi:%get-transpose-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  
+(defun get-backends/sum ()
+  (let ((num-backends (nnl2.ffi:%get-sum-num-backends))
+	    (backends (nnl2.ffi:%get-sum-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  
+(defun get-backends/l2norm ()
+  (let ((num-backends (nnl2.ffi:%get-l2norm-num-backends))
+	    (backends (nnl2.ffi:%get-l2norm-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+
+(defun get-backends/norm (&key (p :l2))
+  (case p 
+    (:l2 (get-backends/l2norm))
+	(otherwise (error "Incorrect :p key in norm~%"))))
+	
+(defun get-backends/copy ()
+  (let ((num-backends (nnl2.ffi:%get-copy-num-backends))
+	    (backends (nnl2.ffi:%get-copy-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  
+(defun get-backends/axpy! ()
+  (let ((num-backends (nnl2.ffi:%get-axpy-inplace-num-backends))
+	    (backends (nnl2.ffi:%get-axpy-inplace-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))		  
+		  
+(defun get-backends/axpy ()
+  (let ((num-backends (nnl2.ffi:%get-axpy-num-backends))
+	    (backends (nnl2.ffi:%get-axpy-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  

@@ -230,6 +230,9 @@ const char* get_empty_backend() {
 	return current_backend(empty);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(empty);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(empty);
+
 /** @brief
  * Creates a new tensor and initializes all elements to zero.
  *
@@ -364,6 +367,9 @@ make_current_backend(zeros);
 const char* get_zeros_backend() {
 	return current_backend(zeros);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(zeros);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(zeros);
 
 /** @brief
  * Frees the memory allocated for the tensor.
@@ -565,6 +571,9 @@ const char* get_inplace_fill_backend() {
 	return current_backend(empty);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(inplace_fill);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
+
 Tensor* cpu64_ones(const int* shape, int rank, TensorType dtype) {
     Tensor* tensor_t = empty(shape, rank, dtype);
 
@@ -613,6 +622,8 @@ const char* get_ones_backend() {
 	return current_backend(ones);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(ones);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(ones);
 
 Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
 	Tensor* tensor_t = empty(shape, rank, dtype);
@@ -989,6 +1000,9 @@ const char* get_gemm_backend() {
 	return current_backend(gemm);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(dgemminplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(dgemminplace);
+
 Tensor* sgemm(const nnl2_order order, const nnl2_transpose transa, 
 			  const nnl2_transpose transb, const int m, const int n, 
 			  const int k, const float alpha, const Tensor* a, const int lda,
@@ -1357,6 +1371,9 @@ const char* get_addinplace_backend() {
 	return current_backend(addinplace);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(addinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(addinplace);
+
 void naive_subinplace(Tensor* summand, const Tensor* addend) {
 	size_t len = product(summand->shape, summand->rank);
 	
@@ -1508,6 +1525,9 @@ void set_subinplace_backend(const char* backend_name) {
 const char* get_subinplace_backend() {
 	return current_backend(subinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(subinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(subinplace);
 
 int get_mem_alignment() {
 	return TENSOR_MEM_ALIGNMENT;
@@ -1692,6 +1712,9 @@ const char* get_add_backend() {
 	return current_backend(add);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(add);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(add);
+
 Tensor* naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
 	size_t len = product(minuend->shape, minuend->rank);
 	
@@ -1863,6 +1886,9 @@ const char* get_sub_backend() {
 	return current_backend(sub);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(sub);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(sub);
+
 void naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
 	size_t len = product(multiplicand->shape, multiplicand->rank);
 	
@@ -1930,6 +1956,9 @@ const char* get_mulinplace_backend() {
 	return current_backend(mulinplace);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(mulinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(mulinplace);
+
 void naive_divinplace(Tensor* dividend, const Tensor* divisor) {
 	size_t len = product(dividend->shape, dividend->rank);
 	
@@ -1996,6 +2025,9 @@ void set_divinplace_backend(const char* backend_name) {
 const char* get_divinplace_backend() {
 	return current_backend(divinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(divinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(divinplace);
 
 Tensor* naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
     size_t len = product(multiplicand->shape, multiplicand->rank);
@@ -2070,6 +2102,9 @@ void set_mul_backend(const char* backend_name) {
 const char* get_mul_backend() {
 	return current_backend(mul);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(mul);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(mul);
 
 Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
     size_t len = product(dividend->shape, dividend->rank);
@@ -2162,6 +2197,9 @@ const char* get_div_backend() {
 	return current_backend(div);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(div);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(div);
+
 void naive_powinplace(Tensor* base, const Tensor* exponent) {
 	size_t len = product(base->shape, base->rank);
     
@@ -2228,6 +2266,9 @@ void set_powinplace_backend(const char* backend_name) {
 const char* get_powinplace_backend() {
 	return current_backend(powinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(powinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(powinplace);
 
 Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
     size_t len = product(base->shape, base->rank);
@@ -2303,6 +2344,9 @@ const char* get_pow_backend() {
 	return current_backend(pow);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(pow);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(pow);
+
 void naive_expinplace(Tensor* tensor) {
 	size_t len = product(tensor->shape, tensor->rank);
 	
@@ -2346,6 +2390,9 @@ void set_expinplace_backend(const char* backend_name) {
 const char* get_expinplace_backend() {
 	return current_backend(expinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(expinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(expinplace);
 
 Tensor* naive_exp(const Tensor* tensor) {
 	size_t len = product(tensor->shape, tensor->rank);
@@ -2398,6 +2445,9 @@ const char* get_exp_backend() {
 	return current_backend(exp);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(exp);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(exp);
+
 void naive_loginplace(Tensor* tensor) {
 	size_t len = product(tensor->shape, tensor->rank);
 	
@@ -2441,6 +2491,9 @@ void set_loginplace_backend(const char* backend_name) {
 const char* get_loginplace_backend() {
 	return current_backend(loginplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(loginplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(loginplace);
 
 Tensor* naive_log(const Tensor* tensor) {
 	size_t len = product(tensor->shape, tensor->rank);
@@ -2492,6 +2545,9 @@ void set_log_backend(const char* backend_name) {
 const char* get_log_backend() {
 	return current_backend(log);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(log);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(log);
 
 void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);
 
@@ -2680,6 +2736,9 @@ const char* get_scaleinplace_backend() {
 	return current_backend(scaleinplace);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(scaleinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(scaleinplace);
+
 Tensor* naive_scale(const Tensor* tensor, float multiplier) {
 	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
 	void* data_original = tensor->data;
@@ -2731,6 +2790,9 @@ void set_scale_backend(const char* backend_name) {
 const char* get_scale_backend() {
 	return current_backend(scale);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(scale);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(scale);
 
 Tensor* empty_like(const Tensor* tensor) {
 	return empty(tensor->shape, tensor->rank, tensor->dtype);
@@ -2811,6 +2873,9 @@ const char* get_maxinplace_backend() {
 	return current_backend(maxinplace);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(maxinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(maxinplace);
+
 void naive_mininplace(Tensor* tensora, const Tensor* tensorb) {
 	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
 	
@@ -2873,6 +2938,9 @@ void set_mininplace_backend(const char* backend_name) {
 const char* get_mininplace_backend() {
 	return current_backend(mininplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(mininplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(mininplace);
 
 Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
 	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
@@ -2945,6 +3013,9 @@ const char* get_max_backend() {
 	return current_backend(max);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(max);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(max);
+
 Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
 	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
 	
@@ -3016,6 +3087,9 @@ const char* get_min_backend() {
 	return current_backend(min);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(min);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(min);
+
 void naive_absinplace(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
 	void* data = tensor->data;
@@ -3060,6 +3134,9 @@ void set_absinplace_backend(const char* backend_name) {
 const char* get_absinplace_backend() {
 	return current_backend(absinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(absinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(absinplace);
 
 Tensor* naive_abs(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
@@ -3114,6 +3191,9 @@ void set_abs_backend(const char* backend_name) {
 const char* get_abs_backend() {
 	return current_backend(abs);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(abs);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(abs);
 
 void* get_tensor_data(Tensor* tensor) {
 	return tensor->data;
@@ -3228,6 +3308,9 @@ void set_hstack_backend(const char* backend_name) {
 const char* get_hstack_backend() {
 	return current_backend(hstack);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(hstack);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(hstack);
 
 Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
 	TensorType typea = tensora->dtype;
@@ -3360,6 +3443,9 @@ const char* get_vstack_backend() {
 	return current_backend(vstack);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(vstack);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(vstack);
+
 void naive_reluinplace(Tensor* tensor) {
 	int total_elems = product(tensor->shape, tensor->rank);	
 	void* data = tensor->data;
@@ -3404,6 +3490,9 @@ void set_reluinplace_backend(const char* backend_name) {
 const char* get_reluinplace_backend() {
 	return current_backend(reluinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(reluinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(reluinplace);
 
 Tensor* naive_relu(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
@@ -3459,6 +3548,9 @@ const char* get_relu_backend() {
 	return current_backend(relu);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(relu);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(relu);
+
 void naive_leakyreluinplace(Tensor* tensor, float alpha) {
 	int total_elems = product(tensor->shape, tensor->rank);	
 	void* data = tensor->data;
@@ -3503,6 +3595,9 @@ void set_leakyreluinplace_backend(const char* backend_name) {
 const char* get_leakyreluinplace_backend() {
 	return current_backend(leakyreluinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(leakyreluinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(leakyreluinplace);
 
 Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
@@ -3590,6 +3685,9 @@ const char* get_leakyrelu_backend() {
 	return current_backend(leakyrelu);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(leakyrelu);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(leakyrelu);
+
 void naive_sigmoidinplace(Tensor* tensor) {
 	int total_elems = product(tensor->shape, tensor->rank);	
 	void* data = tensor->data;
@@ -3634,6 +3732,9 @@ void set_sigmoidinplace_backend(const char* backend_name) {
 const char* get_sigmoidinplace_backend() {
 	return current_backend(sigmoidinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(sigmoidinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(sigmoidinplace);
 
 Tensor* naive_sigmoid(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
@@ -3694,6 +3795,9 @@ const char* get_sigmoid_backend() {
 	return current_backend(sigmoid);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(sigmoid);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(sigmoid);
+
 void naive_tanhinplace(Tensor* tensor) {
 	int total_elems = product(tensor->shape, tensor->rank);	
 	void* data = tensor->data;
@@ -3738,6 +3842,9 @@ void set_tanhinplace_backend(const char* backend_name) {
 const char* get_tanhinplace_backend() {
 	return current_backend(tanhinplace);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(tanhinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(tanhinplace);
 
 Tensor* naive_tanh(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
@@ -3796,6 +3903,9 @@ void set_tanh_backend(const char* backend_name) {
 const char* get_tanh_backend() {
 	return current_backend(tanh);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(tanh);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(tanh);
 
 Tensor* naive_concat(const Tensor* tensora, const Tensor* tensorb, int axis) {
     TensorType typea = tensora->dtype;
@@ -3895,6 +4005,9 @@ const char* get_concat_backend() {
 	return current_backend(concat);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(concat);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(concat);
+
 Tensor* naive_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
 	Tensor* result = empty(shape, rank, dtype);
 	
@@ -3949,6 +4062,9 @@ const char* get_randn_backend() {
 	return current_backend(randn);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(randn);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(randn);
+
 Tensor* naive_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	if(dtype == INT32) {
 		fprintf(stderr, "Error (Hello from C!): Provided an not supported type (xavier-naive)\n");
@@ -3995,6 +4111,9 @@ void set_xavier_backend(const char* backend_name) {
 const char* get_xavier_backend() {
 	return current_backend(xavier);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(xavier);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(xavier);
 
 void naive_transposeinplace(Tensor* tensor) {
 	if(tensor->rank < 2) {
@@ -4110,6 +4229,8 @@ const char* get_transposeinplace_backend() {
 	return current_backend(transposeinplace);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(transposeinplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(transposeinplace);
 
 Tensor* naive_transpose(const Tensor* tensor) {
 	if(tensor->rank < 2) {
@@ -4195,6 +4316,9 @@ const char* get_transpose_backend() {
 	return current_backend(transpose);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(transpose);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(transpose);
+
 void naive_sum(const Tensor* tensor, int* axes, int num_axes, void* result) {
 	bool reduce_all = false;
 	
@@ -4256,6 +4380,9 @@ void set_sum_backend(const char* backend_name) {
 const char* get_sum_backend() {
 	return current_backend(sum);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(sum);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(sum);
 
 void naive_l2norm(const Tensor* tensor, int* axes, int num_axes, void* result) {
 	bool reduce_all = false;
@@ -4327,6 +4454,9 @@ const char* get_l2norm_backend() {
 	return current_backend(l2norm);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(l2norm);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(l2norm);
+
 Tensor* naive_copy(const Tensor* tensor) {
 	TensorType dtype = tensor->dtype;
 	
@@ -4378,6 +4508,9 @@ void set_copy_backend(const char* backend_name) {
 const char* get_copy_backend() {
 	return current_backend(copy);
 }
+
+DEFINE_GET_BACKENDS_FUNCTION(copy);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(copy);
 
 void naive_add_incf_inplace(Tensor* tensor, void* inc) {
 	size_t total_elems = product(tensor->shape, tensor->rank);
@@ -6105,6 +6238,9 @@ const char* get_axpy_inplace_backend() {
 	return current_backend(axpy_inplace);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(axpy_inplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(axpy_inplace);
+
 Tensor* naive_axpy(const Tensor* summand, const Tensor* sumend, float alpha) {
 	size_t total_elems = product(summand->shape, summand->rank);
 	Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
@@ -6158,6 +6294,8 @@ const char* get_axpy_backend() {
 	return current_backend(axpy);
 }
 
+DEFINE_GET_BACKENDS_FUNCTION(axpy);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(axpy);
 
 void naive_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 	size_t total_elems = product(summand->shape, summand->rank);

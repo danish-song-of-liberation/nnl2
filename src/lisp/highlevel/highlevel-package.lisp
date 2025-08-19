@@ -37,5 +37,16 @@
    :get-backend/.sigmoid :get-backend/.sigmoid! :get-backend/.tanh :get-backend/.tanh!
    :get-backend/concat :get-backend/randn :get-backend/xavier :get-backend/transpose
    :get-backend/transpose! :get-backend/sum :get-backend/norm :get-backend/copy
-   :get-backend/axpy! :get-backend/axpy))
+   :get-backend/axpy! :get-backend/axpy :get-backends/empty :get-backends/zeros
+   :get-backends/full :get-backends/ones :get-backends/gemm :get-backend/gemm!
+   :get-backends/+= :get-backends/-= :get-backends/.+ :get-backends/.- :get-backends/*=
+   :get-backends//! :get-backends/.* :get-backends/./ :get-backends/^= :get-backends/.^
+   :get-backends/.exp! :get-backends/.exp :get-backends/.log! :get-backends/.log
+   :get-backends/scale :get-backends/scale! :get-backends/.max! :get-backends/.min!
+   :get-backends/.max :get-backends/.min :get-backends/.abs :get-backends/.abs!
+   :get-backends/hstack :get-backends/vstack :get-backends/.relu :get-backends/.relu!
+   :get-backends/.leaky-relu :get-backends/.leaky-relu! :get-backends/.sigmoid
+   :get-backends/.sigmoid! :get-backends/.tanh :get-backends/.tanh! :get-backends/concat
+   :get-backends/randn :get-backends/xavier :get-backends/transpose! :get-backends/transpose
+   :get-backends/sum :get-backends/norm :get-backends/copy :get-backends/axpy! :get-backends/axpy))
    

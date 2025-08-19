@@ -41,4 +41,28 @@
    :%get-vstack-backend :%get-reluinplace-backend :%get-relu-backend :%get-leakyreluinplace-backend :%get-leakyrelu-backend
    :%get-sigmoid-backend :%get-sigmoidinplace-backend :%get-tanh-backend :%get-tanhinplace-backend
    :%get-concat-backend :%get-randn-backend :%get-xavier-backend :%get-transpose-backend :%get-transposeinplace-backend
-   :%get-sum-backend :%get-l2norm-backend :%get-copy-backend :%get-axpy-inplace-backend :%get-axpy-backend))
+   :%get-sum-backend :%get-l2norm-backend :%get-copy-backend :%get-axpy-inplace-backend :%get-axpy-backend
+   :%get-empty-backends :%get-empty-num-backends :%get-zeros-num-backends :%get-zeros-backends
+   :%get-inplace-fill-num-backends :%get-inplace-fill-backends :%get-ones-num-backends :%get-ones-backends
+   :%get-gemm-num-backends :%get-gemm-backends :%get-addinplace-num-backends :%get-addinplace-backends
+   :%get-subinplace-num-backends :%get-subinplace-backends :%get-add-num-backends :%get-add-backends
+   :%get-sub-num-backends :%get-sub-backends :%get-mulinplace-num-backends :%get-mulinplace-backends
+   :%get-divinplace-num-backends :%get-divinplace-backends :%get-mul-num-backends :%get-mul-backends
+   :%get-div-num-backends :%get-div-backends :%get-powinplace-num-backends :%get-powinplace-backends
+   :%get-pow-num-backends :%get-pow-backends :%get-expinplace-num-backends :%get-expinplace-backends
+   :%get-exp-num-backends :%get-exp-backends :%get-loginplace-num-backends :%get-loginplace-backends
+   :%get-log-num-backends :%get-log-backends :%get-scaleinplace-num-backends :%get-scaleinplace-backends
+   :%get-scale-num-backends :%get-scale-backends :%get-maxinplace-num-backends :%get-maxinplace-backends
+   :%get-mininplace-num-backends :%get-mininplace-backends :%get-max-num-backends :%get-max-backends 
+   :%get-min-num-backends :%get-min-backends :%get-absinplace-num-backends :%get-absinplace-backends
+   :%get-abs-num-backends :%get-abs-backends :%get-hstack-num-backends :%get-hstack-backends :%get-vstack-num-backends
+   :%get-vstack-backends :%get-reluinplace-num-backends :%get-reluinplace-backends :%get-relu-num-backends
+   :%get-relu-backends :%get-leakyreluinplace-num-backends :%get-leakyreluinplace-backends
+   :%get-leakyrelu-num-backends :%get-leakyrelu-backends :%get-sigmoidinplace-num-backends
+   :%get-sigmoidinplace-backends :%get-sigmoid-num-backends :%get-sigmoid-backends :%get-tanhinplace-num-backends
+   :%get-tanhinplace-backends :%get-tanh-num-backends :%get-tanh-backends :%get-concat-num-backends 
+   :%get-concat-backends :%get-randn-num-backends :%get-randn-backends :%get-xavier-num-backends
+   :%get-xavier-backends :%get-transposeinplace-num-backends :%get-transposeinplace-backends
+   :%get-transpose-num-backends :%get-transpose-backends :%get-sum-num-backends :%get-sum-backends
+   :%get-l2norm-num-backends :%get-l2norm-backends :%get-copy-num-backends :%get-copy-backends
+   :%get-axpy-inplace-num-backends :%get-axpy-inplace-backends :%get-axpy-num-backends :%get-axpy-backends))

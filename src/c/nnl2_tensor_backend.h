@@ -10,7 +10,10 @@
 #define INIT_BACKEND(fn_var, backends_array) fn_var = init_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]))
 #define EINIT_BACKEND(fn_var, backends_array, cur_pntr) fn_var = einit_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]), cur_pntr)
 #define SET_BACKEND_BY_NAME(backend, fn, backend_name) set_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name)
+#define GET_BACKENDS(backend) get_backends(backend, sizeof(backend)/sizeof(backend[0]))
 #define ESET_BACKEND_BY_NAME(backend, fn, backend_name, cur_pntr) eset_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name, cur_pntr)
+#define DEFINE_GET_BACKENDS_FUNCTION(name) const char** get_##name##_backends() { return GET_BACKENDS(name##_backends); }
+#define DEFINE_GET_NUMS_BACKENDS_FUNCTION(name) size_t get_##name##_num_backends() { return sizeof(name##_backends) / sizeof(name##_backends[0]); }
 #define MAX_BACKEND_NAME_LENGTH 32
 
 // NNL2
@@ -79,7 +82,8 @@ typedef enum {
 	nnl2_naive,
 	nnl2_avx128,
 	nnl2_avx256,
-	nnl2_blas
+	nnl2_blas,
+	nnl2_implver_count
 } implver;
 
 typedef void (*fn_inplace_fill)(Tensor*, void*, TensorType);
@@ -274,6 +278,20 @@ void eset_backend_by_name(Implementation* backends, size_t count, void** target_
             return;
         }
     }
+}
+
+const char** get_backends(Implementation* backends, size_t count) {
+    static const char* backend_names[nnl2_implver_count]; 
+	
+    if (count > nnl2_implver_count) {
+        return NULL;
+    }
+
+    for (size_t it = 0; it < count; it++) {
+        backend_names[it] = backends[it].name;
+    }
+
+    return backend_names;
 }
 
 #endif
