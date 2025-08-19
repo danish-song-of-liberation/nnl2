@@ -4545,7 +4545,7 @@ void naive_add_incf_inplace(Tensor* tensor, void* inc) {
 }	
 
 Implementation add_incf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_add_incf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_add_incf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 addincfinplacefn add_incf_inplace;
@@ -4593,7 +4593,7 @@ Tensor* naive_add_incf(const Tensor* tensor, void* inc) {
 }
 
 Implementation add_incf_backends[] = {
-	REGISTER_BACKEND(naive_add_incf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_add_incf, nnl2_naive, "NAIVE"),
 };	
 
 addincffn add_incf;
@@ -4635,7 +4635,7 @@ void naive_sub_decf_inplace(Tensor* tensor, void* inc) {
 }	
 
 Implementation sub_decf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_sub_decf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_sub_decf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 subdecfinplacefn sub_decf_inplace;
@@ -4683,7 +4683,7 @@ Tensor* naive_sub_decf(const Tensor* tensor, void* inc) {
 }
 
 Implementation sub_decf_backends[] = {
-	REGISTER_BACKEND(naive_sub_decf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_sub_decf, nnl2_naive, "NAIVE"),
 };	
 
 subdecffn sub_decf;
@@ -4725,7 +4725,7 @@ void naive_mul_mulf_inplace(Tensor* tensor, void* mulf) {
 }	
 
 Implementation mul_mulf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_mul_mulf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_mul_mulf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 mulmulfinplacefn mul_mulf_inplace;
@@ -4773,7 +4773,7 @@ Tensor* naive_mul_mulf(const Tensor* tensor, void* mulf) {
 }
 
 Implementation mul_mulf_backends[] = {
-	REGISTER_BACKEND(naive_mul_mulf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_mul_mulf, nnl2_naive, "NAIVE"),
 };	
 
 mulmulffn mul_mulf;
@@ -4815,7 +4815,7 @@ void naive_div_divf_inplace(Tensor* tensor, void* divf) {
 }	
 
 Implementation div_divf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_div_divf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_div_divf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 divdivfinplacefn div_divf_inplace;
@@ -4863,7 +4863,7 @@ Tensor* naive_div_divf(const Tensor* tensor, void* divf) {
 }
 
 Implementation div_divf_backends[] = {
-	REGISTER_BACKEND(naive_div_divf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_div_divf, nnl2_naive, "NAIVE"),
 };	
 
 divdivffn div_divf;
@@ -4905,7 +4905,7 @@ void naive_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
 }	
 
 Implementation pow_powf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_pow_powf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_pow_powf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 powpowfinplacefn pow_powf_inplace;
@@ -4953,7 +4953,7 @@ Tensor* naive_pow_powf(const Tensor* tensor, void* powf_arg) {
 }
 
 Implementation pow_powf_backends[] = {
-	REGISTER_BACKEND(naive_pow_powf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_pow_powf, nnl2_naive, "NAIVE"),
 };	
 
 powpowffn pow_powf;
@@ -4995,7 +4995,7 @@ void naive_max_maxf_inplace(Tensor* tensor, void* maxf) {
 }	
 
 Implementation max_maxf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_max_maxf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_max_maxf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 maxmaxfinplacefn max_maxf_inplace;
@@ -5043,7 +5043,7 @@ Tensor* naive_max_maxf(const Tensor* tensor, void* maxf) {
 }
 
 Implementation max_maxf_backends[] = {
-	REGISTER_BACKEND(naive_max_maxf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_max_maxf, nnl2_naive, "NAIVE"),
 };	
 
 maxmaxffn max_maxf;
@@ -5085,7 +5085,7 @@ void naive_min_minf_inplace(Tensor* tensor, void* minf) {
 }	
 
 Implementation min_minf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_min_minf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_min_minf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 minminfinplacefn min_minf_inplace;
@@ -5133,7 +5133,7 @@ Tensor* naive_min_minf(const Tensor* tensor, void* minf) {
 }
 
 Implementation min_minf_backends[] = {
-	REGISTER_BACKEND(naive_min_minf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_min_minf, nnl2_naive, "NAIVE"),
 };	
 
 minminffn min_minf;
@@ -5201,7 +5201,7 @@ void naive_add_broadcasting_inplace(Tensor* summand, const Tensor* sumend) {
 }
 
 Implementation add_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_add_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_add_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 addbroadcastinginplacefn add_broadcasting_inplace;
@@ -5276,7 +5276,7 @@ Tensor* naive_add_broadcasting(const Tensor* summand, const Tensor* sumend) {
 }
 
 Implementation add_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_add_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_add_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 addbroadcastingfn add_broadcasting;
@@ -5344,7 +5344,7 @@ void naive_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend) {
 }
 
 Implementation sub_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_sub_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_sub_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 subbroadcastinginplacefn sub_broadcasting_inplace;
@@ -5419,7 +5419,7 @@ Tensor* naive_sub_broadcasting(const Tensor* minuend, const Tensor* subtrahend) 
 }
 
 Implementation sub_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_sub_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_sub_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 subbroadcastingfn sub_broadcasting;
@@ -5487,7 +5487,7 @@ void naive_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multipli
 }
 
 Implementation mul_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_mul_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_mul_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 mulbroadcastinginplacefn mul_broadcasting_inplace;
@@ -5562,7 +5562,7 @@ Tensor* naive_mul_broadcasting(const Tensor* multiplicand, const Tensor* multipl
 }
 
 Implementation mul_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_mul_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_mul_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 mulbroadcastingfn mul_broadcasting;
@@ -5630,7 +5630,7 @@ void naive_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) {
 }
 
 Implementation div_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_div_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_div_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 divbroadcastinginplacefn div_broadcasting_inplace;
@@ -5705,7 +5705,7 @@ Tensor* naive_div_broadcasting(const Tensor* dividend, const Tensor* divisor) {
 }
 
 Implementation div_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_div_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_div_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 divbroadcastingfn div_broadcasting;
@@ -5773,7 +5773,7 @@ void naive_pow_broadcasting_inplace(Tensor* base, const Tensor* exponent) {
 }
 
 Implementation pow_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_pow_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_pow_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 powbroadcastinginplacefn pow_broadcasting_inplace;
@@ -5848,7 +5848,7 @@ Tensor* naive_pow_broadcasting(const Tensor* base, const Tensor* exponent) {
 }
 
 Implementation pow_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_pow_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_pow_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 powbroadcastingfn pow_broadcasting;
@@ -5916,7 +5916,7 @@ void naive_max_broadcasting_inplace(Tensor* x, const Tensor* y) {
 }
 
 Implementation max_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_max_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_max_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 maxbroadcastinginplacefn max_broadcasting_inplace;
@@ -5984,7 +5984,7 @@ void naive_min_broadcasting_inplace(Tensor* x, const Tensor* y) {
 }	
 
 Implementation min_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_min_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_min_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 minbroadcastinginplacefn min_broadcasting_inplace;
@@ -6059,7 +6059,7 @@ Tensor* naive_max_broadcasting(const Tensor* x, const Tensor* y) {
 }
 
 Implementation max_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_max_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_max_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 maxbroadcastingfn max_broadcasting;
@@ -6134,7 +6134,7 @@ Tensor* naive_min_broadcasting(const Tensor* x, const Tensor* y) {
 }
 
 Implementation min_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_min_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_min_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 minbroadcastingfn min_broadcasting;
@@ -6169,7 +6169,7 @@ void naive_fill_tensor_with_data(Tensor* tensor, void* data, size_t num_elems) {
 }
 
 Implementation fill_tensor_with_data_backends[] = {
-	REGISTER_BACKEND(naive_fill_tensor_with_data, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_fill_tensor_with_data, nnl2_naive, "NAIVE"),
 };	
 
 filltensorwithdatafn fill_tensor_with_data;
@@ -6280,7 +6280,7 @@ Tensor* naive_axpy(const Tensor* summand, const Tensor* sumend, float alpha) {
 }
 
 Implementation axpy_backends[] = {
-	REGISTER_BACKEND(naive_axpy, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_axpy, nnl2_naive, "NAIVE"),
 };	
 
 axpyfn axpy;
@@ -6330,7 +6330,7 @@ void naive_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 }	
 
 Implementation axpf_inplace_backends[] = {
-	REGISTER_BACKEND(naive_axpf_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_axpf_inplace, nnl2_naive, "NAIVE"),
 };	
 
 axpfinplacefn axpf_inplace;
@@ -6378,7 +6378,7 @@ Tensor* naive_axpf(const Tensor* summand, void* sumend, float alpha) {
 }
 
 Implementation axpf_backends[] = {
-	REGISTER_BACKEND(naive_axpf, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_axpf, nnl2_naive, "NAIVE"),
 };	
 
 axpffn axpf;
@@ -6446,7 +6446,7 @@ void naive_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, floa
 }	
 
 Implementation axpy_broadcasting_inplace_backends[] = {
-	REGISTER_BACKEND(naive_axpy_broadcasting_inplace, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_axpy_broadcasting_inplace, nnl2_naive, "NAIVE"),
 };	
 
 axpybroadcastinginplacefn axpy_broadcasting_inplace;
@@ -6520,7 +6520,7 @@ Tensor* naive_axpy_broadcasting(const Tensor* summand, const Tensor* sumend, flo
 }
 
 Implementation axpy_broadcasting_backends[] = {
-	REGISTER_BACKEND(naive_axpy_broadcasting, 10, "NAIVE"),
+	REGISTER_BACKEND(naive_axpy_broadcasting, nnl2_naive, "NAIVE"),
 };	
 
 axpybroadcastingfn axpy_broadcasting;

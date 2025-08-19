@@ -1,68 +1,326 @@
-(defpackage :nnl2.ffi
-  (:use :cl)
+(defpackage #:nnl2.ffi
+  (:use #:cl)
   (:export 
-   :get-openblas0330woa64static-status :%empty :%zeros :%ones :%full :free-tensor :print-tensor
-   :%dgemm :%sgemm :%gemm :get-tensor-rank :get-tensor-dtype :get-int-tensor-dtype :get-pointer-to-tensor-shape
-   :%gemm! :%+= :%-= :%get-size :%get-size-in-bytes :%+ :%- :%*= :%/= :%* :%/ :%^= :%.^ :%.exp! :%.exp :%.log!
-   :%.log :%tref :%tref-setter :%scale! :%scale :%zeros-like :%ones-like :%full-like :%.max! :%.min! :%.max :%.min
-   :%.abs! :%.abs :get-tensor-data :%empty-like :%hstack :%vstack :%.relu! :%.relu :%.leaky-relu! :%.leaky-relu
-   :%.sigmoid! :%.sigmoid :%.tanh! :%.tanh :%concat :%randn :%randn-like :%xavier :%transpose! :%transpose :%sum
-   :%l2norm :%copy :%.+/incf! :%.+/incf :%.-/decf! :%.-/decf :%.*/mulf! :%.*/mulf :%.//divf! :%.//divf :%.^/powf! 
-   :%.^/powf :%.max/maxf! :%.max/maxf :%.min/minf! :%.min/minf :%.+/broadcasting! :%.+/broadcasting :%.-/broadcasting!
-   :%.-/broadcasting :%.*/broadcasting! :%.*/broadcasting :%.//broadcasting! :%.//broadcasting :%.^/broadcasting!
-   :%.^/broadcasting :%.max/broadcasting :%.max/broadcasting! :%.min/broadcasting :%.min/broadcasting!
-   :%make-tensor-from-flatten :%axpy/axpf! :%axpy/axpf :%axpy/broadcasting! :%axpy/broadcasting :%axpy :%axpy!
-   :%set-abs-backend :%set-abs-inplace-backend :%set-inplace-fill-backend :%set-empty-backend :%set-zeros-backend
-   :%set-ones-backend :%set-sgemminplace-backend :%set-dgemminplace-backend :%set-addinplace-backend 
-   :%set-subinplace-backend :%set-add-backend :%set-sub-backend :%set-mulinplace-backend :%set-divinplace-backend
-   :%set-mul-backend :%set-div-backend :%set-powinplace-backend :%set-expinplace-backend :%set-pow-backend
-   :%set-exp-backend :%set-loginplace-backend :%set-log-backend :%set-scaleinplace-backend :%set-scale-backend
-   :%set-maxinplace-backend :%set-mininplace-backend :%set-max-backend :%set-min-backend :%set-hstack-backend
-   :%set-vstack-backend :%set-reluinplace-backend :%set-relu-backend :%set-leakyreluinplace-backend
-   :%set-leakyrelu-backend :%set-sigmoidinplace-backend :%set-sigmoid-backend :%set-tanhinplace-backend
-   :%set-tanh-backend :%set-concat-backend :%set-randn-backend :%set-xavier-backend :%set-transposeinplace-backend
-   :%set-transpose-backend :%set-sum-backend :%set-l2norm-backend :%set-copy-backend :%set-add-incf-inplace-backend
-   :%set-add-incf-backend :%set-sub-decf-inplace-backend :%set-sub-decf-backend :%set-mul-mulf-inplace-backend
-   :%set-mul-mulf-backend :%set-div-divf-inplace-backend :%set-div-divf-backend :%set-pow-powf-inplace-backend
-   :%set-pow-powf-backend :%set-max-maxf-inplace-backend :%set-max-maxf-backend :%set-min-minf-inplace-backend
-   :%set-min-minf-backend :%set-add-broadcasting-inplace-backend :%set-add-broadcasting-backend
-   :%set-sub-broadcasting-inplace-backend :%set-sub-broadcasting-backend :%set-mul-broadcasting-inplace-backend
-   :%set-mul-broadcasting-backend :%set-div-broadcasting-inplace-backend :%set-div-broadcasting-backend
-   :%set-pow-broadcasting-inplace-backend :%set-pow-broadcasting-backend :%set-max-broadcasting-inplace-backend
-   :%set-min-broadcasting-inplace-backend :%set-max-broadcasting-backend :%get-max-backend
-   :%set-fill-tensor-with-data-backend :%set-axpy-inplace-backend :%set-min-broadcasting-backend
-   :%set-axpy-backend :%set-axpf-inplace-backend :%set-axpf-backend :%set-axpy-broadcasting-inplace-backend
-   :%set-axpy-broadcasting-backend :%get-empty-backend :%get-zeros-backend :%get-inplace-fill-backend
-   :%get-ones-backend :%get-gemm-backend :%get-addinplace-backend :%get-subinplace-backend
-   :%get-add-backend :%get-sub-backend :%get-mulinplace-backend :%get-divinplace-backend :%get-mul-backend
-   :%get-div-backend :%get-powinplace-backend :%get-pow-backend :%get-expinplace-backend :%get-exp-backend
-   :%get-loginplace-backend :%get-log-backend :%get-scaleinplace-backend :%get-scale-backend :%get-maxinplace-backend
-   :%get-mininplace-backend :%get-min-backend :%get-absinplace-backend :%get-abs-backend :%get-hstack-backend
-   :%get-vstack-backend :%get-reluinplace-backend :%get-relu-backend :%get-leakyreluinplace-backend :%get-leakyrelu-backend
-   :%get-sigmoid-backend :%get-sigmoidinplace-backend :%get-tanh-backend :%get-tanhinplace-backend
-   :%get-concat-backend :%get-randn-backend :%get-xavier-backend :%get-transpose-backend :%get-transposeinplace-backend
-   :%get-sum-backend :%get-l2norm-backend :%get-copy-backend :%get-axpy-inplace-backend :%get-axpy-backend
-   :%get-empty-backends :%get-empty-num-backends :%get-zeros-num-backends :%get-zeros-backends
-   :%get-inplace-fill-num-backends :%get-inplace-fill-backends :%get-ones-num-backends :%get-ones-backends
-   :%get-gemm-num-backends :%get-gemm-backends :%get-addinplace-num-backends :%get-addinplace-backends
-   :%get-subinplace-num-backends :%get-subinplace-backends :%get-add-num-backends :%get-add-backends
-   :%get-sub-num-backends :%get-sub-backends :%get-mulinplace-num-backends :%get-mulinplace-backends
-   :%get-divinplace-num-backends :%get-divinplace-backends :%get-mul-num-backends :%get-mul-backends
-   :%get-div-num-backends :%get-div-backends :%get-powinplace-num-backends :%get-powinplace-backends
-   :%get-pow-num-backends :%get-pow-backends :%get-expinplace-num-backends :%get-expinplace-backends
-   :%get-exp-num-backends :%get-exp-backends :%get-loginplace-num-backends :%get-loginplace-backends
-   :%get-log-num-backends :%get-log-backends :%get-scaleinplace-num-backends :%get-scaleinplace-backends
-   :%get-scale-num-backends :%get-scale-backends :%get-maxinplace-num-backends :%get-maxinplace-backends
-   :%get-mininplace-num-backends :%get-mininplace-backends :%get-max-num-backends :%get-max-backends 
-   :%get-min-num-backends :%get-min-backends :%get-absinplace-num-backends :%get-absinplace-backends
-   :%get-abs-num-backends :%get-abs-backends :%get-hstack-num-backends :%get-hstack-backends :%get-vstack-num-backends
-   :%get-vstack-backends :%get-reluinplace-num-backends :%get-reluinplace-backends :%get-relu-num-backends
-   :%get-relu-backends :%get-leakyreluinplace-num-backends :%get-leakyreluinplace-backends
-   :%get-leakyrelu-num-backends :%get-leakyrelu-backends :%get-sigmoidinplace-num-backends
-   :%get-sigmoidinplace-backends :%get-sigmoid-num-backends :%get-sigmoid-backends :%get-tanhinplace-num-backends
-   :%get-tanhinplace-backends :%get-tanh-num-backends :%get-tanh-backends :%get-concat-num-backends 
-   :%get-concat-backends :%get-randn-num-backends :%get-randn-backends :%get-xavier-num-backends
-   :%get-xavier-backends :%get-transposeinplace-num-backends :%get-transposeinplace-backends
-   :%get-transpose-num-backends :%get-transpose-backends :%get-sum-num-backends :%get-sum-backends
-   :%get-l2norm-num-backends :%get-l2norm-backends :%get-copy-num-backends :%get-copy-backends
-   :%get-axpy-inplace-num-backends :%get-axpy-inplace-backends :%get-axpy-num-backends :%get-axpy-backends))
+   #:get-openblas0330woa64static-status
+   #:%empty
+   #:%zeros
+   #:%ones
+   #:%full
+   #:free-tensor
+   #:print-tensor
+   #:%dgemm
+   #:%sgemm
+   #:%gemm
+   #:get-tensor-rank
+   #:get-tensor-dtype
+   #:get-int-tensor-dtype
+   #:get-pointer-to-tensor-shape
+   #:%gemm!
+   #:%+=
+   #:%-=
+   #:%get-size
+   #:%get-size-in-bytes
+   #:%+
+   #:%-
+   #:%*=
+   #:%/=
+   #:%*
+   #:%/
+   #:%^=
+   #:%.^
+   #:%.exp!
+   #:%.exp
+   #:%.log!
+   #:%.log
+   #:%tref
+   #:%tref-setter
+   #:%scale!
+   #:%scale
+   #:%zeros-like
+   #:%ones-like
+   #:%full-like
+   #:%.max!
+   #:%.min!
+   #:%.max
+   #:%.min
+   #:%.abs!
+   #:%.abs
+   #:get-tensor-data
+   #:%empty-like
+   #:%hstack
+   #:%vstack
+   #:%.relu!
+   #:%.relu
+   #:%.leaky-relu!
+   #:%.leaky-relu
+   #:%.sigmoid!
+   #:%.sigmoid
+   #:%.tanh!
+   #:%.tanh
+   #:%concat
+   #:%randn
+   #:%randn-like
+   #:%xavier
+   #:%transpose!
+   #:%transpose
+   #:%sum
+   #:%l2norm
+   #:%copy
+   #:%.+/incf!
+   #:%.+/incf
+   #:%.-/decf!
+   #:%.-/decf
+   #:%.*/mulf!
+   #:%.*/mulf
+   #:%.//divf!
+   #:%.//divf
+   #:%.^/powf!
+   #:%.^/powf
+   #:%.max/maxf!
+   #:%.max/maxf
+   #:%.min/minf!
+   #:%.min/minf
+   #:%.+/broadcasting!
+   #:%.+/broadcasting
+   #:%.-/broadcasting!
+   #:%.-/broadcasting
+   #:%.*/broadcasting!
+   #:%.*/broadcasting
+   #:%.//broadcasting!
+   #:%.//broadcasting
+   #:%.^/broadcasting!
+   #:%.^/broadcasting
+   #:%.max/broadcasting
+   #:%.max/broadcasting!
+   #:%.min/broadcasting
+   #:%.min/broadcasting!
+   #:%make-tensor-from-flatten
+   #:%axpy/axpf!
+   #:%axpy/axpf
+   #:%axpy/broadcasting!
+   #:%axpy/broadcasting
+   #:%axpy
+   #:%axpy!
+   #:%set-abs-backend
+   #:%set-abs-inplace-backend
+   #:%set-inplace-fill-backend
+   #:%set-empty-backend
+   #:%set-zeros-backend
+   #:%set-ones-backend
+   #:%set-sgemminplace-backend
+   #:%set-dgemminplace-backend
+   #:%set-addinplace-backend
+   #:%set-subinplace-backend
+   #:%set-add-backend
+   #:%set-sub-backend
+   #:%set-mulinplace-backend
+   #:%set-divinplace-backend
+   #:%set-mul-backend
+   #:%set-div-backend
+   #:%set-powinplace-backend
+   #:%set-expinplace-backend
+   #:%set-pow-backend
+   #:%set-exp-backend
+   #:%set-loginplace-backend
+   #:%set-log-backend
+   #:%set-scaleinplace-backend
+   #:%set-scale-backend
+   #:%set-maxinplace-backend
+   #:%set-mininplace-backend
+   #:%set-max-backend
+   #:%set-min-backend
+   #:%set-hstack-backend
+   #:%set-vstack-backend
+   #:%set-reluinplace-backend
+   #:%set-relu-backend
+   #:%set-leakyreluinplace-backend
+   #:%set-leakyrelu-backend
+   #:%set-sigmoidinplace-backend
+   #:%set-sigmoid-backend
+   #:%set-tanhinplace-backend
+   #:%set-tanh-backend
+   #:%set-concat-backend
+   #:%set-randn-backend
+   #:%set-xavier-backend
+   #:%set-transposeinplace-backend
+   #:%set-transpose-backend
+   #:%set-sum-backend
+   #:%set-l2norm-backend
+   #:%set-copy-backend
+   #:%set-add-incf-inplace-backend
+   #:%set-add-incf-backend
+   #:%set-sub-decf-inplace-backend
+   #:%set-sub-decf-backend
+   #:%set-mul-mulf-inplace-backend
+   #:%set-mul-mulf-backend
+   #:%set-div-divf-inplace-backend
+   #:%set-div-divf-backend
+   #:%set-pow-powf-inplace-backend
+   #:%set-pow-powf-backend
+   #:%set-max-maxf-inplace-backend
+   #:%set-max-maxf-backend
+   #:%set-min-minf-inplace-backend
+   #:%set-min-minf-backend
+   #:%set-add-broadcasting-inplace-backend
+   #:%set-add-broadcasting-backend
+   #:%set-sub-broadcasting-inplace-backend
+   #:%set-sub-broadcasting-backend
+   #:%set-mul-broadcasting-inplace-backend
+   #:%set-mul-broadcasting-backend
+   #:%set-div-broadcasting-inplace-backend
+   #:%set-div-broadcasting-backend
+   #:%set-pow-broadcasting-inplace-backend
+   #:%set-pow-broadcasting-backend
+   #:%set-max-broadcasting-inplace-backend
+   #:%set-min-broadcasting-inplace-backend
+   #:%set-max-broadcasting-backend
+   #:%get-max-backend
+   #:%set-fill-tensor-with-data-backend
+   #:%set-axpy-inplace-backend
+   #:%set-min-broadcasting-backend
+   #:%set-axpy-backend
+   #:%set-axpf-inplace-backend
+   #:%set-axpf-backend
+   #:%set-axpy-broadcasting-inplace-backend
+   #:%set-axpy-broadcasting-backend
+   #:%get-empty-backend
+   #:%get-zeros-backend
+   #:%get-inplace-fill-backend
+   #:%get-ones-backend
+   #:%get-gemm-backend
+   #:%get-addinplace-backend
+   #:%get-subinplace-backend
+   #:%get-add-backend
+   #:%get-sub-backend
+   #:%get-mulinplace-backend
+   #:%get-divinplace-backend
+   #:%get-mul-backend
+   #:%get-div-backend
+   #:%get-powinplace-backend
+   #:%get-pow-backend
+   #:%get-expinplace-backend
+   #:%get-exp-backend
+   #:%get-loginplace-backend
+   #:%get-log-backend
+   #:%get-scaleinplace-backend
+   #:%get-scale-backend
+   #:%get-maxinplace-backend
+   #:%get-mininplace-backend
+   #:%get-min-backend
+   #:%get-absinplace-backend
+   #:%get-abs-backend
+   #:%get-hstack-backend
+   #:%get-vstack-backend
+   #:%get-reluinplace-backend
+   #:%get-relu-backend
+   #:%get-leakyreluinplace-backend
+   #:%get-leakyrelu-backend
+   #:%get-sigmoid-backend
+   #:%get-sigmoidinplace-backend
+   #:%get-tanh-backend
+   #:%get-tanhinplace-backend
+   #:%get-concat-backend
+   #:%get-randn-backend
+   #:%get-xavier-backend
+   #:%get-transpose-backend
+   #:%get-transposeinplace-backend
+   #:%get-sum-backend
+   #:%get-l2norm-backend
+   #:%get-copy-backend
+   #:%get-axpy-inplace-backend
+   #:%get-axpy-backend
+   #:%get-empty-backends
+   #:%get-empty-num-backends
+   #:%get-zeros-num-backends
+   #:%get-zeros-backends
+   #:%get-inplace-fill-num-backends
+   #:%get-inplace-fill-backends
+   #:%get-ones-num-backends
+   #:%get-ones-backends
+   #:%get-gemm-num-backends
+   #:%get-gemm-backends
+   #:%get-addinplace-num-backends
+   #:%get-addinplace-backends
+   #:%get-subinplace-num-backends
+   #:%get-subinplace-backends
+   #:%get-add-num-backends
+   #:%get-add-backends
+   #:%get-sub-num-backends
+   #:%get-sub-backends
+   #:%get-mulinplace-num-backends
+   #:%get-mulinplace-backends
+   #:%get-divinplace-num-backends
+   #:%get-divinplace-backends
+   #:%get-mul-num-backends
+   #:%get-mul-backends
+   #:%get-div-num-backends
+   #:%get-div-backends
+   #:%get-powinplace-num-backends
+   #:%get-powinplace-backends
+   #:%get-pow-num-backends
+   #:%get-pow-backends
+   #:%get-expinplace-num-backends
+   #:%get-expinplace-backends
+   #:%get-exp-num-backends
+   #:%get-exp-backends
+   #:%get-loginplace-num-backends
+   #:%get-loginplace-backends
+   #:%get-log-num-backends
+   #:%get-log-backends
+   #:%get-scaleinplace-num-backends
+   #:%get-scaleinplace-backends
+   #:%get-scale-num-backends
+   #:%get-scale-backends
+   #:%get-maxinplace-num-backends
+   #:%get-maxinplace-backends
+   #:%get-mininplace-num-backends
+   #:%get-mininplace-backends
+   #:%get-max-num-backends
+   #:%get-max-backends
+   #:%get-min-num-backends
+   #:%get-min-backends
+   #:%get-absinplace-num-backends
+   #:%get-absinplace-backends
+   #:%get-abs-num-backends
+   #:%get-abs-backends
+   #:%get-hstack-num-backends
+   #:%get-hstack-backends
+   #:%get-vstack-num-backends
+   #:%get-vstack-backends
+   #:%get-reluinplace-num-backends
+   #:%get-reluinplace-backends
+   #:%get-relu-num-backends
+   #:%get-relu-backends
+   #:%get-leakyreluinplace-num-backends
+   #:%get-leakyreluinplace-backends
+   #:%get-leakyrelu-num-backends
+   #:%get-leakyrelu-backends
+   #:%get-sigmoidinplace-num-backends
+   #:%get-sigmoidinplace-backends
+   #:%get-sigmoid-num-backends
+   #:%get-sigmoid-backends
+   #:%get-tanhinplace-num-backends
+   #:%get-tanhinplace-backends
+   #:%get-tanh-num-backends
+   #:%get-tanh-backends
+   #:%get-concat-num-backends
+   #:%get-concat-backends
+   #:%get-randn-num-backends
+   #:%get-randn-backends
+   #:%get-xavier-num-backends
+   #:%get-xavier-backends
+   #:%get-transposeinplace-num-backends
+   #:%get-transposeinplace-backends
+   #:%get-transpose-num-backends
+   #:%get-transpose-backends
+   #:%get-sum-num-backends
+   #:%get-sum-backends
+   #:%get-l2norm-num-backends
+   #:%get-l2norm-backends
+   #:%get-copy-num-backends
+   #:%get-copy-backends
+   #:%get-axpy-inplace-num-backends
+   #:%get-axpy-inplace-backends
+   #:%get-axpy-num-backends
+   #:%get-axpy-backends))
+   

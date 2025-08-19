@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name, "NOT INITIALIZED" }
+#define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name }
 #define INIT_BACKEND(fn_var, backends_array) fn_var = init_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]))
 #define EINIT_BACKEND(fn_var, backends_array, cur_pntr) fn_var = einit_backend(backends_array, sizeof(backends_array)/sizeof(backends_array[0]), cur_pntr)
 #define SET_BACKEND_BY_NAME(backend, fn, backend_name) set_backend_by_name(backend, sizeof(backend)/sizeof(backend[0]), (void**)&fn, backend_name)
@@ -65,7 +65,6 @@ typedef struct {
     int speed_priority;
     bool available;
     const char* name;
-	const char* current;
 } Implementation;
 
 typedef enum {
