@@ -274,142 +274,277 @@
 (defun get-backend/ones-like () (get-backend/ones))
   
 (defun get-backend/gemm ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))  
+  (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))
+
+(defun (setf get-backend/gemm) (name)
+  (use-backend/gemm name))  
     
 (defun get-backend/gemm! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))    
+  
+(defun (setf get-backend/gemm!) (name)
+  (use-backend/gemm! name))  
  
 (defun get-backend/+= ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-addinplace-backend)))    
+  (uppercase-string-to-symbol (nnl2.ffi:%get-addinplace-backend))) 
+
+(defun (setf get-backend/+=) (name)
+  (use-backend/+= name))  
  
 (defun get-backend/-= ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-subinplace-backend)))    
+  (uppercase-string-to-symbol (nnl2.ffi:%get-subinplace-backend)))
+
+(defun (setf get-backend/-=) (name)
+  (use-backend/-= name))  
   
 (defun get-backend/.+ ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-add-backend)))    
+  (uppercase-string-to-symbol (nnl2.ffi:%get-add-backend)))
+
+(defun (setf get-backend/.+) (name)
+  (use-backend/.+ name))
  
 (defun get-backend/.- ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-sub-backend)))     
+  (uppercase-string-to-symbol (nnl2.ffi:%get-sub-backend)))  
+
+(defun (setf get-backend/.-) (name)
+  (use-backend/.- name))  
  
 (defun get-backend/*= ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-mulinplace-backend)))       
 
+(defun (setf get-backend/*=) (name)
+  (use-backend/*= name))
+
 (defun get-backend//! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-divinplace-backend)))  
+
+(defun (setf get-backend//!) (name)
+  (use-backend//! name))
 
 (defun get-backend/.* ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-mul-backend)))    
 
+(defun (setf get-backend/.*) (name)
+  (use-backend/.* name))
+
 (defun get-backend/./ ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-div-backend)))      
   
+(defun (setf get-backend/./) (name)
+  (use-backend/./ name))  
+  
 (defun get-backend/^= ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-powinplace-backend)))      
+
+(defun (setf get-backend/^=) (name)
+  (use-backend/^= name))
   
 (defun get-backend/.^ ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-pow-backend)))      
   
+(defun (setf get-backend/.^) (name)
+  (use-backend/.^ name))  
+  
 (defun get-backend/.exp! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-expinplace-backend)))   
+  
+(defun (setf get-backend/.exp!) (name)
+  (use-backend/.exp! name))  
   
 (defun get-backend/.exp ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-exp-backend)))   
 
+(defun (setf get-backend/.exp) (name)
+  (use-backend/.exp name))
+
 (defun get-backend/.log! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-loginplace-backend)))      
+
+(defun (setf get-backend/.log!) (name)
+  (use-backend/.log! name))
 	
 (defun get-backend/.log ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-log-backend)))    	
 	
+(defun (setf get-backend/.log) (name)
+  (use-backend/.log name))	
+	
 (defun get-backend/scale! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-scaleinplace-backend)))    		
 
+(defun (setf get-backend/scale!) (name)
+  (use-backend/scale! name))
+
 (defun get-backend/scale ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-scale-backend)))    		
-		
+	
+(defun (setf get-backend/scale) (name)
+  (use-backend/scale name))
+	
 (defun get-backend/.max! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-maxinplace-backend)))    		
+
+(defun (setf get-backend/.max!) (name)
+  (use-backend/.max! name))
 
 (defun get-backend/.min! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-mininplace-backend)))  
 
+(defun (setf get-backend/.min!) (name)
+  (use-backend/.min! name))
+
 (defun get-backend/.max ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-max-backend)))    		
+
+(defun (setf get-backend/.max) (name)
+  (use-backend/.max name))
 
 (defun get-backend/.min ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-min-backend))) 
 
+(defun (setf get-backend/.min) (name)
+  (use-backend/.min name))
+
 (defun get-backend/.abs! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-absinplace-backend)))   
+  
+(defun (setf get-backend/.abs!) (name)
+  (use-backend/.abs! name))  
   
 (defun get-backend/.abs ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-abs-backend)))  
   
+(defun (setf get-backend/.abs) (name)
+  (use-backend/.abs name))  
+  
 (defun get-backend/hstack ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-hstack-backend)))   
+  
+(defun (setf get-backend/hstack) (name)
+  (use-backend/hstack name))  
   
 (defun get-backend/vstack ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-vstack-backend)))    
   
+(defun (setf get-backend/vstack) (name)
+  (use-backend/vstack name))  
+  
 (defun get-backend/.relu! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-reluinplace-backend)))     
+  
+(defun (setf get-backend/.relu!) (name)
+  (use-backend/.relu! name))  
   
 (defun get-backend/.relu ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-relu-backend)))       
   
+(defun (setf get-backend/.relu) (name)
+  (use-backend/.relu name))  
+  
 (defun get-backend/.leaky-relu! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-leakyreluinplace-backend)))     
   
+(defun (setf get-backend/.leaky-relu!) (name)
+  (use-backend/.leaky-relu name))  
+  
 (defun get-backend/.leaky-relu ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-leakyrelu-backend)))   
-  
+ 
+(defun (setf get-backend/.leaky-relu) (name)
+  (use-backend/.leaky-relu name))
+ 
 (defun get-backend/.sigmoid! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-sigmoidinplace-backend)))     
-  
+ 
+(defun (setf get-backend/.sigmoid!) (name)
+  (use-backend/.sigmoid! name))
+ 
 (defun get-backend/.sigmoid ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-sigmoid-backend)))     
+  
+(defun (setf get-backend/.sigmoid) (name)
+  (use-backend/.sigmoid name))  
   
 (defun get-backend/.tanh! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-tanhinplace-backend)))     
   
+(defun (setf get-backend/.tanh!) (name)
+  (use-backend/.tanh! name))  
+  
 (defun get-backend/.tanh ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-tanh-backend)))    
+  
+(defun (setf get-backend/.tanh) (name)
+  (use-backend/.tanh name))  
   
 (defun get-backend/concat ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-concat-backend)))   
   
+(defun (setf get-backend/concat) (name)
+  (use-backend/concat name))  
+  
 (defun get-backend/randn ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-randn-backend)))  
  
+(defun (setf get-backend/randn) (name)
+  (use-backend/randn name)) 
+ 
 (defun get-backend/randn-like () 
-  (get-backend/randn)) 
+  (get-backend/randn))
+
+(defun (setf get-backend/randn-like) (name)
+  (use-backend/randn-like name))  
  
 (defun get-backend/xavier ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-xavier-backend))) 
+  (uppercase-string-to-symbol (nnl2.ffi:%get-xavier-backend)))
+
+(defun (setf get-backend/xavier) (name)
+  (use-backend/xavier name))  
   
 (defun get-backend/transpose! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-transposeinplace-backend))) 
     
+(defun (setf get-backend/transpose!) (name)
+  (use-backend/transpose! name))	
+	
 (defun get-backend/transpose ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-transpose-backend))) 
-    	
+    
+(defun (setf get-backend/transpose) (name)
+  (use-backend/transpose name))
+	
 (defun get-backend/sum ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-sum-backend)))	
+  
+(defun (setf get-backend/sum) (name)
+  (use-backend/sum name))  
   
 (defun get-backend/norm (&key (p :l2))
   (case p
     (:l2 (uppercase-string-to-symbol (nnl2.ffi:%get-sum-backend)))
 	(otherwise (error "Incorrect :p key in norm~%"))))
+
+(defun (setf get-backend/norm) (name &key (p :l2))
+  (use-backend/norm name :p p))
 	
 (defun get-backend/copy ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-copy-backend)))		
+  (uppercase-string-to-symbol (nnl2.ffi:%get-copy-backend)))
+
+(defun (setf get-backend/copy) (name)
+  (use-backend/copy name))  
   
 (defun get-backend/axpy! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-inplace-backend)))
   
+(defun (setf get-backend/axpy!) (name)
+  (use-backend/axpy! name))  
+  
 (defun get-backend/axpy ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-backend)))
 
+(defun (setf get-backend/axpy) (name)
+  (use-backend/axpy name))
+  
 (defun get-backends/empty ()
   (let ((num-backends (nnl2.ffi:%get-empty-num-backends))
 	    (backends (nnl2.ffi:%get-empty-backends)))
