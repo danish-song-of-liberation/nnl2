@@ -31,7 +31,7 @@
   (rank :int)
   (dtype tensor-type))   
   
-(cffi:defcfun ("lisp_call_ones" %ones) :pointer
+(cffi:defcfun ("ones" %ones) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type))  

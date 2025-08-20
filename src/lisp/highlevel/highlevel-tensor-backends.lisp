@@ -258,14 +258,26 @@
 (defun get-backend/empty ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-empty-backend)))    
   
+(defun (setf get-backend/empty) (name)
+  (use-backend/empty name))    
+  
 (defun get-backend/zeros ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-zeros-backend)))
+
+(defun (setf get-backend/zeros) (name)
+  (use-backend/zeros name))  
 
 (defun get-backend/ones ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
   
+(defun (setf get-backend/ones) (name)
+  (use-backend/ones name))    
+  
 (defun get-backend/full ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
+  
+(defun (setf get-backend/full) (name)
+  (use-backend/full name))    
   
 (defun get-backend/full-like () (get-backend/full))	
 (defun get-backend/empty-like () (get-backend/empty))	
@@ -366,7 +378,7 @@
   (uppercase-string-to-symbol (nnl2.ffi:%get-log-backend)))    	
 	
 (defun (setf get-backend/.log) (name)
-  (use-backend/.log name))	
+  (use-backend/.log name))	ы
 	
 (defun get-backend/scale! ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-scaleinplace-backend)))    		
@@ -889,3 +901,390 @@
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
 		  
+(defmacro with-backend/full (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/full)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/full) ,name)
+             ,@body)
+         (setf (get-backend/full) ,old-backend-sym)))))
+		 
+(defmacro with-backend/empty (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/empty)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/empty) ,name)
+             ,@body)
+         (setf (get-backend/empty) ,old-backend-sym)))))		 
+		 
+(defmacro with-backend/zeros (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/zeros)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/zeros) ,name)
+             ,@body)
+         (setf (get-backend/zeros) ,old-backend-sym)))))		 		 
+		 
+(defmacro with-backend/ones (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/ones)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/ones) ,name)
+             ,@body)
+         (setf (get-backend/ones) ,old-backend-sym)))))		 
+		 
+(defmacro with-backend/+= (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/+=)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/+=) ,name)
+             ,@body)
+         (setf (get-backend/+=) ,old-backend-sym)))))		 
+		 
+(defmacro with-backend/-= (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/-=)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/-=) ,name)
+             ,@body)
+         (setf (get-backend-=) ,old-backend-sym)))))		 		 
+		 		 
+(defmacro with-backend/gemm (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/gemm)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/gemm) ,name)
+             ,@body)
+         (setf (get-backend/gemm) ,old-backend-sym)))))						 
+				 
+(defmacro with-backend/gemm! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/gemm!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/gemm!) ,name)
+             ,@body)
+         (setf (get-backend/gemm!) ,old-backend-sym)))))						 
+				 				 
+(defmacro with-backend/.+ (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.+)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.+) ,name)
+             ,@body)
+         (setf (get-backend/.+) ,old-backend-sym)))))									 
+
+(defmacro with-backend/.- (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.-)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.-) ,name)
+             ,@body)
+         (setf (get-backend/.-) ,old-backend-sym)))))
+
+(defmacro with-backend/*= (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/*=)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/*=) ,name)
+             ,@body)
+         (setf (get-backend/*=) ,old-backend-sym)))))			 
+
+(defmacro with-backend//! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend//!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend//!) ,name)
+             ,@body)
+         (setf (get-backend//!) ,old-backend-sym)))))			 
+
+(defmacro with-backend/.exp! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.exp!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.exp!) ,name)
+             ,@body)
+         (setf (get-backend/.exp!) ,old-backend-sym)))))				 
+		 
+(defmacro with-backend/.exp (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.exp)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.exp) ,name)
+             ,@body)
+         (setf (get-backend/.exp) ,old-backend-sym)))))	
+
+(defmacro with-backend/.log! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.log!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.log!) ,name)
+             ,@body)
+         (setf (get-backend/.log!) ,old-backend-sym)))))				 
+		 
+(defmacro with-backend/.log (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.log)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.log) ,name)
+             ,@body)
+         (setf (get-backend/.log) ,old-backend-sym)))))			
+	
+(defmacro with-backend/scale! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/scale!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/scale!) ,name)
+             ,@body)
+         (setf (get-backend/scale!) ,old-backend-sym)))))				 
+		 
+(defmacro with-backend/scale (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/scale)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/scale) ,name)
+             ,@body)
+         (setf (get-backend/scale) ,old-backend-sym)))))			
+		
+(defmacro with-backend/.max! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.max!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.max!) ,name)
+             ,@body)
+         (setf (get-backend/.max!) ,old-backend-sym)))))	
+
+(defmacro with-backend/.min! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.min!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.min!) ,name)
+             ,@body)
+         (setf (get-backend/.min!) ,old-backend-sym)))))	
+		 		 
+(defmacro with-backend/.max (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.max)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.max) ,name)
+             ,@body)
+         (setf (get-backend/.max) ,old-backend-sym)))))	
+
+(defmacro with-backend/.min (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.min)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.min) ,name)
+             ,@body)
+         (setf (get-backend/.min) ,old-backend-sym)))))					 
+				 
+(defmacro with-backend/.abs! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.abs!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.abs!) ,name)
+             ,@body)
+         (setf (get-backend/.abs!) ,old-backend-sym)))))
+	
+(defmacro with-backend/.abs (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.abs)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.abs) ,name)
+             ,@body)
+         (setf (get-backend/.abs) ,old-backend-sym)))))
+		 	
+(defmacro with-backend/hstack (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/hstack)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/hstack) ,name)
+             ,@body)
+         (setf (get-backend/hstack) ,old-backend-sym)))))
+	
+(defmacro with-backend/vstack (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/vstack)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/vstack) ,name)
+             ,@body)
+         (setf (get-backend/vstack) ,old-backend-sym)))))			
+
+(defmacro with-backend/.relu! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.relu!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.relu!) ,name)
+             ,@body)
+         (setf (get-backend/.relu!) ,old-backend-sym)))))			
+						
+(defmacro with-backend/.relu (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.relu)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.relu) ,name)
+             ,@body)
+         (setf (get-backend/.relu) ,old-backend-sym)))))	
+		 
+(defmacro with-backend/.leaky-relu! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.leaky-relu!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.leaky-relu!) ,name)
+             ,@body)
+         (setf (get-backend/.leaky-relu!) ,old-backend-sym)))))			
+						
+(defmacro with-backend/.leaky-relu (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.leaky-relu)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.leaky-relu) ,name)
+             ,@body)
+         (setf (get-backend/.leaky-relu) ,old-backend-sym)))))	
+		 
+(defmacro with-backend/.sigmoid! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.sigmoid!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.sigmoid!) ,name)
+             ,@body)
+         (setf (get-backend/.sigmoid!) ,old-backend-sym)))))			
+						
+(defmacro with-backend/.sigmoid (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.sigmoid)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.sigmoid) ,name)
+             ,@body)
+         (setf (get-backend/.sigmoid) ,old-backend-sym)))))	
+		 		 
+(defmacro with-backend/.tanh! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.tanh!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.tanh!) ,name)
+             ,@body)
+         (setf (get-backend/.tanh!) ,old-backend-sym)))))			
+						
+(defmacro with-backend/.tanh (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/.tanh)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/.tanh) ,name)
+             ,@body)
+         (setf (get-backend/.tanh) ,old-backend-sym)))))	
+		 
+(defmacro with-backend/concat (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/concat)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/concat) ,name)
+             ,@body)
+         (setf (get-backend/concat) ,old-backend-sym)))))			 
+	
+(defmacro with-backend/randn (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/randn)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/randn) ,name)
+             ,@body)
+         (setf (get-backend/randn) ,old-backend-sym)))))			 
+		 	
+(defmacro with-backend/xavier (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/xavier)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/xavier) ,name)
+             ,@body)
+         (setf (get-backend/xavier) ,old-backend-sym)))))
+
+(defmacro with-backend/transpose! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/transpose!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/transpose!) ,name)
+             ,@body)
+         (setf (get-backend/transpose!) ,old-backend-sym)))))		 
+		 
+(defmacro with-backend/transpose (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/transpose)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/transpose) ,name)
+             ,@body)
+         (setf (get-backend/transpose) ,old-backend-sym)))))
+
+(defmacro with-backend/sum (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/sum)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/sum) ,name)
+             ,@body)
+         (setf (get-backend/sum) ,old-backend-sym)))))
+
+(defmacro with-backend/norm (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/norm)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/norm) ,name)
+             ,@body)
+         (setf (get-backend/norm) ,old-backend-sym)))))		 
+
+(defmacro with-backend/axpy! (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/axpy!)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/axpy!) ,name)
+             ,@body)
+         (setf (get-backend/axpy!) ,old-backend-sym)))))	
+
+(defmacro with-backend/axpy (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/axpy)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/axpy) ,name)
+             ,@body)
+         (setf (get-backend/axpy) ,old-backend-sym)))))
+		 

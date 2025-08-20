@@ -229,7 +229,7 @@
    #:get-backends/full-like
    #:get-backends/ones-like
    #:get-backends/gemm
-   #:get-backend/gemm!
+   #:get-backends/gemm!
    #:get-backends/+=
    #:get-backends/-=
    #:get-backends/.+
@@ -272,5 +272,50 @@
    #:get-backends/norm
    #:get-backends/copy
    #:get-backends/axpy!
-   #:get-backends/axpy))
+   #:get-backends/axpy
+   #:with-backend/full
+   #:with-backend/ones
+   #:with-backend/zeros
+   #:with-backend/empty
+   #:with-backend/gemm
+   #:with-backend/gemm!
+   #:with-backend/.+
+   #:with-backend/.-
+   #:with-backend/+=
+   #:with-backend/-=
+   #:with-backend/*=
+   #:with-backend//!
+   #:with-backend/.exp!
+   #:with-backend/.exp
+   #:with-backend/.log!
+   #:with-backend/.log
+   #:with-backend/scale!
+   #:with-backend/scale
+   #:with-backend/.max!
+   #:with-backend/.min!
+   #:with-backend/.max
+   #:with-backend/.min
+   #:with-backend/.abs!
+   #:with-backend/.abs
+   #:with-backend/hstack
+   #:with-backend/vstack
+   #:with-backend/.relu
+   #:with-backend/.relu!
+   #:with-backend/.leaky-relu
+   #:with-backend/.leaky-relu!
+   #:with-backend/.sigmoid
+   #:with-backend/.sigmoid!
+   #:with-backend/.tanh
+   #:with-backend/.tanh!
+   #:with-backend/concat
+   #:with-backend/randn
+   #:with-backend/randn-like
+   #:with-backend/xavier
+   #:with-backend/transpose!
+   #:with-backend/transpose
+   #:with-backend/sum
+   #:with-backend/norm
+   #:with-backend/copy
+   #:with-backend/axpy!
+   #:with-backend/axpy))
    
