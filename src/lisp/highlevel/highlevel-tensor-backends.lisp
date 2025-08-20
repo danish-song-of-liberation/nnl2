@@ -27,8 +27,7 @@
     (nnl2.ffi:%set-zeros-backend sig)))  
 
 (defun use-backend/ones (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-ones-backend sig)))	
+  (use-backend/full name))
 	
 (defun use-backend/full-like (name) (use-backend/full name))	
 (defun use-backend/empty-like (name) (use-backend/empty name))	
@@ -263,7 +262,7 @@
   (uppercase-string-to-symbol (nnl2.ffi:%get-zeros-backend)))
 
 (defun get-backend/ones ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-ones-backend)))  
+  (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
   
 (defun get-backend/full ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
@@ -567,11 +566,7 @@
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
   
 (defun get-backends/ones ()
-  (let ((num-backends (nnl2.ffi:%get-ones-num-backends))
-	    (backends (nnl2.ffi:%get-ones-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
+  (get-backends/full))
     
 (defun get-backends/full-like () (get-backends/full))	
 (defun get-backends/empty-like () (get-backends/empty))	

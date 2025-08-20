@@ -481,9 +481,6 @@
 (cffi:defcfun ("set_zeros_backend" %set-zeros-backend) :void
   (backend-name :string))  
 
-(cffi:defcfun ("set_ones_backend" %set-ones-backend) :void
-  (backend-name :string))  
-
 (cffi:defcfun ("set_sgemminplace_backend" %set-sgemminplace-backend) :void
   (backend-name :string))  
 
@@ -768,8 +765,6 @@
 (cffi:defcfun ("get_zeros_backends" %get-zeros-backends) :pointer)
 (cffi:defcfun ("get_inplace_fill_num_backends" %get-inplace-fill-num-backends) :int)
 (cffi:defcfun ("get_inplace_fill_backends" %get-inplace-fill-backends) :pointer)
-(cffi:defcfun ("get_ones_num_backends" %get-ones-num-backends) :int)
-(cffi:defcfun ("get_ones_backends" %get-ones-backends) :pointer)
 (cffi:defcfun ("get_dgemminplace_num_backends" %get-gemm-num-backends) :int)
 (cffi:defcfun ("get_dgemminplace_backends" %get-gemm-backends) :pointer)
 (cffi:defcfun ("get_addinplace_num_backends" %get-addinplace-num-backends) :int)

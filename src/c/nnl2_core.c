@@ -12,7 +12,7 @@
  
 #ifdef __SSE3__ 
 #include <pmmintrin.h>   
-#endif
+#endif 
   
 #ifdef __SSSE3__
 #include <tmmintrin.h>
@@ -40,7 +40,6 @@ void init_system() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
 	EINIT_BACKEND(empty, empty_backends, current_backend(empty));
 	EINIT_BACKEND(zeros, zeros_backends, current_backend(zeros));
-	EINIT_BACKEND(ones, ones_backends, current_backend(ones));
 	INIT_BACKEND(sgemminplace, sgemminplace_backends); 
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace)); 
@@ -81,7 +80,7 @@ void init_system() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum));   
-	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm)); 
+	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));  
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
 	INIT_BACKEND(add_incf, add_incf_backends);  
@@ -126,11 +125,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
  
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return zeros(shape, rank, dtype); 
-}  	  	  
-
-Tensor* lisp_call_ones(const int* shape, int rank, TensorType dtype) {   
-	return ones(shape, rank, dtype);   
-}                        
+}  	  	          
         
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
