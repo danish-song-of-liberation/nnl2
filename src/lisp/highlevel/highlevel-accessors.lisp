@@ -219,7 +219,7 @@
 		 (tensor-rank (rank tensor))
 	     (tensor-dtype (dtype tensor))
 		 (shape (make-shape-pntr (subst -1 '* shape)))
-		 (void-ptr (nnl2.ffi:%tref tensor shape shape-rank)))	 
+		 (void-ptr (nnl2.ffi:%tref-getter tensor shape shape-rank)))	 
 		 
 	(if (= shape-rank tensor-rank)	 
 	  (case tensor-dtype

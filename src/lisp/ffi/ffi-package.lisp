@@ -32,7 +32,7 @@
    #:%.exp
    #:%.log!
    #:%.log
-   #:%tref
+   #:%tref-getter
    #:%tref-setter
    #:%scale!
    #:%scale
@@ -101,6 +101,8 @@
    #:%axpy/broadcasting
    #:%axpy
    #:%axpy!
+   #:%set-tref-getter-backend
+   #:%set-tref-setter-backend
    #:%set-abs-backend
    #:%set-abs-inplace-backend
    #:%set-inplace-fill-backend
@@ -183,6 +185,7 @@
    #:%set-axpf-backend
    #:%set-axpy-broadcasting-inplace-backend
    #:%set-axpy-broadcasting-backend
+   #:%get-tref-getter-backend
    #:%get-empty-backend
    #:%get-zeros-backend
    #:%get-inplace-fill-backend
@@ -229,6 +232,8 @@
    #:%get-copy-backend
    #:%get-axpy-inplace-backend
    #:%get-axpy-backend
+   #:%get-tref-getter-backends
+   #:%get-tref-getter-num-backends
    #:%get-empty-backends
    #:%get-empty-num-backends
    #:%get-zeros-num-backends

@@ -123,6 +123,7 @@
    #:axpy
    #:axpy!
    #:use-backend
+   #:use-backend/tref
    #:use-backend/abs
    #:use-backend/inplace-fill
    #:use-backend/+=
@@ -167,6 +168,7 @@
    #:use-backend/.tanh!
    #:use-backend/transpose
    #:use-backend/transpose!
+   #:get-backend/tref
    #:get-backend/empty
    #:get-backend/zeros
    #:get-backend/ones
@@ -220,6 +222,7 @@
    #:get-backend/copy
    #:get-backend/axpy!
    #:get-backend/axpy
+   #:get-backends/tref
    #:get-backends/empty
    #:get-backends/zeros
    #:get-backends/full
@@ -273,10 +276,15 @@
    #:get-backends/copy
    #:get-backends/axpy!
    #:get-backends/axpy
+   #:with-backend/tref
    #:with-backend/full
    #:with-backend/ones
    #:with-backend/zeros
    #:with-backend/empty
+   #:with-backend/full-like
+   #:with-backend/ones-like
+   #:with-backend/zeros-like
+   #:with-backend/empty-like
    #:with-backend/gemm
    #:with-backend/gemm!
    #:with-backend/.+

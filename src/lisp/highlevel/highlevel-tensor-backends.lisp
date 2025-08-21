@@ -5,6 +5,11 @@
 
 (defun uppercase-string-to-symbol (upstring)
   (intern (string-downcase upstring) :keyword))
+  
+(defun use-backend/tref (name)
+  (let ((sig (symbol-to-uppercase-string name)))
+    (nnl2.ffi:%set-tref-getter-backend sig)
+	(nnl2.ffi:%set-tref-setter-backend sig)))
 
 (defun use-backend/.abs (name)
   (let ((sig (symbol-to-uppercase-string name)))
@@ -215,6 +220,7 @@
     (nnl2.ffi:%set-copy-backend sig)))
 
 (defun use-backend (name)
+  (use-backend/tref name)
   (use-backend/+= name)
   (use-backend/-= name)
   (use-backend/*= name)
@@ -255,6 +261,12 @@
   (use-backend/transpose name)
   (use-backend/transpose! name))
   
+(defun get-backend/tref ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-tref-getter-backend)))      
+ 
+(defun (setf get-backend/tref) (name)
+  (use-backend/tref name))    
+ 
 (defun get-backend/empty ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-empty-backend)))    
   
@@ -556,6 +568,13 @@
 (defun (setf get-backend/axpy) (name)
   (use-backend/axpy name))
   
+(defun get-backends/tref ()
+  (let ((num-backends (nnl2.ffi:%get-tref-getter-num-backends))
+	    (backends (nnl2.ffi:%get-tref-getter-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+		  
 (defun get-backends/empty ()
   (let ((num-backends (nnl2.ffi:%get-empty-num-backends))
 	    (backends (nnl2.ffi:%get-empty-backends)))
@@ -900,7 +919,16 @@
 		
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  
+	
+(defmacro with-backend/tref (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/tref)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/tref) ,name)
+             ,@body)
+         (setf (get-backend/tref) ,old-backend-sym)))))
+	
 (defmacro with-backend/full (name &body body)
   (let ((old-backend-sym (gensym "old-backend-")))
     `(let ((,old-backend-sym (get-backend/full)))
@@ -936,6 +964,42 @@
              (setf (get-backend/ones) ,name)
              ,@body)
          (setf (get-backend/ones) ,old-backend-sym)))))		 
+
+(defmacro with-backend/full-like (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/full-like)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/full-like) ,name)
+             ,@body)
+         (setf (get-backend/full-like) ,old-backend-sym)))))
+		 
+(defmacro with-backend/empty-like (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/empty-like)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/empty-like) ,name)
+             ,@body)
+         (setf (get-backend/empty-like) ,old-backend-sym)))))		 
+
+(defmacro with-backend/zeros-like (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/zeros-like)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/zeros-like) ,name)
+             ,@body)
+         (setf (get-backend/zeros-like) ,old-backend-sym)))))
+
+(defmacro with-backend/empty-like (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/empty-like)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/empty-like) ,name)
+             ,@body)
+         (setf (get-backend/empty-like) ,old-backend-sym)))))
 		 
 (defmacro with-backend/+= (name &body body)
   (let ((old-backend-sym (gensym "old-backend-")))

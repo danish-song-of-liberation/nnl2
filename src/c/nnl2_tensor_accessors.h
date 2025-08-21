@@ -392,7 +392,7 @@ void free_tensor(Tensor* tensor) {
 	free(tensor);
 }
 
-void* at(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
+void* naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
     if (tensor == NULL) {
         fprintf(stderr, "Error (Hello from C!): Null tensor pointer\n");
         return NULL;
@@ -466,6 +466,25 @@ void* at(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
         return subtensor;
     }
 }
+
+Implementation tref_getter_backends[] = {
+	REGISTER_BACKEND(naive_tref_getter, nnl2_naive, NAIVE_BACKEND_NAME),
+};
+
+trefgetterfn tref_getter;
+
+void set_tref_getter_backend(const char* backend_name) {
+    SET_BACKEND_BY_NAME(tref_getter_backends, tref_getter, backend_name);
+}
+
+make_current_backend(tref_getter);
+
+const char* get_tref_getter_backend() {
+	return current_backend(tref_getter);
+}
+
+DEFINE_GET_BACKENDS_FUNCTION(tref_getter);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(tref_getter);
 
 void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	size_t total_elems = product(tensor->shape, tensor->rank);	
@@ -2535,7 +2554,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(log);
 
 void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);
 
-void at_set(Tensor* tensor, int* shape, int rank, void* change_with, bool is_tensor) {
+void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool is_tensor) {
     TensorType tensor_dtype = tensor->dtype;
 
     if (is_tensor) {
@@ -2592,7 +2611,7 @@ void at_set(Tensor* tensor, int* shape, int rank, void* change_with, bool is_ten
         if(shape[i] == -1) {
             for(int shape_i = 0; shape_i < tensor->shape[i]; shape_i++) {
                 shape[i] = shape_i;
-                at_set(tensor, shape, rank, change_with, is_tensor);
+                naive_tref_setter(tensor, shape, rank, change_with, is_tensor);
             }
             
             shape[i] = -1;
@@ -2604,19 +2623,19 @@ void at_set(Tensor* tensor, int* shape, int rank, void* change_with, bool is_ten
         switch(tensor_dtype) {
             case FLOAT64: {
                 double* change_elem = (double*)change_with;
-                double* elem = (double*)at(tensor, shape, rank);
+                double* elem = (double*)tref_getter(tensor, shape, rank);
                 *elem = *change_elem;
                 break;
             }
             case FLOAT32: {
                 float* change_elem = (float*)change_with;
-                float* elem = (float*)at(tensor, shape, rank);
+                float* elem = (float*)tref_getter(tensor, shape, rank);
                 *elem = *change_elem;
                 break;
             }
             case INT32: {
                 int32_t* change_elem = (int32_t*)change_with;
-                int32_t* elem = (int32_t*)at(tensor, shape, rank);
+                int32_t* elem = (int32_t*)tref_getter(tensor, shape, rank);
                 *elem = *change_elem;
                 break;
             }
@@ -2637,7 +2656,7 @@ void at_set(Tensor* tensor, int* shape, int rank, void* change_with, bool is_ten
 
         for (int i = 0; i < tensor->shape[rank]; i++) {
             subshape[rank] = i;
-            at_set(tensor, subshape, new_rank, change_with, is_tensor);
+            naive_tref_setter(tensor, subshape, new_rank, change_with, is_tensor);
         }
 
         free(subshape);
@@ -2646,8 +2665,8 @@ void at_set(Tensor* tensor, int* shape, int rank, void* change_with, bool is_ten
 
 void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank) {
     if (src_rank == src->rank) {
-        void* dest_ptr = at(dest, dest_shape, dest_rank);
-        void* src_ptr = at(src, src_shape, src_rank);
+        void* dest_ptr = tref_getter(dest, dest_shape, dest_rank);
+        void* src_ptr = tref_getter(src, src_shape, src_rank);
         
         size_t type_size;
         switch (dest->dtype) {
@@ -2673,6 +2692,16 @@ void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* 
         dest_shape[dest_rank] = src_shape[src_rank];
         tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
     }
+}
+
+Implementation tref_setter_backends[] = {
+	REGISTER_BACKEND(naive_tref_setter, nnl2_naive, NAIVE_BACKEND_NAME),
+};	
+
+trefsetterfn tref_setter;
+
+void set_tref_setter_backend(const char* backend_name) {
+    SET_BACKEND_BY_NAME(tref_setter_backends, tref_setter, backend_name);
 }
 
 void naive_scaleinplace(Tensor* tensor, float multiplier) {

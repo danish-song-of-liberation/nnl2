@@ -181,6 +181,8 @@ typedef void (*axpfinplacefn)(Tensor*, void*, float);
 typedef Tensor* (*axpffn)(const Tensor*, void*, float);
 typedef void (*axpybroadcastinginplacefn)(Tensor*, const Tensor*, float);
 typedef Tensor* (*axpybroadcastingfn)(const Tensor*, const Tensor*, float);
+typedef void* (*trefgetterfn)(Tensor*, const int32_t*, uint8_t);
+typedef void* (*trefsetterfn)(Tensor*, int*, int, void*, bool);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

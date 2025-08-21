@@ -37,6 +37,8 @@
 void init_system() {   
 	srand(time(NULL));  
 
+	EINIT_BACKEND(tref_getter, tref_getter_backends, current_backend(tref_getter));
+	INIT_BACKEND(tref_setter, tref_setter_backends);
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
 	EINIT_BACKEND(empty, empty_backends, current_backend(empty));
 	EINIT_BACKEND(zeros, zeros_backends, current_backend(zeros));
@@ -117,7 +119,15 @@ void init_system() {
 	INIT_BACKEND(axpf, axpf_backends);
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);
-}     
+}      
+
+void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
+	return tref_getter(tensor, indices, num_indices);
+}
+
+void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
+	tref_setter(tensor, shape, rank, change_with, tensor_p);
+}
   
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return empty(shape, rank, dtype);
