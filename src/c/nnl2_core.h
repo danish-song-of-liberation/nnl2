@@ -1,6 +1,9 @@
 #include <stdint.h>
-#include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
+#include <errno.h>
+#include <math.h>
+#include <time.h>
 
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H

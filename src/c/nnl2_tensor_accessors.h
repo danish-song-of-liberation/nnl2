@@ -1,4 +1,5 @@
 #include "nnl2_core.h"
+#include "nnl2_log.h"
 #include "nnl2_tensor_backend.h"
 
 #include <string.h>
@@ -8,7 +9,7 @@
 #define NNL2_TENSOR_ACCESSORS
 
 #ifdef _WIN32
-
+ 
 #include <malloc.h>
 
 #define ALLOC_ALIGNED(ptr, alignment, size) \
@@ -123,90 +124,128 @@ inline size_t product(const int* lst, int len) {
  * The function firstly:
  *
  *
- *** checks the input parameters for correctness
- ** then
- *** allocates memory for tensor structure
- ** then
- *** allocates memory for the shape array and copies the data into it
- ** then
- *** calculates the total size of the data required for the tensor
- ** then 
- *** allocates aligned memory for the tensor data (tensor->data)
- ** finally
- *** returns a pointer to the created tensor
+ *** Checks the input parameters for correctness (namely shape, rank, dtype)
+ ** Then
+ *** Allocates memory for tensor structure
+ ** Then
+ *** Allocates memory for the shape array and copies the data into it
+ ** Then
+ *** Calculates the total number of elements and checks for multiplication overflow
+ *** to prevent size_t overflow when calculating total memory size
+ ** Then 
+ *** Allocates aligned memory for the tensor data (tensor->data)
+ ** Finally
+ *** Returns a pointer to the created tensor
  *
  *
  ** @code
  * int shape[] = {2, 3, 4};
  * Tensor* my_tensor = empty(shape, 3, FLOAT32);
+ * if (my_tensor == NULL) {
+ *     // Handle error
+ * }
  ** @endcode
+ ** @note
+ * The function performs comprehensive error checking including:
+ ** - NULL pointer validation
+ ** - Parameter range validation  
+ ** - Memory allocation failure handling
+ ** - Multiplication overflow protection
+ ** - Type safety checks
+ *
  ** @warning
- * do not forget to free the memory allocated for the tensor using free_tensor after using it
+ * Do not forget to free the memory allocated for the tensor using free_tensor after using it
+ *
+ ** @see free_tensor
+ ** @see get_dtype_size
+ ** @see product
+ ** @see ALLOC_ALIGNED
+ *
+ ** @exception[out_of_memory] 
+ * If memory allocation fails for tensor structure, shape array, or data
+ *
+ ** @exception[invalid_argument]
+ * If shape is NULL, rank <= 0, invalid dtype, or any dimension <= 0
+ *
+ ** @exception[overflow_error]
+ * If the calculated total size would overflow size_t
  *
  **/
-Tensor* cpu64_empty(const int* shape, int rank, TensorType dtype) {	
-	// checks the input parameters for correctness
+Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorType dtype) {
+	#ifdef NNL2_DEBUG_MODE
+	NNL2_FUNC_ENTER();
+	#endif
+	
+	// Checks the input parameters for correctness
 	
 	if (shape == NULL) {
-        fprintf(stderr, "Error at zeros: Bad shape pointer\n");
+        NNL2_ERROR("Bad shape pointer (NULL)"); 
         return NULL;
     }	
 	
 	if (rank <= 0) {
-		fprintf(stderr, "Error at zeros: Bad rank (%d). Rank must be positive\n", rank);
+		NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
 		return NULL;
 	}
 	
 	if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
-        fprintf(stderr, "Error (Hello from C!): Bad tensor type (%d)\n", dtype);
+        NNL2_ERROR("Bad tensor type (%d)", dtype);
         return NULL;
     }
 	
 	for (int i = 0; i < rank; i++) {
         if (shape[i] <= 0) {
-            fprintf(stderr, "Error (Hello from C!): Bad shape dimension at %d (%d). Dimensions must be positive\n",  i, shape[i]);
+            NNL2_ERROR("Bad shape dimension at %d (%d). Dimensions must be positive", i, shape[i]);
             return NULL;
         }
     }
 	
-	// allocating memory for tensor structure
+	// Allocating memory for tensor structure
 
 	Tensor* tensor = malloc(sizeof(Tensor));
 	
 	if (tensor == NULL) {
-        fprintf(stderr, "Error (Hello from C!): failed to allocate memory for Tensor structure\n");
+        NNL2_ERROR("Failed to allocate memory for Tensor structure");
         return NULL;
     }
 	
 	tensor->rank = rank;
 	tensor->dtype = dtype;
 	
-	// allocates memory for the shape array and copies the data into it
+	// Allocates memory for the shape array and copies the data into it
 	
 	tensor->shape = malloc(rank * sizeof(int));
 	
 	if (tensor->shape == NULL) {
-        fprintf(stderr, "Error (Hello from C!): failed to allocate memory for shape\n");
+        NNL2_ERROR("Failed to allocate memory for shape");
         free(tensor);
         return NULL;
     }
 	
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
-	// calculates the total size of the data required for the tensor
-	
+	// Calculates the total size of the data required for the tensor
 	size_t total_elems = product(shape, rank);
 	size_t type_size = get_dtype_size(dtype);
+	
+	// Check for multiplication overflow
+	if (type_size != 0 && total_elems > SIZE_MAX / type_size) {
+		NNL2_ERROR("Tensor size too large, multiplication overflow (elems: %zu, type size: %zu)", total_elems, type_size);
+		free(tensor->shape);
+		free(tensor);
+		return NULL;
+	}
+
 	size_t total_size = total_elems * type_size;
 	
-	// allocates aligned memory for tensor data (tensor->data)
+	// Allocates aligned memory for tensor data (tensor->data)
 	
 	void* data;
 	
 	ALLOC_ALIGNED(data, (size_t)TENSOR_MEM_ALIGNMENT, total_size);
 	
 	if (data == NULL) {
-        fprintf(stderr, "Error (Hello from C!): failed to allocate aligned memory\n");
+        NNL2_ERROR("Failed to allocate aligned memory");
         free(tensor->shape);
         free(tensor);
         return NULL;
@@ -214,11 +253,16 @@ Tensor* cpu64_empty(const int* shape, int rank, TensorType dtype) {
 	
 	tensor->data = data;
 	
+	#ifdef NNL2_DEBUG_MODE
+	NNL2_DEBUG("Created tensor: %dD, size=%zu bytes", rank, total_size);
+	NNL2_FUNC_EXIT();
+	#endif
+	
 	return tensor;
 }
 
 Implementation empty_backends[] = {
-	REGISTER_BACKEND(cpu64_empty, nnl2_naive, NAIVE_BACKEND_NAME)
+	REGISTER_BACKEND(nnl2_naive_empty, nnl2_naive, NAIVE_BACKEND_NAME)
 };
 
 fn_empty empty;
@@ -2538,7 +2582,7 @@ Implementation log_backends[] = {
 	REGISTER_BACKEND(naive_log, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
-logfn nnl2_log;
+logfn nnl2_logarithm;
 make_current_backend(log);
 
 void set_log_backend(const char* backend_name) {
