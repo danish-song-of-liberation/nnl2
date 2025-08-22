@@ -42,8 +42,8 @@ void init_system() {
 	// Initialization of the logging system
 	nnl2_log_init( 
 		NNL2_LOG_DEFAULT_COLOR,
-		NNL2_LOG_DEFAULT_TIMESTAMPS,      
-		NNL2_LOG_DEFAULT_DEBUG_INFO, 
+		NNL2_LOG_DEFAULT_TIMESTAMPS,       
+		NNL2_LOG_DEFAULT_DEBUG_INFO,    
 		NNL2_LOG_LEVEL_DEBUG
 	); 
  

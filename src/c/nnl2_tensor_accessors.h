@@ -1,6 +1,7 @@
 #include "nnl2_core.h"
 #include "nnl2_log.h"
 #include "nnl2_tensor_backend.h"
+#include "nnl2_backend_system_docs.h"
 
 #include <string.h>
 #include <math.h>
@@ -50,13 +51,49 @@
 #include <cblas.h>
 #endif
 
-#define current_backend(name) current_##name##_backend_name
+/// @{
+
+/** @brief
+ * I had to delete all these macros after a certain period of time. 
+ * if you see this, it means that I forgot, please let me know
+ */
+#define current_backend(name) current_##name##_backend_name 
 #define make_current_backend(name) static char current_##name##_backend_name[MAX_BACKEND_NAME_LENGTH] = ""
+
+/// @}
+	
+#define CURRENT_BACKEND(name) current_##name##_backend_name 
+#define MAKE_CURRENT_BACKEND(name) static char current_##name##_backend_name[MAX_BACKEND_NAME_LENGTH] = ""
 
 #define NAIVE_BACKEND_NAME "NAIVE"
 #define AVX128_BACKEND_NAME "AVX128"
 #define AVX256_BACKEND_NAME "AVX256"
 #define BLAS_BACKEND_NAME "BLAS"
+
+// NNL2
+
+/** @file nnl2_tensor_accessors.h
+ ** @brief Contains all operations for accessing tensors of type tref
+ ** @copyright MIT License
+ *
+ * The file fully includes tensor accessors, 
+ * i.e. tref getters and setters, as well as 
+ * some additional functions
+ *
+ ** Filepath: nnl2/src/c/nnl2_tensor_accessors.h
+ ** File: nnl2_tensor_accessors.h
+ **
+ ** The file contains tensor accessories
+ **
+ ** Note:
+ **   You can find many backend declarations in 
+ **   the code, and you can view their full 
+ **   documentation in the nnl2_backend_system_docs.h 
+ **   file (in the same directory).
+ **
+ ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+ ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2		
+ **/
 
 /** @brief
  * Returns the size of the TensorType data type in bytes
@@ -261,23 +298,58 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	return tensor;
 }
 
+/** @ingroup backend_system
+ ** @brief Backend implementations for empty tensor creation.
+ **
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - nnl2_naive_empty: Basic reference implementation
+ **/
 Implementation empty_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_empty, nnl2_naive, NAIVE_BACKEND_NAME)
 };
 
+/**
+ * @brief Function pointer for the active empty() backend. 
+ * @ingroup backend_system 
+ */
 fn_empty empty;
 
+/** 
+ * @brief Sets the backend for empty tensor creation.
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate.
+ */
 void set_empty_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(empty_backends, empty, backend_name);
 }
 
-make_current_backend(empty);
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ */
+MAKE_CURRENT_BACKEND(empty);
 
+/** 
+ * @brief Gets the name of the active backend for empty().
+ * @ingroup backend_system
+ * @return Name of the current backend.
+ */
 const char* get_empty_backend() {
-	return current_backend(empty);
+	return CURRENT_BACKEND(empty);
 }
 
+/** 
+ * @brief Function declaration for getting all empty available backends
+ * @ingroup backend_system
+ */
 DEFINE_GET_BACKENDS_FUNCTION(empty);
+
+/**
+ * @brief Function declaration for getting the number of all empty backends
+ * @ingroup backend_system
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(empty);
 
 /** @brief

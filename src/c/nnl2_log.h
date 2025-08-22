@@ -336,6 +336,12 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
 
     va_list args;
     va_start(args, format);
+	
+	if (nnl2_log_current_config.enable_color) {
+        fprintf(stderr, "%s[nnl2] ", level_colors[level]);
+    } else {
+        fprintf(stderr, "[nnl2] ");
+    }
 
     // Prefix output
     if (nnl2_log_current_config.enable_timestamps) {
