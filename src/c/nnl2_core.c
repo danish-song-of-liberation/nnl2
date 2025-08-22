@@ -86,7 +86,7 @@ void init_system() {
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(tanhinplace, tanhinplace_backends, current_backend(tanhinplace)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
-	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat)); 
+	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));   
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn)); 
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier)); 
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
@@ -476,4 +476,4 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
 }		
-		        
+		            

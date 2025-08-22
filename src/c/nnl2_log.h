@@ -161,13 +161,13 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
  * @brief Log function entry (debug level)
  * @note Automatically captures function name using __func__
  */
-#define NNL2_FUNC_ENTER() NNL2_DEBUG("Function %s() entered", __func__)
+#define NNL2_FUNC_ENTER() NNL2_DEBUG("-> Function %s() entered", __func__)
 
 /** 
  * @brief Log function exit (debug level)
  * @note Automatically captures function name using __func__
  */
-#define NNL2_FUNC_EXIT()  NNL2_DEBUG("Function %s() exited", __func__)
+#define NNL2_FUNC_EXIT()  NNL2_DEBUG("<- Function %s() exited", __func__)
 
 /// @}
 

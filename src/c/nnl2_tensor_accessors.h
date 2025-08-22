@@ -665,15 +665,67 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(zeros);
  * A pointer to a tensor whose memory needs to be freed. If tensor is null, the function does nothing.
  *
  ** @note
- * After calling this function tensor pointer becomes invalid. Do not attempt to access the tensor after it has been freed (although you'll try it anyway, you idiot).
+ * After calling this function tensor pointer becomes invalid. 
+ * Do not attempt to access the tensor after it has been freed (although you'll try it anyway, you idiot).
  *
- */
-void free_tensor(Tensor* tensor) {
-	if (tensor == NULL) return;
+ ** @note 
+ * Additional checks are added depending on the debug level
+ *
+ ** @see FREE_ALIGNED
+ **/
+void nnl2_free_tensor(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_ENTER();
+	#endif
 	
-	free(tensor->shape); 
-	FREE_ALIGNED(tensor->data); 
+	if (tensor == NULL) {
+		NNL2_ERROR("Invalid data (NULL) was passed to the tensor release");
+		return;
+	}
+	
+	// Additional checks
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		if (tensor->rank < 0) {
+			NNL2_WARN("Invalid tensor rank: %d", tensor->rank);
+		}
+		
+		if (tensor->shape == NULL && tensor->rank > 0) {
+			NNL2_WARN("NULL shape array with rank %d", tensor->rank);
+		}
+	#endif
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_DEBUG("Freeing tensor [%p] (rank: %d)", (void*)tensor, tensor->rank);
+    #endif
+	
+	#if NNL2_DEBUG_MODE == NNL2_DEBUG_MODE_OFF
+		free(tensor->shape); 
+		FREE_ALIGNED(tensor->data);
+	#else
+		// Safe freeing
+		if (tensor->shape != NULL) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+				NNL2_DEBUG("Freeing shape array [%p]", (void*)tensor->shape);
+			#endif
+			
+			free(tensor->shape);
+		}
+    
+		if (tensor->data != NULL) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+				NNL2_DEBUG("Freeing data [%p]", (void*)tensor->data);
+			#endif
+			
+			FREE_ALIGNED(tensor->data);
+		}
+	#endif
+	
 	free(tensor);
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
 void* naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
@@ -904,7 +956,7 @@ Tensor* ones(const int* shape, int rank, TensorType dtype) {
         
         default: {
             fprintf(stderr, "Error (Hello from C!): Unknown data type");
-            free_tensor(tensor_t);  
+            nnl2_free_tensor(tensor_t);  
             return NULL;
         }
     }
@@ -2432,7 +2484,7 @@ Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
             for (size_t i = 0; i < len; i++) {
                 if (data_divisor[i] == 0.0f) {
                     fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
-                    free_tensor(quotient);
+                    nnl2_free_tensor(quotient);
                     return NULL;
                 }
 				
@@ -2461,7 +2513,7 @@ Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
         
         default: {
             fprintf(stderr, "Error (Hello from C!): Bad data type (div)\n");
-            free_tensor(quotient);
+            nnl2_free_tensor(quotient);
             return NULL;
         }
     }
@@ -3937,7 +3989,7 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {
 			}
 			
 			if(float64_conversion) {
-				free_tensor(result);
+				nnl2_free_tensor(result);
 				
 				result = empty(tensor->shape, tensor->rank, FLOAT64);
 				data_r = result->data;

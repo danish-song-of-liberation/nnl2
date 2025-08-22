@@ -430,7 +430,7 @@
 (cffi:defcfun ("lisp_call_copy" %copy) :pointer
   (tensor :pointer))  
   
-(cffi:defcfun ("free_tensor" free-tensor) :void
+(cffi:defcfun ("nnl2_free_tensor" free-tensor) :void
   (tensor :pointer))     
   
 (cffi:defcfun ("print_tensor" print-tensor) :void
