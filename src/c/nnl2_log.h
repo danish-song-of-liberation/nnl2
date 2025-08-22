@@ -4,50 +4,134 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
 #include <time.h>
 
-// ANSI Colors
-#define NNL2_COLOR_RESET   "\x1b[0m"
-#define NNL2_COLOR_DEBUG   "\x1b[36m"  // Cyan
-#define NNL2_COLOR_INFO    "\x1b[32m"  // Green
-#define NNL2_COLOR_WARNING "\x1b[33m"  // Yellow
-#define NNL2_COLOR_ERROR   "\x1b[31m"  // Red
-#define NNL2_COLOR_FATAL   "\x1b[35m"  // Magenta
+// NNL2
 
-// Text constants
-#define NNL2_LOG_PREFIX_DEBUG   "DEBUG"
-#define NNL2_LOG_PREFIX_INFO    "INFO"
-#define NNL2_LOG_PREFIX_WARNING "WARN"
-#define NNL2_LOG_PREFIX_ERROR   "ERROR"
-#define NNL2_LOG_PREFIX_FATAL   "FATAL"
+/** @file nnl2_log.h
+ ** @brief Full implementation of the logging system
+ ** @copyright MIT License
+ ** @defgroup logging Logging System
+ *
+ * File provides a simple yet powerful logging system
+ * with colored terminal output, support for timestamps, and
+ * automatic handling of system errors (errno)
+ *
+ ** Filepath: nnl2/src/c/nnl2_log.h
+ ** File: nnl2_log.h
+ **
+ ** The file contains the implementation of the logging system
+ **
+ ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+ ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+ **
+ ** @code
+ * int main() {
+ *     // Initialization of the logging system
+ *     nnl2_log_init( 
+ *	       NNL2_LOG_DEFAULT_COLOR,
+ *	       NNL2_LOG_DEFAULT_TIMESTAMPS,     
+ *	       NNL2_LOG_DEFAULT_DEBUG_INFO,
+ *	       NNL2_LOG_DEFAULT_MIN_LEVEL // or NNL2_LOG_LEVEL_DEBUG
+ *     );
+ *    
+ *     // You can also write nnl2_init_system() which 
+ *     // automatically initializes the logging system
+ *	   // (instead of nnl2_log_init(NNL2_ ...) you can 
+ *	   //  use nnl2_init_system())
+ *
+ *     int32_t qux = 123; // Placeholder
+ *
+ *     NNL2_INFO("Application started");
+ *     NNL2_DEBUG("Value of qux: %d", qux); // You need to set the debug mode by passing the -DNNL2_DEBUG_MODE flag
+ *	   NNL2_LOG_ERROR("Failed to open file");
+ *     
+ *     return 0;
+ * }
+ ** @endcode
+ **
+ **/
 
-#define NNL2_LOG_TIMESTAMP_FORMAT "%H:%M:%S"
-#define NNL2_LOG_TIMESTAMP_SIZE   20
+/// @defgroup colors ANSI Colors Constants
+/// @{
+	
+#define NNL2_COLOR_RESET   "\x1b[0m"   ///< Reset all formatting and colors
+#define NNL2_COLOR_DEBUG   "\x1b[36m"  ///< Cyan - debug messages
+#define NNL2_COLOR_INFO    "\x1b[32m"  ///< Green - informational message
+#define NNL2_COLOR_WARNING "\x1b[33m"  ///< Yellow - warning messages
+#define NNL2_COLOR_ERROR   "\x1b[31m"  ///< Red - error messages
+#define NNL2_COLOR_FATAL   "\x1b[35m"  ///< Magenta - fatal error messages
 
-#define NNL2_LOG_SYSTEM_ERROR_PREFIX " (system error "
-#define NNL2_LOG_SYSTEM_ERROR_SUFFIX ": "
-#define NNL2_LOG_SYSTEM_ERROR_END    ")"
+/// @}
 
-// Logging levels
+/// @defgroup prefixes Log Prefix Constants
+/// @{
+
+#define NNL2_LOG_PREFIX_DEBUG   "DEBUG"   ///< Debug level prefix
+#define NNL2_LOG_PREFIX_INFO    "INFO"    ///< Info level prefix
+#define NNL2_LOG_PREFIX_WARNING "WARN"    ///< Warning level prefix
+#define NNL2_LOG_PREFIX_ERROR   "ERROR"   ///< Error level prefix
+#define NNL2_LOG_PREFIX_FATAL   "FATAL"   ///< Fatal level prefix
+
+/// @}
+
+/// @defgroup formatting Formatting Constants  
+/// @{
+
+#define NNL2_LOG_TIMESTAMP_FORMAT "%H:%M:%S"  ///< Time format for timestamps
+#define NNL2_LOG_TIMESTAMP_SIZE   20          ///< Buffer size for timestamp
+
+#define NNL2_LOG_SYSTEM_ERROR_PREFIX " (system error "  ///< System error prefix
+#define NNL2_LOG_SYSTEM_ERROR_SUFFIX ": "               ///< System error separator
+#define NNL2_LOG_SYSTEM_ERROR_END    ")"                ///< System error suffix
+
+/// @}
+
+/// @defgroup defaults Default Configuration Values
+/// @{
+
+#define NNL2_LOG_DEFAULT_COLOR        1    ///< Enable colors by default
+#define NNL2_LOG_DEFAULT_TIMESTAMPS   1    ///< Enable timestamps by default
+#define NNL2_LOG_DEFAULT_DEBUG_INFO   0    ///< Disable debug info by default
+#define NNL2_LOG_DEFAULT_MIN_LEVEL    NNL2_LOG_LEVEL_INFO  ///< Default min level
+
+/// @}
+
+/**
+ * @brief Log level enumeration
+ * @ingroup logging
+ */
 typedef enum {
-    NNL2_LOG_LEVEL_DEBUG,
-    NNL2_LOG_LEVEL_INFO,
-    NNL2_LOG_LEVEL_WARNING,
-    NNL2_LOG_LEVEL_ERROR,
-    NNL2_LOG_LEVEL_FATAL
+    NNL2_LOG_LEVEL_DEBUG,    ///< Debug messages - detailed development information
+    NNL2_LOG_LEVEL_INFO,     ///< Informational messages - normal operation
+    NNL2_LOG_LEVEL_WARNING,  ///< Warning messages - potential issues
+    NNL2_LOG_LEVEL_ERROR,    ///< Error messages - operation failures
+    NNL2_LOG_LEVEL_FATAL     ///< Fatal messages - critical errors causing shutdown
 } nnl2_log_level_t;
 
-// Configuration Structure
+/**
+ * @brief Logging configuration structure
+ * @ingroup logging
+ */
 typedef struct {
-    int enable_color;
-    int enable_timestamps;
-    int enable_debug_info;
-    nnl2_log_level_t min_log_level; 
+    int enable_color;               ///< Enable colored output (0/1)
+    int enable_timestamps;          ///< Enable timestamp display (0/1)
+    int enable_debug_info;          ///< Enable debug information (file/line) (0/1)
+    nnl2_log_level_t min_log_level; ///< Minimum log level to display
 } nnl2_log_config_t;
 
-// Global variables
+/** 
+ * @brief Global logging configuration
+ * @ingroup logging
+ * @note This variable should be accessed through configuration functions
+ * @see nnl2_log_set_color()
+ * @see nnl2_log_set_timestamps()
+ * @see nnl2_log_set_debug_info()
+ * @see nnl2_log_set_min_level()
+ */
 extern nnl2_log_config_t nnl2_log_current_config;
 
 // Configuration Functions
@@ -61,22 +145,31 @@ void nnl2_log_get_config(nnl2_log_config_t* out_config);
 // Main logging function
 void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* func, const char* format, ...);
 
-// Macros for logging
-#define NNL2_LOG(level, ...) nnl2_log(level, __FILE__, __LINE__, __func__, __VA_ARGS__)
+/// @name Logging Macros
+/// @brief Convenience macros for different log levels
+/// @{
+	
+/// @brief Generic log macro with auto file/line/function capture	
+#define NNL2_LOG(level, ...) nnl2_log(level, __FILE__, __LINE__, __func__, __VA_ARGS__) 
 #define NNL2_DEBUG(...)      NNL2_LOG(NNL2_LOG_LEVEL_DEBUG, __VA_ARGS__)
 #define NNL2_INFO(...)       NNL2_LOG(NNL2_LOG_LEVEL_INFO, __VA_ARGS__)
 #define NNL2_WARN(...)       NNL2_LOG(NNL2_LOG_LEVEL_WARNING, __VA_ARGS__)
 #define NNL2_ERROR(...)      NNL2_LOG(NNL2_LOG_LEVEL_ERROR, __VA_ARGS__)
 #define NNL2_FATAL(...)      NNL2_LOG(NNL2_LOG_LEVEL_FATAL, __VA_ARGS__)
 
-// Standard parameters for initialization
-#define NNL2_LOG_DEFAULT_COLOR        1
-#define NNL2_LOG_DEFAULT_TIMESTAMPS   1
-#define NNL2_LOG_DEFAULT_DEBUG_INFO   1
-#define NNL2_LOG_DEFAULT_MIN_LEVEL    NNL2_LOG_LEVEL_INFO
-
+/** 
+ * @brief Log function entry (debug level)
+ * @note Automatically captures function name using __func__
+ */
 #define NNL2_FUNC_ENTER() NNL2_DEBUG("Function %s() entered", __func__)
+
+/** 
+ * @brief Log function exit (debug level)
+ * @note Automatically captures function name using __func__
+ */
 #define NNL2_FUNC_EXIT()  NNL2_DEBUG("Function %s() exited", __func__)
+
+/// @}
 
 // --------------- Realization ---------------
 
@@ -90,41 +183,122 @@ nnl2_log_config_t nnl2_log_current_config = {
 
 // Configuration functions
 
-void nnl2_log_init(int enable_color, int enable_timestamps, int enable_debug_info, nnl2_log_level_t min_log_level) {
+/// @brief Initialize logging system with custom settings
+void nnl2_log_init(int enable_color, int enable_timestamps, 
+				   int enable_debug_info, nnl2_log_level_t min_log_level) {
     nnl2_log_current_config.enable_color = enable_color;
     nnl2_log_current_config.enable_timestamps = enable_timestamps;
     nnl2_log_current_config.enable_debug_info = enable_debug_info;
     nnl2_log_current_config.min_log_level = min_log_level;
 }
 
+/// @brief Enable/disable colored output
 void nnl2_log_set_color(int enabled) {
     nnl2_log_current_config.enable_color = enabled;
 }
 
+/// @brief Enable/disable timestamp display  
 void nnl2_log_set_timestamps(int enabled) {
     nnl2_log_current_config.enable_timestamps = enabled;
 }
 
+/// @brief Enable/disable debug info (file/line)
 void nnl2_log_set_debug_info(int enabled) {
     nnl2_log_current_config.enable_debug_info = enabled;
 }
 
+/// @brief Set minimum log level to display
 void nnl2_log_set_min_level(nnl2_log_level_t min_level) {
     if (min_level >= NNL2_LOG_LEVEL_DEBUG && min_level <= NNL2_LOG_LEVEL_FATAL) {
         nnl2_log_current_config.min_log_level = min_level;
     }
 }
 
+/// @brief Get current logging configuration
 void nnl2_log_get_config(nnl2_log_config_t* out_config) {
     if (out_config != NULL) {
         *out_config = nnl2_log_current_config;
     }
 }	
 
-// Main logging function
+/** @brief
+ * The main logging function of the nnl2 system
+ *
+ ** @details 
+ * Function performs formatted output of log messages with 
+ * support for color formatting via ANSI escape codes, time stamps 
+ * with a custom format, information about the source file, line, 
+ * and function, automatic handling of system errors (errno), and filtering 
+ * by logging levels
+ *
+ **
+ ** @param level
+ * Message importance level (from nnl2_log_level_t)
+ *
+ ** @param file 
+ * Name of the source file (usually __FILE__)
+ *
+ ** @param line
+ * Line number in the source file (usually __LINE__)
+ *
+ ** @param func
+ * Function name (usually __func__)
+ *
+ ** @param format 
+ * Printf-style format string
+ *
+ ** @param ...
+ * Variable arguments for formatting
+ *
+ **
+ ** @note
+ * The function automatically saves and restores the errno value
+ *
+ ** @note
+ * Messages are filtered according to nnl2_log_current_config.min_log_level
+ *
+ ** @note
+ * For system errors, a description is automatically added from strerror()
+ *
+ **
+ ** @warning
+ * Do not call directly - use the macros NNL2_LOG(), NNL2_DEBUG(), etc.
+ *
+ **
+ ** @par Example:
+ ** @code
+ * // Instead of a direct call:
+ * // nnl2_log(NNL2_LOG_LEVEL_ERROR, "file.c", 42, "main", "Error: %s", "message");
+ *
+ * // Use macros:
+ * NNL2_ERROR("Error: %s", "message");
+ ** @endcode
+ **
+ ** @see nnl2_log_config_t
+ ** @see nnl2_log_level_t
+ ** @see NNL2_LOG()
+ ** @see NNL2_DEBUG()
+ ** @see NNL2_INFO()
+ ** @see NNL2_WARN()
+ ** @see NNL2_ERROR()
+ ** @see NNL2_FATAL()
+ **
+ ** @ingroup logging
+ **/
 void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* func, const char* format, ...) {
-    // Checking the logging level
+    // Checking the logging level	
     if (level < nnl2_log_current_config.min_log_level) {
+        return;
+    }
+	
+	if (format == NULL) {
+        fprintf(stderr, "[nnl2] [ERROR]: Null format string passed to nnl2_log\n");
+        return;
+    }
+	
+	// Checking the correctness of the logging level
+	if (level < NNL2_LOG_LEVEL_DEBUG || level > NNL2_LOG_LEVEL_FATAL) {
+        fprintf(stderr, "[nnl2] [ERROR]: Invalid log level: %d\n", level);
         return;
     }
 

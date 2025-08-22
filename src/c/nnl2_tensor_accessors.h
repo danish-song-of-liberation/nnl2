@@ -325,7 +325,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(empty);
  * do not forget to free the memory allocated for the tensor using free_tensor after using it
  *
  **/
-Tensor* cpu64_zeros(const int* shape, int rank, TensorType dtype) {
+Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 	// checks the input parameters for correctness
 	
 	if (shape == NULL) {
@@ -400,7 +400,7 @@ Tensor* cpu64_zeros(const int* shape, int rank, TensorType dtype) {
 }
 
 Implementation zeros_backends[] = {
-	REGISTER_BACKEND(cpu64_zeros, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_zeros, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
 fn_zeros zeros;
