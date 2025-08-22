@@ -78,7 +78,7 @@ void init_system() {
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));  
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack)); 
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
-	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));  
+	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));       
 	EINIT_BACKEND(relu, relu_backends, current_backend(relu));    
 	EINIT_BACKEND(leakyreluinplace, leakyreluinplace_backends, current_backend(leakyreluinplace));  
 	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));  
