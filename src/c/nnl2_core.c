@@ -43,15 +43,15 @@ void init_system() {
 	nnl2_log_init( 
 		NNL2_LOG_DEFAULT_COLOR,
 		NNL2_LOG_DEFAULT_TIMESTAMPS,          
-		NNL2_LOG_DEFAULT_DEBUG_INFO,    
+		NNL2_LOG_DEFAULT_DEBUG_INFO,     
 		NNL2_LOG_LEVEL_DEBUG
 	); 
       
 	EINIT_BACKEND(tref_getter, tref_getter_backends, current_backend(tref_getter));
 	INIT_BACKEND(tref_setter, tref_setter_backends);
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
-	EINIT_BACKEND(empty, empty_backends, CURRENT_BACKEND(empty));   
-	EINIT_BACKEND(zeros, zeros_backends, CURRENT_BACKEND(zeros));   
+	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
+	EINIT_BACKEND(nnl2_zeros, nnl2_zeros_backends, CURRENT_BACKEND(nnl2_zeros));   
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
@@ -140,11 +140,11 @@ void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_wi
 }
   
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
-	return empty(shape, rank, dtype);
-}
+	return nnl2_empty(shape, rank, dtype);
+} 
  
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
-	return zeros(shape, rank, dtype); 
+	return nnl2_zeros(shape, rank, dtype); 
 }  	  	          
         
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {

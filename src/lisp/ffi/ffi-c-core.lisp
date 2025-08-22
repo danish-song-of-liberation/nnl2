@@ -481,10 +481,10 @@
 (cffi:defcfun ("set_inplace_fill_backend" %set-inplace-fill-backend) :void
   (backend-name :string))  
 
-(cffi:defcfun ("set_empty_backend" %set-empty-backend) :void
+(cffi:defcfun ("nnl2_set_empty_backend" %set-empty-backend) :void
   (backend-name :string))  
 
-(cffi:defcfun ("set_zeros_backend" %set-zeros-backend) :void
+(cffi:defcfun ("nnl2_set_zeros_backend" %set-zeros-backend) :void
   (backend-name :string))  
 
 (cffi:defcfun ("set_sgemminplace_backend" %set-sgemminplace-backend) :void
@@ -719,8 +719,8 @@
   (backend-name :string)) 
   
 (cffi:defcfun ("get_tref_getter_backend" %get-tref-getter-backend) :string)    
-(cffi:defcfun ("get_empty_backend" %get-empty-backend) :string)  
-(cffi:defcfun ("get_zeros_backend" %get-zeros-backend) :string)
+(cffi:defcfun ("nnl2_get_empty_backend" %get-empty-backend) :string)  
+(cffi:defcfun ("nnl2_get_zeros_backend" %get-zeros-backend) :string)
 (cffi:defcfun ("get_inplace_fill_backend" %get-inplace-fill-backend) :string)
 (cffi:defcfun ("get_gemm_backend" %get-gemm-backend) :string)
 (cffi:defcfun ("get_addinplace_backend" %get-addinplace-backend) :string)
@@ -768,10 +768,10 @@
 
 (cffi:defcfun ("get_tref_getter_num_backends" %get-tref-getter-num-backends) :int)
 (cffi:defcfun ("get_tref_getter_backends" %get-tref-getter-backends) :pointer)
-(cffi:defcfun ("get_empty_num_backends" %get-empty-num-backends) :int)
-(cffi:defcfun ("get_empty_backends" %get-empty-backends) :pointer)
-(cffi:defcfun ("get_zeros_num_backends" %get-zeros-num-backends) :int)
-(cffi:defcfun ("get_zeros_backends" %get-zeros-backends) :pointer)
+(cffi:defcfun ("get_nnl2_empty_num_backends" %get-empty-num-backends) :int)
+(cffi:defcfun ("get_nnl2_empty_backends" %get-empty-backends) :pointer)
+(cffi:defcfun ("get_nnl2_zeros_num_backends" %get-zeros-num-backends) :int)
+(cffi:defcfun ("get_nnl2_zeros_backends" %get-zeros-backends) :pointer)
 (cffi:defcfun ("get_inplace_fill_num_backends" %get-inplace-fill-num-backends) :int)
 (cffi:defcfun ("get_inplace_fill_backends" %get-inplace-fill-backends) :pointer)
 (cffi:defcfun ("get_dgemminplace_num_backends" %get-gemm-num-backends) :int)

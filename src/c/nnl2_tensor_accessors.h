@@ -155,7 +155,7 @@ inline size_t get_dtype_size(TensorType dtype) {
  ** @see NNL2_FORCE_INLINE
  **
  */
-NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) {
+NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rename from product to nnl2_product
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();	
 		int32_t original_len = len;
@@ -240,7 +240,7 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) {
  *
  ** @code
  * int shape[] = {2, 3, 4};
- * Tensor* my_tensor = empty(shape, 3, FLOAT32);
+ * Tensor* my_tensor = nnl2_empty(shape, 3, FLOAT32);
  * if (my_tensor == NULL) {
  *     // Handle error
  * }
@@ -376,7 +376,7 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
  ** @see nnl2_naive_empty
  ** @see nnl2_naive
  **/
-Implementation empty_backends[] = {
+Implementation nnl2_empty_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_empty, nnl2_naive, NAIVE_BACKEND_NAME)
 };
 
@@ -384,7 +384,7 @@ Implementation empty_backends[] = {
  * @brief Function pointer for the active empty() backend
  * @ingroup backend_system 
  */
-fn_empty empty;
+fn_empty nnl2_empty;
 
 /** 
  * @brief Sets the backend for empty tensor creation
@@ -392,8 +392,8 @@ fn_empty empty;
  * @param backend_name Name of the backend to activate
  * @see SET_BACKEND_BY_NAME
  */
-void set_empty_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(empty_backends, empty, backend_name);
+void nnl2_set_empty_backend(const char* backend_name) {
+    SET_BACKEND_BY_NAME(nnl2_empty_backends, nnl2_empty, backend_name);
 }
 
 /** 
@@ -401,15 +401,15 @@ void set_empty_backend(const char* backend_name) {
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-MAKE_CURRENT_BACKEND(empty);
+MAKE_CURRENT_BACKEND(nnl2_empty);
 
 /** 
  * @brief Gets the name of the active backend for empty()
  * @ingroup backend_system
  * @return Name of the current backend
  */
-const char* get_empty_backend() {
-	return CURRENT_BACKEND(empty);
+const char* nnl2_get_empty_backend() {
+	return CURRENT_BACKEND(nnl2_empty);
 }
 
 /** 
@@ -417,14 +417,14 @@ const char* get_empty_backend() {
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
-DEFINE_GET_BACKENDS_FUNCTION(empty);
+DEFINE_GET_BACKENDS_FUNCTION(nnl2_empty);
 
 /**
  * @brief Function declaration for getting the number of all `empty` backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
-DEFINE_GET_NUMS_BACKENDS_FUNCTION(empty);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
 
 /** @brief
  * Creates a new tensor and initializes all elements to zero
@@ -608,7 +608,7 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
  ** @see nnl2_naive_empty
  ** @see nnl2_naive
  **/
-Implementation zeros_backends[] = {
+Implementation nnl2_zeros_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_zeros, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
@@ -616,7 +616,7 @@ Implementation zeros_backends[] = {
  * @brief Function pointer for the active zeros() backend 
  * @ingroup backend_system 
  */
-fn_zeros zeros;
+fn_zeros nnl2_zeros;
 
 /** 
  * @brief Sets the backend for zeros tensor creation
@@ -625,7 +625,7 @@ fn_zeros zeros;
  * @see SET_BACKEND_BY_NAME
  */
 void set_zeros_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(zeros_backends, zeros, backend_name);
+    SET_BACKEND_BY_NAME(nnl2_zeros_backends, nnl2_zeros, backend_name);
 }
 
 /** 
@@ -633,15 +633,15 @@ void set_zeros_backend(const char* backend_name) {
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-MAKE_CURRENT_BACKEND(zeros);
+MAKE_CURRENT_BACKEND(nnl2_zeros);
 
 /** 
  * @brief Gets the name of the active backend for zeros()
  * @ingroup backend_system
  * @return Name of the current backend
  */
-const char* get_zeros_backend() {
-	return CURRENT_BACKEND(zeros);
+const char* nnl2_get_zeros_backend() {
+	return CURRENT_BACKEND(nnl2_zeros);
 }
 
 /** 
@@ -649,14 +649,14 @@ const char* get_zeros_backend() {
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
-DEFINE_GET_BACKENDS_FUNCTION(zeros);
+DEFINE_GET_BACKENDS_FUNCTION(nnl2_zeros);
 
 /**
  * @brief Function declaration for getting the number of all `zeros` backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
-DEFINE_GET_NUMS_BACKENDS_FUNCTION(zeros);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_zeros);
 
 /** @brief
  * Frees the memory allocated for the tensor.
@@ -728,7 +728,7 @@ void nnl2_free_tensor(Tensor* tensor) {
 	#endif
 }
 
-void* naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
+void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
     if (tensor == NULL) {
         fprintf(stderr, "Error (Hello from C!): Null tensor pointer\n");
         return NULL;
@@ -804,7 +804,7 @@ void* naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indi
 }
 
 Implementation tref_getter_backends[] = {
-	REGISTER_BACKEND(naive_tref_getter, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_tref_getter, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
 trefgetterfn tref_getter;
@@ -926,14 +926,14 @@ void set_inplace_fill_backend(const char* backend_name) {
 make_current_backend(inplace_fill);
 
 const char* get_inplace_fill_backend() {
-	return current_backend(empty);
+	return current_backend(inplace_fill);
 }
 
 DEFINE_GET_BACKENDS_FUNCTION(inplace_fill);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
 
 Tensor* ones(const int* shape, int rank, TensorType dtype) {
-    Tensor* tensor_t = empty(shape, rank, dtype);
+    Tensor* tensor_t = nnl2_empty(shape, rank, dtype);
 
     switch(dtype) {
         case INT32: {
@@ -965,7 +965,7 @@ Tensor* ones(const int* shape, int rank, TensorType dtype) {
 }
 
 Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
-	Tensor* tensor_t = empty(shape, rank, dtype);
+	Tensor* tensor_t = nnl2_empty(shape, rank, dtype);
 	inplace_fill(tensor_t, filler, dtype);
 	return tensor_t;
 }
@@ -1891,7 +1891,7 @@ Tensor* naive_add(const Tensor* summand, const Tensor* addend) {
 		return NULL;
 	}
 	
-	Tensor* amount = zeros(summand->shape, summand->rank, dtype_summand);
+	Tensor* amount = nnl2_zeros(summand->shape, summand->rank, dtype_summand);
 	
 	switch(dtype_summand) {
 		case FLOAT64: {
@@ -1951,7 +1951,7 @@ Tensor* avx_add(const Tensor* summand, const Tensor* addend) {
         return NULL;
     }
     
-    Tensor* sum = zeros(summand->shape, summand->rank, dtype_summand);
+    Tensor* sum = nnl2_zeros(summand->shape, summand->rank, dtype_summand);
     
     switch(dtype_summand) {
         case FLOAT64: {
@@ -2065,7 +2065,7 @@ Tensor* naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
 		return NULL;
 	}
 	
-	Tensor* difference = zeros(minuend->shape, minuend->rank, dtype_minuend);
+	Tensor* difference = nnl2_zeros(minuend->shape, minuend->rank, dtype_minuend);
 	
 	switch(dtype_minuend) {
 		case FLOAT64: {
@@ -2125,7 +2125,7 @@ Tensor* avx_sub(const Tensor* minuend, const Tensor* subtrahend) {
         return NULL;
     }
     
-    Tensor* difference = zeros(minuend->shape, minuend->rank, dtype_minuend);
+    Tensor* difference = nnl2_zeros(minuend->shape, minuend->rank, dtype_minuend);
     
     switch(dtype_minuend) {
         case FLOAT64: {
@@ -2379,7 +2379,7 @@ Tensor* naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
         return NULL;
     }
     
-    Tensor* product = zeros(multiplicand->shape, multiplicand->rank, dtype_multiplicand);
+    Tensor* product = nnl2_zeros(multiplicand->shape, multiplicand->rank, dtype_multiplicand);
     
     switch(dtype_multiplicand) {
         case FLOAT64: {
@@ -2456,7 +2456,7 @@ Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
         return NULL;
     }
     
-    Tensor* quotient = zeros(dividend->shape, dividend->rank, dtype_dividend);
+    Tensor* quotient = nnl2_zeros(dividend->shape, dividend->rank, dtype_dividend);
     
     switch (dtype_dividend) {
         case FLOAT64: {
@@ -2620,7 +2620,7 @@ Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
         return NULL;
     }
     
-    Tensor* result = zeros(base->shape, base->rank, dtype_base);
+    Tensor* result = nnl2_zeros(base->shape, base->rank, dtype_base);
     
     switch(dtype_base) {
         case FLOAT64: {
@@ -2736,7 +2736,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(expinplace);
 Tensor* naive_exp(const Tensor* tensor) {
 	size_t len = product(tensor->shape, tensor->rank);
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -2837,7 +2837,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(loginplace);
 Tensor* naive_log(const Tensor* tensor) {
 	size_t len = product(tensor->shape, tensor->rank);
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -3089,7 +3089,7 @@ DEFINE_GET_BACKENDS_FUNCTION(scaleinplace);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(scaleinplace);
 
 Tensor* naive_scale(const Tensor* tensor, float multiplier) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	void* data_original = tensor->data;
 	void* data_result = result->data;
 	int num_elems = product(tensor->shape, tensor->rank);
@@ -3144,11 +3144,11 @@ DEFINE_GET_BACKENDS_FUNCTION(scale);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(scale);
 
 Tensor* empty_like(const Tensor* tensor) {
-	return empty(tensor->shape, tensor->rank, tensor->dtype);
+	return nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 }
 
 Tensor* zeros_like(const Tensor* tensor) {
-	return zeros(tensor->shape, tensor->rank, tensor->dtype);
+	return nnl2_zeros(tensor->shape, tensor->rank, tensor->dtype);
 }
 
 Tensor* ones_like(const Tensor* tensor) {
@@ -3301,7 +3301,7 @@ Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
 	
 	int total_elems = product(tensora->shape, tensora->rank);
 	
-	Tensor* result = empty(tensora->shape, tensora->rank, typea);
+	Tensor* result = nnl2_empty(tensora->shape, tensora->rank, typea);
 	
 	void* data_a = tensora->data;
 	void* data_b = tensorb->data;
@@ -3375,7 +3375,7 @@ Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
 	
 	int total_elems = product(tensora->shape, tensora->rank);
 	
-	Tensor* result = empty(tensora->shape, tensora->rank, typea);
+	Tensor* result = nnl2_empty(tensora->shape, tensora->rank, typea);
 	
 	void* data_a = tensora->data;
 	void* data_b = tensorb->data;
@@ -3490,7 +3490,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(absinplace);
 Tensor* naive_abs(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -3586,7 +3586,7 @@ Tensor* naive_hstack(const Tensor* tensora, const Tensor* tensorb) {
 		}
 		
 		shapec[0] = shapea[0] + shapeb[0];
-		result = empty(shapec, 1, typea);
+		result = nnl2_empty(shapec, 1, typea);
 		free(shapec); 
 		
 		size_t item_size = get_dtype_size(typea);
@@ -3615,7 +3615,7 @@ Tensor* naive_hstack(const Tensor* tensora, const Tensor* tensorb) {
 			}
 		}
 
-		result = empty(shapec, ranka, typea);
+		result = nnl2_empty(shapec, ranka, typea);
 		free(shapec); 
 		
 		size_t item_size = get_dtype_size(typea);
@@ -3694,7 +3694,7 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
 		
 		shapec[1] = shapea[0];
 		shapec[0] = 2;
-		result = empty(shapec, 2, typea);
+		result = nnl2_empty(shapec, 2, typea);
 		free(shapec); 
 		
 		size_t item_size = get_dtype_size(typea);
@@ -3717,7 +3717,7 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
 		shapec[0] = shapea[0] + 1;
         shapec[1] = shapea[1];
 		
-		result = empty(shapec, 2, typea);
+		result = nnl2_empty(shapec, 2, typea);
         free(shapec);
         
         size_t item_size = get_dtype_size(typea);
@@ -3738,7 +3738,7 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
 		shapec[0] = shapeb[0] + 1;
         shapec[1] = shapeb[1];
 		
-		result = empty(shapec, 2, typea);
+		result = nnl2_empty(shapec, 2, typea);
         free(shapec);
 		
 		size_t item_size = get_dtype_size(typea);
@@ -3762,7 +3762,7 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
 			shapec[i] = shapea[i];
 		}
 
-		result = empty(shapec, ranka, typea);
+		result = nnl2_empty(shapec, ranka, typea);
 		free(shapec); 
 		
 		size_t item_size = get_dtype_size(typea);
@@ -3846,7 +3846,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(reluinplace);
 Tensor* naive_relu(Tensor* tensor) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -3951,7 +3951,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(leakyreluinplace);
 Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {	
 	int total_elems = product(tensor->shape, tensor->rank);	
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -3991,7 +3991,7 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha) {
 			if(float64_conversion) {
 				nnl2_free_tensor(result);
 				
-				result = empty(tensor->shape, tensor->rank, FLOAT64);
+				result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
 				data_r = result->data;
 				
 				double* cast_data_r_f64 = (double*)data_r;
@@ -4092,7 +4092,7 @@ Tensor* naive_sigmoid(Tensor* tensor) {
 	
 	if(dtype == INT32) dtype = FLOAT64;
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -4202,7 +4202,7 @@ Tensor* naive_tanh(Tensor* tensor) {
 	
 	if(dtype == INT32) dtype = FLOAT64;
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -4298,7 +4298,7 @@ Tensor* naive_concat(const Tensor* tensora, const Tensor* tensorb, int axis) {
         shapec[i] = (i == axis) ? (shapea[i] + shapeb[i]) : shapea[i];
     }    
     
-    Tensor* result = empty(shapec, ranka, typea);
+    Tensor* result = nnl2_empty(shapec, ranka, typea);
     
     if (result == NULL) {
         free(shapec);
@@ -4358,7 +4358,7 @@ DEFINE_GET_BACKENDS_FUNCTION(concat);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(concat);
 
 Tensor* naive_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
-	Tensor* result = empty(shape, rank, dtype);
+	Tensor* result = nnl2_empty(shape, rank, dtype);
 	
 	size_t total_elems = product(shape, rank);
 	
@@ -4420,7 +4420,7 @@ Tensor* naive_xavier(int* shape, int rank, TensorType dtype, int in, int out, fl
 		return NULL;
 	}
 	
-	Tensor* result = empty(shape, rank, dtype);
+	Tensor* result = nnl2_empty(shape, rank, dtype);
 	size_t total_elems = product(shape, rank);
 	float stddev = gain * sqrt(distribution / (in + out));
 	
@@ -4587,7 +4587,7 @@ Tensor* naive_transpose(const Tensor* tensor) {
 		return NULL;
 	}
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 
 	int rows = tensor->shape[0];
 	int cols = tensor->shape[1];
@@ -4809,7 +4809,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(l2norm);
 Tensor* naive_copy(const Tensor* tensor) {
 	TensorType dtype = tensor->dtype;
 	
-	Tensor* result = empty(tensor->shape, tensor->rank, dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(dtype) {
@@ -4904,7 +4904,7 @@ void set_add_incf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_add_incf(const Tensor* tensor, void* inc) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -4994,7 +4994,7 @@ void set_sub_decf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_sub_decf(const Tensor* tensor, void* inc) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -5084,7 +5084,7 @@ void set_mul_mulf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_mul_mulf(const Tensor* tensor, void* mulf) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -5174,7 +5174,7 @@ void set_div_divf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_div_divf(const Tensor* tensor, void* divf) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -5264,7 +5264,7 @@ void set_pow_powf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_pow_powf(const Tensor* tensor, void* powf_arg) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -5354,7 +5354,7 @@ void set_max_maxf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_max_maxf(const Tensor* tensor, void* maxf) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -5444,7 +5444,7 @@ void set_min_minf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_min_minf(const Tensor* tensor, void* minf) {
-	Tensor* result = empty(tensor->shape, tensor->rank, tensor->dtype);
+	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	switch(tensor->dtype) {
@@ -5564,7 +5564,7 @@ Tensor* naive_add_broadcasting(const Tensor* summand, const Tensor* sumend) {
 	size_t numel_sumend = product(sumend->shape, sumend->rank);
 	
 	if((numel_summand % numel_sumend) == 0) {
-		Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+		Tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
 		
 		switch(summand->dtype) {
 			case FLOAT64: {
@@ -5707,7 +5707,7 @@ Tensor* naive_sub_broadcasting(const Tensor* minuend, const Tensor* subtrahend) 
 	size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
 	
 	if((numel_minuend % numel_subtrahend) == 0) {
-		Tensor* result = empty(minuend->shape, minuend->rank, minuend->dtype);
+		Tensor* result = nnl2_empty(minuend->shape, minuend->rank, minuend->dtype);
 		
 		switch(minuend->dtype) {
 			case FLOAT64: {
@@ -5850,7 +5850,7 @@ Tensor* naive_mul_broadcasting(const Tensor* multiplicand, const Tensor* multipl
     size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
 
     if((numel_multiplicand % numel_multiplier) == 0) {
-        Tensor* result = empty(multiplicand->shape, multiplicand->rank, multiplicand->dtype);
+        Tensor* result = nnl2_empty(multiplicand->shape, multiplicand->rank, multiplicand->dtype);
 
         switch(multiplicand->dtype) {
             case FLOAT64: {
@@ -5993,7 +5993,7 @@ Tensor* naive_div_broadcasting(const Tensor* dividend, const Tensor* divisor) {
     size_t numel_divisor = product(divisor->shape, divisor->rank);
 
     if((numel_dividend % numel_divisor) == 0) {
-        Tensor* result = empty(dividend->shape, dividend->rank, dividend->dtype);
+        Tensor* result = nnl2_empty(dividend->shape, dividend->rank, dividend->dtype);
 
         switch(dividend->dtype) {
             case FLOAT64: {
@@ -6136,7 +6136,7 @@ Tensor* naive_pow_broadcasting(const Tensor* base, const Tensor* exponent) {
     size_t numel_exponent = product(exponent->shape, exponent->rank);
 
     if((numel_base % numel_exponent) == 0) {
-        Tensor* result = empty(base->shape, base->rank, base->dtype);
+        Tensor* result = nnl2_empty(base->shape, base->rank, base->dtype);
 
         switch(base->dtype) {
             case FLOAT64: {
@@ -6347,7 +6347,7 @@ Tensor* naive_max_broadcasting(const Tensor* x, const Tensor* y) {
     size_t numel_y = product(y->shape, y->rank);
 
     if((numel_x % numel_y) == 0) {
-        Tensor* result = empty(x->shape, x->rank, x->dtype);
+        Tensor* result = nnl2_empty(x->shape, x->rank, x->dtype);
 
         switch(x->dtype) {
             case FLOAT64: {
@@ -6422,7 +6422,7 @@ Tensor* naive_min_broadcasting(const Tensor* x, const Tensor* y) {
     size_t numel_y = product(y->shape, y->rank);
 
     if((numel_x % numel_y) == 0) {
-        Tensor* result = empty(x->shape, x->rank, x->dtype);
+        Tensor* result = nnl2_empty(x->shape, x->rank, x->dtype);
 
         switch(x->dtype) {
             case FLOAT64: {
@@ -6535,7 +6535,7 @@ Tensor* make_tensor_from_flatten(void* arr, size_t num_elems_arr, int* shape, in
 		return NULL;
 	}
 	
-	Tensor* result = empty(shape, rank, dtype);
+	Tensor* result = nnl2_empty(shape, rank, dtype);
 	fill_tensor_with_data(result, arr, num_elems_tensor);
 	return result;
 }
@@ -6592,7 +6592,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(axpy_inplace);
 
 Tensor* naive_axpy(const Tensor* summand, const Tensor* sumend, float alpha) {
 	size_t total_elems = product(summand->shape, summand->rank);
-	Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+	Tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
 	
 	switch(summand->dtype) {
 		case FLOAT64: {
@@ -6689,7 +6689,7 @@ void set_axpf_inplace_backend(const char* backend_name) {
 }
 
 Tensor* naive_axpf(const Tensor* summand, void* sumend, float alpha) {
-	Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+	Tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
 	size_t total_elems = product(summand->shape, summand->rank);
 	
 	switch(summand->dtype) {
@@ -6809,7 +6809,7 @@ Tensor* naive_axpy_broadcasting(const Tensor* summand, const Tensor* sumend, flo
     size_t numel_sumend = product(sumend->shape, sumend->rank);
 
     if((numel_summand % numel_sumend) == 0) {
-        Tensor* result = empty(summand->shape, summand->rank, summand->dtype);
+        Tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
 
         switch(summand->dtype) {
             case FLOAT64: {
