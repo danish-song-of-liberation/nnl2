@@ -47,6 +47,14 @@
 	#define TENSOR_MEM_ALIGNMENT 16
 #endif
 
+#if defined(_MSC_VER)
+    #define NNL2_FORCE_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+    #define NNL2_FORCE_INLINE inline __attribute__((always_inline))
+#else
+    #define NNL2_FORCE_INLINE inline
+#endif
+
 #ifdef OPENBLAS_AVAILABLE
 #include <cblas.h>
 #endif
@@ -70,6 +78,8 @@
 #define AVX256_BACKEND_NAME "AVX256"
 #define BLAS_BACKEND_NAME "BLAS"
 
+#define MIN_TENSOR_DIMENSION 0
+
 // NNL2
 
 /** @file nnl2_tensor_accessors.h
@@ -89,7 +99,7 @@
  **   You can find many backend declarations in 
  **   the code, and you can view their full 
  **   documentation in the nnl2_backend_system_docs.h 
- **   file (in the same directory).
+ **   file (in the same directory)
  **
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2		
@@ -115,32 +125,30 @@ inline size_t get_dtype_size(TensorType dtype) {
 }	
 
 /** @brief
- * calculates the total number of elements in the tensor specified by the shape (for calculating memory)
+ * Calculates the total number of elements in the tensor specified by the shape (for calculating memory)
  *
  ** @param lst
- * pointer to an array of integers representing the tensor's shape
+ * Pointer to an array of integers representing the tensor's shape
  *
  ** @param len
- * length of the array `lst`, which is the number of dimensions in the tensor
+ * Length of the array `lst`, which is the number of dimensions in the tensor
  *
  ** @return 
- * total number of elements in the tensor
+ * Total number of elements in the tensor
  *
  ** @code
  * int shape[] = {2, 3, 4};
  * size_t num_elements = product(shape, 3); // num_elements will be 24
  ** @endcode
  */
-inline size_t product(const int* lst, int len) {
+NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) {
 	size_t acc = 1;
-	
 	while (len--) acc *= *lst++;
-	
 	return acc;
 }
 
 /** @brief
- * Creates a new tensor without initializing the data.
+ * Creates a new tensor without initializing the data
  *
  * This function allocates memory for the Tensor structure and its data,
  * using the provided shape and data type. The data memory is not (!) initialized
@@ -209,10 +217,10 @@ inline size_t product(const int* lst, int len) {
  *
  **/
 Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorType dtype) {
-	#ifdef NNL2_DEBUG_MODE
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 	NNL2_FUNC_ENTER();
 	#endif
-	
+
 	// Checks the input parameters for correctness
 	
 	if (shape == NULL) {
@@ -290,36 +298,44 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	
 	tensor->data = data;
 	
-	#ifdef NNL2_DEBUG_MODE
-	NNL2_DEBUG("Created tensor: %dD, size=%zu bytes", rank, total_size);
-	NNL2_FUNC_EXIT();
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_DEBUG("Created empty tensor: %dD, elems=%zu, size=%zu bytes", rank, total_elems, total_size);
+		#endif
+	
+    NNL2_FUNC_EXIT();
 	#endif
 	
 	return tensor;
 }
 
 /** @ingroup backend_system
- ** @brief Backend implementations for empty tensor creation.
- **
+ ** @brief Backend implementations for empty tensor creation
  ** @details
  * Array follows the common backend registration pattern
  * Currently register backends:
  *  - nnl2_naive_empty: Basic reference implementation
+ *
+ ** @see REGISTER_BACKEND
+ ** @see NAIVE_BACKEND_NAME
+ ** @see nnl2_naive_empty
+ ** @see nnl2_naive
  **/
 Implementation empty_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_empty, nnl2_naive, NAIVE_BACKEND_NAME)
 };
 
 /**
- * @brief Function pointer for the active empty() backend. 
+ * @brief Function pointer for the active empty() backend
  * @ingroup backend_system 
  */
 fn_empty empty;
 
 /** 
- * @brief Sets the backend for empty tensor creation.
+ * @brief Sets the backend for empty tensor creation
  * @ingroup backend_system
- * @param backend_name Name of the backend to activate.
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
  */
 void set_empty_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(empty_backends, empty, backend_name);
@@ -328,37 +344,40 @@ void set_empty_backend(const char* backend_name) {
 /** 
  * @brief Creates an empty static string for manual backend work
  * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
  */
 MAKE_CURRENT_BACKEND(empty);
 
 /** 
- * @brief Gets the name of the active backend for empty().
+ * @brief Gets the name of the active backend for empty()
  * @ingroup backend_system
- * @return Name of the current backend.
+ * @return Name of the current backend
  */
 const char* get_empty_backend() {
 	return CURRENT_BACKEND(empty);
 }
 
 /** 
- * @brief Function declaration for getting all empty available backends
+ * @brief Function declaration for getting all `empty` available backends
  * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(empty);
 
 /**
- * @brief Function declaration for getting the number of all empty backends
+ * @brief Function declaration for getting the number of all `empty` backends
  * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(empty);
 
 /** @brief
- * Creates a new tensor and initializes all elements to zero.
+ * Creates a new tensor and initializes all elements to zero
  *
  * This function allocates memory for tensor structure and its data,
- * using the provided shape and data type.
+ * using the provided shape and data type
  *
- * memory is initialized to zero.
+ * Memory is initialized to zero
  *
  ** @param shape
  * A pointer to an array of integers representing the tensor's shape
@@ -393,73 +412,116 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(empty);
  * int shape[] = {2, 3, 4};
  * Tensor* my_tensor = zeros(shape, 3, FLOAT32);
  ** @endcode
+ **
+ ** @note
+ * The function performs comprehensive error checking including:
+ ** - NULL pointer validation
+ ** - Parameter range validation  
+ ** - Memory allocation failure handling
+ ** - Multiplication overflow protection
+ ** - Type safety checks
+ **
+ ** @note
+ * The function is almost the same as empty except 
+ * that it fills the memory with zeros and is made 
+ * separately for performance reasons, as it is not 
+ * efficient to create an empty tensor and then fill 
+ * it with zeros.
+ *
  ** @warning
- * do not forget to free the memory allocated for the tensor using free_tensor after using it
+ * Do not forget to free the memory allocated for the tensor using free_tensor after using it
+ *
+ ** @see free_tensor
+ ** @see get_dtype_size
+ ** @see product
+ ** @see ALLOC_ALIGNED
+ *
+ ** @exception[out_of_memory] 
+ * If memory allocation fails for tensor structure, shape array, or data
+ *
+ ** @exception[invalid_argument]
+ * If shape is NULL, rank <= 0, invalid dtype, or any dimension <= 0
+ *
+ ** @exception[overflow_error]
+ * If the calculated total size would overflow size_t
  *
  **/
 Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
-	// checks the input parameters for correctness
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+	NNL2_FUNC_ENTER();
+	#endif
+	
+	// Checks the input parameters for correctness
 	
 	if (shape == NULL) {
-        fprintf(stderr, "Error at zeros: Bad shape pointer\n");
+        NNL2_ERROR("Bad shape pointer");
         return NULL;
     }	
 	
-	if (rank <= 0) {
-		fprintf(stderr, "Error at zeros: Bad rank (%d). Rank must be positive\n", rank);
+	if (rank <= MIN_TENSOR_DIMENSION) {
+		NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
 		return NULL;
 	}
 	
 	if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
-        fprintf(stderr, "Error (Hello from C!): Bad tensor type (%d)\n", dtype);
+        NNL2_ERROR("Invalid tensor data type (%d). Must be in range [0, %d]", dtype, NUM_TENSOR_TYPES - 1);
         return NULL;
     }
 	
 	for (int i = 0; i < rank; i++) {
         if (shape[i] <= 0) {
-            fprintf(stderr, "Error (Hello from C!): Bad shape dimension at %d (%d). Dimensions must be positive\n",  i, shape[i]);
+            NNL2_ERROR("Bad shape dimension at %d (%d). Dimensions must be positive",  i, shape[i]);
             return NULL;
         }
     }
 	
-	// allocating memory for tensor structure
+	// Allocating memory for tensor structure
 
 	Tensor* tensor = malloc(sizeof(Tensor));
 	
 	if (tensor == NULL) {
-        fprintf(stderr, "Error (Hello from C!): failed to allocate memory for Tensor structure\n");
+        NNL2_ERROR("Failed to allocate memory for Tensor structure");
         return NULL;
     }
 	
 	tensor->rank = rank;
 	tensor->dtype = dtype;
 	
-	// allocates memory for the shape array and copies the data into it
+	// Allocates memory for the shape array and copies the data into it
 	 
 	tensor->shape = malloc(rank * sizeof(int));
 	
 	if (tensor->shape == NULL) {
-        fprintf(stderr, "Error (Hello from C!): failed to allocate memory for shape\n");
+        NNL2_ERROR("Failed to allocate memory for shape");
         free(tensor);
         return NULL;
     }
 	
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
-	// calculates the total size of the data required for the tensor
+	// Calculates the total size of the data required for the tensor
 	
 	size_t total_elems = product(shape, rank);
 	size_t type_size = get_dtype_size(dtype);
+	
+	// Check for multiplication overflow
+	if (type_size != 0 && total_elems > SIZE_MAX / type_size) {
+		NNL2_ERROR("Tensor size too large, multiplication overflow (elems: %zu, type size: %zu)", total_elems, type_size);
+		free(tensor->shape);
+		free(tensor);
+		return NULL;
+	}
+	
 	size_t total_size = total_elems * type_size;
 	
-	// allocates aligned memory for tensor data (tensor->data)
+	// Allocates aligned memory for tensor data (tensor->data)
 	 
 	void* data;
 	
 	ALLOC_ALIGNED(data, (size_t)TENSOR_MEM_ALIGNMENT, total_size);
 	
 	if (data == NULL) {
-        fprintf(stderr, "Error (Hello from C!): failed to allocate aligned memory\n");
+        NNL2_ERROR("Failed to allocate aligned memory");
         free(tensor->shape);
         free(tensor);
         return NULL;
@@ -468,26 +530,77 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 	tensor->data = data;
 	memset(tensor->data, 0, total_size);
 	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_DEBUG("Created zeros tensor: %dD, elems=%zu, size=%zu bytes", rank, total_elems, total_size);
+		#endif
+	
+    NNL2_FUNC_EXIT();
+	#endif
+	
 	return tensor;
 }
 
+/** @ingroup backend_system
+ ** @brief Backend implementations for zeros tensor creation
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - nnl2_naive_zeros: Basic reference implementation
+ *
+ ** @see REGISTER_BACKEND
+ ** @see NAIVE_BACKEND_NAME
+ ** @see nnl2_naive_empty
+ ** @see nnl2_naive
+ **/
 Implementation zeros_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_zeros, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for the active zeros() backend 
+ * @ingroup backend_system 
+ */
 fn_zeros zeros;
 
+/** 
+ * @brief Sets the backend for zeros tensor creation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ */
 void set_zeros_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(zeros_backends, zeros, backend_name);
 }
 
-make_current_backend(zeros);
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(zeros);
 
+/** 
+ * @brief Gets the name of the active backend for zeros()
+ * @ingroup backend_system
+ * @return Name of the current backend
+ */
 const char* get_zeros_backend() {
-	return current_backend(zeros);
+	return CURRENT_BACKEND(zeros);
 }
 
+/** 
+ * @brief Function declaration for getting all `zeros` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(zeros);
+
+/**
+ * @brief Function declaration for getting the number of all `zeros` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(zeros);
 
 /** @brief

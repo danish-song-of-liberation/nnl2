@@ -171,6 +171,19 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
 
 /// @}
 
+/// @name Debug constants
+/// @brief Constants for the debug level
+/// @{
+	
+#define NNL2_DEBUG_MODE_OFF 0
+#define NNL2_DEBUG_MODE_MINIMAL 1
+#define NNL2_DEBUG_MODE_VERBOSE 2
+#define NNL2_DEBUG_MODE_FULL 3
+
+/// @}
+
+#define NNL2_DEBUG_MODE NNL2_DEBUG_MODE_OFF // 0
+
 // --------------- Realization ---------------
 
 // Global configuration

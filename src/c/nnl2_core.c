@@ -37,21 +37,21 @@
 #include <time.h> 
   
 void init_system() {    
-	srand(time(NULL));  
+	srand(time(NULL));         
 	 
 	// Initialization of the logging system
 	nnl2_log_init( 
 		NNL2_LOG_DEFAULT_COLOR,
-		NNL2_LOG_DEFAULT_TIMESTAMPS,       
+		NNL2_LOG_DEFAULT_TIMESTAMPS,          
 		NNL2_LOG_DEFAULT_DEBUG_INFO,    
 		NNL2_LOG_LEVEL_DEBUG
 	); 
- 
+      
 	EINIT_BACKEND(tref_getter, tref_getter_backends, current_backend(tref_getter));
 	INIT_BACKEND(tref_setter, tref_setter_backends);
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
-	EINIT_BACKEND(empty, empty_backends, current_backend(empty));   
-	EINIT_BACKEND(zeros, zeros_backends, current_backend(zeros));   
+	EINIT_BACKEND(empty, empty_backends, CURRENT_BACKEND(empty));   
+	EINIT_BACKEND(zeros, zeros_backends, CURRENT_BACKEND(zeros));   
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
