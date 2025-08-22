@@ -93,9 +93,9 @@
 /// @defgroup defaults Default Configuration Values
 /// @{
 
-#define NNL2_LOG_DEFAULT_COLOR        1    ///< Enable colors by default
-#define NNL2_LOG_DEFAULT_TIMESTAMPS   1    ///< Enable timestamps by default
-#define NNL2_LOG_DEFAULT_DEBUG_INFO   0    ///< Disable debug info by default
+#define NNL2_LOG_DEFAULT_COLOR        true    ///< Enable colors by default
+#define NNL2_LOG_DEFAULT_TIMESTAMPS   true    ///< Enable timestamps by default
+#define NNL2_LOG_DEFAULT_DEBUG_INFO   false   ///< Disable debug info by default
 #define NNL2_LOG_DEFAULT_MIN_LEVEL    NNL2_LOG_LEVEL_INFO  ///< Default min level
 
 /// @}
@@ -117,9 +117,9 @@ typedef enum {
  * @ingroup logging
  */
 typedef struct {
-    int enable_color;               ///< Enable colored output (0/1)
-    int enable_timestamps;          ///< Enable timestamp display (0/1)
-    int enable_debug_info;          ///< Enable debug information (file/line) (0/1)
+    bool enable_color;               ///< Enable colored output (0/1) (false/true)
+    bool enable_timestamps;          ///< Enable timestamp display (0/1) (false/true)
+    bool enable_debug_info;          ///< Enable debug information (file/line) (0/1) (false/true)
     nnl2_log_level_t min_log_level; ///< Minimum log level to display
 } nnl2_log_config_t;
 
@@ -135,10 +135,10 @@ typedef struct {
 extern nnl2_log_config_t nnl2_log_current_config;
 
 // Configuration Functions
-void nnl2_log_init(int enable_color, int enable_timestamps, int enable_debug_info, nnl2_log_level_t min_log_level);
-void nnl2_log_set_color(int enabled);
-void nnl2_log_set_timestamps(int enabled);
-void nnl2_log_set_debug_info(int enabled);
+void nnl2_log_init(bool enable_color, bool enable_timestamps, bool enable_debug_info, nnl2_log_level_t min_log_level);
+void nnl2_log_set_color(bool enabled);
+void nnl2_log_set_timestamps(bool enabled);
+void nnl2_log_set_debug_info(bool enabled);
 void nnl2_log_set_min_level(nnl2_log_level_t min_level);
 void nnl2_log_get_config(nnl2_log_config_t* out_config);
 
@@ -175,17 +175,17 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
 
 // Global configuration
 nnl2_log_config_t nnl2_log_current_config = {
-    .enable_color = 1,
-    .enable_timestamps = 1,
-    .enable_debug_info = 0,
+    .enable_color = true,
+    .enable_timestamps = true,
+    .enable_debug_info = false,
     .min_log_level = NNL2_LOG_LEVEL_DEBUG  // By default all levels are
 };
 
 // Configuration functions
 
 /// @brief Initialize logging system with custom settings
-void nnl2_log_init(int enable_color, int enable_timestamps, 
-				   int enable_debug_info, nnl2_log_level_t min_log_level) {
+void nnl2_log_init(bool enable_color, bool enable_timestamps, 
+				   bool enable_debug_info, nnl2_log_level_t min_log_level) {
     nnl2_log_current_config.enable_color = enable_color;
     nnl2_log_current_config.enable_timestamps = enable_timestamps;
     nnl2_log_current_config.enable_debug_info = enable_debug_info;
@@ -193,17 +193,17 @@ void nnl2_log_init(int enable_color, int enable_timestamps,
 }
 
 /// @brief Enable/disable colored output
-void nnl2_log_set_color(int enabled) {
+void nnl2_log_set_color(bool enabled) {
     nnl2_log_current_config.enable_color = enabled;
-}
+}	
 
 /// @brief Enable/disable timestamp display  
-void nnl2_log_set_timestamps(int enabled) {
+void nnl2_log_set_timestamps(bool enabled) {
     nnl2_log_current_config.enable_timestamps = enabled;
 }
 
 /// @brief Enable/disable debug info (file/line)
-void nnl2_log_set_debug_info(int enabled) {
+void nnl2_log_set_debug_info(bool enabled) {
     nnl2_log_current_config.enable_debug_info = enabled;
 }
 
