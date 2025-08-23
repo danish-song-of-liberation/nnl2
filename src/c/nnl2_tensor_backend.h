@@ -52,12 +52,17 @@ typedef enum {
  *
  * The number of dimensions of the tensor
  *
+ ** numel:
+ *
+ * Total number of elements in the tensor
+ *
  */
 typedef struct {
 	TensorType dtype;
 	void* data;
 	int* shape;
 	int rank;
+	size_t numel;
 } Tensor;
 
 typedef struct {

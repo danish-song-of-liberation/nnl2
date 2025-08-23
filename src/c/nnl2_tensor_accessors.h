@@ -208,6 +208,9 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  * This function allocates memory for the Tensor structure and its data,
  * using the provided shape and data type. The data memory is not (!) initialized
  *
+ * The created tensor will have the numel field pre-calculated for
+ * optimal performance in subsequent operations
+ *
  ** @param shape
  * A pointer to an array of integers representing the tensor's shape
  *
@@ -337,6 +340,7 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	}
 
 	size_t total_size = total_elems * type_size;
+	tensor->numel = total_size;
 	
 	// Allocates aligned memory for tensor data (tensor->data)
 	
@@ -433,6 +437,9 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  * using the provided shape and data type
  *
  * Memory is initialized to zero
+ *
+ * The created tensor will have the numel field pre-calculated for
+ * optimal performance in subsequent operations
  *
  ** @param shape
  * A pointer to an array of integers representing the tensor's shape
@@ -568,6 +575,7 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 	}
 	
 	size_t total_size = total_elems * type_size;
+	tensor->numel = total_size;
 	
 	// Allocates aligned memory for tensor data (tensor->data)
 	 
