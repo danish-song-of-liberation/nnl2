@@ -220,14 +220,15 @@
 	     (tensor-dtype (dtype tensor))
 		 (shape (make-shape-pntr (subst -1 '* shape)))
 		 (void-ptr (nnl2.ffi:%tref-getter tensor shape shape-rank)))	 
-		 
-	(if (= shape-rank tensor-rank)	 
-	  (case tensor-dtype
-	    (:float64 (cffi:mem-ref void-ptr :double))	 
-        (:float32 (cffi:mem-ref void-ptr :float))
-	    (:int32 (cffi:mem-ref void-ptr :int)))
+	
+	(unless (cffi:null-pointer-p void-ptr)
+	  (if (= shape-rank tensor-rank)	 
+	    (case tensor-dtype
+	      (:float64 (cffi:mem-ref void-ptr :double))	 
+          (:float32 (cffi:mem-ref void-ptr :float))
+	      (:int32 (cffi:mem-ref void-ptr :int)))
 	  
-	  void-ptr)))
+	    void-ptr))))
 	  
 (defun (setf tref) (change-to tensor &rest shape)
   (let* ((shape-rank (length shape))

@@ -42,7 +42,7 @@ void init_system() {
 	// Initialization of the logging system
 	nnl2_log_init( 
 		NNL2_LOG_DEFAULT_COLOR,
-		NNL2_LOG_DEFAULT_TIMESTAMPS,          
+		NNL2_LOG_DEFAULT_TIMESTAMPS,            
 		NNL2_LOG_DEFAULT_DEBUG_INFO,     
 		NNL2_LOG_LEVEL_DEBUG
 	); 
@@ -128,7 +128,7 @@ void init_system() {
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
 	INIT_BACKEND(axpf, axpf_backends);
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
-	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);
+	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);   
 }      
 
 void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
@@ -142,7 +142,7 @@ void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_wi
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
 } 
- 
+     
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return nnl2_zeros(shape, rank, dtype); 
 }  	  	          
@@ -204,10 +204,10 @@ void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 } 
    
 void lisp_call_expinplace(Tensor* tensor) {
-	expinplace(tensor);
+	expinplace(tensor);       
 }
 
-Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {
+Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) { 
 	return nnl2_pow(base, exponent);
 } 
          
@@ -475,5 +475,5 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
-}		
-		            
+}		   
+		             

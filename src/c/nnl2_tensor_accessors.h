@@ -35,7 +35,7 @@
 
 #endif
 
-#define NUM_TENSOR_TYPES 3 // int32, float32, float64
+#define NUM_TENSOR_TYPES 3
 
 #if defined(__AVX512F__)
 	#define TENSOR_MEM_ALIGNMENT 64
@@ -80,6 +80,13 @@
 
 #define MIN_TENSOR_DIMENSION 0
 
+#define NNL2_SAFETY_MODE_OFF 0
+#define NNL2_SAFETY_MODE_MIN 1
+#define NNL2_SAFETY_MODE_MODERATE 2
+#define NNL2_SAFETY_MODE_MAX 3
+
+#define NNL2_SAFETY_MODE NNL2_SAFETY_MODE_MAX
+
 // NNL2
 
 /** @file nnl2_tensor_accessors.h
@@ -117,11 +124,32 @@
  ** @return
  * The size of the specified data type in bytes
  *
+ ** @note
+ * Can perform additional checks depending on the safety level
+ *
+ ** @note
+ * In debug mode, it can output additional information to the console
+ *
+ ** @see NNL2_DEBUG_MODE
+ ** @see NNL2_SAFETY_MODE
  **/
 inline size_t get_dtype_size(TensorType dtype) {
-	static const size_t sizes[] = {sizeof(int), sizeof(float), sizeof(double)};
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_ENTER();	
+	    NNL2_DEBUG("Function get_dtype_size was called with dtype=%d", dtype);
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if(dtype > (NUM_TENSOR_TYPES - 1)) {
+			NNL2_ERROR("Invalid data type: %d", dtype);
+		}
+	#endif
 		
-	return sizes[dtype]; 
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL    
+		NNL2_FUNC_EXIT();	
+	#endif
+	
+	return (const size_t[]){sizeof(int), sizeof(float), sizeof(double)}[dtype]; 
 }	
 
 /** @brief
@@ -150,11 +178,15 @@ inline size_t get_dtype_size(TensorType dtype) {
  * lower than the maximum, nothing is displayed
  *
  ** @note
- * Сan perform additional checks at a high level of debugging
+ * Сan perform additional checks at a high level of safety
  *
+ ** @note
+ * In debug mode, it can output additional information to the console
+ *
+ ** @see NNL2_DEBUG_MODE
+ ** @see NNL2_SAFETY_MODE
  ** @see NNL2_FORCE_INLINE
- **
- */
+ **/
 NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rename from product to nnl2_product
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();	
@@ -256,6 +288,12 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  ** - Multiplication overflow protection
  ** - Type safety checks
  *
+ ** @note
+ * In debug mode, it can output additional information to the console
+ *
+ ** @note
+ * Сan perform additional checks at a high level of safety
+ *
  ** @warning
  * Do not forget to free the memory allocated for the tensor using free_tensor after using it
  *
@@ -263,6 +301,8 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  ** @see get_dtype_size
  ** @see product
  ** @see ALLOC_ALIGNED
+ ** @see NNL2_DEBUG_MODE
+ ** @see NNL2_SAFETY_MODE
  *
  ** @exception[out_of_memory] 
  * If memory allocation fails for tensor structure, shape array, or data
@@ -281,27 +321,35 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 
 	// Checks the input parameters for correctness
 	
-	if (shape == NULL) {
-        NNL2_ERROR("Bad shape pointer (NULL)"); 
-        return NULL;
-    }	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (shape == NULL) {
+			NNL2_ERROR("Bad shape pointer (NULL)"); 
+			return NULL;
+		}	
+	#endif
 	
-	if (rank <= 0) {
-		NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
-		return NULL;
-	}
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (rank <= 0) {
+			NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
+			return NULL;
+		}
+	#endif
 	
-	if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
-        NNL2_ERROR("Bad tensor type (%d)", dtype);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
+			NNL2_ERROR("Bad tensor type (%d)", dtype);
+			return NULL;
+		}
+	#endif
 	
-	for (int i = 0; i < rank; i++) {
-        if (shape[i] <= 0) {
-            NNL2_ERROR("Bad shape dimension at %d (%d). Dimensions must be positive", i, shape[i]);
-            return NULL;
-        }
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		for (int i = 0; i < rank; i++) {
+			if (shape[i] <= 0) {
+				NNL2_ERROR("Bad shape dimension at %d (%d). Dimensions must be positive", i, shape[i]);
+				return NULL;
+			}
+		}
+	#endif
 	
 	// Allocating memory for tensor structure
 
@@ -319,28 +367,33 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	
 	tensor->shape = malloc(rank * sizeof(int));
 	
-	if (tensor->shape == NULL) {
-        NNL2_ERROR("Failed to allocate memory for shape");
-        free(tensor);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (tensor->shape == NULL) {
+			NNL2_ERROR("Failed to allocate memory for shape");
+			free(tensor);
+			return NULL;
+		}
+	#endif
 	
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
 	// Calculates the total size of the data required for the tensor
 	size_t total_elems = product(shape, rank);
+	tensor->numel = total_elems;
+	
 	size_t type_size = get_dtype_size(dtype);
 	
-	// Check for multiplication overflow
-	if (type_size != 0 && total_elems > SIZE_MAX / type_size) {
-		NNL2_ERROR("Tensor size too large, multiplication overflow (elems: %zu, type size: %zu)", total_elems, type_size);
-		free(tensor->shape);
-		free(tensor);
-		return NULL;
-	}
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		// Check for multiplication overflow
+		if (type_size != 0 && total_elems > SIZE_MAX / type_size) {
+			NNL2_ERROR("Tensor size too large, multiplication overflow (elems: %zu, type size: %zu)", total_elems, type_size);
+			free(tensor->shape);
+			free(tensor);
+			return NULL;
+		}
+	#endif
 
 	size_t total_size = total_elems * type_size;
-	tensor->numel = total_size;
 	
 	// Allocates aligned memory for tensor data (tensor->data)
 	
@@ -348,12 +401,14 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	
 	ALLOC_ALIGNED(data, (size_t)TENSOR_MEM_ALIGNMENT, total_size);
 	
-	if (data == NULL) {
-        NNL2_ERROR("Failed to allocate aligned memory");
-        free(tensor->shape);
-        free(tensor);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (data == NULL) {
+			NNL2_ERROR("Failed to allocate aligned memory");
+			free(tensor->shape);
+			free(tensor);
+			return NULL;
+		}
+	#endif
 	
 	tensor->data = data;
 	
@@ -457,17 +512,17 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  * The function firstly:
  *
  *
- *** checks the input parameters for correctness
- ** then
- *** allocates memory for tensor structure
- ** then
- *** allocates memory for the shape array and copies the data into it
- ** then
- *** calculates the total size of the data required for the tensor
- ** then 
- *** allocates aligned memory for the tensor data (tensor->data)
- ** finally
- *** returns a pointer to the created tensor
+ *** Checks the input parameters for correctness
+ ** Then
+ *** Allocates memory for tensor structure
+ ** Then
+ *** Allocates memory for the shape array and copies the data into it
+ ** Then
+ *** Calculates the total size of the data required for the tensor
+ ** Then 
+ *** Allocates aligned memory for the tensor data (tensor->data)
+ ** Finally
+ *** Returns a pointer to the created tensor
  *
  *
  ** @code
@@ -488,7 +543,13 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  * that it fills the memory with zeros and is made 
  * separately for performance reasons, as it is not 
  * efficient to create an empty tensor and then fill 
- * it with zeros.
+ * it with zeros
+ *
+ ** @note
+ * In debug mode, it can output additional information to the console
+ *
+ ** @note
+ * Сan perform additional checks at a high level of safety
  *
  ** @warning
  * Do not forget to free the memory allocated for the tensor using free_tensor after using it
@@ -497,6 +558,8 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  ** @see get_dtype_size
  ** @see product
  ** @see ALLOC_ALIGNED
+ ** @see NNL2_DEBUG_MODE
+ ** @see NNL2_SAFETY_MODE
  *
  ** @exception[out_of_memory] 
  * If memory allocation fails for tensor structure, shape array, or data
@@ -515,36 +578,46 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 	
 	// Checks the input parameters for correctness
 	
-	if (shape == NULL) {
-        NNL2_ERROR("Bad shape pointer");
-        return NULL;
-    }	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (shape == NULL) {
+			NNL2_ERROR("Bad shape pointer");
+			return NULL;
+		}	
+	#endif	
 	
-	if (rank <= MIN_TENSOR_DIMENSION) {
-		NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
-		return NULL;
-	}
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (rank <= MIN_TENSOR_DIMENSION) {
+			NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
+			return NULL;
+		}
+	#endif
 	
-	if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
-        NNL2_ERROR("Invalid tensor data type (%d). Must be in range [0, %d]", dtype, NUM_TENSOR_TYPES - 1);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
+			NNL2_ERROR("Invalid tensor data type (%d). Must be in range [0, %d]", dtype, NUM_TENSOR_TYPES - 1);
+			return NULL;
+		}
+	#endif
 	
-	for (int i = 0; i < rank; i++) {
-        if (shape[i] <= 0) {
-            NNL2_ERROR("Bad shape dimension at %d (%d). Dimensions must be positive",  i, shape[i]);
-            return NULL;
-        }
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		for (int i = 0; i < rank; i++) {
+			if (shape[i] <= 0) {
+				NNL2_ERROR("Bad shape dimension at %d (%d). Dimensions must be positive",  i, shape[i]);
+				return NULL;
+			}
+		}
+	#endif
 	
 	// Allocating memory for tensor structure
 
 	Tensor* tensor = malloc(sizeof(Tensor));
 	
-	if (tensor == NULL) {
-        NNL2_ERROR("Failed to allocate memory for Tensor structure");
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (tensor == NULL) {
+			NNL2_ERROR("Failed to allocate memory for Tensor structure");
+			return NULL;
+		}
+	#endif
 	
 	tensor->rank = rank;
 	tensor->dtype = dtype;
@@ -553,29 +626,34 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 	 
 	tensor->shape = malloc(rank * sizeof(int));
 	
-	if (tensor->shape == NULL) {
-        NNL2_ERROR("Failed to allocate memory for shape");
-        free(tensor);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (tensor->shape == NULL) {
+			NNL2_ERROR("Failed to allocate memory for shape");
+			free(tensor);
+			return NULL;
+		}
+	#endif
 	
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
 	// Calculates the total size of the data required for the tensor
 	
 	size_t total_elems = product(shape, rank);
+	tensor->numel = total_elems;
+	
 	size_t type_size = get_dtype_size(dtype);
 	
-	// Check for multiplication overflow
-	if (type_size != 0 && total_elems > SIZE_MAX / type_size) {
-		NNL2_ERROR("Tensor size too large, multiplication overflow (elems: %zu, type size: %zu)", total_elems, type_size);
-		free(tensor->shape);
-		free(tensor);
-		return NULL;
-	}
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		// Check for multiplication overflow
+		if (type_size != 0 && total_elems > SIZE_MAX / type_size) {
+			NNL2_ERROR("Tensor size too large, multiplication overflow (elems: %zu, type size: %zu)", total_elems, type_size);
+			free(tensor->shape);
+			free(tensor);
+			return NULL;
+		}
+	#endif
 	
 	size_t total_size = total_elems * type_size;
-	tensor->numel = total_size;
 	
 	// Allocates aligned memory for tensor data (tensor->data)
 	 
@@ -583,12 +661,14 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 	
 	ALLOC_ALIGNED(data, (size_t)TENSOR_MEM_ALIGNMENT, total_size);
 	
-	if (data == NULL) {
-        NNL2_ERROR("Failed to allocate aligned memory");
-        free(tensor->shape);
-        free(tensor);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (data == NULL) {
+			NNL2_ERROR("Failed to allocate aligned memory");
+			free(tensor->shape);
+			free(tensor);
+			return NULL;
+		}
+	#endif
 	
 	tensor->data = data;
 	memset(tensor->data, 0, total_size);
@@ -677,29 +757,33 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_zeros);
  * Do not attempt to access the tensor after it has been freed (although you'll try it anyway, you idiot).
  *
  ** @note 
- * Additional checks are added depending on the debug level
+ * Additional checks are added depending on the safety level
  *
  ** @see FREE_ALIGNED
+ ** @see NNL2_DEBUG_MODE
+ ** @see NNL2_SAFETY_MODE
  **/
 void nnl2_free_tensor(Tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	if (tensor == NULL) {
-		NNL2_ERROR("Invalid data (NULL) was passed to the tensor release");
-		return;
-	}
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+		if (tensor == NULL) {
+			NNL2_ERROR("Invalid data (NULL) was passed to the tensor release");
+			return;
+		}
+	#endif
 	
 	// Additional checks
 	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (tensor->rank < 0) {
-			NNL2_WARN("Invalid tensor rank: %d", tensor->rank);
+			NNL2_ERROR("Invalid tensor rank: %d", tensor->rank);
 		}
 		
 		if (tensor->shape == NULL && tensor->rank > 0) {
-			NNL2_WARN("NULL shape array with rank %d", tensor->rank);
+			NNL2_ERROR("NULL shape array with rank %d", tensor->rank);
 		}
 	#endif
 	
@@ -707,7 +791,7 @@ void nnl2_free_tensor(Tensor* tensor) {
 		NNL2_DEBUG("Freeing tensor [%p] (rank: %d)", (void*)tensor, tensor->rank);
     #endif
 	
-	#if NNL2_DEBUG_MODE == NNL2_DEBUG_MODE_OFF
+	#if NNL2_SAFETY_MODE <= NNL2_SAFETY_MODE_MODERATE
 		free(tensor->shape); 
 		FREE_ALIGNED(tensor->data);
 	#else
@@ -737,33 +821,48 @@ void nnl2_free_tensor(Tensor* tensor) {
 }
 
 void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
-    if (tensor == NULL) {
-        fprintf(stderr, "Error (Hello from C!): Null tensor pointer\n");
-        return NULL;
-    }
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (tensor == NULL) {
+			NNL2_ERROR("Null tensor pointer in tref (getter)");
+			return NULL;
+		}
+	#endif
     
-    if (indices == NULL) {
-        fprintf(stderr, "Error (Hello from C!): Null indices pointer\n");
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (indices == NULL) {
+			NNL2_ERROR("Null indices pointer in tref (getter)");
+			return NULL;
+		}
+	#endif
     
-    if (tensor->rank <= 0) {
-        fprintf(stderr, "Error (Hello from C!): Invalid tensor rank (%d)\n", tensor->rank);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (tensor->rank <= 0 || tensor->shape == NULL || tensor->data == NULL) {
+			NNL2_ERROR("Invalid tensor structure in tref (getter)");
+			return NULL;
+		}
+	#endif
     
-    if (num_indices > tensor->rank) {
-        fprintf(stderr, "Error (Hello from C!): Too many indices (%d > %d)\n", num_indices, tensor->rank);
-        return NULL;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (num_indices > tensor->rank) {
+			NNL2_ERROR("Too many indices (%u > %d) in tref (getter)", num_indices, tensor->rank);
+			return NULL;
+		}
+	#endif
 
-    for (int i = 0; i < num_indices; i++) {
-        if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
-            fprintf(stderr, "Error (Hello from C!): Index %d (%d) out of bounds for dimension %d (size %d)\n",
-                   i, indices[i], i, tensor->shape[i]);
-            return NULL;
-        }
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		for (uint8_t i = 0; i < num_indices; i++) {
+			if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
+				NNL2_ERROR("Index %u (%d) out of bounds for dimension %u (size %d) in tref (getter)",
+							i, indices[i], i, tensor->shape[i]);
+						
+				return NULL;
+			}
+		}
+	#endif
 	
     size_t offset = 0;
     size_t stride = 1;
@@ -776,39 +875,42 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
     }
 
     if (num_indices == tensor->rank) {
-        switch(tensor->dtype) {
-            case FLOAT64: return (double*)tensor->data + offset;
-            case FLOAT32: return (float*)tensor->data + offset;
-            case INT32:   return (int32_t*)tensor->data + offset;
-            default:
-                fprintf(stderr, "Error: Unknown data type\n");
-                return NULL;
-        }
+        const size_t element_size = get_dtype_size(tensor->dtype);
+		return (char*)tensor->data + offset * element_size;
     }
 
-    else {
-        Tensor* subtensor = (Tensor*)malloc(sizeof(Tensor));
-        if (!subtensor) {
-            fprintf(stderr, "Error: Failed to allocate subtensor\n");
-            return NULL;
-        }
+    Tensor* subtensor = (Tensor*)malloc(sizeof(Tensor));
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (!subtensor) {
+			NNL2_ERROR("Failed to allocate subtensor in tref (getter)");
+			return NULL;
+		}
+	#endif
 
-        subtensor->dtype = tensor->dtype;
-        subtensor->rank = tensor->rank - num_indices;
+    subtensor->dtype = tensor->dtype;
+    subtensor->rank = tensor->rank - num_indices;
         
-        subtensor->shape = (int*)malloc(subtensor->rank * sizeof(int));
-        if (!subtensor->shape) {
-            fprintf(stderr, "Error: Failed to allocate subtensor shape\n");
-            free(subtensor);
-            return NULL;
-        }
-        memcpy(subtensor->shape, tensor->shape + num_indices, subtensor->rank * sizeof(int));
+    subtensor->shape = (int32_t*)malloc(subtensor->rank * sizeof(int32_t));
+    
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (!subtensor->shape) {
+			NNL2_ERROR("Failed to allocate subtensor shape in tref (getter)");
+			free(subtensor);
+			return NULL;
+		}
+	#endif
+    
+	memcpy(subtensor->shape, tensor->shape + num_indices, subtensor->rank * sizeof(int32_t));
 
-        size_t element_size = get_dtype_size(tensor->dtype);
-        subtensor->data = (char*)tensor->data + offset * element_size;
+    const size_t element_size = get_dtype_size(tensor->dtype);
+    subtensor->data = (char*)tensor->data + offset * element_size;
 
-        return subtensor;
-    }
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+
+    return subtensor;
 }
 
 Implementation tref_getter_backends[] = {
