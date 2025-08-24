@@ -212,14 +212,14 @@
 (defmacro size-in-bytes (tensor)
   `(nnl2.ffi:%get-size-in-bytes ,tensor))  
   
-(defun tref (tensor &rest shape)
+(defun view (tensor &rest shape)
   (declare (optimize (speed 3)))
 
   (let* ((shape-rank (length shape))
 		 (tensor-rank (rank tensor))
 	     (tensor-dtype (dtype tensor))
 		 (shape (make-shape-pntr (subst -1 '* shape)))
-		 (void-ptr (nnl2.ffi:%tref-getter tensor shape shape-rank)))	 
+		 (void-ptr (nnl2.ffi:%view tensor shape shape-rank)))	 
 	
 	(unless (cffi:null-pointer-p void-ptr)
 	  (if (= shape-rank tensor-rank)	 

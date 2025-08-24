@@ -41,6 +41,7 @@
    #:.exp!
    #:.exp
    #:tref
+   #:view
    #:scale!
    #:scale
    #:zeros-like
@@ -168,6 +169,7 @@
    #:use-backend/.tanh!
    #:use-backend/transpose
    #:use-backend/transpose!
+   #:get-backend/view
    #:get-backend/tref
    #:get-backend/empty
    #:get-backend/zeros
@@ -223,6 +225,7 @@
    #:get-backend/axpy!
    #:get-backend/axpy
    #:get-backends/tref
+   #:get-backends/view
    #:get-backends/empty
    #:get-backends/zeros
    #:get-backends/full
@@ -276,6 +279,7 @@
    #:get-backends/copy
    #:get-backends/axpy!
    #:get-backends/axpy
+   #:with-backend/view
    #:with-backend/tref
    #:with-backend/full
    #:with-backend/ones

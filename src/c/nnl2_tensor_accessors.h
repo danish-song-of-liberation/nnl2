@@ -938,11 +938,11 @@ void nnl2_free_tensor(Tensor* tensor) {
  ** @code
  * // Example 1: Access single element from 3D tensor
  * int indices[] = {1, 2, 3};
- * float* element = (float*)nnl2_naive_tref_getter(tensor3d, indices, 3);
+ * float* element = (float*)nnl2_naive_view(tensor3d, indices, 3);
  *
  * // Example 2: Create 2D slice from 3D tensor
  * int slice_indices[] = {1};
- * Tensor* slice = (Tensor*)nnl2_naive_tref_getter(tensor3d, slice_indices, 1);
+ * Tensor* slice = (Tensor*)nnl2_naive_view(tensor3d, slice_indices, 1);
  ** @endcode
  **
  ** @warning
@@ -964,7 +964,7 @@ void nnl2_free_tensor(Tensor* tensor) {
  * If memory allocation fails for subtensor structure or arrays
  *
  **/
-void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
+void* nnl2_naive_view(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -973,28 +973,28 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (tensor == NULL) {
-			NNL2_ERROR("Null tensor pointer in tref (getter)");
+			NNL2_ERROR("Null tensor pointer in view");
 			return NULL;
 		}
 	#endif
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (indices == NULL) {
-			NNL2_ERROR("Null indices pointer in tref (getter)");
+			NNL2_ERROR("Null indices pointer in view");
 			return NULL;
 		}
 	#endif
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
 		if (tensor->rank <= 0 || tensor->shape == NULL || tensor->data == NULL) {
-			NNL2_ERROR("Invalid tensor structure in tref (getter)");
+			NNL2_ERROR("Invalid tensor structure in view");
 			return NULL;
 		}
 	#endif
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (num_indices > tensor->rank) {
-			NNL2_ERROR("Too many indices (%u > %d) in tref (getter)", num_indices, tensor->rank);
+			NNL2_ERROR("Too many indices (%u > %d) in view", num_indices, tensor->rank);
 			return NULL;
 		}
 	#endif
@@ -1004,7 +1004,7 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 		
 		for (uint8_t i = 0; i < num_indices; i++) {
 			if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
-				NNL2_ERROR("Index %u (%d) out of bounds for dimension %u (size %d) in tref (getter)",
+				NNL2_ERROR("Index %u (%d) out of bounds for dimension %u (size %d) in view",
 							i, indices[i], i, tensor->shape[i]);
 						
 				return NULL;
@@ -1029,7 +1029,7 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (!subtensor) {
-			NNL2_ERROR("Failed to allocate subtensor in tref (getter)");
+			NNL2_ERROR("Failed to allocate subtensor in view");
 			return NULL;
 		}
 	#endif
@@ -1042,7 +1042,7 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (!subtensor->shape) {
-			NNL2_ERROR("Failed to allocate subtensor shape in tref (getter)");
+			NNL2_ERROR("Failed to allocate subtensor shape in view");
 			free(subtensor);
 			return NULL;
 		}
@@ -1057,7 +1057,7 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 	
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if (!subtensor->strides) {
-            NNL2_ERROR("Failed to allocate subtensor strides in tref (getter)");
+            NNL2_ERROR("Failed to allocate subtensor strides in view");
             free(subtensor->shape);
             free(subtensor);
             return NULL;
@@ -1096,15 +1096,15 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
  ** @see nnl2_naive_tref_getter
  ** @see nnl2_naive
  **/
-Implementation tref_getter_backends[] = {
-	REGISTER_BACKEND(nnl2_naive_tref_getter, nnl2_naive, NAIVE_BACKEND_NAME),
+Implementation nnl2_view_backends[] = {
+	REGISTER_BACKEND(nnl2_naive_view, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
 /**
  * @brief Function pointer for the active tref (getter) backend 
  * @ingroup backend_system 
  */
-trefgetterfn tref_getter;
+viewfn nnl2_view;
 
 /** 
  * @brief Sets the backend for tref (getter)
@@ -1112,8 +1112,8 @@ trefgetterfn tref_getter;
  * @param backend_name Name of the backend to activate
  * @see SET_BACKEND_BY_NAME
  */
-void set_tref_getter_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(tref_getter_backends, tref_getter, backend_name);
+void nnl2_set_view_backend(const char* backend_name) {
+    SET_BACKEND_BY_NAME(nnl2_view_backends, nnl2_view, backend_name);
 }
 
 /** 
@@ -1121,7 +1121,7 @@ void set_tref_getter_backend(const char* backend_name) {
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-MAKE_CURRENT_BACKEND(tref_getter);
+MAKE_CURRENT_BACKEND(nnl2_view);
 
 /** 
  * @brief Gets the name of the active backend for tref (getter)
@@ -1129,8 +1129,8 @@ MAKE_CURRENT_BACKEND(tref_getter);
  * @return Name of the current backend
  * @see CURRENT_BACKEND
  */
-const char* get_tref_getter_backend() {
-	return CURRENT_BACKEND(tref_getter);
+const char* nnl2_get_view_backend() {
+	return CURRENT_BACKEND(nnl2_view);
 }
 
 /** 
@@ -1138,14 +1138,14 @@ const char* get_tref_getter_backend() {
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
-DEFINE_GET_BACKENDS_FUNCTION(tref_getter);
+DEFINE_GET_BACKENDS_FUNCTION(nnl2_view);
 
 /**
  * @brief Function declaration for getting the number of all `tref (getter)` backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
-DEFINE_GET_NUMS_BACKENDS_FUNCTION(tref_getter);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_view);
 
 void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	size_t total_elems = product(tensor->shape, tensor->rank);	
@@ -3284,22 +3284,25 @@ void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, 
         switch(tensor_dtype) {
             case FLOAT64: {
                 double* change_elem = (double*)change_with;
-                double* elem = (double*)tref_getter(tensor, shape, rank);
+                double* elem = (double*)nnl2_view(tensor, shape, rank);
                 *elem = *change_elem;
                 break;
             }
+			
             case FLOAT32: {
                 float* change_elem = (float*)change_with;
-                float* elem = (float*)tref_getter(tensor, shape, rank);
+                float* elem = (float*)nnl2_view(tensor, shape, rank);
                 *elem = *change_elem;
                 break;
             }
+			
             case INT32: {
                 int32_t* change_elem = (int32_t*)change_with;
-                int32_t* elem = (int32_t*)tref_getter(tensor, shape, rank);
+                int32_t* elem = (int32_t*)nnl2_view(tensor, shape, rank);
                 *elem = *change_elem;
                 break;
             }
+			
             default: {
                 fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
                 return;
@@ -3326,8 +3329,8 @@ void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, 
 
 void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank) {
     if (src_rank == src->rank) {
-        void* dest_ptr = tref_getter(dest, dest_shape, dest_rank);
-        void* src_ptr = tref_getter(src, src_shape, src_rank);
+        void* dest_ptr = nnl2_view(dest, dest_shape, dest_rank);
+        void* src_ptr = nnl2_view(src, src_shape, src_rank);
         
         size_t type_size;
         switch (dest->dtype) {
@@ -3360,10 +3363,18 @@ Implementation tref_setter_backends[] = {
 };	
 
 trefsetterfn tref_setter;
+make_current_backend(tref_setter);
 
 void set_tref_setter_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(tref_setter_backends, tref_setter, backend_name);
 }
+
+const char* get_tref_setter_backend() {
+	return CURRENT_BACKEND(tref_setter);
+}
+
+DEFINE_GET_BACKENDS_FUNCTION(tref_setter);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(tref_setter);
 
 void naive_scaleinplace(Tensor* tensor, float multiplier) {
 	void* data = tensor->data;

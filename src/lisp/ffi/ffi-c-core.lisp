@@ -42,7 +42,7 @@
   (dtype tensor-type)
   (filler :pointer))  
 
-(cffi:defcfun ("lisp_call_tref_getter" %tref-getter) :pointer
+(cffi:defcfun ("lisp_call_view" %view) :pointer
   (tensor :pointer)
   (shape :pointer)
   (rank :int))
@@ -472,7 +472,7 @@
 (cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
   (tensor :pointer))
  
-(cffi:defcfun ("set_tref_getter_backend" %set-tref-getter-backend) :void
+(cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
   (backend-name :string))   
   
 (cffi:defcfun ("set_tref_setter_backend" %set-tref-setter-backend) :void
@@ -718,7 +718,7 @@
 (cffi:defcfun ("set_axpy_broadcasting_backend" %set-axpy-broadcasting-backend) :void
   (backend-name :string)) 
   
-(cffi:defcfun ("get_tref_getter_backend" %get-tref-getter-backend) :string)    
+(cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_empty_backend" %get-empty-backend) :string)  
 (cffi:defcfun ("nnl2_get_zeros_backend" %get-zeros-backend) :string)
 (cffi:defcfun ("get_inplace_fill_backend" %get-inplace-fill-backend) :string)
@@ -766,8 +766,10 @@
 (cffi:defcfun ("get_axpy_inplace_backend" %get-axpy-inplace-backend) :string) 
 (cffi:defcfun ("get_axpy_backend" %get-axpy-backend) :string) 
 
-(cffi:defcfun ("get_tref_getter_num_backends" %get-tref-getter-num-backends) :int)
-(cffi:defcfun ("get_tref_getter_backends" %get-tref-getter-backends) :pointer)
+(cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
+(cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
+(cffi:defcfun ("get_tref_setter_num_backends" %get-tref-setter-num-backends) :int)
+(cffi:defcfun ("get_tref_setter_backends" %get-tref-setter-backends) :pointer)
 (cffi:defcfun ("get_nnl2_empty_num_backends" %get-empty-num-backends) :int)
 (cffi:defcfun ("get_nnl2_empty_backends" %get-empty-backends) :pointer)
 (cffi:defcfun ("get_nnl2_zeros_num_backends" %get-zeros-num-backends) :int)

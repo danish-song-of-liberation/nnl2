@@ -47,8 +47,8 @@ void init_system() {
 		NNL2_LOG_LEVEL_DEBUG
 	); 
       
-	EINIT_BACKEND(tref_getter, tref_getter_backends, CURRENT_BACKEND(tref_getter));
-	INIT_BACKEND(tref_setter, tref_setter_backends);
+	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
+	EINIT_BACKEND(tref_setter, tref_setter_backends, CURRENT_BACKEND(tref_setter));
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
 	EINIT_BACKEND(nnl2_zeros, nnl2_zeros_backends, CURRENT_BACKEND(nnl2_zeros));   
@@ -88,7 +88,7 @@ void init_system() {
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
 	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));   
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn)); 
-	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier)); 
+	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));  
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum));   
@@ -121,7 +121,7 @@ void init_system() {
 	INIT_BACKEND(max_broadcasting_inplace, max_broadcasting_inplace_backends);
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends);
 	INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
-	INIT_BACKEND(min_broadcasting, min_broadcasting_backends);
+	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy));
@@ -131,8 +131,8 @@ void init_system() {
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);   
 }      
 
-void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
-	return tref_getter(tensor, indices, num_indices);
+void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
+	return nnl2_view(tensor, indices, num_indices);
 }
 
 void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
@@ -305,7 +305,7 @@ Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
-}
+}  
 
 void lisp_call_transposeinplace(Tensor* tensor) {
 	transposeinplace(tensor);  

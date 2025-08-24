@@ -8,8 +8,11 @@
   
 (defun use-backend/tref (name)
   (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-tref-getter-backend sig)
 	(nnl2.ffi:%set-tref-setter-backend sig)))
+	
+(defun use-backend/view (name)
+  (let ((sig (symbol-to-uppercase-string name)))
+	(nnl2.ffi:%set-view-backend sig)))	
 
 (defun use-backend/.abs (name)
   (let ((sig (symbol-to-uppercase-string name)))
@@ -221,6 +224,7 @@
 
 (defun use-backend (name)
   (use-backend/tref name)
+  (use-backend/view name)
   (use-backend/+= name)
   (use-backend/-= name)
   (use-backend/*= name)
@@ -266,6 +270,12 @@
  
 (defun (setf get-backend/tref) (name)
   (use-backend/tref name))    
+  
+(defun get-backend/view ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-view-backend)))      
+ 
+(defun (setf get-backend/view) (name)
+  (use-backend/view name))      
  
 (defun get-backend/empty ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-empty-backend)))    
@@ -569,8 +579,15 @@
   (use-backend/axpy name))
   
 (defun get-backends/tref ()
-  (let ((num-backends (nnl2.ffi:%get-tref-getter-num-backends))
-	    (backends (nnl2.ffi:%get-tref-getter-backends)))
+  (let ((num-backends (nnl2.ffi:%get-tref-setter-num-backends))
+	    (backends (nnl2.ffi:%get-tref-setter-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+
+(defun get-backends/view ()
+  (let ((num-backends (nnl2.ffi:%get-view-num-backends))
+	    (backends (nnl2.ffi:%get-view-backends)))
 		
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
@@ -928,7 +945,16 @@
              (setf (get-backend/tref) ,name)
              ,@body)
          (setf (get-backend/tref) ,old-backend-sym)))))
-	
+
+(defmacro with-backend/view (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/view)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/view) ,name)
+             ,@body)
+         (setf (get-backend/view) ,old-backend-sym)))))
+		 
 (defmacro with-backend/full (name &body body)
   (let ((old-backend-sym (gensym "old-backend-")))
     `(let ((,old-backend-sym (get-backend/full)))
