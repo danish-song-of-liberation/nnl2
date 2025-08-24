@@ -72,7 +72,7 @@ void init_system() {
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));  
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace)); 
-	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));    
+	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));      
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));   
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));  

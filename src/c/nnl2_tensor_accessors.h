@@ -895,28 +895,81 @@ void nnl2_free_tensor(Tensor* tensor) {
 
 /** @brief
  * Gets an element or a subtensor from a tensor using the specified indices
+ * Uses precomputed strides for optimal performance
  *
  ** @param tensor
- * Pointer to the tensor from which the sample is taken
+ * Pointer to the source tensor from which to extract elements or subtensors
+ * Must be a valid tensor with properly initialized strides and shape arrays
  *
  ** @param indices
- * An array of indices for accessing tensor elements
+ * An array of indices for accessing tensor elements along each dimension
+ * Indices are applied in row-major order (first index for outermost dimension)
+ * Partial indexing is supported for creating subtensors
  *
  ** @param num_indices
- * The number of indexes in the indeсes array
+ * The number of indices in the indices array
+ * Can range from 0 (return full tensor view) to tensor->rank (return single element)
+ *
+ ** @return
+ * If num_indices == tensor->rank returns pointer to the specific element in tensor data
+ * If num indices < tensor->rank returns pointer to a subtensor
+ * NULL in case of any error or invalid parameters
+ *
+ ** @note
+ * When returning a subtensor, it creates a view that shares data with the original tensor
+ * Modifications to the subtensor will affect the original tensor and vice versa
  *
  ** @note
  * The function performs index boundary checks based on the safety level
+ *
+ ** @note
+ * Uses tensor->strides for efficient offset calculation
+ *
+ ** @details
+ * The function firstly:
+ *
+ *** Сhecks the parameters for correctness
+ ** Then
+ *** Calculates the shift using steps
+ ** Finally
+ *** Returns a result based on the received 
+ *** data, namely a scalar or a subtensor
+ *
+ ** @code
+ * // Example 1: Access single element from 3D tensor
+ * int indices[] = {1, 2, 3};
+ * float* element = (float*)nnl2_naive_tref_getter(tensor3d, indices, 3);
+ *
+ * // Example 2: Create 2D slice from 3D tensor
+ * int slice_indices[] = {1};
+ * Tensor* slice = (Tensor*)nnl2_naive_tref_getter(tensor3d, slice_indices, 1);
+ ** @endcode
+ **
+ ** @warning
+ * The returned subtensor is a view that shares data with the original tensor
+ * Freeing the original tensor while subtensors exist will cause dangling pointers
  *
  ** @see nnl2_free_tensor()
  ** @see get_dtype_size()
  ** @see NNL2_DEBUG_MODE
  ** @see NNL2_SAFETY_MODE
+ **
+ ** @exception[invalid_argument]
+ * If tensor is NULL, indices is NULL, or tensor structure is invalid
+ *
+ ** @exception[out_of_range]
+ * If num_indices exceeds tensor rank or any index is out of bounds
+ *
+ ** @exception[out_of_memory]
+ * If memory allocation fails for subtensor structure or arrays
+ *
  **/
 void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
+	
+	// Parameter validation and safety checks
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (tensor == NULL) {
@@ -947,6 +1000,8 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 	#endif
 
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		// Validate each index against corresponding dimension bounds
+		
 		for (uint8_t i = 0; i < num_indices; i++) {
 			if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
 				NNL2_ERROR("Index %u (%d) out of bounds for dimension %u (size %d) in tref (getter)",
@@ -957,16 +1012,14 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 		}
 	#endif
 	
+	// Offset calculation using precomputed strides
     size_t offset = 0;
-    size_t stride = 1;
 
-    for (int i = tensor->rank - 1; i >= 0; i--) {
-        if (i < num_indices) {
-            offset += indices[i] * stride;
-        }
-        stride *= tensor->shape[i];
+    for (uint8_t i = 0; i < num_indices; i++) {
+        offset += indices[i] * tensor->strides[i];	
     }
-
+	
+	// Result construction
     if (num_indices == tensor->rank) {
         const size_t element_size = get_dtype_size(tensor->dtype);
 		return (char*)tensor->data + offset * element_size;
@@ -984,6 +1037,7 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
     subtensor->dtype = tensor->dtype;
     subtensor->rank = tensor->rank - num_indices;
         
+	 // Allocate and copy remaining shape dimensions	
     subtensor->shape = (int32_t*)malloc(subtensor->rank * sizeof(int32_t));
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
@@ -994,8 +1048,32 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 		}
 	#endif
     
+	// Copy shape information for non-indexed dimensions
 	memcpy(subtensor->shape, tensor->shape + num_indices, subtensor->rank * sizeof(int32_t));
 
+	// Allocate and copy corresponding strides
+	// Strides for remaining dimensions remain valid since they're precomputed
+	subtensor->strides = (int32_t*)malloc(subtensor->rank * sizeof(int32_t));
+	
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!subtensor->strides) {
+            NNL2_ERROR("Failed to allocate subtensor strides in tref (getter)");
+            free(subtensor->shape);
+            free(subtensor);
+            return NULL;
+        }
+    #endif
+	
+	// Copy stride information for non-indexed dimensions
+	memcpy(subtensor->strides, tensor->strides + num_indices, subtensor->rank * sizeof(int32_t));
+
+	// Calculate total elements in subtensor
+	subtensor->numel = 1;
+    for (int i = 0; i < subtensor->rank; i++) {
+        subtensor->numel *= subtensor->shape[i];
+    }
+
+	// Set data pointer to shared memory with calculated offset
     const size_t element_size = get_dtype_size(tensor->dtype);
     subtensor->data = (char*)tensor->data + offset * element_size;
 
