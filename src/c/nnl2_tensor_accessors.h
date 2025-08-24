@@ -337,16 +337,12 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 			NNL2_ERROR("Bad shape pointer (NULL)"); 
 			return NULL;
 		}	
-	#endif
-	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+
 		if (rank <= 0) {
 			NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
 			return NULL;
 		}
-	#endif
-	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		
 		if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
 			NNL2_ERROR("Bad tensor type (%d)", dtype);
 			return NULL;
@@ -631,9 +627,7 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 			NNL2_ERROR("Bad rank (%d). Rank must be positive", rank);
 			return NULL;
 		}
-	#endif
-	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		
 		if (dtype < 0 || dtype >= NUM_TENSOR_TYPES) {
 			NNL2_ERROR("Invalid tensor data type (%d). Must be in range [0, %d]", dtype, NUM_TENSOR_TYPES - 1);
 			return NULL;
@@ -997,11 +991,8 @@ void* nnl2_naive_view(Tensor* tensor, const int32_t* indices, uint8_t num_indice
 			NNL2_ERROR("Too many indices (%u > %d) in view", num_indices, tensor->rank);
 			return NULL;
 		}
-	#endif
-
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		// Validate each index against corresponding dimension bounds
 		
+		// Validate each index against corresponding dimension bounds	
 		for (uint8_t i = 0; i < num_indices; i++) {
 			if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
 				NNL2_ERROR("Index %u (%d) out of bounds for dimension %u (size %d) in view",
@@ -1093,7 +1084,7 @@ void* nnl2_naive_view(Tensor* tensor, const int32_t* indices, uint8_t num_indice
  *
  ** @see REGISTER_BACKEND
  ** @see NAIVE_BACKEND_NAME
- ** @see nnl2_naive_tref_getter
+ ** @see nnl2_naive_view
  ** @see nnl2_naive
  **/
 Implementation nnl2_view_backends[] = {
@@ -1249,9 +1240,7 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
             NNL2_ERROR("Too many indices (%u > %d) in copy", num_indices, tensor->rank);
             return NULL;
         }
-    #endif
 
-    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         for (uint8_t i = 0; i < num_indices; i++) {
             if (indices[i] < 0 || indices[i] >= tensor->shape[i]) {
                 NNL2_ERROR("Index %u (%d) out of bounds for dimension %u (size %d) in copy",
@@ -1354,12 +1343,35 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
 
     return subtensor;
 }
+
+/** @ingroup backend_system
+ ** @brief Backend implementations for view
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - nnl2_naive_tref_getter: Basic reference implementation
+ *
+ ** @see REGISTER_BACKEND
+ ** @see NAIVE_BACKEND_NAME
+ ** @see nnl2_naive_tref_getter
+ ** @see nnl2_naive
+ **/
 Implementation nnl2_tref_getter_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_tref_getter, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for the active tref (getter) 
+ * @ingroup backend_system 
+ */
 trefgetterfn nnl2_tref_getter;
 
+/** 
+ * @brief Sets the backend for tref (getter)
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ */
 void nnl2_set_tref_getter_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(nnl2_tref_getter_backends, nnl2_tref_getter, backend_name);
 }
