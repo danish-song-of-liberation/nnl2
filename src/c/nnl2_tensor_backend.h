@@ -60,8 +60,9 @@ typedef enum {
 typedef struct {
 	TensorType dtype;
 	void* data;
-	int* shape;
-	int rank;
+	int32_t* shape;
+	int32_t* strides;
+	int32_t rank;
 	size_t numel;
 } Tensor;
 

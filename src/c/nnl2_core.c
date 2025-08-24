@@ -47,7 +47,7 @@ void init_system() {
 		NNL2_LOG_LEVEL_DEBUG
 	); 
       
-	EINIT_BACKEND(tref_getter, tref_getter_backends, current_backend(tref_getter));
+	EINIT_BACKEND(tref_getter, tref_getter_backends, CURRENT_BACKEND(tref_getter));
 	INIT_BACKEND(tref_setter, tref_setter_backends);
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
@@ -60,7 +60,7 @@ void init_system() {
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub)); 
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
-	EINIT_BACKEND(mul, mul_backends, current_backend(mul));     
+	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	   
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));   
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));     
@@ -72,11 +72,11 @@ void init_system() {
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));  
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace)); 
-	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));  
+	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));    
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));   
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));  
-	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack)); 
+	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
 	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));       
 	EINIT_BACKEND(relu, relu_backends, current_backend(relu));    

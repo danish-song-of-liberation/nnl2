@@ -87,6 +87,10 @@
 
 #define NNL2_SAFETY_MODE NNL2_SAFETY_MODE_MAX
 
+#define NNL2_STRIDES_LAST_DIM_INDEX 1
+#define NNL2_STRIDES_SECOND_LAST_DIM_INDEX 2
+#define NNL2_STRIDES_NEXT_DIM_INDEX 1
+
 // NNL2
 
 /** @file nnl2_tensor_accessors.h
@@ -243,6 +247,8 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  * The created tensor will have the numel field pre-calculated for
  * optimal performance in subsequent operations
  *
+ * And also, the tensor has strides fields that will be initialized inside
+ *
  ** @param shape
  * A pointer to an array of integers representing the tensor's shape
  *
@@ -265,8 +271,10 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  ** Then
  *** Allocates memory for the shape array and copies the data into it
  ** Then
- *** Calculates the total number of elements and checks for multiplication overflow
- *** to prevent size_t overflow when calculating total memory size
+ *** Calculates the total number of elements and strides
+ ** Then
+ *** Checks for multiplication overflow to prevent size_t 
+ *** overflow when calculating total memory size
  ** Then 
  *** Allocates aligned memory for the tensor data (tensor->data)
  ** Finally
@@ -303,6 +311,9 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  ** @see ALLOC_ALIGNED
  ** @see NNL2_DEBUG_MODE
  ** @see NNL2_SAFETY_MODE
+ ** @see NNL2_STRIDES_LAST_DIM_INDEX
+ ** @see NNL2_STRIDES_SECOND_LAST_DIM_INDEX
+ ** @see NNL2_STRIDES_NEXT_DIM_INDEX
  *
  ** @exception[out_of_memory] 
  * If memory allocation fails for tensor structure, shape array, or data
@@ -365,6 +376,7 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	
 	// Allocates memory for the shape array and copies the data into it
 	
+	size_t total_elems = 1;
 	tensor->shape = malloc(rank * sizeof(int));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
@@ -377,8 +389,28 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
-	// Calculates the total size of the data required for the tensor
-	size_t total_elems = product(shape, rank);
+	tensor->strides = malloc(rank);
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (tensor->strides == NULL) {
+			NNL2_ERROR("Failed to allocate memory for strides");
+			free(tensor->shape);
+			free(tensor);
+			return NULL;
+		}
+	#endif
+	
+	// Initializes the step for the last dimension
+	// Stride for the innermost (last) dimension is 1
+	tensor->strides[rank - NNL2_STRIDES_LAST_DIM_INDEX] = 1;
+	total_elems *= shape[rank - NNL2_STRIDES_LAST_DIM_INDEX];
+	
+	// Going from the second-to-last dimension to the first (from left to right in shape)
+	for(int i = rank - NNL2_STRIDES_SECOND_LAST_DIM_INDEX; i >= 0; i--) {
+		tensor->strides[i] = tensor->strides[i + NNL2_STRIDES_NEXT_DIM_INDEX] * shape[i + NNL2_STRIDES_NEXT_DIM_INDEX];
+		total_elems *= shape[i];
+	}
+
 	tensor->numel = total_elems;
 	
 	size_t type_size = get_dtype_size(dtype);
@@ -466,6 +498,7 @@ MAKE_CURRENT_BACKEND(nnl2_empty);
  * @brief Gets the name of the active backend for empty()
  * @ingroup backend_system
  * @return Name of the current backend
+ * @see CURRENT_BACKEND
  */
 const char* nnl2_get_empty_backend() {
 	return CURRENT_BACKEND(nnl2_empty);
@@ -496,6 +529,8 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  * The created tensor will have the numel field pre-calculated for
  * optimal performance in subsequent operations
  *
+ * And also, the tensor has strides fields that will be initialized inside
+ *
  ** @param shape
  * A pointer to an array of integers representing the tensor's shape
  *
@@ -518,7 +553,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  ** Then
  *** Allocates memory for the shape array and copies the data into it
  ** Then
- *** Calculates the total size of the data required for the tensor
+ *** Calculates the total number of elements and strides
+ ** Then
+ *** Checks for multiplication overflow to prevent size_t 
+ *** overflow when calculating total memory size
  ** Then 
  *** Allocates aligned memory for the tensor data (tensor->data)
  ** Finally
@@ -560,6 +598,9 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  ** @see ALLOC_ALIGNED
  ** @see NNL2_DEBUG_MODE
  ** @see NNL2_SAFETY_MODE
+ ** @see NNL2_STRIDES_LAST_DIM_INDEX
+ ** @see NNL2_STRIDES_SECOND_LAST_DIM_INDEX
+ ** @see NNL2_STRIDES_NEXT_DIM_INDEX
  *
  ** @exception[out_of_memory] 
  * If memory allocation fails for tensor structure, shape array, or data
@@ -634,11 +675,33 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 		}
 	#endif
 	
+	size_t total_elems = 1; // Initializing total_elems
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
 	// Calculates the total size of the data required for the tensor
 	
-	size_t total_elems = product(shape, rank);
+	tensor->strides = malloc(rank);
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (tensor->strides == NULL) {
+			NNL2_ERROR("Failed to allocate memory for strides");
+			free(tensor->shape);
+			free(tensor);
+			return NULL;
+		}
+	#endif
+	
+	// Initializes the step for the last dimension
+	// Stride for the innermost (last) dimension is 1
+	tensor->strides[rank - NNL2_STRIDES_LAST_DIM_INDEX] = 1;
+	total_elems *= shape[rank - NNL2_STRIDES_LAST_DIM_INDEX];
+	
+	// Going from the second-to-last dimension to the first (from left to right in shape)
+	for(int i = rank - NNL2_STRIDES_SECOND_LAST_DIM_INDEX; i >= 0; i--) {
+		tensor->strides[i] = tensor->strides[i + NNL2_STRIDES_NEXT_DIM_INDEX] * shape[i + NNL2_STRIDES_NEXT_DIM_INDEX];
+		total_elems *= shape[i];
+	}
+	
 	tensor->numel = total_elems;
 	
 	size_t type_size = get_dtype_size(dtype);
@@ -727,6 +790,7 @@ MAKE_CURRENT_BACKEND(nnl2_zeros);
  * @brief Gets the name of the active backend for zeros()
  * @ingroup backend_system
  * @return Name of the current backend
+ * @see CURRENT_BACKEND
  */
 const char* nnl2_get_zeros_backend() {
 	return CURRENT_BACKEND(nnl2_zeros);
@@ -793,6 +857,7 @@ void nnl2_free_tensor(Tensor* tensor) {
 	
 	#if NNL2_SAFETY_MODE <= NNL2_SAFETY_MODE_MODERATE
 		free(tensor->shape); 
+		free(tensor->strides);
 		FREE_ALIGNED(tensor->data);
 	#else
 		// Safe freeing
@@ -804,6 +869,14 @@ void nnl2_free_tensor(Tensor* tensor) {
 			free(tensor->shape);
 		}
     
+		if (tensor->strides != NULL) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+				NNL2_DEBUG("Freeing strides [%p]", (void*)tensor->strides);
+			#endif
+			
+			free(tensor->strides);
+		}
+	
 		if (tensor->data != NULL) {
 			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 				NNL2_DEBUG("Freeing data [%p]", (void*)tensor->data);
@@ -820,6 +893,26 @@ void nnl2_free_tensor(Tensor* tensor) {
 	#endif
 }
 
+/** @brief
+ * Gets an element or a subtensor from a tensor using the specified indices
+ *
+ ** @param tensor
+ * Pointer to the tensor from which the sample is taken
+ *
+ ** @param indices
+ * An array of indices for accessing tensor elements
+ *
+ ** @param num_indices
+ * The number of indexes in the indeсes array
+ *
+ ** @note
+ * The function performs index boundary checks based on the safety level
+ *
+ ** @see nnl2_free_tensor()
+ ** @see get_dtype_size()
+ ** @see NNL2_DEBUG_MODE
+ ** @see NNL2_SAFETY_MODE
+ **/
 void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num_indices) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
@@ -913,23 +1006,67 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
     return subtensor;
 }
 
+/** @ingroup backend_system
+ ** @brief Backend implementations for tref (tensor reference) (getter)
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - nnl2_naive_tref_getter: Basic reference implementation
+ *
+ ** @see REGISTER_BACKEND
+ ** @see NAIVE_BACKEND_NAME
+ ** @see nnl2_naive_tref_getter
+ ** @see nnl2_naive
+ **/
 Implementation tref_getter_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_tref_getter, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for the active tref (getter) backend 
+ * @ingroup backend_system 
+ */
 trefgetterfn tref_getter;
 
+/** 
+ * @brief Sets the backend for tref (getter)
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ */
 void set_tref_getter_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(tref_getter_backends, tref_getter, backend_name);
 }
 
-make_current_backend(tref_getter);
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(tref_getter);
 
+/** 
+ * @brief Gets the name of the active backend for tref (getter)
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_tref_getter_backend() {
-	return current_backend(tref_getter);
+	return CURRENT_BACKEND(tref_getter);
 }
 
+/** 
+ * @brief Function declaration for getting all `tref (getter)` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(tref_getter);
+
+/**
+ * @brief Function declaration for getting the number of all `tref (getter)` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(tref_getter);
 
 void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
