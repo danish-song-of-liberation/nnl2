@@ -229,6 +229,24 @@
 	      (:int32 (cffi:mem-ref void-ptr :int)))
 	  
 	    void-ptr))))
+		
+(defun tref (tensor &rest shape)
+  (declare (optimize (speed 3)))
+
+  (let* ((shape-rank (length shape))
+		 (tensor-rank (rank tensor))
+	     (tensor-dtype (dtype tensor))
+		 (shape (make-shape-pntr (subst -1 '* shape)))
+		 (void-ptr (nnl2.ffi:%tref-getter tensor shape shape-rank)))	 
+	
+	(unless (cffi:null-pointer-p void-ptr)
+	  (if (= shape-rank tensor-rank)	 
+	    (case tensor-dtype
+	      (:float64 (cffi:mem-ref void-ptr :double))	 
+          (:float32 (cffi:mem-ref void-ptr :float))
+	      (:int32 (cffi:mem-ref void-ptr :int)))
+	  
+	    void-ptr))))		
 	  
 (defun (setf tref) (change-to tensor &rest shape)
   (let* ((shape-rank (length shape))

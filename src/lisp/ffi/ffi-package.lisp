@@ -34,6 +34,7 @@
    #:%.log
    #:%view
    #:%tref-setter
+   #:%tref-getter
    #:%scale!
    #:%scale
    #:%zeros-like
@@ -103,6 +104,7 @@
    #:%axpy!
    #:%set-view-backend
    #:%set-tref-setter-backend
+   #:%set-tref-getter-backend
    #:%set-abs-backend
    #:%set-abs-inplace-backend
    #:%set-inplace-fill-backend
@@ -237,6 +239,8 @@
    #:%get-view-num-backends
    #:%get-tref-setter-num-backends
    #:%get-tref-setter-backends
+   #:%get-tref-getter-num-backends
+   #:%get-tref-getter-backends
    #:%get-empty-backends
    #:%get-empty-num-backends
    #:%get-zeros-num-backends

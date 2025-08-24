@@ -48,7 +48,8 @@ void init_system() {
 	); 
       
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
-	EINIT_BACKEND(tref_setter, tref_setter_backends, CURRENT_BACKEND(tref_setter));
+	INIT_BACKEND(tref_setter, tref_setter_backends);
+	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
 	EINIT_BACKEND(nnl2_zeros, nnl2_zeros_backends, CURRENT_BACKEND(nnl2_zeros));   
@@ -133,11 +134,15 @@ void init_system() {
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_view(tensor, indices, num_indices);
-}
+} 
 
 void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
 	tref_setter(tensor, shape, rank, change_with, tensor_p);
 }
+
+void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
+	return nnl2_tref_getter(tensor, indices, num_indices);
+} 
   
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
@@ -224,10 +229,10 @@ Tensor* lisp_call_log(Tensor* tensor) {
 } 
   
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
-	scaleinplace(tensor, multiplier);  
+	scaleinplace(tensor, multiplier);     
 }
 
-Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {
+Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {   
 	return scale(tensor, multiplier); 
 }
   
@@ -238,7 +243,7 @@ void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
 	mininplace(tensora, tensorb);
 }
-
+  
 Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
 	return nnl2_max(tensora, tensorb);  
 } 
@@ -248,7 +253,7 @@ Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) {
 }  
   
 void lisp_call_absinplace(Tensor* tensor) {
-	absinplace(tensor); 
+	absinplace(tensor);     
 }
   
 Tensor* lisp_call_abs(Tensor* tensor) {

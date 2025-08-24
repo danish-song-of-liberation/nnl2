@@ -98,6 +98,6 @@
 (fiveam:test nnl2.hli.ts/.tanh/int32
   (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.tanh-operation-shape* :val 1 :expected 0.7615941559557649d0 :op #'nnl2.hli.ts:.tanh :tolerance 0.001))				 
    
-;; the continuation of the file is `ts-tests-activation-functions-inplace.lisp` 
+;; The continuation of the file is `ts-tests-activation-functions-inplace.lisp` 
 ;; with the implementation of activation function tests in place   
    

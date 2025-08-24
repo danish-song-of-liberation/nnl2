@@ -8,6 +8,7 @@
   
 (defun use-backend/tref (name)
   (let ((sig (symbol-to-uppercase-string name)))
+    (nnl2.ffi:%set-tref-getter-backend sig)
 	(nnl2.ffi:%set-tref-setter-backend sig)))
 	
 (defun use-backend/view (name)
@@ -579,8 +580,8 @@
   (use-backend/axpy name))
   
 (defun get-backends/tref ()
-  (let ((num-backends (nnl2.ffi:%get-tref-setter-num-backends))
-	    (backends (nnl2.ffi:%get-tref-setter-backends)))
+  (let ((num-backends (nnl2.ffi:%get-tref-getter-num-backends))
+	    (backends (nnl2.ffi:%get-tref-getter-backends)))
 		
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
