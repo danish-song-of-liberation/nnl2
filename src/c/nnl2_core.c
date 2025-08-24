@@ -48,7 +48,7 @@ void init_system() {
 	); 
       
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
-	INIT_BACKEND(tref_setter, tref_setter_backends);
+	INIT_BACKEND(tref_setter, tref_setter_backends);   
 	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
@@ -82,27 +82,27 @@ void init_system() {
 	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));       
 	EINIT_BACKEND(relu, relu_backends, current_backend(relu));    
 	EINIT_BACKEND(leakyreluinplace, leakyreluinplace_backends, current_backend(leakyreluinplace));  
-	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));  
+	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));   
 	EINIT_BACKEND(sigmoidinplace, sigmoidinplace_backends, current_backend(sigmoidinplace)); 
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(tanhinplace, tanhinplace_backends, current_backend(tanhinplace)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
-	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));   
-	EINIT_BACKEND(randn, randn_backends, current_backend(randn)); 
+	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));     
+	EINIT_BACKEND(randn, randn_backends, current_backend(randn));  
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));  
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
-	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum));   
+	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum));    
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));  
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
-	INIT_BACKEND(add_incf, add_incf_backends);  
+	INIT_BACKEND(add_incf, add_incf_backends);    
 	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends); 
 	INIT_BACKEND(sub_decf, sub_decf_backends); 
 	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends);  
 	INIT_BACKEND(mul_mulf, mul_mulf_backends); 
-	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);   
-	INIT_BACKEND(div_divf, div_divf_backends); 
+	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);    
+	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);   
@@ -127,7 +127,7 @@ void init_system() {
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy));
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
-	INIT_BACKEND(axpf, axpf_backends);
+	INIT_BACKEND(axpf, axpf_backends); 
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);   
 }      
@@ -143,7 +143,7 @@ void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_wi
 void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_tref_getter(tensor, indices, num_indices);
 } 
-  
+     
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
 } 
@@ -151,7 +151,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return nnl2_zeros(shape, rank, dtype); 
 }  	  	          
-        
+               
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
@@ -267,14 +267,14 @@ Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {  
 	return vstack(tensora, tensorb);
 }
- 
+  
 void lisp_call_reluinplace(Tensor* tensor) {
 	reluinplace(tensor);
 }  	
  
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
-}
+}         
  
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha); 

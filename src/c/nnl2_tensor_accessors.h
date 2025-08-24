@@ -74,6 +74,9 @@
 #define MAKE_CURRENT_BACKEND(name) static char current_##name##_backend_name[MAX_BACKEND_NAME_LENGTH] = ""
 
 #define NAIVE_BACKEND_NAME "NAIVE"
+#define UNROLL_128_BACKEND_NAME "UNROLL128"
+#define UNROLL_256_BACKEND_NAME "UNROLL256"
+#define UNROLL_512_BACKEND_NAME "UNROLL512"
 #define AVX128_BACKEND_NAME "AVX128"
 #define AVX256_BACKEND_NAME "AVX256"
 #define BLAS_BACKEND_NAME "BLAS"
@@ -85,11 +88,13 @@
 #define NNL2_SAFETY_MODE_MODERATE 2
 #define NNL2_SAFETY_MODE_MAX 3
 
-#define NNL2_SAFETY_MODE NNL2_SAFETY_MODE_MAX
+#define NNL2_SAFETY_MODE NNL2_SAFETY_MODE_OFF
 
 #define NNL2_STRIDES_LAST_DIM_INDEX 1
 #define NNL2_STRIDES_SECOND_LAST_DIM_INDEX 2
 #define NNL2_STRIDES_NEXT_DIM_INDEX 1
+
+#define NNL2_TYPE_ERROR(transmitted_data_type) NNL2_ERROR("Invalid data-type: %d", transmitted_data_type)
 
 // NNL2
 
@@ -191,7 +196,7 @@ inline size_t get_dtype_size(TensorType dtype) {
  ** @see NNL2_SAFETY_MODE
  ** @see NNL2_FORCE_INLINE
  **/
-NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rename from product to nnl2_product
+NNL2_FORCE_INLINE static size_t product(const int32_t* lst, int32_t len) { // todo rename from product to nnl2_product
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();	
 		int32_t original_len = len;
@@ -199,7 +204,7 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
 	
 	// Additional checks when the debugging level is sufficient 
 	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (lst == NULL) {
 			NNL2_ERROR("product(): NULL pointer passed as shape array");
 			return 0;
@@ -211,31 +216,42 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
 		}
 	#endif
 	
-	size_t acc = 1;
-	while (len--) {
-		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE 
-			if (*lst <= 0) {
-				NNL2_ERROR("product(): Invalid dimension value %d", *lst);
-				return 0;
-			}
-		#endif
+	switch(len) {
+		// Unrolling
+		case 0: return 0;  
+		case 1: return lst[0];
+		case 2: return lst[0] * lst[1]; 
+		case 3: return lst[0] * lst[1] * lst[2];
+		case 4: return lst[0] * lst[1] * lst[2] * lst[3];
 		
-		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-			if (acc > SIZE_MAX / (size_t)(*lst)) {
-				NNL2_ERROR("Multiplication overflow in product()");
+		default: {
+			size_t acc = 1;
+			while (len--) {
+				#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE 
+					if (*lst <= 0) {
+						NNL2_ERROR("product(): Invalid dimension value %d", *lst);
+						return 0;
+					}
+				#endif
+				
+				#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+					if (acc > SIZE_MAX / (size_t)(*lst)) {
+						NNL2_ERROR("Multiplication overflow in product()");
+					}
+				#endif
+				
+				// Calculation
+				acc *= (size_t)*lst++;
 			}
-        #endif
-		
-		// Calculation
-		acc *= (size_t)*lst++;
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+				NNL2_DEBUG("Product calculated for shape[%d], result=%zu", original_len, acc);
+				NNL2_FUNC_EXIT();
+			#endif
+			
+			return acc;
+		}
 	}
-	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-		NNL2_DEBUG("Product calculated for shape[%d], result=%zu", original_len, acc);
-		NNL2_FUNC_EXIT();
-	#endif
-	
-	return acc;
 }
 
 /** @brief
@@ -243,9 +259,6 @@ NNL2_FORCE_INLINE size_t product(const int32_t* lst, int32_t len) { // todo rena
  *
  * This function allocates memory for the Tensor structure and its data,
  * using the provided shape and data type. The data memory is not (!) initialized
- *
- * The created tensor will have the numel field pre-calculated for
- * optimal performance in subsequent operations
  *
  * And also, the tensor has strides fields that will be initialized inside
  *
@@ -406,8 +419,6 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 		tensor->strides[i] = tensor->strides[i + NNL2_STRIDES_NEXT_DIM_INDEX] * shape[i + NNL2_STRIDES_NEXT_DIM_INDEX];
 		total_elems *= shape[i];
 	}
-
-	tensor->numel = total_elems;
 	
 	size_t type_size = get_dtype_size(dtype);
 	
@@ -521,9 +532,6 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_empty);
  * using the provided shape and data type
  *
  * Memory is initialized to zero
- *
- * The created tensor will have the numel field pre-calculated for
- * optimal performance in subsequent operations
  *
  * And also, the tensor has strides fields that will be initialized inside
  *
@@ -695,8 +703,6 @@ Tensor* nnl2_naive_zeros(const int* shape, int rank, TensorType dtype) {
 		tensor->strides[i] = tensor->strides[i + NNL2_STRIDES_NEXT_DIM_INDEX] * shape[i + NNL2_STRIDES_NEXT_DIM_INDEX];
 		total_elems *= shape[i];
 	}
-	
-	tensor->numel = total_elems;
 	
 	size_t type_size = get_dtype_size(dtype);
 	
@@ -1263,9 +1269,11 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
         // Copy single element using aligned allocation
         void* element_copy = NULL;
         ALLOC_ALIGNED(element_copy, TENSOR_MEM_ALIGNMENT, element_size);
+		
         #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
             if (!element_copy) {
                 NNL2_ERROR("Failed to allocate element copy");
+				free(element_copy);
                 return NULL;
             }
         #endif
@@ -1407,7 +1415,44 @@ DEFINE_GET_BACKENDS_FUNCTION(nnl2_tref_getter);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_tref_getter);
 
+/** @brief
+ * Fills the tensor with the specified value in-place
+ *
+ ** @details
+ * The function fills all tensor elements with the specified value.
+ * The operation is performed directly in the tensor memory without creating copies.
+ * INT32, FLOAT32, and FLOAT64 data types are supported.
+ *
+ ** @param tensor
+ * Pointer to the tensor structure for filling
+ *
+ ** @param value 
+ * Pointer to a value to be filled (the type must match the dtype)
+ *
+ ** @param dtype
+ * The data type of the tensor value and elements
+ *
+ ** @example
+ * // Filling a tensor with integers
+ * int32_t fill_value = 42;
+ * naive_inplace_fill(tensor, &fill_value, INT32);
+ * 
+ * // Filling a tensor with floating-point numbers
+ * float float_value = 3.14f;
+ * naive_inplace_fill(tensor, &float_value, FLOAT32);
+ */
 void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (!tensor || !tensor->data || !value) {
+			NNL2_ERROR("Incorrect tensor structure");
+			return;
+		}
+	#endif
+	
 	size_t total_elems = product(tensor->shape, tensor->rank);	
 	if (total_elems == 0) return;
 	
@@ -1432,7 +1477,394 @@ void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
 			break;
 		}
+		
+		default: {
+			NNL2_TYPE_ERROR(dtype);
+		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+}
+
+void unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (!tensor || !tensor->data || !value) {
+			NNL2_ERROR("Incorrect tensor structure");
+			return;
+		}
+	#endif
+	
+	size_t total_elems = product(tensor->shape, tensor->rank);	
+	if (total_elems == 0) return;
+	
+	switch(dtype) {
+		case INT32: {
+			int32_t filler = *(int32_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int32_t* data = (int32_t*)tensor->data;	
+			#else 
+				volatile int32_t* data = (int32_t*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)3); i += 4) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float filler = *(float*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				float* data = (float*)tensor->data;	
+			#else 
+				volatile float* data = (float*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)3); i += 4) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		case FLOAT64: {
+			double filler = *(double*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				double* data = (double*)tensor->data;	
+			#else 
+				volatile double* data = (double*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)7); i += 8) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+                data[i + 4] = filler;
+                data[i + 5] = filler;
+                data[i + 6] = filler;
+                data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		default: {
+			NNL2_TYPE_ERROR(dtype);
+		}
+	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+}
+
+void unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (!tensor || !tensor->data || !value) {
+			NNL2_ERROR("Incorrect tensor structure");
+			return;
+		}
+	#endif
+	
+	size_t total_elems = product(tensor->shape, tensor->rank);	
+	if (total_elems == 0) return;
+	
+	switch(dtype) {
+		case INT32: {
+			int32_t filler = *(int32_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int32_t* data = (int32_t*)tensor->data;	
+			#else 
+				volatile int32_t* data = (int32_t*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)7); i += 8) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+				data[i + 4] = filler;
+				data[i + 5] = filler;
+				data[i + 6] = filler;
+				data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float filler = *(float*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				float* data = (float*)tensor->data;	
+			#else 
+				volatile float data = (float*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)7); i += 8) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+				data[i + 4] = filler;
+				data[i + 5] = filler;
+				data[i + 6] = filler;
+				data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		case FLOAT64: {
+			double filler = *(double*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				double* data = (double*)tensor->data;	
+			#else 
+				volatile double* data = (double*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)15); i += 16) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+				data[i + 4] = filler;
+				data[i + 5] = filler;
+				data[i + 6] = filler;
+				data[i + 7] = filler;
+				data[i + 8] = filler;
+				data[i + 9] = filler;
+				data[i + 10] = filler;
+				data[i + 11] = filler;
+				data[i + 12] = filler;
+				data[i + 13] = filler;
+				data[i + 14] = filler;
+				data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		default: {
+			NNL2_TYPE_ERROR(dtype);
+		}
+	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+}
+
+void unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (!tensor || !tensor->data || !value) {
+			NNL2_ERROR("Incorrect tensor structure");
+			return;
+		}
+	#endif
+	
+	size_t total_elems = product(tensor->shape, tensor->rank);	
+	if (total_elems == 0) return;
+	
+	switch(dtype) {
+		case INT32: {
+			int32_t filler = *(int32_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int32_t* data = (int32_t*)tensor->data;	
+			#else 
+				volatile int32_t* data = (int32_t*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)15); i += 16) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+				data[i + 4] = filler;
+				data[i + 5] = filler;
+				data[i + 6] = filler;
+				data[i + 7] = filler;
+				data[i + 8] = filler;
+				data[i + 9] = filler;
+				data[i + 10] = filler;
+				data[i + 11] = filler;
+				data[i + 12] = filler;
+				data[i + 13] = filler;
+				data[i + 14] = filler;
+				data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			float filler = *(float*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				float* data = (float*)tensor->data;	
+			#else 
+				volatile float* data = (float*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)15); i += 16) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+				data[i + 4] = filler;
+				data[i + 5] = filler;
+				data[i + 6] = filler;
+				data[i + 7] = filler;
+				data[i + 8] = filler;
+				data[i + 9] = filler;
+				data[i + 10] = filler;
+				data[i + 11] = filler;
+				data[i + 12] = filler;
+				data[i + 13] = filler;
+				data[i + 14] = filler;
+				data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		case FLOAT64: {
+			double filler = *(double*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				double* data = (double*)tensor->data;	
+			#else 
+				volatile double* data = (double*)tensor->data;	
+			#endif
+			
+			size_t i = 0;
+			
+			for(; i < (total_elems & ~(size_t)31); i += 32) {
+				data[i] = filler;
+				data[i + 1] = filler;
+				data[i + 2] = filler;
+				data[i + 3] = filler;
+				data[i + 4] = filler;
+				data[i + 5] = filler;
+				data[i + 6] = filler;
+				data[i + 7] = filler;
+				data[i + 8] = filler;
+				data[i + 9] = filler;
+				data[i + 10] = filler;
+				data[i + 11] = filler;
+				data[i + 12] = filler;
+				data[i + 13] = filler;
+				data[i + 14] = filler;
+				data[i + 15] = filler;
+				data[i + 16] = filler;
+				data[i + 17] = filler;
+				data[i + 18] = filler;
+				data[i + 19] = filler;
+				data[i + 20] = filler;
+				data[i + 21] = filler;
+				data[i + 22] = filler;
+				data[i + 23] = filler;
+				data[i + 24] = filler;
+				data[i + 25] = filler;
+				data[i + 26] = filler;
+				data[i + 27] = filler;
+				data[i + 28] = filler;
+				data[i + 29] = filler;
+				data[i + 30] = filler;
+				data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+                data[i] = filler;
+            }
+			
+			break;
+		}
+		
+		default: {
+			NNL2_TYPE_ERROR(dtype);
+		}
+	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
 #ifdef __AVX__
@@ -1495,10 +1927,13 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 #endif
 
 Implementation inplace_fill_backends[] = {
+	REGISTER_BACKEND(unroll_128_inplace_fill, nnl2_unroll_128, UNROLL_128_BACKEND_NAME),
+	REGISTER_BACKEND(unroll_256_inplace_fill, nnl2_unroll_256, UNROLL_256_BACKEND_NAME),
+	REGISTER_BACKEND(unroll_512_inplace_fill, nnl2_unroll_512, UNROLL_512_BACKEND_NAME),
 	REGISTER_BACKEND(naive_inplace_fill, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
+	//REGISTER_BACKEND(avx_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
 	#endif
 };
 

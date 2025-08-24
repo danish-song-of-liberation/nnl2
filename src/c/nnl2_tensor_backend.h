@@ -85,6 +85,9 @@ typedef enum {
 
 typedef enum {
 	nnl2_naive,
+	nnl2_unroll_128,
+	nnl2_unroll_256,
+	nnl2_unroll_512,
 	nnl2_avx128,
 	nnl2_avx256,
 	nnl2_blas,
