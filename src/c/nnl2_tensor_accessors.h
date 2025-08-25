@@ -96,6 +96,12 @@
 
 #define NNL2_TYPE_ERROR(transmitted_data_type) NNL2_ERROR("Invalid data-type: %d", transmitted_data_type)
 
+#define NNL2_IS_ALIGNED(pntr, alignment) (((uintptr_t)(pntr) % (alignment)) == 0)
+
+#define NNL2_TENSOR_ALIGNMENT_64 64
+#define NNL2_TENSOR_ALIGNMENT_32 32
+#define NNL2_TENSOR_ALIGNMENT_16 16
+
 // NNL2
 
 /** @file nnl2_tensor_accessors.h
@@ -1872,6 +1878,14 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	if (total_elems == 0) return;
 	
+	bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(!is_aligned) {
+			NNL2_WARN("In the avx256 implementation of inplace_fill, memory is not aligned to 32 bytes. Calculations may be slightly slower");
+		}
+	#endif
+	
 	switch(dtype) {
 		case INT32: {
 			int32_t filler = *(int32_t*)value;
@@ -1880,8 +1894,15 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			__m256i avx_filler = _mm256_set1_epi32(filler);
 				
 			size_t avx_iters = total_elems / 8; 
-			for (size_t i = 0; i < avx_iters; i++) { 
-				_mm256_storeu_si256((__m256i*)(data + i * 8), avx_filler);
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 8), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 8), avx_filler);
+				}
 			}
 
 			for (size_t j = avx_iters * 8; j < total_elems; j++) {
@@ -1898,8 +1919,15 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			__m256 avx_filler = _mm256_set1_ps(filler);
 			
 			size_t avx_iters = total_elems / 8; 
-			for (size_t i = 0; i < avx_iters; i++) {
-				_mm256_storeu_ps(data + i * 8, avx_filler);
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) {
+					_mm256_store_ps(data + i * 8, avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_ps(data + i * 8, avx_filler);
+				}
 			}
 
 			for (size_t j = avx_iters * 8; j < total_elems; j++) {
@@ -1917,8 +1945,19 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			
 			size_t it = 0;
 			
-			for(; it < total_elems - 3; it += 4) _mm256_storeu_pd(data + it, avx_filler);
-			for(size_t j = it; j < total_elems; j++) data[j] = filler;
+			if(is_aligned) {
+				for(; it < total_elems - 3; it += 4) {
+					_mm256_store_pd(data + it, avx_filler);
+				}
+			} else {
+				for(; it < total_elems - 3; it += 4) {
+					_mm256_storeu_pd(data + it, avx_filler);
+				}
+			}
+			
+			for(size_t j = it; j < total_elems; j++) {
+				data[j] = filler;
+			}
 			
 			break;
 		}
@@ -1928,22 +1967,33 @@ void avx_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 
 Implementation inplace_fill_backends[] = {
 	REGISTER_BACKEND(unroll_128_inplace_fill, nnl2_unroll_128, UNROLL_128_BACKEND_NAME),
+	
+	#ifdef __AVX__
+		#if TENSOR_MEM_ALIGNMENT == 32
+			REGISTER_BACKEND(avx_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
+		#endif
+	#endif
+	
 	REGISTER_BACKEND(unroll_256_inplace_fill, nnl2_unroll_256, UNROLL_256_BACKEND_NAME),
 	REGISTER_BACKEND(unroll_512_inplace_fill, nnl2_unroll_512, UNROLL_512_BACKEND_NAME),
 	REGISTER_BACKEND(naive_inplace_fill, nnl2_naive, NAIVE_BACKEND_NAME),
-	
-	#ifdef __AVX__
-	//REGISTER_BACKEND(avx_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
-	#endif
 };
 
 fn_inplace_fill inplace_fill;
+MAKE_CURRENT_BACKEND(inplace_fill);
 
 void set_inplace_fill_backend(const char* backend_name) {
-    SET_BACKEND_BY_NAME(inplace_fill_backends, inplace_fill, backend_name);
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MIN
+	    NNL2_FUNC_ENTER();
+		NNL2_DEBUG("Changed backend for inplace_fill from %s to %s", CURRENT_BACKEND(inplace_fill), backend_name);	
+	#endif
+	
+    ESET_BACKEND_BY_NAME(inplace_fill_backends, inplace_fill, backend_name, CURRENT_BACKEND(inplace_fill));
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MIN
+		NNL2_FUNC_EXIT();
+	#endif
 }
-
-make_current_backend(inplace_fill);
 
 const char* get_inplace_fill_backend() {
 	return current_backend(inplace_fill);

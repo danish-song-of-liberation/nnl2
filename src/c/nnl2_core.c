@@ -40,24 +40,24 @@ void init_system() {
 	srand(time(NULL));         
 	 
 	// Initialization of the logging system
-	nnl2_log_init( 
-		NNL2_LOG_DEFAULT_COLOR,
+	nnl2_log_init(   
+		NNL2_LOG_DEFAULT_COLOR,     
 		NNL2_LOG_DEFAULT_TIMESTAMPS,            
 		NNL2_LOG_DEFAULT_DEBUG_INFO,     
 		NNL2_LOG_LEVEL_DEBUG
 	); 
-      
+        
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
 	INIT_BACKEND(tref_setter, tref_setter_backends);   
 	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
-	EINIT_BACKEND(inplace_fill, inplace_fill_backends, current_backend(inplace_fill));
+	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
 	EINIT_BACKEND(nnl2_zeros, nnl2_zeros_backends, CURRENT_BACKEND(nnl2_zeros));   
-	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
+	INIT_BACKEND(sgemminplace, sgemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
 	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace)); 
-	EINIT_BACKEND(add, add_backends, current_backend(add)); 
+	EINIT_BACKEND(add, add_backends, current_backend(add));   
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub)); 
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
@@ -65,7 +65,7 @@ void init_system() {
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));   
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));     
-	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));  
+	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));    
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp)); 
 	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log)); 
@@ -105,7 +105,7 @@ void init_system() {
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
-	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);   
+	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);      
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);  
 	INIT_BACKEND(min_minf, min_minf_backends);  
@@ -151,7 +151,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return nnl2_zeros(shape, rank, dtype); 
 }  	  	          
-               
+                 
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return full(shape, rank, dtype, filler);
 }
