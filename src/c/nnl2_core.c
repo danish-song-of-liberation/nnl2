@@ -235,7 +235,7 @@ void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {   
 	return scale(tensor, multiplier); 
 }
-  
+    
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 	maxinplace(tensora, tensorb);
 } 
@@ -257,7 +257,7 @@ void lisp_call_absinplace(Tensor* tensor) {
 }
   
 Tensor* lisp_call_abs(Tensor* tensor) {
-	return nnl2_abs(tensor);    
+	return nnl2_abs(tensor);       
 }            
     
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {

@@ -94,7 +94,7 @@ typedef enum {
 	nnl2_implver_count
 } implver;
 
-typedef void (*fn_inplace_fill)(Tensor*, void*, TensorType);
+typedef bool (*fn_inplace_fill)(Tensor*, void*, TensorType);
 typedef Tensor* (*fn_empty)(const int*, int, TensorType);
 typedef Tensor* (*fn_zeros)(const int*, int, TensorType);
 typedef Tensor* (*fn_ones)(const int*, int, TensorType);

@@ -1461,6 +1461,9 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_tref_getter);
  * In the NNL2_SAFETY_MODE_OFF safety mode, a regular pointer is used,
  * while in other modes, a volatile pointer is used to prevent compiler optimizations
  *
+ ** @return
+ * Returns true (1) if the function is successful, false (0) if it is unsuccessful
+ *	
  ** @exception NNL2Error
  * Throws error if tensor pointer is NULL (only in NNL2_SAFETY_MODE_MAX)
  *
@@ -1474,7 +1477,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_tref_getter);
  * Throws error if unsupported data type is specified
  *
  */
-void nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+bool nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -1482,14 +1485,20 @@ void nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	// Validate input parameters in maximum safety mode
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (!tensor || !tensor->data || !value) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+		
 			NNL2_ERROR("Incorrect tensor structure");
-			return;
+			return false;
 		}
 	#endif
 	
 	// Calculate total number of elements from tensor shape and rank
 	size_t total_elems = product(tensor->shape, tensor->rank);	
-	if (total_elems == 0) return; // Early return for empty tensors
+	if (total_elems == 0) return true; // Early return for empty tensors
+	
+	bool result = true;
 	
 	switch(dtype) {
 		case INT32: {
@@ -1539,12 +1548,16 @@ void nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 		
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Error: unsupported data type
+			result = false;
+			break;
 		}
 	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT(); 
 	#endif
+	
+	return result;
 }
 
 /** @brief
@@ -1576,6 +1589,9 @@ void nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  ** @note
  * The function will return at the very beginning if the tensor is empty without doing anything
  *
+ ** @return
+ * Returns true (1) if the function is successful, false (0) if it is unsuccessful
+ *
  ** @example
  * // Filling a tensor with integers using optimized unrolled version
  * int32_t fill_value = 42;
@@ -1598,21 +1614,27 @@ void nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  * Throws error if unsupported data type is specified
  *
  */
-void nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+bool nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (!tensor || !tensor->data || !value) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			
 			NNL2_ERROR("Incorrect tensor structure");
-			return;
+			return false;
 		}
 	#endif
 	
 	// Calculating the total number of elements in a tensor
 	size_t total_elems = product(tensor->shape, tensor->rank);	
-	if (total_elems == 0) return; // Exit if the tensor is empty
+	if (total_elems == 0) return true; // Exit if the tensor is empty
+	
+	bool result = true;
 	
 	switch(dtype) {
 		case INT32: {
@@ -1696,12 +1718,16 @@ void nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 		
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Unsupported data type error
+			result = false;
+			break;
 		}
 	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif
+	
+	return result;
 }
 
 /** @brief
@@ -1733,6 +1759,9 @@ void nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
  ** @note
  * The function will return at the very beginning if the tensor is empty without doing anything
  *
+ ** @return
+ * Returns true (1) if the function is successful, false (0) if it is unsuccessful
+ *
  ** @example
  * // Filling a tensor with integers using 256-bit optimized version
  * int32_t fill_value = 42;
@@ -1759,21 +1788,27 @@ void nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
  * Throws error if unsupported data type is specified
  *
  */
-void nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+bool nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (!tensor || !tensor->data || !value) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			
 			NNL2_ERROR("Incorrect tensor structure");
-			return;
+			return false;
 		}
 	#endif
 	
 	// Calculating the total number of elements in a tensor
 	size_t total_elems = product(tensor->shape, tensor->rank);	
-	if (total_elems == 0) return; // Exit if the tensor is empty
+	if (total_elems == 0) return true; // Exit if the tensor is empty
+	
+	bool result = true;
 	
 	switch(dtype) {
 		case INT32: { 
@@ -1861,12 +1896,16 @@ void nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 		
 		default: {
 			NNL2_TYPE_ERROR(dtype);
+			result = false;
+			break;
 		}
 	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif
+	
+	return result;
 }
 
 /** @brief
@@ -1890,6 +1929,9 @@ void nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
  *
  ** @param dtype
  * The data type of the tensor value and elements
+ *
+ ** @return
+ * Returns true (1) if the function is successful, false (0) if it is unsuccessful
  *
  ** @note
  * In the NNL2_SAFETY_MODE_OFF safety mode, a regular pointer is used for maximum performance,
@@ -1921,21 +1963,27 @@ void nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
  * Throws error if unsupported data type is specified
  *
  */
-void nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+bool nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (!tensor || !tensor->data || !value) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			
 			NNL2_ERROR("Incorrect tensor structure");
-			return;
+			return false;
 		}
 	#endif
 	
 	// Calculating the total number of elements in a tensor
 	size_t total_elems = product(tensor->shape, tensor->rank);	
-	if (total_elems == 0) return; // Exit if the tensor is empty
+	if (total_elems == 0) return true; // Exit if the tensor is empty
+	
+	bool result = true;
 	
 	switch(dtype) {
 		case INT32: {
@@ -2031,12 +2079,16 @@ void nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 		
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Unsupported data type error
+			result = false;
+			break;
 		}
 	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif
+	
+	return result;
 }
 
 #ifdef __AVX__
@@ -2062,6 +2114,9 @@ void nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
  ** @param dtype 
  * Data type of the tensor elements and fill value
  *
+ ** @return
+ * Returns true (1) if the function is successful, false (0) if it is unsuccessful
+ *
  ** @note 
  * This function requires AVX support and will only be compiled if __AVX__ is defined
  *
@@ -2077,14 +2132,24 @@ void nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
  * Throws error if unsupported data type is specified
  *
  */
-void nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+bool nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (tensor == NULL || value == NULL || tensor->data == NULL) {
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			
+			return false; // Invalid parameters
+		}
+	#endif
+	
 	// Calculate total elements from tensor shape and rank
 	size_t total_elems = product(tensor->shape, tensor->rank);
-	if (total_elems == 0) return; // Exit if the tensor is empty
+	if (total_elems == 0) return true; // Exit if the tensor is empty
 	
 	// Check if tensor data is 32-byte aligned for optimal AVX performance
 	bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -2095,6 +2160,8 @@ void nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			NNL2_WARN("In the avx256 implementation of inplace_fill, memory is not aligned to 32 bytes. Calculations may be slightly slower");
 		}
 	#endif
+	
+	bool result = true;
 	
 	switch(dtype) {
 		case INT32: {
@@ -2189,12 +2256,16 @@ void nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 		
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Unsupported data type error
+			result = false;
+			break;
 		}
 	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif
+	
+	return result;
 }
 #endif
 
@@ -2362,11 +2433,13 @@ Tensor* ones(const int32_t* shape, const int32_t rank, const TensorType dtype) {
 		}
 	#endif
 
+	bool success;
+
 	// Filling the tensor with units depending on the data type
     switch(dtype) {
-        case INT32:    inplace_fill(tensor_t, &(int32_t){1}, dtype);   break;
-        case FLOAT32:  inplace_fill(tensor_t, &(float){1.0f}, dtype);  break;     
-        case FLOAT64:  inplace_fill(tensor_t, &(double){1.0}, dtype);  break;
+        case INT32:    success = inplace_fill(tensor_t, &(int32_t){1}, dtype);   break;
+        case FLOAT32:  success = inplace_fill(tensor_t, &(float){1.0f}, dtype);  break;     
+        case FLOAT64:  success = inplace_fill(tensor_t, &(double){1.0}, dtype);  break;
 
 		// Processing unsupported data types
         default: {
@@ -2375,6 +2448,10 @@ Tensor* ones(const int32_t* shape, const int32_t rank, const TensorType dtype) {
             return NULL;
         }
     }
+	
+	if(!success) {
+		NNL2_ERROR("Function completed failed");
+	}
     
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_EXIT();
@@ -2475,7 +2552,10 @@ Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
 	#endif
 	
 	// Fill the tensor with the specified value
-	inplace_fill(tensor_t, filler, dtype);
+	if(!inplace_fill(tensor_t, filler, dtype)) {
+		// Error handle
+		NNL2_ERROR("Function completed failed");
+	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_EXIT();
