@@ -181,12 +181,12 @@ void lisp_call_subinplace(Tensor* summand, Tensor* addend) {
 }
 
 Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
-	return add(summand, addend);  
+	return add(summand, addend);      
 }
 
-Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) {
-	return sub(summand, addend); 
-}    
+Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) { 
+	return sub(summand, addend);  
+}     
 
 void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 	mulinplace(multiplicand, multiplier);

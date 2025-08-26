@@ -952,6 +952,9 @@
           (if (> (rank a) (rank b))
             (.min/broadcasting! a b)
             (.min/broadcasting! b a)))))))	  		
+			
+(defun tensor-p (obj)
+  (typep obj 'nnl2-tensor))			
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 
