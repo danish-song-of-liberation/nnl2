@@ -2092,7 +2092,7 @@ void nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
 	
 	// Warning for unaligned memory in safety modes (performance impact)
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MINI
 		if(!is_aligned) {
 			NNL2_WARN("In the avx256 implementation of inplace_fill, memory is not aligned to 32 bytes. Calculations may be slightly slower");
 		}
@@ -2262,14 +2262,14 @@ MAKE_CURRENT_BACKEND(inplace_fill);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_inplace_fill_backend(const char* backend_name) {
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MIN
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 	    NNL2_FUNC_ENTER();
 		NNL2_DEBUG("Changed backend for inplace_fill from %s to %s", CURRENT_BACKEND(inplace_fill), backend_name);	
 	#endif
 	
     ESET_BACKEND_BY_NAME(inplace_fill_backends, inplace_fill, backend_name, CURRENT_BACKEND(inplace_fill));
 	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MIN
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_EXIT();
 	#endif
 }
@@ -2298,35 +2298,90 @@ DEFINE_GET_BACKENDS_FUNCTION(inplace_fill);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
 
-Tensor* ones(const int* shape, int rank, TensorType dtype) {
+/** @brief 
+ * Creates a new tensor filled with ones
+ *
+ ** @param shape
+ * Pointer to integer array specifying the dimensions of the tensor
+ *
+ ** @param rank 
+ * Number of dimensions (length of shape array)
+ *
+ ** @param dtype
+ * Data type of the tensor elements
+ *
+ ** @return
+ * Pointer to the newly allocated tensor filled with ones, or NULL on failure
+ *
+ ** @note 
+ * The returned tensor must be freed using nnl2_free_tensor() to avoid memory leaks
+ *
+ ** @note 
+ * For optimal performance with floating-point types, ensure proper memory alignment
+ *
+ ** @note
+ * May conduct additional checks depending on the safety level
+ *
+ ** @example
+ * // Create a 3x3 matrix of ones with float32 type
+ * int shape[] = {3, 3};
+ * Tensor* ones_matrix = ones(shape, 2, FLOAT32); 
+ *
+ ** @exception NNL2Error
+ * Shape is NULL or rank is invalid
+ *
+ ** @exception NNL2Error
+ * New tensor allocation fails
+ *
+ ** @exception NNL2Error
+ * Unsupported data type is specified
+ *
+ ** @see nnl2_empty()
+ ** @see nnl2_zeros()
+ ** @see inplace_fill()
+ **/
+Tensor* ones(const int32_t* shape, const int32_t rank, const TensorType dtype) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Additional validation of input parameters in maximal safety level
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (shape == NULL || rank <= 0) {
+			NNL2_ERROR("Invalid shape or rank in ones");
+			return NULL;
+		}
+	#endif
+	
+	// Creating an empty tensor with a specified shape and data type
     Tensor* tensor_t = nnl2_empty(shape, rank, dtype);
+	
+	// Checking the success of tensor creation
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (tensor_t == NULL) {
+			NNL2_ERROR("Failed to allocate empty tensor");
+			return NULL;
+		}
+	#endif
 
+	// Filling the tensor with units depending on the data type
     switch(dtype) {
-        case INT32: {
-            int32_t filler = 1;
-            inplace_fill(tensor_t, &filler, dtype);
-            break;
-        }
-        
-        case FLOAT32: {		
-            float filler = 1.0;
-            inplace_fill(tensor_t, &filler, dtype);
-            break;
-        }
-        
-        case FLOAT64: {
-            double filler = 1.0;
-            inplace_fill(tensor_t, &filler, dtype);
-            break;
-        }
-        
+        case INT32:    inplace_fill(tensor_t, &(int32_t){1}, dtype);   break;
+        case FLOAT32:  inplace_fill(tensor_t, &(float){1.0f}, dtype);  break;     
+        case FLOAT64:  inplace_fill(tensor_t, &(double){1.0}, dtype);  break;
+
+		// Processing unsupported data types
         default: {
-            fprintf(stderr, "Error (Hello from C!): Unknown data type");
+            NNL2_ERROR("Invalid data type in ones");
             nnl2_free_tensor(tensor_t);  
             return NULL;
         }
     }
     
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+		NNL2_FUNC_EXIT();
+	#endif
+	
     return tensor_t;
 }
 

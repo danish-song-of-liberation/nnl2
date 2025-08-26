@@ -170,7 +170,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const float beta) {
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}           
+}                
     
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
@@ -242,7 +242,7 @@ void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 
 void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
 	mininplace(tensora, tensorb);
-}
+} 
   
 Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
 	return nnl2_max(tensora, tensorb);  
@@ -259,7 +259,7 @@ void lisp_call_absinplace(Tensor* tensor) {
 Tensor* lisp_call_abs(Tensor* tensor) {
 	return nnl2_abs(tensor); 
 }  
-
+    
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
 }  
@@ -271,7 +271,7 @@ Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 void lisp_call_reluinplace(Tensor* tensor) {
 	reluinplace(tensor);
 }  	
- 
+  
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
 }         
@@ -311,10 +311,10 @@ Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
 }  
-
+ 
 void lisp_call_transposeinplace(Tensor* tensor) {
 	transposeinplace(tensor);  
-}
+}  
 
 Tensor* lisp_call_transpose(Tensor* tensor) {
 	return transpose(tensor);  
