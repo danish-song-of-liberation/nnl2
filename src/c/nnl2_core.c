@@ -170,7 +170,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const float beta) {
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}          
+}           
     
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
@@ -186,7 +186,7 @@ Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
 
 Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) { 
 	return sub(summand, addend);  
-}     
+}        
 
 void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 	mulinplace(multiplicand, multiplier);

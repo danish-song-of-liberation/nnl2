@@ -1455,6 +1455,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_tref_getter);
  ** @note
  * The function will return at the very beginning if the tensor is empty without doing anything
  *
+ ** @note
+ * In the NNL2_SAFETY_MODE_OFF safety mode, a regular pointer is used,
+ * while in other modes, a volatile pointer is used to prevent compiler optimizations
+ *
  ** @exception NNL2Error
  * Throws error if tensor pointer is NULL (only in NNL2_SAFETY_MODE_MAX)
  *
@@ -1468,11 +1472,12 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(nnl2_tref_getter);
  * Throws error if unsupported data type is specified
  *
  */
-void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+void nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
+	// Validate input parameters in maximum safety mode
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (!tensor || !tensor->data || !value) {
 			NNL2_ERROR("Incorrect tensor structure");
@@ -1480,38 +1485,63 @@ void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 		}
 	#endif
 	
+	// Calculate total number of elements from tensor shape and rank
 	size_t total_elems = product(tensor->shape, tensor->rank);	
-	if (total_elems == 0) return;
+	if (total_elems == 0) return; // Early return for empty tensors
 	
 	switch(dtype) {
 		case INT32: {
-			int32_t filler = *(int32_t*)value;
-			volatile int32_t* data = (int32_t*)tensor->data;	
+			int32_t filler = *(int32_t*)value; // Extract integer fill value
+			
+			// Cast tensor data to integer pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int32_t* data = (int32_t*)tensor->data;
+			#else
+				volatile int32_t* data = (int32_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for INT32 elements
 			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
 			break;
 		}
 		
 		case FLOAT32: {
-			float filler = *(float*)value;
-			volatile float* data = (float*)tensor->data;
+			float filler = *(float*)value; // Extract float fill value
+			
+			// Cast tensor data to float pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				float* data = (float*)tensor->data;
+			#else
+				volatile float* data = (float*)tensor->data;
+			#endif
+			
+			// Simple scalar loop for FLOAT32 elements
 			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
 			break;
 		}
 		
 		case FLOAT64: {
-			double filler = *(double*)value;
-			volatile double* data = (double*)tensor->data;
+			double filler = *(double*)value; // Extract double fill value
+			
+			// Cast tensor data to double pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				double* data = (double*)tensor->data;
+			#else 
+				volatile double* data = (double*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for FLOAT64 elements
 			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
 			break;
 		}
 		
 		default: {
-			NNL2_TYPE_ERROR(dtype);
+			NNL2_TYPE_ERROR(dtype); // Error: unsupported data type
 		}
 	}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-		NNL2_FUNC_EXIT();
+		NNL2_FUNC_EXIT(); 
 	#endif
 }
 
@@ -1566,7 +1596,7 @@ void naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  * Throws error if unsupported data type is specified
  *
  */
-void unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+void nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -1727,7 +1757,7 @@ void unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  * Throws error if unsupported data type is specified
  *
  */
-void unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+void nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -1889,7 +1919,7 @@ void unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  * Throws error if unsupported data type is specified
  *
  */
-void unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+void nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -2045,7 +2075,7 @@ void unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  * Throws error if unsupported data type is specified
  *
  */
-void avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+void nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -2167,17 +2197,17 @@ void avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 #endif
 
 Implementation inplace_fill_backends[] = {
-	REGISTER_BACKEND(unroll_128_inplace_fill, nnl2_unroll_128, UNROLL_128_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_unroll_128_inplace_fill, nnl2_unroll_128, UNROLL_128_BACKEND_NAME),
 	
 	#ifdef __AVX__
 		#if TENSOR_MEM_ALIGNMENT == 32
-			REGISTER_BACKEND(avx256_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
+			REGISTER_BACKEND(nnl2_avx256_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
 		#endif
 	#endif
 	
-	REGISTER_BACKEND(unroll_256_inplace_fill, nnl2_unroll_256, UNROLL_256_BACKEND_NAME),
-	REGISTER_BACKEND(unroll_512_inplace_fill, nnl2_unroll_512, UNROLL_512_BACKEND_NAME),
-	REGISTER_BACKEND(naive_inplace_fill, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_unroll_256_inplace_fill, nnl2_unroll_256, UNROLL_256_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_unroll_512_inplace_fill, nnl2_unroll_512, UNROLL_512_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_inplace_fill, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
 fn_inplace_fill inplace_fill;
