@@ -2740,6 +2740,10 @@ Implementation sgemminplace_backends[] = {
 	#endif
 };
 
+/**
+ * @brief Function pointer for sgemm in-place
+ * @ingroup backend_system 
+ */
 sgemminplacefn sgemminplace;
 
 void set_sgemminplace_backend(const char* backend_name) {
