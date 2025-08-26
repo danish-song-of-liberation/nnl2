@@ -222,7 +222,7 @@ Tensor* lisp_call_exp(Tensor* tensor) {
  
 void lisp_call_loginplace(Tensor* tensor) { 
 	loginplace(tensor);      
-}
+} 
    
 Tensor* lisp_call_log(Tensor* tensor) {
 	return nnl2_logarithm(tensor);
