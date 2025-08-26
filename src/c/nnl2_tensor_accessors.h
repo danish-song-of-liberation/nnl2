@@ -1520,12 +1520,11 @@ void unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)3); i += 4) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1545,12 +1544,11 @@ void unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)3); i += 4) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1570,16 +1568,12 @@ void unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)7); i += 8) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-                data[i + 4] = filler;
-                data[i + 5] = filler;
-                data[i + 6] = filler;
-                data[i + 7] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+                data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1625,16 +1619,12 @@ void unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)7); i += 8) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-				data[i + 4] = filler;
-				data[i + 5] = filler;
-				data[i + 6] = filler;
-				data[i + 7] = filler;
+			for(; i < unroll_factor; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1654,16 +1644,12 @@ void unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)7); i += 8) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-				data[i + 4] = filler;
-				data[i + 5] = filler;
-				data[i + 6] = filler;
-				data[i + 7] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler;	data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1683,24 +1669,14 @@ void unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)15); i += 16) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-				data[i + 4] = filler;
-				data[i + 5] = filler;
-				data[i + 6] = filler;
-				data[i + 7] = filler;
-				data[i + 8] = filler;
-				data[i + 9] = filler;
-				data[i + 10] = filler;
-				data[i + 11] = filler;
-				data[i + 12] = filler;
-				data[i + 13] = filler;
-				data[i + 14] = filler;
-				data[i + 15] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1746,24 +1722,14 @@ void unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)15); i += 16) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-				data[i + 4] = filler;
-				data[i + 5] = filler;
-				data[i + 6] = filler;
-				data[i + 7] = filler;
-				data[i + 8] = filler;
-				data[i + 9] = filler;
-				data[i + 10] = filler;
-				data[i + 11] = filler;
-				data[i + 12] = filler;
-				data[i + 13] = filler;
-				data[i + 14] = filler;
-				data[i + 15] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1783,24 +1749,14 @@ void unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)15); i += 16) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-				data[i + 4] = filler;
-				data[i + 5] = filler;
-				data[i + 6] = filler;
-				data[i + 7] = filler;
-				data[i + 8] = filler;
-				data[i + 9] = filler;
-				data[i + 10] = filler;
-				data[i + 11] = filler;
-				data[i + 12] = filler;
-				data[i + 13] = filler;
-				data[i + 14] = filler;
-				data[i + 15] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
 			}
 			
 			for (; i < total_elems; i++) {
@@ -1820,40 +1776,18 @@ void unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			#endif
 			
 			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
 			
-			for(; i < (total_elems & ~(size_t)31); i += 32) {
-				data[i] = filler;
-				data[i + 1] = filler;
-				data[i + 2] = filler;
-				data[i + 3] = filler;
-				data[i + 4] = filler;
-				data[i + 5] = filler;
-				data[i + 6] = filler;
-				data[i + 7] = filler;
-				data[i + 8] = filler;
-				data[i + 9] = filler;
-				data[i + 10] = filler;
-				data[i + 11] = filler;
-				data[i + 12] = filler;
-				data[i + 13] = filler;
-				data[i + 14] = filler;
-				data[i + 15] = filler;
-				data[i + 16] = filler;
-				data[i + 17] = filler;
-				data[i + 18] = filler;
-				data[i + 19] = filler;
-				data[i + 20] = filler;
-				data[i + 21] = filler;
-				data[i + 22] = filler;
-				data[i + 23] = filler;
-				data[i + 24] = filler;
-				data[i + 25] = filler;
-				data[i + 26] = filler;
-				data[i + 27] = filler;
-				data[i + 28] = filler;
-				data[i + 29] = filler;
-				data[i + 30] = filler;
-				data[i + 31] = filler;
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler; 
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
 			}
 			
 			for (; i < total_elems; i++) {

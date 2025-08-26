@@ -105,7 +105,7 @@ void init_system() {
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
-	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);      
+	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);       
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);  
 	INIT_BACKEND(min_minf, min_minf_backends);  
