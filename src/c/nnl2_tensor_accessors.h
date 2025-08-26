@@ -500,6 +500,7 @@ fn_empty nnl2_empty;
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
  * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
  */
 void nnl2_set_empty_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(nnl2_empty_backends, nnl2_empty, backend_name);
@@ -785,6 +786,7 @@ fn_zeros nnl2_zeros;
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
  * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
  */
 void set_zeros_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(nnl2_zeros_backends, nnl2_zeros, backend_name);
@@ -1119,6 +1121,7 @@ viewfn nnl2_view;
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
  * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
  */
 void nnl2_set_view_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(nnl2_view_backends, nnl2_view, backend_name);
@@ -1390,6 +1393,7 @@ trefgetterfn nnl2_tref_getter;
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
  * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
  */
 void nnl2_set_tref_getter_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(nnl2_tref_getter_backends, nnl2_tref_getter, backend_name);
@@ -2196,23 +2200,67 @@ void nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 }
 #endif
 
+/** @ingroup backend_system
+ ** @brief Backend implementations for inplace_fill
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - nnl2_unroll_128_inplace_fill: 128-bit optimized loop unrolling implementation
+ *  - nnl2_unroll_256_inplace_fill: 256-bit optimized loop unrolling implementation  
+ *  - nnl2_unroll_512_inplace_fill: 512-bit optimized loop unrolling implementation
+ *  - nnl2_naive_inplace_fill: Basic reference implementation
+ *  - nnl2_avx256_inplace_fill: AVX-256 SIMD optimized implementation (conditionally compiled)
+ *
+ ** @see REGISTER_BACKEND
+ ** @see UNROLL_128_BACKEND_NAME
+ ** @see UNROLL_256_BACKEND_NAME
+ ** @see UNROLL_512_BACKEND_NAME
+ ** @see AVX512_BACKEND_NAME
+ ** @see NAIVE_BACKEND_NAME
+ ** @see nnl2_unroll_128_inplace_fill
+ ** @see nnl2_unroll_256_inplace_fill
+ ** @see nnl2_unroll_512_inplace_fill
+ ** @see nnl2_avx_256_inplace_fill
+ ** @see nnl2_naive_inplace_fillss
+ ** @see nnl2_unroll_128
+ ** @see nnl2_unroll_256
+ ** @see nnl2_unroll_512
+ ** @see nnl2_avx256
+ ** @see nnl2_naive
+ **/
 Implementation inplace_fill_backends[] = {
-	REGISTER_BACKEND(nnl2_unroll_128_inplace_fill, nnl2_unroll_128, UNROLL_128_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_unroll_128_inplace_fill, nnl2_unroll_128, UNROLL_128_BACKEND_NAME),	
+	REGISTER_BACKEND(nnl2_unroll_256_inplace_fill, nnl2_unroll_256, UNROLL_256_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_unroll_512_inplace_fill, nnl2_unroll_512, UNROLL_512_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_inplace_fill, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef __AVX__
 		#if TENSOR_MEM_ALIGNMENT == 32
 			REGISTER_BACKEND(nnl2_avx256_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
 		#endif
 	#endif
-	
-	REGISTER_BACKEND(nnl2_unroll_256_inplace_fill, nnl2_unroll_256, UNROLL_256_BACKEND_NAME),
-	REGISTER_BACKEND(nnl2_unroll_512_inplace_fill, nnl2_unroll_512, UNROLL_512_BACKEND_NAME),
-	REGISTER_BACKEND(nnl2_naive_inplace_fill, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for inplace_fill 
+ * @ingroup backend_system 
+ */
 fn_inplace_fill inplace_fill;
+
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
 MAKE_CURRENT_BACKEND(inplace_fill);
 
+/** 
+ * @brief Sets the backend for inplace_fill
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_inplace_fill_backend(const char* backend_name) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MIN
 	    NNL2_FUNC_ENTER();
@@ -2226,11 +2274,28 @@ void set_inplace_fill_backend(const char* backend_name) {
 	#endif
 }
 
+/** 
+ * @brief Gets the name of the active backend for inplace_all
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_inplace_fill_backend() {
 	return current_backend(inplace_fill);
 }
 
+/** 
+ * @brief Function declaration for getting all `inplace_fill` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(inplace_fill);
+
+/**
+ * @brief Function declaration for getting the number of all `inplace_fill` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
 
 Tensor* ones(const int* shape, int rank, TensorType dtype) {
