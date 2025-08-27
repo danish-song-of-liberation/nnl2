@@ -95,6 +95,8 @@
 #define NNL2_STRIDES_NEXT_DIM_INDEX 1
 
 #define NNL2_TYPE_ERROR(transmitted_data_type) NNL2_ERROR("Invalid data-type: %d", transmitted_data_type)
+#define NNL2_ORDER_ERROR(transmitted_order) NNL2_ERROR("Invalid order: %d", transmitted_order)
+#define NNL2_TRANS_ERROR(transmitted_trans) NNL2_ERROR("Invalid trans: %d", transmitted_trans)
 
 #define NNL2_IS_ALIGNED(pntr, alignment) (((uintptr_t)(pntr) % (alignment)) == 0)
 
@@ -2564,45 +2566,129 @@ Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
 	return tensor_t;
 }
 
+/** @brief
+ * Naive implementation of single-precision general matrix multiplication (sgemm) in-place
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @param c
+ * Pointer to tensor for storing result matrix C (modified in-place)
+ *
+ ** @param ldc
+ * Leading dimension of matrix C (stride between rows/columns)
+ *
+ ** @return
+ * None (result is stored in-place in matrix C)
+ *
+ ** @note
+ * This is a naive triple-loop implementation
+ * Not optimized for performance - use for reference only
+ *
+ ** @note
+ * All input tensors must be of FLOAT32 type and properly allocated
+ *
+ ** @note
+ * Matrix dimensions must satisfy: 
+ * - A: [m x k] if transa == NoTrans, [k x m] if transa == Trans
+ * - B: [k x n] if transb == NoTrans, [n x k] if transb == Trans  
+ * - C: [m x n]
+ *
+ ** @note
+ * Leading dimensions must be >= corresponding matrix dimensions
+ *
+ ** @example
+ * // Multiply two matrices: C = alpha * A * B + beta * C
+ * naive_sgemminplace(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, 
+ *                   m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+ *
+ ** @exception
+ * Function returns early with error message if invalid parameters are detected
+ *
+ **/
 void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa, 
                         const nnl2_transpose transb, const int m, const int n, 
                         const int k, const float alpha, const Tensor* a, const int lda,
                         const Tensor* b, const int ldb, const float beta, Tensor* c,
                         const int ldc) {
+							
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
 
-    if (!a || !b || !c || !a->data || !b->data || !c->data) {
-        fprintf(stderr, "Error (Hello from C!): Null pointer passed as argument (matmul)");
-        return;
-    }
-    
-    if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
-        fprintf(stderr, "Error (Hello from C!): Invalid dimensions provided (matmul)");
-        return;
-    }
-    
-    int a_cols = (transa == nnl2Trans) ? m : k;
-    int b_cols = (transb == nnl2Trans) ? k : n;
-    
-    if (lda < a_cols) {
-        fprintf(stderr, "Error (Hello from C!): lda is less than number of columns of a matrix! (matmul)");
-        return;
-    }
-    
-    if (ldb < b_cols) {  
-        fprintf(stderr, "Error (Hello from C!): ldb is less than number of columns of b matrix! (matmul)");
-        return;
-    }
+	// Checking the input data for correctness
 
-    if (ldc < n) {    
-        fprintf(stderr, "Error (Hello from C!): ldc is less than n! (matmul)");
-        return;
-    }
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (!a || !b || !c || !a->data || !b->data || !c->data) {
+			NNL2_ERROR("Null pointer passed as argument (gemm)");
+			return;
+		}
+		
+		if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
+			NNL2_ERROR("Invalid dimensions provided (gemm)");
+			return;
+		}
+		
+		int a_cols = (transa == nnl2Trans) ? m : k;
+		int b_cols = (transb == nnl2Trans) ? k : n;
+		
+		if (lda < a_cols) {
+			NNL2_ERROR("lda is less than number of columns of a matrix! (gemm)");
+			return;
+		}
+		
+		if (ldb < b_cols) {  
+			NNL2_ERROR("ldb is less than number of columns of b matrix! (gemm)");
+			return;
+		}
 
+		if (ldc < n) {    
+			NNL2_ERROR("ldc is less than n! (gemm)");
+			return;
+		}
+	#endif
+	
+	// Casting tensor data to float with volatile to prevent compiler optimizations
     volatile float* data_a = (volatile float*)a->data;
     volatile float* data_b = (volatile float*)b->data;
     volatile float* data_c = (volatile float*)c->data;                          
     
-    if(order == nnl2RowMajor){
+    if(order == nnl2RowMajor) {
+		// Implementation for RowMajor order (lowercase data organization)
+		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {    
                 float acc = 0.0;
@@ -2627,13 +2713,17 @@ void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
                 }
             
                 if(beta == 0) {
+					// C[i,j] = alpha * (A * B)[i,j]
                     *(data_c + i * ldc + j) = acc * alpha;
                 } else {
+					// C[i,j] = alpha * (A * B)[i,j] + beta * C[i,j]
                     *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
                 }
             }
         }
     } else {
+		// Implementation for ColumnMajor order (column-based data organization)
+		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
                 float acc = 0.0;
@@ -2658,26 +2748,103 @@ void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
                 }
                 
                 if(beta == 0) {
+					// C[i,j] = alpha * (A * B)[i,j]
                     *(data_c + i * ldc + j) = acc * alpha;
                 } else {
+					// C[i,j] = alpha * (A * B)[i,j] + beta * C[i,j]
                     *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
                 }
             }
         }
     }
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
 #ifdef OPENBLAS_AVAILABLE
+/** @brief
+ * BLAS-accelerated implementation of single-precision general matrix multiplication (SGEMM) in-place
+ *
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @param c
+ * Pointer to tensor for storing result matrix C (modified in-place)
+ *
+ ** @param ldc
+ * Leading dimension of matrix C (stride between rows/columns)
+ *
+ ** @return
+ * None (result is stored in-place in matrix C)
+ *
+ ** @note
+ * Requires OpenBLAS library to be available and linked
+ * Significantly faster than naive implementation
+ *
+ ** @note
+ * All input tensors must be of FLOAT32 type and properly allocated
+ *
+ ** @note
+ * Performs the operation: C = alpha * op(A) * op(B) + beta * C
+ * where op(X) is either X or X^T depending on transpose flags
+ *
+ ** @example
+ * // Multiply matrices using BLAS: C = alpha * A * B + beta * C
+ * blas_sgemminplace(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+ *
+ ** cblas_sgemm()
+ **/
 void blas_sgemminplace(const nnl2_order order, const nnl2_transpose transa, 
                        const nnl2_transpose transb, const int m, const int n, 
                        const int k, const float alpha, const Tensor* a, const int lda,
                        const Tensor* b, const int ldb, const float beta, Tensor* c,
                        const int ldc) {
 
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+
+	// Casting from void*
 	float* a_data = (float*)a->data;
 	float* b_data = (float*)b->data;
 	float* c_data = (float*)c->data;
 	
+	// Convert nnl2 order enum to CBLAS order enum
 	CBLAS_ORDER cblas_order;
 	
 	switch(order) {
@@ -2690,48 +2857,80 @@ void blas_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
 			break;
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unknown order (matmul)\n");
+			NNL2_ORDER_ERROR(order);
 			return;
 		}
 	}
 	
+	// Convert nnl2 transpose flags to CBLAS transpose enums
 	CBLAS_TRANSPOSE cblas_transa;
 	CBLAS_TRANSPOSE cblas_transb;
 	
 	switch(transa) {
 		case nnl2NoTrans:
-			cblas_transa = CblasNoTrans;
+			cblas_transa = CblasNoTrans;  // Use matrix A as-is (no transposition)
 			break;
 			
 		case nnl2Trans:
-			cblas_transa = CblasTrans;
+			cblas_transa = CblasTrans;    // Use transpose of matrix A
 			break;
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unknown trans (a matrix) (matmul)\n");
+			NNL2_ORDER_ERROR(transa);
 			return;
 		}
 	}
 	
 	switch(transb) {
 		case nnl2NoTrans:
-			cblas_transb = CblasNoTrans;
+			cblas_transb = CblasNoTrans;  // Use matrix B as-is (no transposition)
 			break;
 			
 		case nnl2Trans:
-			cblas_transb = CblasTrans;
+			cblas_transb = CblasTrans;    // Use transpose of matrix B
 			break;
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unknown trans (b matrix) (matmul)\n");
+			NNL2_ORDER_ERROR(transb);
 			return;
 		}
 	}
-						   
-	cblas_sgemm(cblas_order, cblas_transa, cblas_transb, m, n, k, alpha, a_data, lda, b_data, ldb, beta, c_data, ldc);
+					
+	// Call the actual BLAS SGEMM function
+    // This is the highly optimized matrix multiplication routine from OpenBLAS
+    // Performs: C = alpha * op(A) * op(B) + beta * C				
+	cblas_sgemm(cblas_order,    // Memory ordering (RowMajor/ColMajor)
+				cblas_transa,   // Transpose flag for matrix A
+				cblas_transb,   // Transpose flag for matrix B
+				m, 				// Number of rows in matrices A and C
+				n,			    // Number of columns in matrices B and C
+				k, 			    // Number of columns in A and rows in B
+				alpha,		    // Scalar multiplier for A*B product
+				a_data, 		// Pointer to matrix A data
+				lda, 			// Leading dimension of matrix A
+				b_data, 	    // Pointer to matrix B data
+				ldb,  			// Leading dimension of matrix B
+				beta,  			// Scalar multiplier for matrix C
+				c_data,		    // Pointer to matrix C data (output, modified in-place)
+				ldc);     	    // Leading dimension of matrix C
+				
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif			
 }
 #endif
 
+/** @ingroup backend_system
+ ** @brief Backend implementations for sgemminplace
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - naive_sgemminplace: A simple, unremarkable naive implementation of matrix multiplication
+ *  - blas_sgemminplace: BLAS version of matrix multiplication
+ *
+ ** @see naive_sgemminplace
+ ** @see blas_sgemminplace
+ **/
 Implementation sgemminplace_backends[] = {	
 	REGISTER_BACKEND(naive_sgemminplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
@@ -2746,49 +2945,138 @@ Implementation sgemminplace_backends[] = {
  */
 sgemminplacefn sgemminplace;
 
+/** 
+ * @brief Sets the backend for view
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_sgemminplace_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(sgemminplace_backends, sgemminplace, backend_name);
 }
 
+/** @brief
+ * Naive implementation of double-precision general matrix multiplication (DGEMM) in-place
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @param c
+ * Pointer to tensor for storing result matrix C (modified in-place)
+ *
+ ** @param ldc
+ * Leading dimension of matrix C (stride between rows/columns)
+ *
+ ** @return
+ * None (result is stored in-place in matrix C)
+ *
+ ** @note
+ * This is a naive triple-loop implementation
+ * Not optimized for performance - use for reference only
+ *
+ ** @note
+ * All input tensors must be of FLOAT64 type and properly allocated
+ *
+ ** @note
+ * Matrix dimensions must satisfy: 
+ * - A: [m x k] if transa == NoTrans, [k x m] if transa == Trans
+ * - B: [k x n] if transb == NoTrans, [n x k] if transb == Trans  
+ * - C: [m x n]
+ *
+ ** @note
+ * Leading dimensions must be >= corresponding matrix dimensions
+ *
+ ** @example
+ * // Multiply two matrices: C = alpha * A * B + beta * C
+ * naive_dgemminplace(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+ *
+ ** @exception
+ * Function returns early with error message if invalid parameters are detected
+ *
+ **/
 void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
                         const nnl2_transpose transb, const int m, const int n,
                         const int k, const double alpha, const Tensor* a, const int lda,
                         const Tensor* b, const int ldb, const double beta, Tensor* c,
-                        const int ldc) {						
+                        const int ldc) {	
 
-    if (!a || !b || !c || !a->data || !b->data || !c->data) {
-        fprintf(stderr, "Error (Hello from C!): Null pointer passed as argument (matmul)");
-        return;
-    }
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif	
 
-    if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
-        fprintf(stderr, "Error (Hello from C!): Invalid dimensions provided (matmul)");
-        return;
-    }
+	// Checking the input data for correctness
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (!a || !b || !c || !a->data || !b->data || !c->data) {
+			NNL2_ERROR("Null pointer passed as argument (gemm)");
+			return;
+		}
 
-    int a_cols = (transa == nnl2Trans) ? m : k;
-    int b_cols = (transb == nnl2Trans) ? k : n;
+		if (m <= 0 || n <= 0 || k <= 0 || lda <= 0 || ldb <= 0 || ldc <= 0) {
+			NNL2_ERROR("Invalid dimensions provided (gemm)");
+			return;
+		}
 
-    if (lda < a_cols) {
-        fprintf(stderr, "Error (Hello from C!): lda is less than number of columns of a matrix! (matmul)");
-        return;
-    }
+		int a_cols = (transa == nnl2Trans) ? m : k;
+		int b_cols = (transb == nnl2Trans) ? k : n;
 
-    if (ldb < b_cols) {
-        fprintf(stderr, "Error (Hello from C!): ldb is less than number of columns of b matrix! (matmul)");
-        return;
-    }
+		if (lda < a_cols) {
+			NNL2_ERROR("lda is less than number of columns of a matrix");
+			return;
+		}
 
-    if (ldc < n) {
-        fprintf(stderr, "Error (Hello from C!): ldc is less than n! (matmul)");
-        return;
-    }
+		if (ldb < b_cols) {
+			NNL2_ERROR("ldb is less than number of columns of b matrix (gemm)");
+			return;
+		}
 
+		if (ldc < n) {
+			NNL2_ERROR("ldc is less than n (gemm)");
+			return;
+		}
+	#endif
+
+	// Casting data from void*
     volatile double* data_a = (volatile double*)a->data;
     volatile double* data_b = (volatile double*)b->data;
     volatile double* data_c = (volatile double*)c->data;
 
     if(order == nnl2RowMajor){
+		// Implementation for RowMajor order (row-wise data organization)
+		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
                 double acc = 0.0;
@@ -2813,13 +3101,17 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
                 }
 
                 if(beta == 0) {
+					// C[i,j] = alpha * (A * B)[i,j]
                     *(data_c + i * ldc + j) = acc * alpha;
                 } else {
+					// C[i,j] = alpha * (A * B)[i,j] + beta * C[i,j]
                     *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
                 }
             }
         }
     } else {
+		// Implementation for ColumnMajor order (column-wise data organization)
+		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
                 double acc = 0.0;
@@ -2844,26 +3136,104 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
                 }
 
                 if(beta == 0) {
+					// C[i,j] = alpha * (A * B)[i,j]
                     *(data_c + i * ldc + j) = acc * alpha;
                 } else {
+					// C[i,j] = alpha * (A * B)[i,j] + beta * C[i,j]
                     *(data_c + i * ldc + j) = acc * alpha + *(data_c + i * ldc + j) * beta;
                 }
             }
         }
     }
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif	
 }
 
 #ifdef OPENBLAS_AVAILABLE
+/** @brief
+ * BLAS-accelerated implementation of double-precision general matrix multiplication (DGEMM) in-place
+ * Uses highly optimized OpenBLAS library for matrix multiplication operations
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @param c
+ * Pointer to tensor for storing result matrix C (modified in-place)
+ *
+ ** @param ldc
+ * Leading dimension of matrix C (stride between rows/columns)
+ *
+ ** @return
+ * None (result is stored in-place in matrix C)
+ *
+ ** @note
+ * Requires OpenBLAS library to be available and linked
+ * Significantly faster than naive implementation
+ *
+ ** @note
+ * All input tensors must be of FLOAT64 type and properly allocated
+ *
+ ** @note
+ * Performs the operation: C = alpha * op(A) * op(B) + beta * C
+ * where op(X) is either X or X^T depending on transpose flags
+ *
+ ** @example
+ * // Multiply matrices using BLAS: C = alpha * A * B + beta * C
+ * blas_dgemminplace(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+ *
+ ** @see cblas_dgemm()
+ **/
 void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa, 
                        const nnl2_transpose transb, const int m, const int n, 
                        const int k, const double alpha, const Tensor* a, const int lda,
                        const Tensor* b, const int ldb, const double beta, Tensor* c,
                        const int ldc) {
+						   
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif						   
 
+	// Cast data from void* to double*
 	double* a_data = (double*)a->data;
 	double* b_data = (double*)b->data;
 	double* c_data = (double*)c->data;
 	
+	// Convert nnl2 order enum to CBLAS order enum
 	CBLAS_ORDER cblas_order;
 	
 	switch(order) {
@@ -2876,48 +3246,79 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 			break;
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unknown order (matmul)\n");
+			NNL2_ORDER_ERROR(order);
 			return;
 		}
 	}
 	
+	// Convert nnl2 transpose flags to CBLAS transpose enums
 	CBLAS_TRANSPOSE cblas_transa;
 	CBLAS_TRANSPOSE cblas_transb;
 	
 	switch(transa) {
 		case nnl2NoTrans:
-			cblas_transa = CblasNoTrans;
+			cblas_transa = CblasNoTrans;  // Use matrix A as-is (no transposition)
 			break;
 			
 		case nnl2Trans:
-			cblas_transa = CblasTrans;
+			cblas_transa = CblasTrans;    // Use transpose of matrix A
 			break;
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unknown trans (a matrix) (matmul)\n");
+			NNL2_TRANS_ERROR(transa);
 			return;
 		}
 	}
 	
 	switch(transb) {
 		case nnl2NoTrans:
-			cblas_transb = CblasNoTrans;
+			cblas_transb = CblasNoTrans;  // Use matrix B as-is (no transposition)
 			break;
 			
 		case nnl2Trans:
-			cblas_transb = CblasTrans;
+			cblas_transb = CblasTrans;    // Use transpose of matrix B
 			break;
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unknown trans (b matrix) (matmul)\n");
+			NNL2_TRANS_ERROR(transb);
 			return;
 		}
 	}
-						   
-	cblas_dgemm(cblas_order, cblas_transa, cblas_transb, m, n, k, alpha, a_data, lda, b_data, ldb, beta, c_data, ldc);
+	// Call the actual BLAS DGEMM function for double-precision matrices
+    // This is the highly optimized matrix multiplication routine from OpenBLAS
+    // Performs: C = alpha * op(A) * op(B) + beta * Cы					   
+	cblas_dgemm(cblas_order,     // Memory ordering (RowMajor/ColMajor)
+                cblas_transa,    // Transpose flag for matrix A
+                cblas_transb,    // Transpose flag for matrix B
+                m,               // Number of rows in matrices A and C
+                n,               // Number of columns in matrices B and C
+                k,               // Number of columns in A and rows in B
+                alpha,           // Scalar multiplier for A*B product
+                a_data,          // Pointer to matrix A data
+                lda,             // Leading dimension of matrix A
+                b_data,          // Pointer to matrix B data
+                ldb,             // Leading dimension of matrix B
+                beta,            // Scalar multiplier for matrix C
+                c_data,          // Pointer to matrix C data (output, modified in-place)
+                ldc);            // Leading dimension of matrix C
+				
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif	
 }
 #endif
 
+/** @ingroup backend_system
+ ** @brief Backend implementations for inplace_fill
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - naive_dgemminplace: Basic reference implementation
+ *  - blas_dgemminplace: BLAS-accelerated implementation 
+ *
+ ** @see naive_dgemminplace
+ ** @see blas_dgemminplace
+ **/
 Implementation dgemminplace_backends[] = {
 	REGISTER_BACKEND(naive_dgemminplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
@@ -2926,92 +3327,399 @@ Implementation dgemminplace_backends[] = {
 	#endif
 };
 
+/**
+ * @brief Function pointer for dgemm in-place
+ * @ingroup backend_system 
+ */
 dgemminplacefn dgemminplace;
-make_current_backend(gemm);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(gemm);
+
+/** 
+ * @brief Sets the backend for view
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_dgemminplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(dgemminplace_backends, dgemminplace, backend_name, current_backend(gemm));
 }
 
+/** 
+ * @brief Gets the name of the active backend for inplace_all
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_gemm_backend() {
 	return current_backend(gemm);
 }
 
+/** 
+ * @brief Function declaration for getting all `dgemminplace` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(dgemminplace);
+
+/**
+ * @brief Function declaration for getting the number of all `dgemminplace` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(dgemminplace);
 
+/** @brief
+ * Single-precision general matrix multiplication with automatic output allocation
+ * Creates a new tensor for the result and performs matrix multiplication
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A (must be FLOAT32)
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B (must be FLOAT32)
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @return
+ * Pointer to newly allocated tensor containing result matrix C, or NULL on failure
+ *
+ ** @note
+ * Automatically allocates output tensor
+ * Result must be freed using nnl2_free_tensor() to avoid memory leaks
+ *
+ ** @note
+ * Performs: C = alpha * op(A) * op(B) + beta * C
+ * where C is initialized with ones
+ *
+ ** @example
+ * // Multiply matrices and get new result tensor
+ * Tensor* result = sgemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta);
+ *
+ ** @see sgemminplace()
+ **/
 Tensor* sgemm(const nnl2_order order, const nnl2_transpose transa, 
 			  const nnl2_transpose transb, const int m, const int n, 
 			  const int k, const float alpha, const Tensor* a, const int lda,
 			  const Tensor* b, const int ldb, const float beta) {
+				  
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif				  
 	
-	int shape_c[] = {m, n};
-	int rank_c = 2;
+	// Define shape and properties for result matrix C
+	int shape_c[] = {m, n}; // Result matrix dimensions: m x n
+	int rank_c = 2;		    // 2D matrix
 	TensorType type_c = FLOAT32;
 	
-	Tensor* c = ones(shape_c, rank_c, type_c);
+	// Create output tensor
+	Tensor* c = nnl2_empty(shape_c, rank_c, type_c);
 	
+	// Perform in-place matrix multiplication on the created tensor
 	sgemminplace(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, n);
 	
-	return c;
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif	
+	
+	return c; // Return the newly created result tensor
 }
 
+/** @brief
+ * Double-precision general matrix multiplication with automatic output allocation
+ * Creates a new tensor for the result and performs matrix multiplication
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A (must be FLOAT64)
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B (must be FLOAT64)
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @return
+ * Pointer to newly allocated tensor containing result matrix C, or NULL on failure
+ *
+ ** @note
+ * Automatically allocates output tensor filled with ones
+ * Result must be freed using nnl2_free_tensor() to avoid memory leaks
+ *
+ ** @note
+ * Performs: C = alpha * op(A) * op(B) + beta * C
+ * where C is initialized with ones
+ *
+ ** @example
+ * // Multiply matrices and get new result tensor
+ * Tensor* result = dgemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta);
+ *
+ ** @see dgemminplace()
+ **/
 Tensor* dgemm(const nnl2_order order, const nnl2_transpose transa, 
 			  const nnl2_transpose transb, const int m, const int n, 
 			  const int k, const double alpha, const Tensor* a, const int lda,
 			  const Tensor* b, const int ldb, const double beta) {
 	
-	int shape_c[] = {m, n};
-	int rank_c = 2;
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif	
+	
+	// Define shape and properties for result matrix C
+	int shape_c[] = {m, n}; // Result matrix dimensions: m x n
+	int rank_c = 2; 		// 2D matrix
 	TensorType type_c = FLOAT64;
 	
-	Tensor* c = ones(shape_c, rank_c, type_c);
+	// Create output tensor
+	Tensor* c = nnl2_empty(shape_c, rank_c, type_c);
 	
+	// Perform in-place matrix multiplication on the created tensor
 	dgemminplace(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, n);
 	
-	return c;
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif	
+	
+	return c; // Return the newly created result tensor
 }
 
+/** @brief
+ * Type-agnostic general matrix multiplication with automatic output allocation
+ * Automatically detects input data type and calls appropriate precision version
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A (FLOAT32 or FLOAT64)
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B (must match A's data type)
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @return
+ * Pointer to newly allocated tensor containing result matrix C, or NULL on failure
+ *
+ ** @note
+ * Automatically determines precision based on input tensor A data type
+ * Supports both single (FLOAT32) and double (FLOAT64) precision
+ *
+ ** @note
+ * Matrices A and B must have the same data type
+ * Result tensor will have the same data type as input matrices
+ *
+ ** @example
+ * // Multiply matrices with automatic type detection
+ * Tensor* result = gemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, 
+ *                      m, n, k, alpha, A, lda, B, ldb, beta);
+ *
+ ** @see sgemm()
+ ** @see dgemm()
+ **/
 Tensor* gemm(const nnl2_order order, const nnl2_transpose transa, 
 			 const nnl2_transpose transb, const int m, const int n, 
 		     const int k, const double alpha, const Tensor* a, const int lda,
 			 const Tensor* b, const int ldb, const double beta) {
-				
+		
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif	
+		
+	// Determine data type from input tensor A			
 	TensorType dtype = a->dtype;
 	
+	// Dispatch to appropriate precision implementation
 	switch(dtype) {
 		case FLOAT64: return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 		case FLOAT32: return sgemm(order, transa, transb, m, n, k, (const float)alpha, a, lda, b, ldb, (const float)beta);
 		
 		default: {
-			fprintf(stderr, "Unsupported data type!");
+			NNL2_TYPE_ERROR(dtype);
 			return NULL;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif	
 }
 
+/** @brief
+ * Type-agnostic in-place general matrix multiplication
+ * Automatically detects input data type and calls appropriate precision version
+ * 
+ ** @param order
+ * Memory layout ordering (RowMajor or ColumnMajor)
+ *
+ ** @param transa
+ * Transposition flag for matrix A (NoTrans or Trans)
+ *
+ ** @param transb  
+ * Transposition flag for matrix B (NoTrans or Trans)
+ *
+ ** @param m
+ * Number of rows in matrices A and C
+ *
+ ** @param n
+ * Number of columns in matrices B and C
+ *
+ ** @param k
+ * Number of columns in matrix A and rows in matrix B
+ *
+ ** @param alpha
+ * Scalar multiplier for the matrix product A*B
+ *
+ ** @param a
+ * Pointer to tensor containing matrix A (FLOAT32 or FLOAT64)
+ *
+ ** @param lda
+ * Leading dimension of matrix A (stride between rows/columns)
+ *
+ ** @param b
+ * Pointer to tensor containing matrix B (must match A's data type)
+ *
+ ** @param ldb
+ * Leading dimension of matrix B (stride between rows/columns)
+ *
+ ** @param beta
+ * Scalar multiplier for matrix C (before addition)
+ *
+ ** @param c
+ * Pointer to output tensor for storing result matrix C (modified in-place)
+ *
+ ** @param ldc
+ * Leading dimension of matrix C (stride between rows/columns)
+ *
+ ** @return
+ * None (result is stored in-place in matrix C)
+ *
+ ** @note
+ * Automatically determines precision based on input tensor A data type
+ * Supports both single (FLOAT32) and double (FLOAT64) precision
+ *
+ ** @note
+ * All input tensors must have the same data type
+ * Matrix C is modified in-place and must be properly allocated
+ *
+ ** @example
+ * // In-place matrix multiplication with automatic type detection
+ * gemminplace(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+ *
+ ** @see sgemminplace(), dgemminplace()
+ **/
 void gemminplace(const nnl2_order order, const nnl2_transpose transa, 
-					const nnl2_transpose transb, const int m, const int n, 
-					const int k, const double alpha, const Tensor* a, const int lda,
-					const Tensor* b, const int ldb, const double beta,
-					Tensor* c, const int ldc) {
+				 const nnl2_transpose transb, const int m, const int n, 
+				 const int k, const double alpha, const Tensor* a, const int lda,
+				 const Tensor* b, const int ldb, const double beta,
+				 Tensor* c, const int ldc) {
 
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif	
+
+	// Determine data type from input tensor A
 	TensorType dtype = a->dtype;
 	
+	// Dispatch to appropriate precision implementation
 	switch(dtype) {
-		case FLOAT64:
-			dgemminplace(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
-			break;
-			
-		case FLOAT32: 
-			sgemminplace(order, transa, transb, m, n, k, (const float)alpha, a, lda, b, ldb, (const float)beta, c, ldc);
-			break;
+		case FLOAT64: dgemminplace(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);						    break;
+		case FLOAT32: sgemminplace(order, transa, transb, m, n, k, (const float)alpha, a, lda, b, ldb, (const float)beta, c, ldc);  break;
 		
 		default: {
-			fprintf(stderr, "Unsupported data type!");
+			NNL2_TYPE_ERROR(dtype);
 			return;
 		}
 	}			
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif	
 }
 
 void print_1d_tensor(Tensor* tensor) {		

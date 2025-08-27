@@ -210,7 +210,7 @@ void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
    
 void lisp_call_expinplace(Tensor* tensor) {
 	expinplace(tensor);       
-}
+} 
 
 Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) { 
 	return nnl2_pow(base, exponent);
@@ -222,7 +222,7 @@ Tensor* lisp_call_exp(Tensor* tensor) {
  
 void lisp_call_loginplace(Tensor* tensor) { 
 	loginplace(tensor);      
-} 
+}    
    
 Tensor* lisp_call_log(Tensor* tensor) {
 	return nnl2_logarithm(tensor);
@@ -239,7 +239,7 @@ Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 	maxinplace(tensora, tensorb);
 } 
-
+    
 void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
 	mininplace(tensora, tensorb);
 } 
