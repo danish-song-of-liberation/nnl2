@@ -955,6 +955,34 @@
 			
 (defun tensor-p (obj)
   (typep obj 'nnl2-tensor))			
+  
+(defmacro <- (tensor &rest forms)
+  (if (null forms)
+      tensor
+      (let ((form (first forms))
+            (rest (rest forms)))
+			
+        (if (listp form)
+          `(<- ,(if (cdr form)
+                  `(,(car form) ,tensor ,@(cdr form))
+                  `(,form ,tensor))
+            ,@rest)
+			
+          `(<- (,form ,tensor) ,@rest)))))
+		  
+(defmacro -> (tensor &rest forms)
+  (if (null forms)
+      tensor
+      (let ((form (first forms))
+            (rest (rest forms)))
+			
+        (if (listp form)
+          `(-> ,(if (cdr form)
+                  `(,(car form) ,@(cdr form) ,tensor)
+                  `(,form ,tensor))
+            ,@rest)
+			
+          `(-> (,form ,tensor) ,@rest)))))		  
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

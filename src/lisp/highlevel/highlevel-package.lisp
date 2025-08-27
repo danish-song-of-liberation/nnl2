@@ -330,5 +330,7 @@
    #:with-backend/copy
    #:with-backend/axpy!
    #:with-backend/axpy
-   #:tensor-p))
+   #:tensor-p
+   #:->
+   #:<-))
    
