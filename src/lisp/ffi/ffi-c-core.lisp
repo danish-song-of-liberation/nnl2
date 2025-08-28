@@ -439,7 +439,8 @@
   (tensor :pointer))     
   
 (cffi:defcfun ("print_tensor" print-tensor) :void
-  (tensor :pointer))  
+  (tensor :pointer)
+  (full-print :bool))  
   
 (cffi:defcfun ("get_tensor_rank" get-tensor-rank) :int
   (tensor :pointer))  

@@ -187,7 +187,7 @@ Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
 Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) { 
 	return sub(summand, addend);  
 }        
-
+     
 void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 	mulinplace(multiplicand, multiplier);
 }
@@ -209,7 +209,7 @@ void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 } 
    
 void lisp_call_expinplace(Tensor* tensor) {
-	expinplace(tensor);       
+	expinplace(tensor);              
 } 
 
 Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) { 
@@ -234,7 +234,7 @@ void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 
 Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {   
 	return scale(tensor, multiplier); 
-}
+}   
     
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 	maxinplace(tensora, tensorb);
@@ -242,7 +242,7 @@ void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
     
 void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
 	mininplace(tensora, tensorb);
-} 
+}       
   
 Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
 	return nnl2_max(tensora, tensorb);  

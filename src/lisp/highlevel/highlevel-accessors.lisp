@@ -131,8 +131,8 @@
 (defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 
 
-(defmacro print-tensor (tensor)
-  `(nnl2.ffi:print-tensor ,tensor))
+(defmacro print-tensor (tensor &key full-print)
+  `(nnl2.ffi:print-tensor ,tensor ,full-print))
 
 (defmacro rank (tensor)
   `(nnl2.ffi:get-tensor-rank ,tensor))
