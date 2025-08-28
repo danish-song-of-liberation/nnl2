@@ -3878,12 +3878,42 @@ void print_1d_tensor(Tensor* tensor, bool full_print) {
     #endif	
 }
 
-// sorry no doxygen yet
+/** @brief 
+ * Prints the contents of a 2D tensor (matrix) to standard output
+ *
+ ** @param tensor
+ * Pointer to the 2D tensor to be printed 
+ *
+ ** @param full_print
+ * Flag controlling output truncation:
+ ** true: Print all elements regardless of tensor size
+ ** false: Truncate output for large tensors (show first and last rows/columns)
+ *
+ ** @note
+ * In safety mode, performs extensive validation of input parameters
+ *
+ * @note
+ * Output format includes tensor metadata (type, shape) and formatted data.
+ * Truncation can be applied independently to rows and columns.
+ *
+ ** @example
+ * // Print full matrix contents
+ * print_2d_tensor(my_matrix, true);
+ *
+ * // Print truncated version for large matrices  
+ * print_2d_tensor(large_matrix, false);
+ *
+ ** @see NNL2_MAX_2D_TENSOR_PRINT_ROWS
+ ** @see NNL2_MAX_2D_TENSOR_PRINT_COLS
+ ** @see NNL2_2D_TENSOR_SHOW_ROWS
+ ** @see NNL2_2D_TENSOR_SHOW_COLS
+ **/
 void print_2d_tensor(Tensor* tensor, bool full_print) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
 
+	// Comprehensive input validation in maximal safety mode
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
         if (tensor == NULL) {
             NNL2_ERROR("NULL tensor pointer");
@@ -3919,11 +3949,13 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
     TensorType dtype_tensor = tensor->dtype;
     char* type_name = get_tensortype_name(dtype_tensor);
     
+	// Prefix
     printf("#<NNL2:TENSOR/%s [%dx%d]:", type_name, rows, cols);
     
     bool truncate_rows = (rows > NNL2_MAX_2D_TENSOR_PRINT_ROWS) && !full_print;
     bool truncate_cols = (cols > NNL2_MAX_2D_TENSOR_PRINT_COLS) && !full_print;
     
+	// Number of rows/columns displayed before and after skipping
     int show_rows = truncate_rows ? NNL2_2D_TENSOR_SHOW_ROWS : rows;
     int show_cols = truncate_cols ? NNL2_2D_TENSOR_SHOW_COLS : cols;
 
@@ -3934,11 +3966,14 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
             for (int i = 0; i < show_rows; i++) {
                 printf("\n");
                 for (int j = 0; j < show_cols; j++) {
+					// Concatenate "    " with NNL2_FLOAT64_FORMAT
                     printf("    " NNL2_FLOAT64_FORMAT, data_t[i * cols + j]);
                 }
+				
                 if (truncate_cols) {
                     printf("    ... (%d cols skipped) ...", cols - 2 * show_cols);
                     for (int j = cols - show_cols; j < cols; j++) {
+						// Concatenate "    " with NNL2_FLOAT64_FORMAT
                         printf("    " NNL2_FLOAT64_FORMAT, data_t[i * cols + j]);
                     }
                 }
@@ -3950,11 +3985,14 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
                 for (int i = rows - show_rows; i < rows; i++) {
                     printf("\n");
                     for (int j = 0; j < show_cols; j++) {
+						// Concatenate "    " with NNL2_FLOAT64_FORMAT
                         printf("    " NNL2_FLOAT64_FORMAT, data_t[i * cols + j]);
                     }
+					
                     if (truncate_cols) {
                         printf("    ... (%d cols skipped) ...", cols - 2 * show_cols);
                         for (int j = cols - show_cols; j < cols; j++) {
+							// Concatenate "    " with NNL2_FLOAT64_FORMAT
                             printf("    " NNL2_FLOAT64_FORMAT, data_t[i * cols + j]);
                         }
                     }
@@ -3969,12 +4007,14 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
             for (int i = 0; i < show_rows; i++) {
                 printf("\n");
                 for (int j = 0; j < show_cols; j++) {
+					// Concatenate "    " with NNL2_FLOAT32_FORMAT
                     printf("    " NNL2_FLOAT32_FORMAT, data_t[i * cols + j]);
                 }
 				
                 if (truncate_cols) {
                     printf("    ... (%d cols skipped) ...", cols - 2 * show_cols);
                     for (int j = cols - show_cols; j < cols; j++) {
+						// Concatenate "    " with NNL2_FLOAT32_FORMAT
                         printf("    " NNL2_FLOAT32_FORMAT, data_t[i * cols + j]);
                     }
                 }
@@ -3986,12 +4026,14 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
                 for (int i = rows - show_rows; i < rows; i++) {
                     printf("\n");
                     for (int j = 0; j < show_cols; j++) {
+						// Concatenate "    " with NNL2_FLOAT32_FORMAT
                         printf("    " NNL2_FLOAT32_FORMAT, data_t[i * cols + j]);
                     }
 					
                     if (truncate_cols) {
                         printf("    ... (%d cols skipped) ...", cols - 2 * show_cols);
                         for (int j = cols - show_cols; j < cols; j++) {
+							// Concatenate "    " with NNL2_FLOAT32_FORMAT
                             printf("    " NNL2_FLOAT32_FORMAT, data_t[i * cols + j]);
                         }
                     }
@@ -4043,6 +4085,7 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
         }
     }
     
+	// Closing format
     printf(">\n");
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -4050,9 +4093,52 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
     #endif
 }
 
+/** @brief 
+ * Prints a compact representation of a tensor with its metadata
+ *
+ ** @param tensor
+ * Pointer to the tensor to be printed (any rank)
+ *
+ ** @note
+ * Output includes tensor data type and shape information
+ * Does not print actual tensor data values, only metadata
+ *
+ ** @note
+ * In safety mode, performs validation of input parameters and tensor structure
+ * Handles tensors of any rank including scalars (rank 0)
+ *
+ ** @example
+ * // Print tensor metadata
+ * print_huge_tensor(my_tensor);
+ *
+ * // Output format: #<NNL2:TENSOR/FLOAT32 [3x4x5]>
+ *
+ ** @see get_tensortype_name
+ **/
 void print_huge_tensor(Tensor* tensor) {
-	if (tensor == NULL) return;
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
 	
+	// Comprehensive input validation in safety mode
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if (tensor == NULL {
+			NNL2_ERROR("Provided tensor is NULL");
+			return;
+		}
+		
+		if (tensor->rank <= 0) {
+            NNL2_ERROR("Invalid tensor rank: %d", tensor->rank);
+            return;
+        }
+		
+		if (tensor->rank > 0 && tensor->shape == NULL) {
+            NNL2_ERROR("Tensor shape array is NULL");
+            return;
+        }
+	#endif
+	
+	// Print tensor header with library identifier
 	printf("#<NNL2:TENSOR/");
 	
 	TensorType dtype_tensor = tensor->dtype;
@@ -4060,23 +4146,74 @@ void print_huge_tensor(Tensor* tensor) {
 	
 	printf("%s [", type_name);
 	
-	if (tensor->rank > 0) {
-        printf("%d", tensor->shape[0]);
-        for (int i = 1; i < tensor->rank; i++) {
-            printf("x%d", tensor->shape[i]);
-        }
+    // Format shape dimensions as "dim1xdim2xdim3..."
+    printf("%d", tensor->shape[0]);
+    for (int i = 1; i < tensor->rank; i++) {
+        printf("x%d", tensor->shape[i]);
     }
 	
+	// Close tensor output format
     printf("]>");
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
+/** @brief 
+ * Universal tensor printing function that routes to appropriate specialized printer
+ *
+ ** @param tensor
+ * Pointer to the tensor to be printed
+ *
+ ** @param full_print
+ * Flag controlling output detail level:
+ ** true: Print all elements regardless of tensor size
+ ** false: Truncate output for large tensors
+ *
+ ** @note
+ * Automatically selects the appropriate printing function based on tensor rank:
+ ** Rank 1: Uses print_1d_tensor() for vector printing
+ ** Rank 2: Uses print_2d_tensor() for matrix printing  
+ ** Rank 3+: Uses print_huge_tensor() for metadata-only display
+ ** Invalid rank: Handles error or returns silently based on safety mode
+ *
+ ** @note
+ * In safety mode, performs validation of input parameters and tensor structure
+ *
+ ** @example
+ * // Print full tensor contents
+ * print_tensor(my_tensor, true);
+ *
+ * // Print truncated version for large tensors
+ * print_tensor(large_tensor, false);
+ *
+ ** @see print_1d_tensor
+ ** @see print_2d_tensor  
+ ** @see print_huge_tensor
+ **/
 void print_tensor(Tensor* tensor, bool full_print) {
-	int rank = tensor->rank;
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
 	
-	if(rank <= 0)      {return;}
+	int32_t rank = tensor->rank;
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		if(rank <= 0) {
+			NNL2_ERROR("Invalid rank: %d. Rank should be non-negative", rank);
+			return
+		}
+	#else 
+		 if(rank <= 0) {return;}
+	#endif
 	else if(rank == 1) {print_1d_tensor(tensor, full_print);}
 	else if(rank == 2) {print_2d_tensor(tensor, full_print);}
 	else 			   {print_huge_tensor(tensor);}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
 int get_tensor_rank(Tensor* tensor) {

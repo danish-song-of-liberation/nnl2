@@ -18,7 +18,7 @@
 ```
 
 # nnl2
-Common Lisp (CL) neural network framework 
+Common Lisp (CL) neural network framework
 
 *About the Author:* This framework is being developed by a 14-year-old (already 15) as a personal solo project. All code, all bugs, all mine!
 
@@ -40,7 +40,8 @@ The framework is divided into three main components:
 
 # Documentation
 
-You can see docs at /nnl2/src
+Full documentation: https://azinelibrary.org/trash/Land_N_-_The_Thirst_for_Annihilation_-_George_Bataille_and_Virulent_Nihilism.pdf
+You also can see docs at /nnl2/src
 
 # Benchmarks 
 
