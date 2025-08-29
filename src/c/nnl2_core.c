@@ -105,7 +105,7 @@ void init_system() {
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
-	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);       
+	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);        
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);  
 	INIT_BACKEND(min_minf, min_minf_backends);  
@@ -127,7 +127,7 @@ void init_system() {
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy));
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
-	INIT_BACKEND(axpf, axpf_backends); 
+	INIT_BACKEND(axpf, axpf_backends);    
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);   
 }      
@@ -149,7 +149,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 } 
      
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
-	return nnl2_zeros(shape, rank, dtype); 
+	return nnl2_zeros(shape, rank, dtype);  
 }  	  	          
                  
 Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
@@ -170,7 +170,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const float beta) {
 							   
 	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}                
+}                  
     
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
 	addinplace(summand, addend);
@@ -187,7 +187,7 @@ Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
 Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) { 
 	return sub(summand, addend);  
 }        
-              
+               
 void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 	mulinplace(multiplicand, multiplier);
 }

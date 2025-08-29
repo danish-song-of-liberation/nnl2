@@ -132,7 +132,13 @@
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 
 
 (defmacro print-tensor (tensor &key full-print)
-  `(nnl2.ffi:print-tensor ,tensor ,full-print))
+  `(nnl2.ffi:print-tensor 
+     ,tensor 
+	 ,full-print 
+	 nnl2.format:*nnl2-max-rows-format* 
+	 nnl2.format:*nnl2-max-cols-format* 
+	 nnl2.format:*nnl2-show-rows-after-skip* 
+	 nnl2.format:*nnl2-show-cols-after-skip*))
 
 (defmacro rank (tensor)
   `(nnl2.ffi:get-tensor-rank ,tensor))

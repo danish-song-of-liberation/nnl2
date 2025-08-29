@@ -440,7 +440,11 @@
   
 (cffi:defcfun ("nnl2_print_tensor" print-tensor) :void
   (tensor :pointer)
-  (full-print :bool))  
+  (full-print :bool)
+  (max-rows :int)
+  (max-cols :int)
+  (show-rows :int)
+  (show-cols :int))
   
 (cffi:defcfun ("get_tensor_rank" get-tensor-rank) :int
   (tensor :pointer))  

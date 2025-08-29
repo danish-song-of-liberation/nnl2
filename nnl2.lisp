@@ -41,6 +41,12 @@
 														 (:file "ffi-with-c" :type "lisp")
 														 (:file "ffi-c-core" :type "lisp")
 														 (:file "ffi-status" :type "lisp")))
+														 
+										   (:module "format"
+										    :serial t
+											:components ((:file "format-package" :type "lisp")
+														 (:file "format-parameters" :type "lisp")
+														 (:file "format-customize" :type "lisp")))
 										
 										   (:module "highlevel"
 										    :serial t

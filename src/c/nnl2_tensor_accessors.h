@@ -109,7 +109,7 @@
 #define NNL2_FLOAT64_ELEMENTS_PER_AVX256 4     // 256 bits / 64 bits per double
 #define NNL2_MIN_ELEMENTS_FOR_AVX256_DOUBLE 4  // Minimum elements for AVX256 double processing
 
-#define NNL2_MAX_1D_TENSOR_PRINT_ELEMENTS  100
+#define NNL2_MAX_1D_TENSOR_PRINT_ELEMENTS 100
 #define NNL2_LARGE_TENSOR_THRESHOLD 500 
 #define NNL2_LARGE_TENSOR_SAMPLE_SIZE 10
 #define NNL2_1D_TENSOR_SHOW_ELEMENTS 5
@@ -3746,6 +3746,12 @@ void gemminplace(const nnl2_order order, const nnl2_transpose transa,
  ** true: Print all elements regardless of tensor size
  ** false: Truncate output for large tensors (show first and last elements)
  *
+ ** @param max_rows
+ * Maximum number of rows to display without truncation
+ *
+ ** @param show_rows
+ * Number of elements to show from beginning and end when truncating
+ *
  ** @note
  * In safety mode, performs extensive validation of input parameters
  *
@@ -3754,15 +3760,12 @@ void gemminplace(const nnl2_order order, const nnl2_transpose transa,
  *
  ** @example
  * // Print full tensor contents
- * nnl2_print_1d_tensor(my_tensor, true);
+ * nnl2_print_1d_tensor(my_tensor, true, 10, 3);
  *
  * // Print truncated version for large tensors  
- * nnl2_print_1d_tensor(large_tensor, false);
- *
- ** @see NNL2_MAX_1D_TENSOR_PRINT_ELEMENTS
- ** @see NNL2_1D_TENSOR_SHOW_ELEMENTS
- **/
-void nnl2_print_1d_tensor(Tensor* tensor, bool full_print) {		
+ * nnl2_print_1d_tensor(large_tensor, false, 10, 3);
+ */
+void nnl2_print_1d_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_t show_rows) {		
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif	
@@ -3796,6 +3799,13 @@ void nnl2_print_1d_tensor(Tensor* tensor, bool full_print) {
             return;
         }
     #endif
+	
+	if(!full_print) {
+		if(2 * show_rows >= max_rows) {
+			NNL2_ERROR("show_rows (%d) Is too large for max_rows (%d). Check the correctness of the tensor formatting settings you have specified", show_rows, max_rows);
+			return;
+		}
+	}
     
 	// Get data type information for formatting	
     TensorType dtype_tensor = tensor->dtype;
@@ -3805,32 +3815,32 @@ void nnl2_print_1d_tensor(Tensor* tensor, bool full_print) {
     printf("#<NNL2:TENSOR/%s [%d]:", type_name, rows);
     
 	// Handle output truncation for large tensors
-    if (rows > NNL2_MAX_1D_TENSOR_PRINT_ELEMENTS && !full_print) {    
+    if (rows > max_rows && !full_print) {    
 		// Calculate number of elements to skip in the middle
-		int skip = rows - 2 * NNL2_1D_TENSOR_SHOW_ELEMENTS;
+		int skip = rows - 2 * show_rows;
 	
         switch(dtype_tensor) {
             case FLOAT64: {
                 double* data_t = (double*)tensor->data;
-                for(int i = 0; i < NNL2_1D_TENSOR_SHOW_ELEMENTS; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
+                for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
                 printf("\n    ... (%d elements skipped) ...", skip);
-                for(int i = rows - NNL2_1D_TENSOR_SHOW_ELEMENTS; i < rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
+                for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
                 break;
             }
             
             case FLOAT32: {
                 float* data_t = (float*)tensor->data;
-                for(int i = 0; i < NNL2_1D_TENSOR_SHOW_ELEMENTS; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
+                for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
                 printf("\n    ... (%d elements skipped) ...", skip);
-                for(int i = rows - NNL2_1D_TENSOR_SHOW_ELEMENTS; i < rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
+                for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
                 break;
             }
             
             case INT32: {
                 int32_t* data_t = (int32_t*)tensor->data;
-                for(int i = 0; i < NNL2_1D_TENSOR_SHOW_ELEMENTS; i++) printf("\n    %d", data_t[i]);
+                for(int i = 0; i < show_rows; i++) printf("\n    %d", data_t[i]);
                 printf("\n    ... (%d elements skipped) ...", skip);
-				for(int i = rows - NNL2_1D_TENSOR_SHOW_ELEMENTS; i < rows; i++) printf("\n    %d", data_t[i]);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    %d", data_t[i]);
                 break;
             }
             
@@ -3908,7 +3918,7 @@ void nnl2_print_1d_tensor(Tensor* tensor, bool full_print) {
  ** @see NNL2_2D_TENSOR_SHOW_ROWS
  ** @see NNL2_2D_TENSOR_SHOW_COLS
  **/
-void nnl2_print_2d_tensor(Tensor* tensor, bool full_print) {
+void nnl2_print_2d_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_t max_cols, int32_t quantity_show_rows, int32_t quantity_show_cols) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -3945,6 +3955,18 @@ void nnl2_print_2d_tensor(Tensor* tensor, bool full_print) {
             return;
         }
     #endif
+	
+	if (!full_print) {
+        if (rows > max_rows && 2 * quantity_show_rows >= rows) {
+            NNL2_ERROR("quantity_show_rows (%d) Is too large for tensor rows (%d). Check the correctness of the tensor formatting settings you have specified", quantity_show_rows, rows);
+            return;
+        }
+        
+        if (cols > max_cols && 2 * quantity_show_cols >= cols) {
+            NNL2_ERROR("quantity_show_cols (%d) Is too large for tensor columns (%d). Check the correctness of the tensor formatting settings you have specified", quantity_show_cols, cols);
+            return;
+        }
+    }
     
     TensorType dtype_tensor = tensor->dtype;
     char* type_name = get_tensortype_name(dtype_tensor);
@@ -3952,12 +3974,12 @@ void nnl2_print_2d_tensor(Tensor* tensor, bool full_print) {
 	// Prefix
     printf("#<NNL2:TENSOR/%s [%dx%d]:", type_name, rows, cols);
     
-    bool truncate_rows = (rows > NNL2_MAX_2D_TENSOR_PRINT_ROWS) && !full_print;
-    bool truncate_cols = (cols > NNL2_MAX_2D_TENSOR_PRINT_COLS) && !full_print;
+    bool truncate_rows = (rows > max_rows) && !full_print;
+    bool truncate_cols = (cols > max_cols) && !full_print;
     
 	// Number of rows/columns displayed before and after skipping
-    int show_rows = truncate_rows ? NNL2_2D_TENSOR_SHOW_ROWS : rows;
-    int show_cols = truncate_cols ? NNL2_2D_TENSOR_SHOW_COLS : cols;
+    int show_rows = truncate_rows ? quantity_show_rows : rows;
+    int show_cols = truncate_cols ? quantity_show_cols : cols;
 
     switch(dtype_tensor) {
         case FLOAT64: {
@@ -4192,7 +4214,7 @@ void nnl2_print_huge_tensor(Tensor* tensor) {
  ** @see print_2d_tensor  
  ** @see print_huge_tensor
  **/
-void nnl2_print_tensor(Tensor* tensor, bool full_print) {
+void nnl2_print_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_t max_cols, int32_t show_rows, int32_t show_cols) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -4207,8 +4229,8 @@ void nnl2_print_tensor(Tensor* tensor, bool full_print) {
 	#else 
 		 if(rank <= 0) {return;}
 	#endif
-	else if(rank == 1) {nnl2_print_1d_tensor(tensor, full_print);}
-	else if(rank == 2) {nnl2_print_2d_tensor(tensor, full_print);}
+	else if(rank == 1) {nnl2_print_1d_tensor(tensor, full_print, max_rows, show_rows);}
+	else if(rank == 2) {nnl2_print_2d_tensor(tensor, full_print, max_rows, max_cols, show_rows, show_cols);}
 	else 			   {nnl2_print_huge_tensor(tensor);}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
