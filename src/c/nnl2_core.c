@@ -107,7 +107,7 @@ void init_system() {
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);        
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
-	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);  
+	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);   
 	INIT_BACKEND(min_minf, min_minf_backends);  
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
@@ -162,7 +162,7 @@ Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa,
 						const Tensor* b, const int ldb, const double beta) {    
 							    
 	return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
-}           
+}                 
    
 Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 

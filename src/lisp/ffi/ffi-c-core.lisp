@@ -446,16 +446,16 @@
   (show-rows :int)
   (show-cols :int))
   
-(cffi:defcfun ("get_tensor_rank" get-tensor-rank) :int
+(cffi:defcfun ("nnl2_get_tensor_rank" get-tensor-rank) :int
   (tensor :pointer))  
   
-(cffi:defcfun ("get_tensor_dtype" get-tensor-dtype) tensor-type
+(cffi:defcfun ("nnl2_get_tensor_dtype" get-tensor-dtype) tensor-type
   (tensor :pointer))    
   
-(cffi:defcfun ("get_tensor_dtype" get-int-tensor-dtype) :int
+(cffi:defcfun ("nnl2_get_tensor_dtype" get-int-tensor-dtype) :int
   (tensor :pointer))     
 
-(cffi:defcfun ("get_tensor_shape" get-pointer-to-tensor-shape) :pointer
+(cffi:defcfun ("nnl2_get_tensor_shape" get-pointer-to-tensor-shape) :pointer
   (tensor :pointer))        
   
 (cffi:defcfun ("get_tensor_data" get-tensor-data) :pointer

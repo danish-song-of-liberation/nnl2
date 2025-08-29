@@ -117,10 +117,13 @@
 #define NNL2_FLOAT64_FORMAT "%.6f"
 #define NNL2_FLOAT32_FORMAT "%.4f" 
 
-#define NNL2_MAX_2D_TENSOR_PRINT_ROWS 10
-#define NNL2_MAX_2D_TENSOR_PRINT_COLS 8
-#define NNL2_2D_TENSOR_SHOW_ROWS 3
-#define NNL2_2D_TENSOR_SHOW_COLS 3
+#define NNL2_CHECK_TENSOR(tensor, return_in_case_of_error) \
+    if (!tensor) { \
+        NNL2_ERROR("Invalid tensor (NULL pointer)"); \
+        return return_in_case_of_error; \
+    }
+
+#define NNL2_TENSOR_TYPE_INVALID -1
 
 // NNL2
 
@@ -3908,15 +3911,11 @@ void nnl2_print_1d_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int
  *
  ** @example
  * // Print full matrix contents
- * nnl2_print_2d_tensor(my_matrix, true);
+ * nnl2_print_2d_tensor(my_matrix, true, 10, 10, 3, 5);
  *
  * // Print truncated version for large matrices  
- * nnl2_print_2d_tensor(large_matrix, false);
+ * nnl2_print_2d_tensor(large_matrix, false, 10, 10, 3, 5);
  *
- ** @see NNL2_MAX_2D_TENSOR_PRINT_ROWS
- ** @see NNL2_MAX_2D_TENSOR_PRINT_COLS
- ** @see NNL2_2D_TENSOR_SHOW_ROWS
- ** @see NNL2_2D_TENSOR_SHOW_COLS
  **/
 void nnl2_print_2d_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_t max_cols, int32_t quantity_show_rows, int32_t quantity_show_cols) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -4210,9 +4209,9 @@ void nnl2_print_huge_tensor(Tensor* tensor) {
  * // Print truncated version for large tensors
  * print_tensor(large_tensor, false);
  *
- ** @see print_1d_tensor
- ** @see print_2d_tensor  
- ** @see print_huge_tensor
+ ** @see nnl2_print_1d_tensor
+ ** @see nnl2_print_2d_tensor  
+ ** @see nnl2_print_huge_tensor
  **/
 void nnl2_print_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_t max_cols, int32_t show_rows, int32_t show_cols) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -4238,15 +4237,120 @@ void nnl2_print_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_
     #endif
 }
 
-int32_t get_tensor_rank(Tensor* tensor) {
+/** @brief
+ * Get rank (ndim) of  tensor
+ *
+ ** @param tensor 
+ * Pointer to the tensor structure
+ *
+ ** @return 
+ * The rank of the tensor (number of dimensions)
+ *
+ ** @note 
+ * In safety mode, validates the tensor pointer before access
+ *
+ ** @note 
+ * Returns NNL2_TENSOR_TYPE_INVALID (-1) if tensor is invalid in safety mode
+ *
+ * @example
+ * Tensor* t = nnl2_zeros(...);
+ * int32_t rank = nnl2_get_tensor_rank(t);
+ * printf("Tensor rank: %d\n", rank);
+ */
+int32_t nnl2_get_tensor_rank(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		NNL2_CHECK_TENSOR(tensor, NNL2_TENSOR_TYPE_INVALID)
+	#endif
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+	
 	return tensor->rank;
 }
 
-TensorType get_tensor_dtype(Tensor* tensor) {
+/** @brief 
+ * Get the data type of a tensor
+ *
+ ** @param tensor 
+ * Pointer to the tensor structure
+ *
+ ** @return TensorType 
+ * Data type of the tensor elements
+ *
+ ** @note 
+ * In safety mode, validates the tensor pointer before access
+ *
+ ** @note Returns 
+ * NNL2_TENSOR_TYPE_INVALID if tensor is invalid in safety mode
+ *
+ * @example
+ * Tensor* t = nnl2_zeros(...);
+ * TensorType dtype = nnl2_get_tensor_dtype(t);
+ * if (dtype == FLOAT32) {
+ *     printf("Tensor is float32 type\n");
+ * }
+ */
+TensorType nnl2_get_tensor_dtype(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		NNL2_CHECK_TENSOR(tensor, NNL2_TENSOR_TYPE_INVALID)
+	#endif
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+	
 	return tensor->dtype;
 }
 
-int32_t* get_tensor_shape(Tensor* tensor) {
+/** @brief 
+ * Get the shape array of a tensor
+ *
+ ** @param tensor 
+ * Pointer to the tensor structure
+ *
+ ** @return 
+ * Pointer to the shape array containing dimension sizes
+ *
+ ** @note 
+ * The returned array has length equal to the tensor's rank
+ *
+ ** @note 
+ * In safety mode, validates the tensor pointer before access
+ *
+ ** @warning 
+ * Modifying the returned array may corrupt the tensor structure
+ *
+ * @example
+ * Tensor* t = nnl2_zeros(...);
+ * int32_t* shape = nnl2_get_tensor_shape(t);
+ * printf("Tensor shape: [");
+ * for (int i = 0; i < nnl2_get_tensor_rank(t); i++) {
+ *     printf("%d%s", shape[i], i < get_tensor_rank(t)-1 ? ", " : "");
+ * }
+ * printf("]\n");
+ */
+int32_t* nnl2_get_tensor_shape(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		NNL2_CHECK_TENSOR(tensor, NNL2_TENSOR_TYPE_INVALID)
+	#endif
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+	
 	return tensor->shape;
 }
 
