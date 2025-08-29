@@ -438,7 +438,7 @@
 (cffi:defcfun ("nnl2_free_tensor" free-tensor) :void
   (tensor :pointer))     
   
-(cffi:defcfun ("print_tensor" print-tensor) :void
+(cffi:defcfun ("nnl2_print_tensor" print-tensor) :void
   (tensor :pointer)
   (full-print :bool))  
   

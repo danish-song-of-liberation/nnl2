@@ -3754,15 +3754,15 @@ void gemminplace(const nnl2_order order, const nnl2_transpose transa,
  *
  ** @example
  * // Print full tensor contents
- * print_1d_tensor(my_tensor, true);
+ * nnl2_print_1d_tensor(my_tensor, true);
  *
  * // Print truncated version for large tensors  
- * print_1d_tensor(large_tensor, false);
+ * nnl2_print_1d_tensor(large_tensor, false);
  *
  ** @see NNL2_MAX_1D_TENSOR_PRINT_ELEMENTS
  ** @see NNL2_1D_TENSOR_SHOW_ELEMENTS
  **/
-void print_1d_tensor(Tensor* tensor, bool full_print) {		
+void nnl2_print_1d_tensor(Tensor* tensor, bool full_print) {		
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif	
@@ -3898,17 +3898,17 @@ void print_1d_tensor(Tensor* tensor, bool full_print) {
  *
  ** @example
  * // Print full matrix contents
- * print_2d_tensor(my_matrix, true);
+ * nnl2_print_2d_tensor(my_matrix, true);
  *
  * // Print truncated version for large matrices  
- * print_2d_tensor(large_matrix, false);
+ * nnl2_print_2d_tensor(large_matrix, false);
  *
  ** @see NNL2_MAX_2D_TENSOR_PRINT_ROWS
  ** @see NNL2_MAX_2D_TENSOR_PRINT_COLS
  ** @see NNL2_2D_TENSOR_SHOW_ROWS
  ** @see NNL2_2D_TENSOR_SHOW_COLS
  **/
-void print_2d_tensor(Tensor* tensor, bool full_print) {
+void nnl2_print_2d_tensor(Tensor* tensor, bool full_print) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -4109,13 +4109,13 @@ void print_2d_tensor(Tensor* tensor, bool full_print) {
  *
  ** @example
  * // Print tensor metadata
- * print_huge_tensor(my_tensor);
+ * nnl2_print_huge_tensor(my_tensor);
  *
  * // Output format: #<NNL2:TENSOR/FLOAT32 [3x4x5]>
  *
  ** @see get_tensortype_name
  **/
-void print_huge_tensor(Tensor* tensor) {
+void nnl2_print_huge_tensor(Tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -4192,7 +4192,7 @@ void print_huge_tensor(Tensor* tensor) {
  ** @see print_2d_tensor  
  ** @see print_huge_tensor
  **/
-void print_tensor(Tensor* tensor, bool full_print) {
+void nnl2_print_tensor(Tensor* tensor, bool full_print) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -4207,16 +4207,16 @@ void print_tensor(Tensor* tensor, bool full_print) {
 	#else 
 		 if(rank <= 0) {return;}
 	#endif
-	else if(rank == 1) {print_1d_tensor(tensor, full_print);}
-	else if(rank == 2) {print_2d_tensor(tensor, full_print);}
-	else 			   {print_huge_tensor(tensor);}
+	else if(rank == 1) {nnl2_print_1d_tensor(tensor, full_print);}
+	else if(rank == 2) {nnl2_print_2d_tensor(tensor, full_print);}
+	else 			   {nnl2_print_huge_tensor(tensor);}
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();
     #endif
 }
 
-int get_tensor_rank(Tensor* tensor) {
+int32_t get_tensor_rank(Tensor* tensor) {
 	return tensor->rank;
 }
 
@@ -4224,7 +4224,7 @@ TensorType get_tensor_dtype(Tensor* tensor) {
 	return tensor->dtype;
 }
 
-int* get_tensor_shape(Tensor* tensor) {
+int32_t* get_tensor_shape(Tensor* tensor) {
 	return tensor->shape;
 }
 
