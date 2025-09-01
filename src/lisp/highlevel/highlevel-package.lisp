@@ -153,6 +153,7 @@
    #:use-backend/randn
    #:use-backend/randn-like
    #:use-backend/full
+   #:use-backend/ones
    #:use-backend/full-like
    #:use-backend/zeros
    #:use-backend/zeros-like

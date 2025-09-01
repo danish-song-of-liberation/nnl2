@@ -273,9 +273,12 @@ void nnl2_log_get_config(nnl2_log_config_t* out_config) {
  ** @note
  * For system errors, a description is automatically added from strerror()
  *
- **
+ **	
  ** @warning
  * Do not call directly - use the macros NNL2_LOG(), NNL2_DEBUG(), etc.
+ *
+ ** @warning
+ * FATAL exits the program immediately
  *
  **
  ** @par Example:
@@ -400,6 +403,10 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
     fprintf(stderr, "\n");
 
     va_end(args);
+	
+	if (level == NNL2_LOG_LEVEL_FATAL) {
+        exit(EXIT_FAILURE);
+    }
 
     // Restoring errno
     errno = saved_errno;

@@ -37,16 +37,16 @@
 #include <time.h> 
   
 void init_system() {    
-	srand(time(NULL));         
-	 
-	// Initialization of the logging system
-	nnl2_log_init(   
-		NNL2_LOG_DEFAULT_COLOR,     
+	srand(time(NULL));          
+	     
+	// Initialization of the logging system         
+	nnl2_log_init(             
+		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,            
-		NNL2_LOG_DEFAULT_DEBUG_INFO,     
-		NNL2_LOG_LEVEL_DEBUG
+		NNL2_LOG_DEFAULT_DEBUG_INFO,        
+		NNL2_LOG_LEVEL_DEBUG  
 	); 
-        
+           
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
 	INIT_BACKEND(tref_setter, tref_setter_backends);   
 	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
@@ -56,7 +56,7 @@ void init_system() {
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
-	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace)); 
+	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));    
 	EINIT_BACKEND(add, add_backends, current_backend(add));   
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub)); 
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
@@ -130,7 +130,7 @@ void init_system() {
 	INIT_BACKEND(axpf, axpf_backends);    
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);   
-}      
+}                                   
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_view(tensor, indices, num_indices);

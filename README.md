@@ -41,6 +41,7 @@ The framework is divided into three main components:
 # Documentation
 
 Full documentation: https://azinelibrary.org/trash/Land_N_-_The_Thirst_for_Annihilation_-_George_Bataille_and_Virulent_Nihilism.pdf
+<br>
 You also can see docs at /nnl2/src
 
 # Benchmarks 

@@ -21,7 +21,7 @@
 	
 (defun use-backend/.abs! (name)
   (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-abs-inplace-backend sig)))
+    (nnl2.ffi:%set-abs-inplace-backend sig)))	
 	
 (defun use-backend/full (name)
   (let ((sig (symbol-to-uppercase-string name)))

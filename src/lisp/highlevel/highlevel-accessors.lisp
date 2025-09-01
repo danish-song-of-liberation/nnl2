@@ -459,7 +459,7 @@
       (case distribution
 	    (:normal `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 2.0s0))
 	    (:uniform `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 6.0s0))
-	    (otherwise (error "Unknown xavier-distribution: ~a%" distribution))))))
+	    (otherwise (error "Unknown xavier distribution: ~a%" distribution))))))
 		
 (defmacro transpose! (tensor)
   `(nnl2.ffi:%transpose! ,tensor))		
