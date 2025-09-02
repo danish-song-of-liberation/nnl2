@@ -1044,7 +1044,7 @@
            (progn
              (setf (get-backend/-=) ,name)
              ,@body)
-         (setf (get-backend-=) ,old-backend-sym)))))		 		 
+         (setf (get-backend/-=) ,old-backend-sym)))))		 		 
 		 		 
 (defmacro with-backend/gemm (name &body body)
   (let ((old-backend-sym (gensym "old-backend-")))

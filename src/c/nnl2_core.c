@@ -56,13 +56,13 @@ void init_system() {
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
-	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));    
+	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));     
 	EINIT_BACKEND(add, add_backends, current_backend(add));   
-	EINIT_BACKEND(sub, sub_backends, current_backend(sub)); 
+	EINIT_BACKEND(sub, sub_backends, current_backend(sub));   
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
 	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	   
-	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));   
+	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));    
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));     
 	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));    
