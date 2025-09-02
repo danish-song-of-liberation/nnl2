@@ -137,6 +137,13 @@
 #define NNL2_TENSOR_TYPE_INVALID_RET_PNTR ((int32_t*)-1)
 #define NNL2_TENSOR_TYPE_INVALID -1
 
+#define NNL2_TENSORTYPE_TO_C_TYPE(type) \
+    _Generic((type), \
+        INT32: int32_t, \
+        FLOAT32: float, \
+        FLOAT64: double \
+    )
+
 // NNL2
 
 /** @file nnl2_tensor_accessors.h
@@ -6138,352 +6145,1260 @@ int get_size_in_bytes(Tensor* tensor) {
 	return product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
 }
 
-Tensor* naive_add(const Tensor* summand, const Tensor* addend) {
+/** @brief
+ * Performs element-wise addition of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the sum of the corresponding elements
+ * of the two input tensors. It supports various data types with automatic
+ * casting to a higher type in the hierarchy
+ *
+ ** @param summand
+ * Pointer to the summand tensor
+ *
+ ** @param addend
+ * Pointer to the addend tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the addition result
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations (sometimes, with -O2/-O3, naive loops cause errors without volatile. based on experience, adding volatile does not affect speed)
+ *
+ ** @note
+ * Returns NULL in case of failure
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* nnl2_naive_add(const Tensor* summand, const Tensor* addend) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Calculate the total number of elements in the tensors
 	size_t len = product(summand->shape, summand->rank);
 	
 	TensorType dtype_summand = summand->dtype;
 	TensorType dtype_addend = addend->dtype;
 	
-	if(dtype_summand != dtype_addend) {
-		fprintf(stderr, "Error (Hello from C!): In sub (in-place) data-types are other\n");
-		return NULL;
+	// Selecting the winning type (higher in the hierarchy)
+	TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
+
+	// Create an output tensor with the same shape and data type
+	Tensor* amount = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+	
+	if(len == 0) return amount;
+	
+	if(dtype_summand == dtype_addend) {
+		// Handling the case if the data types match
+		
+		switch(dtype_summand) {
+			case FLOAT64: {
+				volatile double* data_summand = (double*)summand->data;
+				volatile double* data_addend = (double*)addend->data;
+				volatile double* data_amount = (double*)amount->data;
+			
+				// Element-wise addition
+				for(size_t i = 0; i < len; i++) {
+					data_amount[i] = data_summand[i] + data_addend[i];
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				volatile float* data_summand = (float*)summand->data;
+				volatile float* data_addend = (float*)addend->data;
+				volatile float* data_amount = (float*)amount->data;
+		
+				// Element-wise addition
+				for(size_t i = 0; i < len; i++) {
+					data_amount[i] = data_summand[i] + data_addend[i];
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				volatile int32_t* data_summand = (int32_t*)summand->data;
+				volatile int32_t* data_addend = (int32_t*)addend->data;
+				volatile int32_t* data_amount = (int32_t*)amount->data;
+		
+				// Element-wise addition
+				for(size_t i = 0; i < len; i++) {
+					data_amount[i] = data_summand[i] + data_addend[i];
+				}
+				
+				break;
+			}
+			
+			default: {
+				NNL2_TYPE_ERROR(dtype_summand);
+				return NULL;
+			}
+		}
+	} else {
+		// Handling the case if the data types are NOT match
+		switch(winner_in_the_type_hierarchy) {
+			case FLOAT64: {
+				volatile double* data_amount = (double*)amount->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+					void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+					
+					data_amount[i] = nnl2_convert_to_float64(elem_summand, dtype_summand) + nnl2_convert_to_float64(elem_addend, dtype_addend);
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				volatile float* data_amount = (float*)amount->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+					void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+					
+					data_amount[i] = nnl2_convert_to_float32(elem_summand, dtype_summand) + nnl2_convert_to_float32(elem_addend, dtype_addend);
+				}
+				
+				break;
+			}
+        
+			case INT32: {
+				volatile int32_t* data_amount = (int32_t*)amount->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+					void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+					
+					data_amount[i] = nnl2_convert_to_int32(elem_summand, dtype_summand) + nnl2_convert_to_int32(elem_addend, dtype_addend);
+				}
+				
+				break;
+			}
+			
+			default: {
+				NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+				return NULL;
+			}
+		}
 	}
 	
-	Tensor* amount = nnl2_zeros(summand->shape, summand->rank, dtype_summand);
-	
-	switch(dtype_summand) {
-		case FLOAT64: {
-			volatile double* data_summand = (double*)summand->data;
-			volatile double* data_addend = (double*)addend->data;
-			volatile double* data_amount = (double*)amount->data;
-	
-			for(size_t i = 0; i < len; i++) {
-				data_amount[i] = data_summand[i] + data_addend[i];
-			}
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			volatile float* data_summand = (float*)summand->data;
-			volatile float* data_addend = (float*)addend->data;
-			volatile float* data_amount = (float*)amount->data;
-	
-			for(size_t i = 0; i < len; i++) {
-				data_amount[i] = data_summand[i] + data_addend[i];
-			}
-			
-			break;
-		}
-		
-		case INT32: {
-			volatile int32_t* data_summand = (int32_t*)summand->data;
-			volatile int32_t* data_addend = (int32_t*)addend->data;
-			volatile int32_t* data_amount = (int32_t*)amount->data;
-	
-			for(size_t i = 0; i < len; i++) {
-				data_amount[i] = data_summand[i] + data_addend[i];
-			}
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data type (sub in-place)");
-			return NULL;
-		}
-	}
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 	
 	return amount;
 }
 
 #ifdef __AVX__
-Tensor* avx_add(const Tensor* summand, const Tensor* addend) {
+
+/** @brief 
+ * AVX256 optimized element-wise addition for int32 tensors (non-in-place)
+ *
+ ** @details
+ * Performs vectorized addition of two int32 tensors using AVX256 instructions
+ * Handles four different alignment scenarios for optimal performance
+ *
+ ** @param a 
+ * Pointer to destination tensor data (will store result)
+ *
+ ** @param b 
+ * Pointer to source tensor data (will not be modified)
+ *
+ ** @param len 
+ * Number of elements to process
+ *
+ ** @param aligned_a 
+ * Whether tensor a is aligned to 32-byte boundary
+ *
+ ** @param aligned_b 
+ * Whether tensor b is aligned to 32-byte boundary
+ *
+ ** @see nnl2_avx256_add
+ **/
+static inline void nnl2_avx_add_non_in_place_int32_same_type(int32_t* a, const int32_t* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * AVX256 optimized element-wise addition for float32 tensors (non-in-place)
+ *
+ * Вocumentation is identical to the documentation of the 
+ * nnl2_avx_add_non_in_place_int32_same_type declaration
+ *
+ ** @see nnl2_avx256_add
+ ** @see nnl2_avx_add_non_in_place_int32_same_type
+ **/
+static inline void nnl2_avx_add_non_in_place_float32_same_type(float* a, const float* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * AVX256 optimized element-wise addition for float64 tensors (non-in-place)
+ *
+ * Вocumentation is identical to the documentation of the 
+ * nnl2_avx_add_non_in_place_int32_same_type declaration
+ *
+ ** @see nnl2_avx256_add
+ ** @see nnl2_avx_add_non_in_place_float32_same_type
+ ** @see nnl2_avx_add_non_in_place_int32_same_type
+ **/
+static inline void nnl2_avx_add_non_in_place_float64_same_type(double* a, const double* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * Performs element-wise addition of two tensors using AVX256 instructions
+ * 
+ ** @details
+ * The function creates a new tensor containing the sum of corresponding elements
+ * from two input tensors. It supports various data types with automatic type
+ * promotion to the highest type in the hierarchy. For same data types, it uses
+ * optimized AVX256 vector instructions. For mixed types, it falls back to scalar
+ * operations with type conversion
+ * 
+ ** @param summand 
+ * Pointer to the summand tensor
+ *
+ ** @param addend 
+ * Pointer to the addend tensor
+ * 
+ ** @return 
+ * Pointer to a new tensor containing the element-wise sum
+ * 
+ ** @note 
+ * For mixed types, scalar operations are used due to AVX limitations
+ * in handling type conversions within vector instructions
+ *
+ ** @note  
+ * Includes proper handling of empty tensors (len == 0)
+ * 
+ ** @see nnl2_empty()
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()  
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* nnl2_avx256_add(const Tensor* summand, const Tensor* addend) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
     size_t len = product(summand->shape, summand->rank);
     
     TensorType dtype_summand = summand->dtype;
     TensorType dtype_addend = addend->dtype;
+	
+	// Selecting the winning type (higher in the hierarchy)
+	TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
     
-    if(dtype_summand != dtype_addend) {
-        fprintf(stderr, "Error (Hello from C!): In add (in-place) data-types are other\n");
-        return NULL;
-    }
+    Tensor* sum = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+	
+	if(len == 0) return sum; 
     
-    Tensor* sum = nnl2_zeros(summand->shape, summand->rank, dtype_summand);
-    
-    switch(dtype_summand) {
-        case FLOAT64: {
-            double* data_summand = (double*)summand->data;
-            double* data_addend = (double*)addend->data;
-            double* data_sum = (double*)sum->data;
+	if(dtype_summand == dtype_addend) {
+	    // Check alignment for both tensors
+		bool aligned_summand = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32);
+		bool aligned_addend = NNL2_IS_ALIGNED(addend->data, NNL2_TENSOR_ALIGNMENT_32);
 
-            size_t i = 0;
-			
-            for(; i + 3 < len; i += 4) {
-                __m256d v_summand = _mm256_loadu_pd(&data_summand[i]);
-                __m256d v_addend = _mm256_loadu_pd(&data_addend[i]);
-				
-                __m256d v_result = _mm256_add_pd(v_summand, v_addend);
-				
-                _mm256_storeu_pd(&data_sum[i], v_result);
+		// Handling the case when the data types are the same
+		switch(dtype_summand) {
+			case FLOAT64: {
+                double* data_summand = (double*)summand->data;
+                double* data_addend = (double*)addend->data;
+                double* data_sum = (double*)sum->data;
+                
+                // Copy data from summand to result first
+                memcpy(data_sum, data_summand, len * sizeof(double));
+                
+                // Use optimized addition
+                nnl2_avx_add_non_in_place_float64_same_type(data_sum, data_addend, len, aligned_summand, aligned_addend);
+                break;
+            }
+            
+            case FLOAT32: {
+                float* data_summand = (float*)summand->data;
+                float* data_addend = (float*)addend->data;
+                float* data_sum = (float*)sum->data;
+                
+                // Copy data from summand to result first
+                memcpy(data_sum, data_summand, len * sizeof(float));
+                
+                // Use optimized addition
+                nnl2_avx_add_non_in_place_float32_same_type(data_sum, data_addend, len, aligned_summand, aligned_addend);
+                break;
+            }
+            
+            case INT32: {
+                int32_t* data_summand = (int32_t*)summand->data;
+                int32_t* data_addend = (int32_t*)addend->data;
+                int32_t* data_sum = (int32_t*)sum->data;
+                
+                // Copy data from summand to result first
+                memcpy(data_sum, data_summand, len * sizeof(int32_t));
+                
+                // Use optimized addition
+                nnl2_avx_add_non_in_place_int32_same_type(data_sum, data_addend, len, aligned_summand, aligned_addend);
+                break;
             }
 			
-            for(; i < len; i++) {
-                data_sum[i] = data_summand[i] + data_addend[i];
+			default: {
+				NNL2_TYPE_ERROR(dtype_summand);
+				return NULL;
+			}
+		} 
+	} else {
+		// Handling the case when the data types are NOT the same
+		// For mixed types, using scalar operations since AVX doesn't easily handle
+        // type conversions within the same instruction
+		
+		switch(winner_in_the_type_hierarchy) {
+			case FLOAT64: {
+                double* data_sum = (double*)sum->data;
+                
+				// Element-wise addition
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+                    void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+                    
+                    data_sum[i] = nnl2_convert_to_float64(elem_summand, dtype_summand) + nnl2_convert_to_float64(elem_addend, dtype_addend);
+                }
+				
+                break;
             }
-			
-            break;
-        }
-        
-        case FLOAT32: {
-            float* data_summand = (float*)summand->data;
-            float* data_addend = (float*)addend->data;
-            float* data_sum = (float*)sum->data;
+            
+            case FLOAT32: {
+                float* data_sum = (float*)sum->data;
+				
+				// Element-wise addition
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+                    void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+                    
+                    data_sum[i] = nnl2_convert_to_float32(elem_summand, dtype_summand) + nnl2_convert_to_float32(elem_addend, dtype_addend);
+                }
+                
+                break;
+            }
+            
+            case INT32: {
+                int32_t* data_sum = (int32_t*)sum->data;
 
-            size_t i = 0;
-			
-            for(; i + 7 < len; i += 8) {
-                __m256 v_summand = _mm256_loadu_ps(&data_summand[i]);
-                __m256 v_addend = _mm256_loadu_ps(&data_addend[i]);
-				
-                __m256 v_result = _mm256_add_ps(v_summand, v_addend);
-				
-                _mm256_storeu_ps(&data_sum[i], v_result);
+				// Element-wise addition
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+                    void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+                    
+                    data_sum[i] = nnl2_convert_to_int32(elem_summand, dtype_summand) + nnl2_convert_to_int32(elem_addend, dtype_addend);
+                }
+                
+                break;
             }
 			
-            for(; i < len; i++) {
-                data_sum[i] = data_summand[i] + data_addend[i];
-            }
-			
-            break;
-        }
-        
-        case INT32: {
-            int32_t* data_summand = (int32_t*)summand->data;
-            int32_t* data_addend = (int32_t*)addend->data;
-            int32_t* data_sum = (int32_t*)sum->data;
-
-            size_t i = 0;
-            for(; i + 7 < len; i += 8) {
-                __m256i v_summand = _mm256_loadu_si256((__m256i*)&data_summand[i]);
-                __m256i v_addend = _mm256_loadu_si256((__m256i*)&data_addend[i]);
-				
-                __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
-				
-                _mm256_storeu_si256((__m256i*)&data_sum[i], v_result);
-            }
-			
-            for(; i < len; i++) {
-                data_sum[i] = data_summand[i] + data_addend[i];
-            }
-			
-            break;
-        }
-        
-        default: {
-            fprintf(stderr, "Error (Hello from C!): Bad data type (add in-place)");
-            return NULL;
-        }
-    }
+			default: {
+				NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+				return NULL;
+			}
+		}
+	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
     
     return sum;
 }
+
+/** @brief 
+ * AVX-optimized element-wise addition for int32 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_add_non_in_place_int32_same_type (declaration)
+ **/
+static inline void nnl2_avx_add_non_in_place_int32_same_type(int32_t* a, const int32_t* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_load_si256((__m256i*)&a[i]);       // Fast loading of aligned data
+            __m256i v_b = _mm256_load_si256((__m256i*)&b[i]);       // Fast loading of aligned data
+            __m256i v_result = _mm256_add_epi32(v_a, v_b);          // Vector addition
+            _mm256_store_si256((__m256i*)&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_load_si256((__m256i*)&a[i]);       // Fast loading of aligned data
+            __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
+            __m256i v_result = _mm256_add_epi32(v_a, v_b);          // Vector addition
+            _mm256_store_si256((__m256i*)&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
+            __m256i v_b = _mm256_load_si256((__m256i*)&b[i]);       // Fast loading of aligned data
+            __m256i v_result = _mm256_add_epi32(v_a, v_b);          // Vector addition
+            _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
+            __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
+            __m256i v_result = _mm256_add_epi32(v_a, v_b);          // Vector addition
+            _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] += b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
+ * AVX-optimized element-wise addition for float32 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_add_non_in_place_float32_same_type (declaration)
+ **/
+static inline void nnl2_avx_add_non_in_place_float32_same_type(float* a, const float* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_load_ps(&a[i]);        // Fast loading of aligned data
+            __m256 v_b = _mm256_load_ps(&b[i]);        // Fast loading of aligned data
+            __m256 v_result = _mm256_add_ps(v_a, v_b); // Vector addition
+            _mm256_store_ps(&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_load_ps(&a[i]);        // Fast loading of aligned data
+            __m256 v_b = _mm256_loadu_ps(&b[i]);       // Slow loading of unaligned data
+            __m256 v_result = _mm256_add_ps(v_a, v_b); // Vector addition
+            _mm256_store_ps(&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_loadu_ps(&a[i]);       // Slow loading of unaligned data
+            __m256 v_b = _mm256_load_ps(&b[i]);        // Fast loading of aligned data
+            __m256 v_result = _mm256_add_ps(v_a, v_b); // Vector addition
+            _mm256_storeu_ps(&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_loadu_ps(&a[i]);       // Slow loading of unaligned data
+            __m256 v_b = _mm256_loadu_ps(&b[i]);       // Slow loading of unaligned data
+            __m256 v_result = _mm256_add_ps(v_a, v_b); // Vector addition
+            _mm256_storeu_ps(&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] += b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
+ * AVX-optimized element-wise addition for float64 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_add_non_in_place_float64_same_type (declaration)
+ **/
+static inline void nnl2_avx_add_non_in_place_float64_same_type(double* a, const double* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_load_pd(&a[i]);        // Fast loading of aligned data
+            __m256d v_b = _mm256_load_pd(&b[i]);        // Fast loading of aligned data
+            __m256d v_result = _mm256_add_pd(v_a, v_b); // Vector addition
+            _mm256_store_pd(&a[i], v_result);           // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_load_pd(&a[i]);        // Fast loading of aligned data
+            __m256d v_b = _mm256_loadu_pd(&b[i]);       // Slow loading of unaligned data
+            __m256d v_result = _mm256_add_pd(v_a, v_b); // Vector addition
+            _mm256_store_pd(&a[i], v_result);           // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_loadu_pd(&a[i]);       // Slow loading of unaligned data
+            __m256d v_b = _mm256_load_pd(&b[i]);        // Fast loading of aligned data
+            __m256d v_result = _mm256_add_pd(v_a, v_b); // Vector addition
+            _mm256_storeu_pd(&a[i], v_result);          // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_loadu_pd(&a[i]);       // Slow loading of unaligned data
+            __m256d v_b = _mm256_loadu_pd(&b[i]);       // Slow loading of unaligned data
+            __m256d v_result = _mm256_add_pd(v_a, v_b); // Vector addition
+            _mm256_storeu_pd(&a[i], v_result);          // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] += b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
 #endif
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for addition operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - naive_add: Basic reference implementation
+ *  - nnl2_avx256_add: AVX256 implementation (if available)
+ * 
+ * @see naive_add
+ * @see nnl2_avx256_add
+ */
 Implementation add_backends[] = {
-	REGISTER_BACKEND(naive_add, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_add, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_add, nnl2_avx256, AVX256_BACKEND_NAME),
+		#if TENSOR_MEM_ALIGNMENT == 32
+			REGISTER_BACKEND(nnl2_avx256_add, nnl2_avx256, AVX256_BACKEND_NAME),
+		#endif
 	#endif
 };
 
+/**
+ * @brief Function pointer for addition operation
+ * @ingroup backend_system 
+ */
 addfn add;
-make_current_backend(add);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(add);
+
+/** 
+ * @brief Sets the backend for addition operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_add_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(add_backends, add, backend_name, current_backend(add));
+    ESET_BACKEND_BY_NAME(add_backends, add, backend_name, CURRENT_BACKEND(add));
 }
 
+/** 
+ * @brief Gets the name of the active backend for addition operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_add_backend() {
 	return current_backend(add);
 }
 
+/** 
+ * @brief Function declaration for getting all `add` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(add);
+
+/**
+ * @brief Function declaration for getting the number of all `add` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(add);
 
-Tensor* naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
+/** @brief
+ * Performs element-wise subtraction of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the difference of the corresponding elements
+ * of the two input tensors. It supports various data types with automatic
+ * casting to a higher type in the hierarchy
+ *
+ ** @param minuend
+ * Pointer to the minuend tensor (number from which to subtract)
+ *
+ ** @param subtrahend
+ * Pointer to the subtrahend tensor (number to subtract)
+ *
+ ** @return 
+ * Pointer to a new tensor with the subtraction result
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations (sometimes, with -O2/-O3, naive loops cause errors without volatile. based on experience, adding volatile does not affect speed)
+ *
+ ** @note
+ * Returns NULL in case of failure
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* nnl2_naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Calculate the total number of elements in the tensors
 	size_t len = product(minuend->shape, minuend->rank);
 	
 	TensorType dtype_minuend = minuend->dtype;
 	TensorType dtype_subtrahend = subtrahend->dtype;
 	
-	if(dtype_minuend != dtype_subtrahend) {
-		fprintf(stderr, "Error (Hello from C!): In sub (in-place) data-types are other\n");
-		return NULL;
+	// Selecting the winning type (higher in the hierarchy)
+	TensorType winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
+
+	// Create an output tensor with the same shape and data type
+	Tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
+	
+	if(len == 0) return difference;
+	
+	if(dtype_minuend == dtype_subtrahend) {
+		// Handling the case if the data types match
+		
+		switch(dtype_minuend) {
+			case FLOAT64: {
+				volatile double* data_minuend = (double*)minuend->data;
+				volatile double* data_subtrahend = (double*)subtrahend->data;
+				volatile double* data_difference = (double*)difference->data;
+			
+				// Element-wise subtraction
+				for(size_t i = 0; i < len; i++) {
+					data_difference[i] = data_minuend[i] - data_subtrahend[i];
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				volatile float* data_minuend = (float*)minuend->data;
+				volatile float* data_subtrahend = (float*)subtrahend->data;
+				volatile float* data_difference = (float*)difference->data;
+		
+				// Element-wise subtraction
+				for(size_t i = 0; i < len; i++) {
+					data_difference[i] = data_minuend[i] - data_subtrahend[i];
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				volatile int32_t* data_minuend = (int32_t*)minuend->data;
+				volatile int32_t* data_subtrahend = (int32_t*)subtrahend->data;
+				volatile int32_t* data_difference = (int32_t*)difference->data;
+		
+				// Element-wise subtraction
+				for(size_t i = 0; i < len; i++) {
+					data_difference[i] = data_minuend[i] - data_subtrahend[i];
+				}
+				
+				break;
+			}
+			
+			default: {
+				NNL2_TYPE_ERROR(dtype_minuend);
+				return NULL;
+			}
+		}
+	} else {
+		// Handling the case if the data types are NOT match
+		switch(winner_in_the_type_hierarchy) {
+			case FLOAT64: {
+				volatile double* data_difference = (double*)difference->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_minuend = (char*)minuend->data + i * get_dtype_size(dtype_minuend);
+					void* elem_subtrahend = (char*)subtrahend->data + i * get_dtype_size(dtype_subtrahend);
+					
+					data_difference[i] = nnl2_convert_to_float64(elem_minuend, dtype_minuend) - nnl2_convert_to_float64(elem_subtrahend, dtype_subtrahend);
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				volatile float* data_difference = (float*)difference->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_minuend = (char*)minuend->data + i * get_dtype_size(dtype_minuend);
+					void* elem_subtrahend = (char*)subtrahend->data + i * get_dtype_size(dtype_subtrahend);
+					
+					data_difference[i] = nnl2_convert_to_float32(elem_minuend, dtype_minuend) - nnl2_convert_to_float32(elem_subtrahend, dtype_subtrahend);
+				}
+				
+				break;
+			}
+        
+			case INT32: {
+				volatile int32_t* data_difference = (int32_t*)difference->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_minuend = (char*)minuend->data + i * get_dtype_size(dtype_minuend);
+					void* elem_subtrahend = (char*)subtrahend->data + i * get_dtype_size(dtype_subtrahend);
+					
+					data_difference[i] = nnl2_convert_to_int32(elem_minuend, dtype_minuend) - nnl2_convert_to_int32(elem_subtrahend, dtype_subtrahend);
+				}
+				
+				break;
+			}
+			
+			default: {
+				NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+				return NULL;
+			}
+		}
 	}
 	
-	Tensor* difference = nnl2_zeros(minuend->shape, minuend->rank, dtype_minuend);
-	
-	switch(dtype_minuend) {
-		case FLOAT64: {
-			volatile double* data_minuend = (double*)minuend->data;
-			volatile double* data_subtrahend = (double*)subtrahend->data;
-			volatile double* data_difference = (double*)difference->data;
-	
-			for(size_t i = 0; i < len; i++) {
-				data_difference[i] = data_minuend[i] - data_subtrahend[i];
-			}
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			volatile float* data_minuend = (float*)minuend->data;
-			volatile float* data_subtrahend = (float*)subtrahend->data;
-			volatile float* data_difference = (float*)difference->data;
-	
-			for(size_t i = 0; i < len; i++) {
-				data_difference[i] = data_minuend[i] - data_subtrahend[i];
-			}
-			
-			break;
-		}
-		
-		case INT32: {
-			volatile int32_t* data_minuend = (int32_t*)minuend->data;
-			volatile int32_t* data_subtrahend = (int32_t*)subtrahend->data;
-			volatile int32_t* data_difference = (int32_t*)difference->data;
-	
-			for(size_t i = 0; i < len; i++) {
-				data_difference[i] = data_minuend[i] - data_subtrahend[i];
-			}
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data type (sub in-place)");
-			return NULL;
-		}
-	}
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 	
 	return difference;
 }
 
 #ifdef __AVX__
-Tensor* avx_sub(const Tensor* minuend, const Tensor* subtrahend) {
+
+/** @brief 
+ * AVX256 optimized element-wise subtraction for int32 tensors (non-in-place)
+ *
+ ** @details
+ * Performs vectorized subtraction of two int32 tensors using AVX256 instructions
+ * Handles four different alignment scenarios for optimal performance
+ *
+ ** @param a 
+ * Pointer to destination tensor data (will store result)
+ *
+ ** @param b 
+ * Pointer to source tensor data (will not be modified)
+ *
+ ** @param len 
+ * Number of elements to process
+ *
+ ** @param aligned_a 
+ * Whether tensor a is aligned to 32-byte boundary
+ *
+ ** @param aligned_b 
+ * Whether tensor b is aligned to 32-byte boundary
+ *
+ ** @see nnl2_avx256_sub
+ **/
+static inline void nnl2_avx_sub_non_in_place_int32_same_type(int32_t* a, const int32_t* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * AVX256 optimized element-wise subtraction for float32 tensors (non-in-place)
+ *
+ * Вocumentation is identical to the documentation of the 
+ * nnl2_avx_sub_non_in_place_int32_same_type declaration
+ *
+ ** @see nnl2_avx256_sub
+ ** @see nnl2_avx_sub_non_in_place_int32_same_type
+ **/
+static inline void nnl2_avx_sub_non_in_place_float32_same_type(float* a, const float* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * AVX256 optimized element-wise subtraction for float64 tensors (non-in-place)
+ *
+ * Вocumentation is identical to the documentation of the 
+ * nnl2_avx_sub_non_in_place_int32_same_type declaration
+ *
+ ** @see nnl2_avx256_sub
+ ** @see nnl2_avx_sub_non_in_place_float32_same_type
+ ** @see nnl2_avx_sub_non_in_place_int32_same_type
+ **/
+static inline void nnl2_avx_sub_non_in_place_float64_same_type(double* a, const double* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * Performs element-wise subtraction of two tensors using AVX256 instructions
+ * 
+ ** @details
+ * The function creates a new tensor containing the difference of corresponding elements
+ * from two input tensors. It supports various data types with automatic type
+ * promotion to the highest type in the hierarchy. For same data types, it uses
+ * optimized AVX256 vector instructions. For mixed types, it falls back to scalar
+ * operations with type conversion
+ * 
+ ** @param minuend 
+ * Pointer to the minuend tensor (number from which to subtract)
+ *
+ ** @param subtrahend 
+ * Pointer to the subtrahend tensor (number to subtract)
+ * 
+ ** @return 
+ * Pointer to a new tensor containing the element-wise difference
+ * 
+ ** @note 
+ * For mixed types, scalar operations are used due to AVX limitations
+ * in handling type conversions within vector instructions
+ *
+ ** @note  
+ * Includes proper handling of empty tensors (len == 0)
+ * 
+ ** @see nnl2_empty()
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()  
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* nnl2_avx256_sub(const Tensor* minuend, const Tensor* subtrahend) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
     size_t len = product(minuend->shape, minuend->rank);
     
     TensorType dtype_minuend = minuend->dtype;
     TensorType dtype_subtrahend = subtrahend->dtype;
+	
+	// Selecting the winning type (higher in the hierarchy)
+	TensorType winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
     
-    if(dtype_minuend != dtype_subtrahend) {
-        fprintf(stderr, "Error (Hello from C!): In sub data-types are other\n");
-        return NULL;
-    }
+    Tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
+	
+	if(len == 0) return difference; 
     
-    Tensor* difference = nnl2_zeros(minuend->shape, minuend->rank, dtype_minuend);
-    
-    switch(dtype_minuend) {
-        case FLOAT64: {
-            double* data_minuend = (double*)minuend->data;
-            double* data_subtrahend = (double*)subtrahend->data;
-            double* data_difference = (double*)difference->data;
+	if(dtype_minuend == dtype_subtrahend) {
+	    // Check alignment for both tensors
+		bool aligned_minuend = NNL2_IS_ALIGNED(minuend->data, NNL2_TENSOR_ALIGNMENT_32);
+		bool aligned_subtrahend = NNL2_IS_ALIGNED(subtrahend->data, NNL2_TENSOR_ALIGNMENT_32);
 
-            size_t i = 0;
-			
-            for(; i + 3 < len; i += 4) {
-                __m256d v_minuend = _mm256_loadu_pd(&data_minuend[i]);
-                __m256d v_subtrahend = _mm256_loadu_pd(&data_subtrahend[i]);
-				
-                __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
-				
-                _mm256_storeu_pd(&data_difference[i], v_result);
+		// Handling the case when the data types are the same
+		switch(dtype_minuend) {
+			case FLOAT64: {
+                double* data_minuend = (double*)minuend->data;
+                double* data_subtrahend = (double*)subtrahend->data;
+                double* data_difference = (double*)difference->data;
+                
+                // Copy data from minuend to result first
+                memcpy(data_difference, data_minuend, len * sizeof(double));
+                
+                // Use optimized subtraction
+                nnl2_avx_sub_non_in_place_float64_same_type(data_difference, data_subtrahend, len, aligned_minuend, aligned_subtrahend);
+                break;
+            }
+            
+            case FLOAT32: {
+                float* data_minuend = (float*)minuend->data;
+                float* data_subtrahend = (float*)subtrahend->data;
+                float* data_difference = (float*)difference->data;
+                
+                // Copy data from minuend to result first
+                memcpy(data_difference, data_minuend, len * sizeof(float));
+                
+                // Use optimized subtraction
+                nnl2_avx_sub_non_in_place_float32_same_type(data_difference, data_subtrahend, len, aligned_minuend, aligned_subtrahend);
+                break;
+            }
+            
+            case INT32: {
+                int32_t* data_minuend = (int32_t*)minuend->data;
+                int32_t* data_subtrahend = (int32_t*)subtrahend->data;
+                int32_t* data_difference = (int32_t*)difference->data;
+                
+                // Copy data from minuend to result first
+                memcpy(data_difference, data_minuend, len * sizeof(int32_t));
+                
+                // Use optimized subtraction
+                nnl2_avx_sub_non_in_place_int32_same_type(data_difference, data_subtrahend, len, aligned_minuend, aligned_subtrahend);
+                break;
             }
 			
-            for(; i < len; i++) {
-                data_difference[i] = data_minuend[i] - data_subtrahend[i];
+			default: {
+				NNL2_TYPE_ERROR(dtype_minuend);
+				return NULL;
+			}
+		} 
+	} else {
+		// Handling the case when the data types are NOT the same
+		// For mixed types, using scalar operations since AVX doesn't easily handle
+        // type conversions within the same instruction
+		
+		switch(winner_in_the_type_hierarchy) {
+			case FLOAT64: {
+                double* data_difference = (double*)difference->data;
+                
+				// Element-wise subtraction
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_minuend = (char*)minuend->data + i * get_dtype_size(dtype_minuend);
+                    void* elem_subtrahend = (char*)subtrahend->data + i * get_dtype_size(dtype_subtrahend);
+                    
+                    data_difference[i] = nnl2_convert_to_float64(elem_minuend, dtype_minuend) - nnl2_convert_to_float64(elem_subtrahend, dtype_subtrahend);
+                }
+				
+                break;
             }
-			
-            break;
-        }
-        
-        case FLOAT32: {
-            float* data_minuend = (float*)minuend->data;
-            float* data_subtrahend = (float*)subtrahend->data;
-            float* data_difference = (float*)difference->data;
+            
+            case FLOAT32: {
+                float* data_difference = (float*)difference->data;
+				
+				// Element-wise subtraction
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_minuend = (char*)minuend->data + i * get_dtype_size(dtype_minuend);
+                    void* elem_subtrahend = (char*)subtrahend->data + i * get_dtype_size(dtype_subtrahend);
+                    
+                    data_difference[i] = nnl2_convert_to_float32(elem_minuend, dtype_minuend) - nnl2_convert_to_float32(elem_subtrahend, dtype_subtrahend);
+                }
+                
+                break;
+            }
+            
+            case INT32: {
+                int32_t* data_difference = (int32_t*)difference->data;
 
-            size_t i = 0;
-			
-            for(; i + 7 < len; i += 8) {
-                __m256 v_minuend = _mm256_loadu_ps(&data_minuend[i]);
-                __m256 v_subtrahend = _mm256_loadu_ps(&data_subtrahend[i]);
-				
-                __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
-				
-                _mm256_storeu_ps(&data_difference[i], v_result);
+				// Element-wise subtraction
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_minuend = (char*)minuend->data + i * get_dtype_size(dtype_minuend);
+                    void* elem_subtrahend = (char*)subtrahend->data + i * get_dtype_size(dtype_subtrahend);
+                    
+                    data_difference[i] = nnl2_convert_to_int32(elem_minuend, dtype_minuend) - nnl2_convert_to_int32(elem_subtrahend, dtype_subtrahend);
+                }
+                
+                break;
             }
 			
-            for(; i < len; i++) {
-                data_difference[i] = data_minuend[i] - data_subtrahend[i];
-            }
-			
-            break;
-        }
-        
-        case INT32: {
-            int32_t* data_minuend = (int32_t*)minuend->data;
-            int32_t* data_subtrahend = (int32_t*)subtrahend->data;
-            int32_t* data_difference = (int32_t*)difference->data;
-
-            size_t i = 0;
-            for(; i + 7 < len; i += 8) {
-                __m256i v_minuend = _mm256_loadu_si256((__m256i*)&data_minuend[i]);
-                __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&data_subtrahend[i]);
-				
-                __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
-				
-                _mm256_storeu_si256((__m256i*)&data_difference[i], v_result);
-            }
-			
-            for(; i < len; i++) {
-                data_difference[i] = data_minuend[i] - data_subtrahend[i];
-            }
-			
-            break;
-        }
-        
-        default: {
-            fprintf(stderr, "Error (Hello from C!): Bad data type (sub)");
-            return NULL;
-        }
-    }
+			default: {
+				NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+				return NULL;
+			}
+		}
+	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
     
     return difference;
 }
+
+/** @brief 
+ * AVX-optimized element-wise subtraction for int32 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_sub_non_in_place_int32_same_type (declaration)
+ **/
+static inline void nnl2_avx_sub_non_in_place_int32_same_type(int32_t* a, const int32_t* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_load_si256((__m256i*)&a[i]);       // Fast loading of aligned data
+            __m256i v_b = _mm256_load_si256((__m256i*)&b[i]);       // Fast loading of aligned data
+            __m256i v_result = _mm256_sub_epi32(v_a, v_b);          // Vector subtraction
+            _mm256_store_si256((__m256i*)&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_load_si256((__m256i*)&a[i]);       // Fast loading of aligned data
+            __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
+            __m256i v_result = _mm256_sub_epi32(v_a, v_b);          // Vector subtraction
+            _mm256_store_si256((__m256i*)&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
+            __m256i v_b = _mm256_load_si256((__m256i*)&b[i]);       // Fast loading of aligned data
+            __m256i v_result = _mm256_sub_epi32(v_a, v_b);          // Vector subtraction
+            _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 7 < len; i += 8) {
+            __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
+            __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
+            __m256i v_result = _mm256_sub_epi32(v_a, v_b);          // Vector subtraction
+            _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] -= b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
+ * AVX-optimized element-wise subtraction for float32 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_sub_non_in_place_float32_same_type (declaration)
+ **/
+static inline void nnl2_avx_sub_non_in_place_float32_same_type(float* a, const float* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_load_ps(&a[i]);        // Fast loading of aligned data
+            __m256 v_b = _mm256_load_ps(&b[i]);        // Fast loading of aligned data
+            __m256 v_result = _mm256_sub_ps(v_a, v_b); // Vector subtraction
+            _mm256_store_ps(&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_load_ps(&a[i]);        // Fast loading of aligned data
+            __m256 v_b = _mm256_loadu_ps(&b[i]);       // Slow loading of unaligned data
+            __m256 v_result = _mm256_sub_ps(v_a, v_b); // Vector subtraction
+            _mm256_store_ps(&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_loadu_ps(&a[i]);       // Slow loading of unaligned data
+            __m256 v_b = _mm256_load_ps(&b[i]);        // Fast loading of aligned data
+            __m256 v_result = _mm256_sub_ps(v_a, v_b); // Vector subtraction
+            _mm256_storeu_ps(&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 7 < len; i += 8) {
+            __m256 v_a = _mm256_loadu_ps(&a[i]);       // Slow loading of unaligned data
+            __m256 v_b = _mm256_loadu_ps(&b[i]);       // Slow loading of unaligned data
+            __m256 v_result = _mm256_sub_ps(v_a, v_b); // Vector subtraction
+            _mm256_storeu_ps(&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] -= b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
+ * AVX-optimized element-wise subtraction for float64 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_sub_non_in_place_float64_same_type (declaration)
+ **/
+static inline void nnl2_avx_sub_non_in_place_float64_same_type(double* a, const double* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_load_pd(&a[i]);        // Fast loading of aligned data
+            __m256d v_b = _mm256_load_pd(&b[i]);        // Fast loading of aligned data
+            __m256d v_result = _mm256_sub_pd(v_a, v_b); // Vector subtraction
+            _mm256_store_pd(&a[i], v_result);           // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_load_pd(&a[i]);        // Fast loading of aligned data
+            __m256d v_b = _mm256_loadu_pd(&b[i]);       // Slow loading of unaligned data
+            __m256d v_result = _mm256_sub_pd(v_a, v_b); // Vector subtraction
+            _mm256_store_pd(&a[i], v_result);           // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_loadu_pd(&a[i]);       // Slow loading of unaligned data
+            __m256d v_b = _mm256_load_pd(&b[i]);        // Fast loading of aligned data
+            __m256d v_result = _mm256_sub_pd(v_a, v_b); // Vector subtraction
+            _mm256_storeu_pd(&a[i], v_result);          // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 3 < len; i += 4) {
+            __m256d v_a = _mm256_loadu_pd(&a[i]);       // Slow loading of unaligned data
+            __m256d v_b = _mm256_loadu_pd(&b[i]);       // Slow loading of unaligned data
+            __m256d v_result = _mm256_sub_pd(v_a, v_b); // Vector subtraction
+            _mm256_storeu_pd(&a[i], v_result);          // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] -= b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
 #endif
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for subtraction operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_sub: Basic reference implementation
+ *  - nnl2_avx256_sub: AVX256 implementation (if available)
+ * 
+ * @see nnl2_naive_sub
+ * @see nnl2_avx256_sub
+ */
 Implementation sub_backends[] = {
-	REGISTER_BACKEND(naive_sub, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_sub, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef __AVX__
-	REGISTER_BACKEND(avx_sub, nnl2_avx256, AVX256_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_avx256_sub, nnl2_avx256, AVX256_BACKEND_NAME),
 	#endif
 };
 
+/**
+ * @brief Function pointer for subtraction operation
+ * @ingroup backend_system 
+ */
 subfn sub;
-make_current_backend(sub);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(sub);
+
+/** 
+ * @brief Sets the backend for subtraction operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_sub_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(sub_backends, sub, backend_name, current_backend(sub));
+    ESET_BACKEND_BY_NAME(sub_backends, sub, backend_name, CURRENT_BACKEND(sub));
 }
 
+/** 
+ * @brief Gets the name of the active backend for subtraction operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_sub_backend() {
 	return current_backend(sub);
 }
 
+/** 
+ * @brief Function declaration for getting all `sub` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(sub);
+
+/**
+ * @brief Function declaration for getting the number of all `sub` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(sub);
 
 void naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {

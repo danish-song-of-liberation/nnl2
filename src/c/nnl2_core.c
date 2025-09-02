@@ -35,15 +35,15 @@
 
 #include <stdlib.h>
 #include <time.h> 
-  
-void init_system() {    
-	srand(time(NULL));          
+       
+void init_system() {     
+	srand(time(NULL));             
 	     
 	// Initialization of the logging system         
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,            
-		NNL2_LOG_DEFAULT_DEBUG_INFO,        
+		NNL2_LOG_DEFAULT_DEBUG_INFO,         
 		NNL2_LOG_LEVEL_DEBUG  
 	); 
            
@@ -58,14 +58,14 @@ void init_system() {
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
 	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));     
 	EINIT_BACKEND(add, add_backends, current_backend(add));   
-	EINIT_BACKEND(sub, sub_backends, current_backend(sub));   
-	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace)); 
+	EINIT_BACKEND(sub, sub_backends, current_backend(sub));      
+	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace));  
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
-	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	   
+	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	      
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));    
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));     
-	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));    
+	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));        
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp)); 
 	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log)); 
