@@ -249,13 +249,15 @@
   (exponent :pointer))    
   
 (cffi:defcfun ("lisp_call_exp" %.exp) :pointer
-  (tensor :pointer))
+  (tensor :pointer)
+  (save-type :bool))
 
 (cffi:defcfun ("lisp_call_loginplace" %.log!) :void
   (tensor :pointer))  
 
 (cffi:defcfun ("lisp_call_log" %.log) :pointer
-  (tensor :pointer))  
+  (tensor :pointer)
+  (save-type :bool))
   
 (cffi:defcfun ("lisp_call_axpy_inplace" %axpy!) :void
   (summand :pointer)

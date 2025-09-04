@@ -35,16 +35,16 @@
 
 #include <stdlib.h>
 #include <time.h> 
-       
+        
 void init_system() {     
 	srand(time(NULL));             
 	     
-	// Initialization of the logging system         
+	// Initialization of the logging system          
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,            
 		NNL2_LOG_DEFAULT_DEBUG_INFO,         
-		NNL2_LOG_LEVEL_DEBUG  
+		NNL2_LOG_LEVEL_DEBUG   
 	); 
            
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
@@ -56,33 +56,33 @@ void init_system() {
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
-	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));     
+	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));      
 	EINIT_BACKEND(add, add_backends, current_backend(add));   
-	EINIT_BACKEND(sub, sub_backends, current_backend(sub));      
+	EINIT_BACKEND(sub, sub_backends, current_backend(sub));       
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace));  
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
-	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	      
+	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	       
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));    
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
-	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));     
-	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));        
-	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp)); 
-	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));  
-	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log)); 
-	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace)); 
+	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));       
+	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));            
+	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
+	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));    
+	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log));   
+	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace));     
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
-	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));  
-	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace)); 
-	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));      
-	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));   
+	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));     
+	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace));   
+	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));         
+	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
-	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));  
+	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));   
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
-	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));       
-	EINIT_BACKEND(relu, relu_backends, current_backend(relu));    
+	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));         
+	EINIT_BACKEND(relu, relu_backends, current_backend(relu));     
 	EINIT_BACKEND(leakyreluinplace, leakyreluinplace_backends, current_backend(leakyreluinplace));  
-	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));   
+	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));     
 	EINIT_BACKEND(sigmoidinplace, sigmoidinplace_backends, current_backend(sigmoidinplace)); 
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(tanhinplace, tanhinplace_backends, current_backend(tanhinplace)); 
@@ -133,7 +133,7 @@ void init_system() {
 }                                   
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
-	return nnl2_view(tensor, indices, num_indices);
+	return nnl2_view(tensor, indices, num_indices); 
 } 
 
 void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
@@ -199,33 +199,33 @@ void lisp_call_divinplace(Tensor* dividend, Tensor* divisor) {
 Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) {
 	return mul(multiplicand, multiplier);    
 }
-      
-Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {
-	return nnl2_div(dividend, divisor); 
-} 
-
+        
+Tensor* lisp_call_div(Tensor* dividend, Tensor* divisor) {  
+	return nnl2_div(dividend, divisor);   
+}  
+  
 void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
-	powinplace(base, exponent);
-} 
+	powinplace(base, exponent);  
+}  
    
-void lisp_call_expinplace(Tensor* tensor) {
+void lisp_call_expinplace(Tensor* tensor) { 
 	expinplace(tensor);              
 } 
-
+ 
 Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) { 
-	return nnl2_pow(base, exponent);
+	return nnl2_pow(base, exponent); 
 } 
          
-Tensor* lisp_call_exp(Tensor* tensor) {
-	return nnl2_exp(tensor);
+Tensor* lisp_call_exp(Tensor* tensor, bool save_type) {
+	return nnl2_exp(tensor, save_type);
 }
- 
+  
 void lisp_call_loginplace(Tensor* tensor) { 
 	loginplace(tensor);      
 }    
    
-Tensor* lisp_call_log(Tensor* tensor) {
-	return nnl2_logarithm(tensor);
+Tensor* lisp_call_log(Tensor* tensor, bool save_type) {
+	return nnl2_logarithm(tensor, save_type);
 } 
   
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {

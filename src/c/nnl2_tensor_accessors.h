@@ -96,10 +96,13 @@
 #define NNL2_STRIDES_SECOND_LAST_DIM_INDEX 2
 #define NNL2_STRIDES_NEXT_DIM_INDEX 1
 
+#define NNL2_STACK_OVERFLOW(function) NNL2_FATAL("Stack overflow (" function ")")
+#define NNL2_STACK_UNDERFLOW(function) NNL2_FATAL("Stack underflow (" function ")")
 #define NNL2_TYPE_ERROR(transmitted_data_type) NNL2_ERROR("Invalid data-type: %d", transmitted_data_type)
 #define NNL2_TYPE_FATAL(transmitted_data_type) NNL2_FATAL("Invalid data-type: %d", transmitted_data_type)
 #define NNL2_ORDER_ERROR(transmitted_order) NNL2_ERROR("Invalid order: %d", transmitted_order)
 #define NNL2_TRANS_ERROR(transmitted_trans) NNL2_ERROR("Invalid trans: %d", transmitted_trans)
+
 #define NNL2_CHECK_NULL_IF_ERR_RETURN(ptr, msg, exit_p) \
         if (ptr == NULL) { \
             NNL2_ERROR(msg); \
@@ -108,6 +111,15 @@
 			} \
             return; \
         }
+		
+#define NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ptr, msg, exit_p, val) \
+        if (ptr == NULL) { \
+            NNL2_ERROR(msg); \
+			if(exit_p) { \
+				NNL2_FUNC_EXIT(); \
+			} \
+            return val; \
+        }		
 
 #define NNL2_IS_ALIGNED(pntr, alignment) (((uintptr_t)(pntr) % (alignment)) == 0)
 
@@ -190,14 +202,14 @@
  ** @see NNL2_DEBUG_MODE
  ** @see NNL2_SAFETY_MODE
  **/
-inline size_t get_dtype_size(TensorType dtype) {
+NNL2_FORCE_INLINE static size_t get_dtype_size(TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();	
 	    NNL2_DEBUG("Function get_dtype_size was called with dtype=%d", dtype);
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
-		if(dtype > (NUM_TENSOR_TYPES - 1)) {
+		if(dtype >= NUM_TENSOR_TYPES) {
 			NNL2_ERROR("Invalid data type: %d", dtype);
 		}
 	#endif
@@ -205,8 +217,19 @@ inline size_t get_dtype_size(TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL    
 		NNL2_FUNC_EXIT();	
 	#endif
+		
+	#ifdef __GNUC__
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Warray-bounds"
+		#define NNL2_SUPPRESS_ARRAY_BOUNDS
+    #endif
 	
 	return (const size_t[]){sizeof(int), sizeof(float), sizeof(double)}[dtype]; 
+	
+	#ifdef __GNUC__
+		#pragma GCC diagnostic pop
+	    #undef NNL2_SUPPRESS_ARRAY_BOUNDS
+    #endif
 }	
 
 /** @brief
@@ -2585,7 +2608,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
  ** @see nnl2_zeros()
  ** @see inplace_fill()
  **/
-Tensor* ones(const int32_t* shape, const int32_t rank, const TensorType dtype) {
+Tensor* ones(int32_t* shape, int32_t rank, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_ENTER();
 	#endif
@@ -7401,466 +7424,1432 @@ DEFINE_GET_BACKENDS_FUNCTION(sub);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(sub);
 
-void naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
-	size_t len = product(multiplicand->shape, multiplicand->rank);
-	
-	TensorType dtype_multiplicand = multiplicand->dtype;
-	TensorType dtype_multiplier = multiplier->dtype;
-	
-	if(dtype_multiplicand != dtype_multiplier) {
-		fprintf(stderr, "Error (Hello from C!): In mul (in-place) data-types are other\n");
-		return;
-	}
-	
-	switch(dtype_multiplicand) {
-		case FLOAT64: {
-			volatile double* multiplicand_data = (double*)multiplicand->data;
-			volatile double* multiplier_data = (double*)multiplier->data;
-			
-			for(size_t it = 0; it < len; it++) {
-				multiplicand_data[it] *= multiplier_data[it];
-			}
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			volatile float* multiplicand_data = (float*)multiplicand->data;
-			volatile float* multiplier_data = (float*)multiplier->data;
-			
-			for(size_t it = 0; it < len; it++) {
-				multiplicand_data[it] *= multiplier_data[it];
-			}
-			
-			break;
-		}
-		
-		case INT32: {
-			volatile int32_t* multiplicand_data = (int32_t*)multiplicand->data;
-			volatile int32_t* multiplier_data = (int32_t*)multiplier->data;
-			
-			for(size_t it = 0; it < len; it++) {
-				multiplicand_data[it] *= multiplier_data[it];
-			}
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data type (mul in-place)");
-			return;
-		}
-	}
+/** @brief 
+ * Performs element-wise multiplication of two tensors (naive implementation)
+ * 
+ * Multiplies the elements of the multiplicand tensor by the corresponding elements 
+ * of the multiplier tensor, modifying the multiplicand tensor in place
+ *
+ ** @param multiplicand 
+ * Pointer to the tensor that will be modified (receives the multiplication result)
+ *
+ ** @param multiplier 
+ * Pointer to the tensor whose values will multiply the multiplicand
+ *
+ ** @note 
+ * Supports different data types through automatic conversion
+ * The multiplier elements are converted to the multiplicand's data type
+ *
+ ** @note 
+ * In max safety mode, validates tensor pointers and data pointers before access
+ *
+ ** @warning 
+ * This function modifies the multiplicand tensor directly
+ *
+ * @example
+ * // Create two tensors with the same shape
+ * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * 
+ * // Multiply a by b (a becomes a * b)
+ * naive_mulinplace(a, b);
+ * 
+ * // Now a contains 1.0 in all elements
+ * nnl2_print_tensor(a);
+ * 
+ * // Cleanup
+ * nnl2_free_tensor(a);
+ * nnl2_free_tensor(b);
+ */
+void nnl2_naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+    
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand, "Multiplicand tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand->data, "Multiplicand tensor's data is NULL", sufficient_debug_mode_p);
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier->data, "Multiplier tensor's data is NULL", sufficient_debug_mode_p);
+    #endif
+    
+    // Calculating the total number of elements in the multiplicand tensor
+    size_t len_multiplicand = product(multiplicand->shape, multiplicand->rank);
+    
+    // If the tensor is empty, exit the function
+    if(len_multiplicand == 0) return;
+    
+    TensorType dtype_multiplicand = multiplicand->dtype;
+    TensorType dtype_multiplier = multiplier->dtype;
+    
+    if(dtype_multiplicand == dtype_multiplier) {
+        // Handling case when the tensors have the same type
+        
+        switch(dtype_multiplicand) {
+            case FLOAT64: {
+                volatile double* data_multiplicand = (double*)multiplicand->data;
+                volatile double* data_multiplier = (double*)multiplier->data;
+                
+                // Element-wise multiplication
+                for(size_t i = 0; i < len_multiplicand; i++) data_multiplicand[i] *= data_multiplier[i];
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_multiplicand = (float*)multiplicand->data;
+                volatile float* data_multiplier = (float*)multiplier->data;
+                
+                // Element-wise multiplication
+                for(size_t i = 0; i < len_multiplicand; i++) data_multiplicand[i] *= data_multiplier[i];    
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
+                volatile int32_t* data_multiplier = (int32_t*)multiplier->data;
+                
+                // Element-wise multiplication
+                for(size_t i = 0; i < len_multiplicand; i++) data_multiplicand[i] *= data_multiplier[i];        
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_multiplicand);
+                return;
+            }
+        }
+    } else {
+        // Handling the case when tensors have different data types
+        // Calculating the step size for accessing multiplier tensor elements
+        size_t multiplier_step = get_dtype_size(dtype_multiplier);
+        
+        // Casting multiplier data to char* for byte access
+        char* multiplier_data = (char*)multiplier->data;
+        
+        switch(dtype_multiplicand) {
+            case FLOAT64: {
+                volatile double* data_multiplicand = (double*)multiplicand->data;
+                
+                // For each element, convert the multiplier element to FLOAT64 and multiply it
+                for(size_t i = 0; i < len_multiplicand; i++) {
+                    void* multiplier_elem = multiplier_data + i * multiplier_step;
+                    data_multiplicand[i] *= nnl2_convert_to_float64(multiplier_elem, dtype_multiplier);
+                }
+                
+                break; 
+            }
+            
+            case FLOAT32: {
+                volatile float* data_multiplicand = (float*)multiplicand->data;
+                
+                // For each element, convert the multiplier element to FLOAT32 and multiply it
+                for(size_t i = 0; i < len_multiplicand; i++) {
+                    void* multiplier_elem = multiplier_data + i * multiplier_step;
+                    data_multiplicand[i] *= nnl2_convert_to_float32(multiplier_elem, dtype_multiplier);
+                }
+                
+                break; 
+            }
+            
+            case INT32: {
+                volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
+                
+                // For each element, convert the multiplier element to INT32 and multiply it
+                for(size_t i = 0; i < len_multiplicand; i++) {
+                    void* multiplier_elem = multiplier_data + i * multiplier_step;
+                    data_multiplicand[i] *= nnl2_convert_to_int32(multiplier_elem, dtype_multiplier);
+                }
+                
+                break; 
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_multiplicand);
+                return;
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for multiplication operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_mulinplace: Basic reference implementation
+ * 
+ * @see nnl2_naive_mulinplace
+ */
 Implementation mulinplace_backends[] = {
-	REGISTER_BACKEND(naive_mulinplace, nnl2_naive, "NAIVE"),
+	REGISTER_BACKEND(nnl2_naive_mulinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for multiplication operation
+ * @ingroup backend_system 
+ */
 mulinplacefn mulinplace;
+
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
 make_current_backend(mulinplace);
 
+/** 
+ * @brief Sets the backend for multiplication operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_mulinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(mulinplace_backends, mulinplace, backend_name, current_backend(mulinplace));
+    ESET_BACKEND_BY_NAME(mulinplace_backends, mulinplace, backend_name, CURRENT_BACKEND(mulinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for multiplication operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_mulinplace_backend() {
-	return current_backend(mulinplace);
+	return CURRENT_BACKEND(mulinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all `mulinplace` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(mulinplace);
+
+/**
+ * @brief Function declaration for getting the number of all `mulinplace` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(mulinplace);
 
-void naive_divinplace(Tensor* dividend, const Tensor* divisor) {
-	size_t len = product(dividend->shape, dividend->rank);
-	
-	TensorType dtype_dividend = dividend->dtype;
-	TensorType dtype_divisor = divisor->dtype;
-	
-	if(dtype_dividend != dtype_divisor) {
-		fprintf(stderr, "Error (Hello from C!): In div (in-place) data-types are other\n");
-		return;
-	}
-	
-	switch(dtype_dividend) {
-		case FLOAT64: {
-			volatile double* dividend_data = (double*)dividend->data;
-			volatile double* divisor_data = (double*)divisor->data;
-			
-			for(size_t it = 0; it < len; it++) {
-				dividend_data[it] /= divisor_data[it];
-			}
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			volatile float* dividend_data = (float*)dividend->data;
-			volatile float* divisor_data = (float*)divisor->data;
-			
-			for(size_t it = 0; it < len; it++) {
-				dividend_data[it] /= divisor_data[it];
-			}
-			
-			break;
-		}
-		
-		case INT32: {
-			volatile int32_t* dividend_data = (int32_t*)dividend->data;
-			volatile int32_t* divisor_data = (int32_t*)divisor->data;
-			
-			for(size_t it = 0; it < len; it++) {
-				dividend_data[it] /= divisor_data[it];
-			}
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data type (mul in-place)");
-			return;
-		}
-	}
+/** @brief 
+ * Performs element-wise division of two tensors (naive implementation)
+ * 
+ * Divides the elements of the dividend tensor by the corresponding elements 
+ * of the divisor tensor, modifying the dividend tensor in place
+ *
+ ** @param dividend 
+ * Pointer to the tensor that will be modified (receives the division result)
+ *
+ ** @param divisor 
+ * Pointer to the tensor whose values will divide the dividend
+ *
+ ** @note 
+ * Supports different data types through automatic conversion
+ * The divisor elements are converted to the dividend's data type
+ *
+ ** @note 
+ * In max safety mode, validates tensor pointers and data pointers before access
+ *
+ ** @warning 
+ * This function modifies the dividend tensor directly
+ * Division by zero may result in undefined behavior depending on data type
+ *
+ * @example
+ * // Create two tensors with the same shape
+ * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * 
+ * // Divide a by b (a becomes a / b)
+ * nnl2_naive_divinplace(a, b);
+ * 
+ * // Now a contains 1.0 in all elements
+ * nnl2_print_tensor(a);
+ * 
+ * // Cleanup
+ * nnl2_free_tensor(a);
+ * nnl2_free_tensor(b);
+ */
+void nnl2_naive_divinplace(Tensor* dividend, const Tensor* divisor) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+    
+        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend, "Dividend tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend->data, "Dividend tensor's data is NULL", sufficient_debug_mode_p);
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor->data, "Divisor tensor's data is NULL", sufficient_debug_mode_p);
+    #endif
+    
+    // Calculating the total number of elements in the dividend tensor
+    size_t len_dividend = product(dividend->shape, dividend->rank);
+    
+    // If the tensor is empty, exit the function
+    if(len_dividend == 0) return;
+    
+    TensorType dtype_dividend = dividend->dtype;
+    TensorType dtype_divisor = divisor->dtype;
+    
+    if(dtype_dividend == dtype_divisor) {
+        // Handling case when the tensors have the same type
+        
+        switch(dtype_dividend) {
+            case FLOAT64: {
+                volatile double* data_dividend = (double*)dividend->data;
+                volatile double* data_divisor = (double*)divisor->data;
+                
+                // Element-wise division
+                for(size_t i = 0; i < len_dividend; i++) data_dividend[i] /= data_divisor[i];
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_dividend = (float*)dividend->data;
+                volatile float* data_divisor = (float*)divisor->data;
+                
+                // Element-wise division
+                for(size_t i = 0; i < len_dividend; i++) data_dividend[i] /= data_divisor[i];    
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_dividend = (int32_t*)dividend->data;
+                volatile int32_t* data_divisor = (int32_t*)divisor->data;
+                
+                // Element-wise division
+                for(size_t i = 0; i < len_dividend; i++) data_dividend[i] /= data_divisor[i];        
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_dividend);
+                return;
+            }
+        }
+    } else {
+        // Handling the case when tensors have different data types
+        // Calculating the step size for accessing divisor tensor elements
+        size_t divisor_step = get_dtype_size(dtype_divisor);
+        
+        // Casting divisor data to char* for byte access
+        char* divisor_data = (char*)divisor->data;
+        
+        switch(dtype_dividend) {
+            case FLOAT64: {
+                volatile double* data_dividend = (double*)dividend->data;
+                
+                // For each element, convert the divisor element to float64 and divide by it
+                for(size_t i = 0; i < len_dividend; i++) {
+                    void* divisor_elem = divisor_data + i * divisor_step;
+                    data_dividend[i] /= nnl2_convert_to_float64(divisor_elem, dtype_divisor);
+                }
+                
+                break; 
+            }
+            
+            case FLOAT32: {
+                volatile float* data_dividend = (float*)dividend->data;
+                
+                // For each element, convert the divisor element to float32 and divide by it
+                for(size_t i = 0; i < len_dividend; i++) {
+                    void* divisor_elem = divisor_data + i * divisor_step;
+                    data_dividend[i] /= nnl2_convert_to_float32(divisor_elem, dtype_divisor);
+                }
+                
+                break; 
+            }
+            
+            case INT32: {
+                volatile int32_t* data_dividend = (int32_t*)dividend->data;
+                
+                // For each element, convert the divisor element to int32 and divide by it
+                for(size_t i = 0; i < len_dividend; i++) {
+                    void* divisor_elem = divisor_data + i * divisor_step;
+                    data_dividend[i] /= nnl2_convert_to_int32(divisor_elem, dtype_divisor);
+                }
+                
+                break; 
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_dividend);
+                return;
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for division operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_divinplace: Basic reference implementation
+ * 
+ * @see nnl2_naive_divinplace
+ */
 Implementation divinplace_backends[] = {
-	REGISTER_BACKEND(naive_divinplace, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_divinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for division operation
+ * @ingroup backend_system 
+ */
 divinplacefn divinplace;
+
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
 make_current_backend(divinplace);
 
+/** 
+ * @brief Sets the backend for division operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_divinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(divinplace_backends, divinplace, backend_name, current_backend(divinplace));
+    ESET_BACKEND_BY_NAME(divinplace_backends, divinplace, backend_name, CURRENT_BACKEND(divinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for division operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_divinplace_backend() {
-	return current_backend(divinplace);
+	return CURRENT_BACKEND(divinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all `divinplace` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(divinplace);
+
+/**
+ * @brief Function declaration for getting the number of all `divinplace` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(divinplace);
 
-Tensor* naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
+/** @brief
+ * Performs element-wise multiplication of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the product of the corresponding elements
+ * of the two input tensors. It supports various data types with automatic
+ * casting to a higher type in the hierarchy
+ *
+ ** @param multiplicand
+ * Pointer to the multiplicand tensor
+ *
+ ** @param multiplier
+ * Pointer to the multiplier tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the multiplication result
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations
+ *
+ ** @note
+ * Returns NULL in case of failure
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* nnl2_naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Calculate the total number of elements in the tensors
     size_t len = product(multiplicand->shape, multiplicand->rank);
     
     TensorType dtype_multiplicand = multiplicand->dtype;
     TensorType dtype_multiplier = multiplier->dtype;
     
-    if(dtype_multiplicand != dtype_multiplier) {
-        fprintf(stderr, "Error (Hello from C!): In mul (in-place) data-types are other\n");
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
+
+    // Create an output tensor with the same shape and winning data type
+    Tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
+    
+    if (product == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
         return NULL;
     }
     
-    Tensor* product = nnl2_zeros(multiplicand->shape, multiplicand->rank, dtype_multiplicand);
+    if (len == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return product;
+    }
     
-    switch(dtype_multiplicand) {
-        case FLOAT64: {
-            volatile double* data_multiplicand = (double*)multiplicand->data;
-            volatile double* data_multiplier = (double*)multiplier->data;
-            volatile double* data_product = (double*)product->data;
-    
-            for(size_t i = 0; i < len; i++) {
-                data_product[i] = data_multiplicand[i] * data_multiplier[i];
+    if (dtype_multiplicand == dtype_multiplier) {
+        // Handling the case if the data types match
+        
+        switch (dtype_multiplicand) {
+            case FLOAT64: {
+                volatile double* data_multiplicand = (double*)multiplicand->data;
+                volatile double* data_multiplier = (double*)multiplier->data;
+                volatile double* data_product = (double*)product->data;
+            
+                // Element-wise multiplication
+                for (size_t i = 0; i < len; i++) {
+                    data_product[i] = data_multiplicand[i] * data_multiplier[i];
+                }
+                
+                break;
             }
             
-            break;
-        }
+            case FLOAT32: {
+                volatile float* data_multiplicand = (float*)multiplicand->data;
+                volatile float* data_multiplier = (float*)multiplier->data;
+                volatile float* data_product = (float*)product->data;
         
-        case FLOAT32: {
-            volatile float* data_multiplicand = (float*)multiplicand->data;
-            volatile float* data_multiplier = (float*)multiplier->data;
-            volatile float* data_product = (float*)product->data;
-    
-            for(size_t i = 0; i < len; i++) {
-                data_product[i] = data_multiplicand[i] * data_multiplier[i];
+                // Element-wise multiplication
+                for (size_t i = 0; i < len; i++) {
+                    data_product[i] = data_multiplicand[i] * data_multiplier[i];
+                }
+                
+                break;
             }
             
-            break;
-        }
+            case INT32: {
+                volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
+                volatile int32_t* data_multiplier = (int32_t*)multiplier->data;
+                volatile int32_t* data_product = (int32_t*)product->data;
         
-        case INT32: {
-            volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
-            volatile int32_t* data_multiplier = (int32_t*)multiplier->data;
-            volatile int32_t* data_product = (int32_t*)product->data;
-    
-            for(size_t i = 0; i < len; i++) {
-                data_product[i] = data_multiplicand[i] * data_multiplier[i];
+                // Element-wise multiplication
+                for (size_t i = 0; i < len; i++) {
+                    data_product[i] = data_multiplicand[i] * data_multiplier[i];
+                }
+                
+                break;
             }
             
-            break;
+            default: {
+                NNL2_TYPE_ERROR(dtype_multiplicand);
+                return NULL;
+            }
         }
+    } else {
+        // Handling the case if the data types are NOT match
+        switch (winner_in_the_type_hierarchy) {
+            case FLOAT64: {
+                volatile double* data_product = (double*)product->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_multiplicand = (char*)multiplicand->data + i * get_dtype_size(dtype_multiplicand);
+                    void* elem_multiplier = (char*)multiplier->data + i * get_dtype_size(dtype_multiplier);
+                    
+                    data_product[i] = nnl2_convert_to_float64(elem_multiplicand, dtype_multiplicand) * 
+                                     nnl2_convert_to_float64(elem_multiplier, dtype_multiplier);
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_product = (float*)product->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_multiplicand = (char*)multiplicand->data + i * get_dtype_size(dtype_multiplicand);
+                    void* elem_multiplier = (char*)multiplier->data + i * get_dtype_size(dtype_multiplier);
+                    
+                    data_product[i] = nnl2_convert_to_float32(elem_multiplicand, dtype_multiplicand) * 
+                                     nnl2_convert_to_float32(elem_multiplier, dtype_multiplier);
+                }
+                
+                break;
+            }
         
-        default: {
-            fprintf(stderr, "Error (Hello from C!): Bad data type (mul in-place)");
-            return NULL;
+            case INT32: {
+                volatile int32_t* data_product = (int32_t*)product->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_multiplicand = (char*)multiplicand->data + i * get_dtype_size(dtype_multiplicand);
+                    void* elem_multiplier = (char*)multiplier->data + i * get_dtype_size(dtype_multiplier);
+                    
+                    data_product[i] = nnl2_convert_to_int32(elem_multiplicand, dtype_multiplicand) * 
+                                     nnl2_convert_to_int32(elem_multiplier, dtype_multiplier);
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+                return NULL;
+            }
         }
     }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
     
     return product;
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for multiplication operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_mul: Basic reference implementation
+ * 
+ * @see nnl2_naive_mul
+ */
 Implementation mul_backends[] = {
-	REGISTER_BACKEND(naive_mul, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_mul, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for multiplication operation
+ * @ingroup backend_system 
+ */
 mulfn mul;
+
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
 make_current_backend(mul);
 
+/** 
+ * @brief Sets the backend for multiplication operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_mul_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(mul_backends, mul, backend_name, current_backend(mul));
+    ESET_BACKEND_BY_NAME(mul_backends, mul, backend_name, CURRENT_BACKEND(mul));
 }
 
+/** 
+ * @brief Gets the name of the active backend for multiplication operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_mul_backend() {
-	return current_backend(mul);
+	return CURRENT_BACKEND(mul);
 }
 
+/** 
+ * @brief Function declaration for getting all `mul` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(mul);
+
+/**
+ * @brief Function declaration for getting the number of all `mul` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(mul);
 
-Tensor* naive_div(const Tensor* dividend, const Tensor* divisor) {
+/** @brief
+ * Performs element-wise division of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the quotient of the corresponding elements
+ * of the two input tensors. It supports various data types with automatic
+ * casting to a higher type in the hierarchy. Checks for division by zero.
+ *
+ ** @param dividend
+ * Pointer to the dividend tensor
+ *
+ ** @param divisor
+ * Pointer to the divisor tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the division result
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations
+ *
+ ** @note
+ * Returns NULL in case of failure or division by zero
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Calculate the total number of elements in the tensors
     size_t len = product(dividend->shape, dividend->rank);
     
     TensorType dtype_dividend = dividend->dtype;
     TensorType dtype_divisor = divisor->dtype;
     
-    if (dtype_dividend != dtype_divisor) {
-        fprintf(stderr, "Error (Hello from C!): In div (in-place) data-types are different\n");
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_dividend, dtype_divisor);
+
+    // Create an output tensor with the same shape and winning data type
+    Tensor* quotient = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
+    
+    if (quotient == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
         return NULL;
     }
     
-    Tensor* quotient = nnl2_zeros(dividend->shape, dividend->rank, dtype_dividend);
+    if (len == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return quotient;
+    }
     
-    switch (dtype_dividend) {
-        case FLOAT64: {
-            volatile double* data_dividend = (double*)dividend->data;
-            volatile double* data_divisor = (double*)divisor->data;
-            volatile double* data_quotient = (double*)quotient->data;
-    
-            for (size_t i = 0; i < len; i++) {			
-                if (data_divisor[i] == 0.0) {
-                    fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);	
-                    return NULL;
-                }
-				
-                data_quotient[i] = data_dividend[i] / data_divisor[i];
-            }
-			
-            break;
-        }
+    if (dtype_dividend == dtype_divisor) {
+        // Handling the case if the data types match
         
-        case FLOAT32: {
-            volatile float* data_dividend = (float*)dividend->data;
-            volatile float* data_divisor = (float*)divisor->data;
-            volatile float* data_quotient = (float*)quotient->data;
-    
-            for (size_t i = 0; i < len; i++) {
-                if (data_divisor[i] == 0.0f) {
-                    fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
-                    nnl2_free_tensor(quotient);
-                    return NULL;
+        switch (dtype_dividend) {
+            case FLOAT64: {
+                volatile double* data_dividend = (double*)dividend->data;
+                volatile double* data_divisor = (double*)divisor->data;
+                volatile double* data_quotient = (double*)quotient->data;
+            
+                // Element-wise division with zero check
+                for (size_t i = 0; i < len; i++) {
+                    if (data_divisor[i] == 0.0) {
+                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    data_quotient[i] = data_dividend[i] / data_divisor[i];
                 }
-				
-                data_quotient[i] = data_dividend[i] / data_divisor[i];
+                
+                break;
             }
-			
-            break;
-        }
+            
+            case FLOAT32: {
+                volatile float* data_dividend = (float*)dividend->data;
+                volatile float* data_divisor = (float*)divisor->data;
+                volatile float* data_quotient = (float*)quotient->data;
         
-        case INT32: {
-            volatile int32_t* data_dividend = (int32_t*)dividend->data;
-            volatile int32_t* data_divisor = (int32_t*)divisor->data;
-            volatile int32_t* data_quotient = (int32_t*)quotient->data;
-    
-            for (size_t i = 0; i < len; i++) {
-                if (data_divisor[i] == 0) {
-                    fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
-                    return NULL;
+                // Element-wise division with zero check
+                for (size_t i = 0; i < len; i++) {
+                    if (data_divisor[i] == 0.0f) {
+                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    data_quotient[i] = data_dividend[i] / data_divisor[i];
                 }
-				
-                data_quotient[i] = data_dividend[i] / data_divisor[i];
+                
+                break;
             }
-			
-            break;
-        }
+            
+            case INT32: {
+                volatile int32_t* data_dividend = (int32_t*)dividend->data;
+                volatile int32_t* data_divisor = (int32_t*)divisor->data;
+                volatile int32_t* data_quotient = (int32_t*)quotient->data;
         
-        default: {
-            fprintf(stderr, "Error (Hello from C!): Bad data type (div)\n");
-            nnl2_free_tensor(quotient);
-            return NULL;
+                // Element-wise division with zero check
+                for (size_t i = 0; i < len; i++) {
+                    if (data_divisor[i] == 0) {
+                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    data_quotient[i] = data_dividend[i] / data_divisor[i];
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_dividend);
+                nnl2_free_tensor(quotient);
+                return NULL;
+            }
+        }
+    } else {
+        // Handling the case if the data types are NOT match
+        switch (winner_in_the_type_hierarchy) {
+            case FLOAT64: {
+                volatile double* data_quotient = (double*)quotient->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_dividend = (char*)dividend->data + i * get_dtype_size(dtype_dividend);
+                    void* elem_divisor = (char*)divisor->data + i * get_dtype_size(dtype_divisor);
+                    
+                    double divisor_val = nnl2_convert_to_float64(elem_divisor, dtype_divisor);
+                    if (divisor_val == 0.0) {
+                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    
+                    data_quotient[i] = nnl2_convert_to_float64(elem_dividend, dtype_dividend) / divisor_val;
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_quotient = (float*)quotient->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_dividend = (char*)dividend->data + i * get_dtype_size(dtype_dividend);
+                    void* elem_divisor = (char*)divisor->data + i * get_dtype_size(dtype_divisor);
+                    
+                    float divisor_val = nnl2_convert_to_float32(elem_divisor, dtype_divisor);
+                    if (divisor_val == 0.0f) {
+                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    
+                    data_quotient[i] = nnl2_convert_to_float32(elem_dividend, dtype_dividend) / divisor_val;
+                }
+                
+                break;
+            }
+        
+            case INT32: {
+                volatile int32_t* data_quotient = (int32_t*)quotient->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_dividend = (char*)dividend->data + i * get_dtype_size(dtype_dividend);
+                    void* elem_divisor = (char*)divisor->data + i * get_dtype_size(dtype_divisor);
+                    
+                    int32_t divisor_val = nnl2_convert_to_int32(elem_divisor, dtype_divisor);
+                    if (divisor_val == 0) {
+                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    
+                    data_quotient[i] = nnl2_convert_to_int32(elem_dividend, dtype_dividend) / divisor_val;
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+                nnl2_free_tensor(quotient);
+                return NULL;
+            }
         }
     }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
     
     return quotient;
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for division operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_div: Basic reference implementation
+ * 
+ * @see nnl2_naive_div
+ */
 Implementation div_backends[] = {
-	REGISTER_BACKEND(naive_div, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_div, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
+/**
+ * @brief Function pointer for division operation
+ * @ingroup backend_system 
+ */
 divfn nnl2_div;
-make_current_backend(div);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(div);
+
+/** 
+ * @brief Sets the backend for division operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_div_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(div_backends, div, backend_name, current_backend(div));
+    ESET_BACKEND_BY_NAME(div_backends, div, backend_name, CURRENT_BACKEND(div));
 }
 
+/** 
+ * @brief Gets the name of the active backend for division operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_div_backend() {
-	return current_backend(div);
+	return CURRENT_BACKEND(div);
 }
 
+/** 
+ * @brief Function declaration for getting all `div` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(div);
+
+/**
+ * @brief Function declaration for getting the number of all `div` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(div);
 
+/** @brief 
+ * Performs element-wise exponentiation of two tensors (naive implementation)
+ * 
+ * Raises the elements of the base tensor to the power of the corresponding elements 
+ * of the exponent tensor, modifying the base tensor in place
+ *
+ ** @param base 
+ * Pointer to the tensor that will be modified (receives the exponentiation result)
+ *
+ ** @param exponent 
+ * Pointer to the tensor whose values will be used as exponents
+ *
+ ** @note 
+ * Supports different data types through automatic conversion
+ * The exponent elements are converted to the base's data type
+ *
+ ** @note 
+ * In max safety mode, validates tensor pointers and data pointers before access
+ *
+ ** @warning 
+ * This function modifies the base tensor directly
+ *
+ * @example
+ * // Create two tensors with the same shape
+ * Tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
+ * Tensor* b = nnl2_tensor((float[]){2.0, 1.0, 0.5}, (int[]){3}, 1, FLOAT32);
+ * 
+ * // Raise a to the power of b (a becomes a^b)
+ * naive_powinplace(a, b);
+ * 
+ * // Now a contains [4.0, 3.0, 2.0]
+ * nnl2_print_tensor(a);
+ * 
+ * // Cleanup
+ * nnl2_free_tensor(a);
+ * nnl2_free_tensor(b);
+ */
 void naive_powinplace(Tensor* base, const Tensor* exponent) {
-	size_t len = product(base->shape, base->rank);
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+    
+        NNL2_CHECK_NULL_IF_ERR_RETURN(base, "Base tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(base->data, "Base tensor's data is NULL", sufficient_debug_mode_p);
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent, "Exponent tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent->data, "Exponent tensor's data is NULL", sufficient_debug_mode_p);
+    #endif
+    
+    // Calculating the total number of elements in the base tensor
+    size_t len_base = product(base->shape, base->rank);
+    
+    // If the tensor is empty, exit the function
+    if(len_base == 0) return;
     
     TensorType dtype_base = base->dtype;
     TensorType dtype_exponent = exponent->dtype;
     
-    if(dtype_base != dtype_exponent) {
-        fprintf(stderr, "Error (Hello from C!): In pow (in-place) data-types are different\n");
-        return;
+    if(dtype_base == dtype_exponent) {
+        // Handling case when the tensors have the same type
+        
+        switch(dtype_base) {
+            case FLOAT64: {
+                volatile double* data_base = (double*)base->data;
+                volatile double* data_exponent = (double*)exponent->data;
+                
+                // Element-wise exponentiation
+                for(size_t i = 0; i < len_base; i++) {
+                    data_base[i] = pow(data_base[i], data_exponent[i]);
+                }
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_base = (float*)base->data;
+                volatile float* data_exponent = (float*)exponent->data;
+                
+                // Element-wise exponentiation
+                for(size_t i = 0; i < len_base; i++) {
+                    data_base[i] = powf(data_base[i], data_exponent[i]);
+                }    
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_base = (int32_t*)base->data;
+                volatile int32_t* data_exponent = (int32_t*)exponent->data;
+                
+                // Element-wise exponentiation
+                for(size_t i = 0; i < len_base; i++) {
+                    data_base[i] = (int32_t)pow(data_base[i], data_exponent[i]);
+                }        
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_base);
+                return;
+            }
+        }
+    } else {
+        // Handling the case when tensors have different data types
+        // Calculating the step size for accessing exponent tensor elements
+        size_t exponent_step = get_dtype_size(dtype_exponent);
+        
+        // Casting exponent data to char* for byte access
+        char* exponent_data = (char*)exponent->data;
+        
+        switch(dtype_base) {
+            case FLOAT64: {
+                volatile double* data_base = (double*)base->data;
+                
+                // For each element, convert the exponent element to FLOAT64 and use it as exponent
+                for(size_t i = 0; i < len_base; i++) {
+                    void* exponent_elem = exponent_data + i * exponent_step;
+                    data_base[i] = pow(data_base[i], nnl2_convert_to_float64(exponent_elem, dtype_exponent));
+                }
+                
+                break; 
+            }
+            
+            case FLOAT32: {
+                volatile float* data_base = (float*)base->data;
+                
+                // For each element, convert the exponent element to FLOAT32 and use it as exponent
+                for(size_t i = 0; i < len_base; i++) {
+                    void* exponent_elem = exponent_data + i * exponent_step;
+                    data_base[i] = powf(data_base[i], nnl2_convert_to_float32(exponent_elem, dtype_exponent));
+                }
+                
+                break; 
+            }
+            
+            case INT32: {
+                volatile int32_t* data_base = (int32_t*)base->data;
+                
+                // For each element, convert the exponent element to INT32 and use it as exponent
+                for(size_t i = 0; i < len_base; i++) {
+                    void* exponent_elem = exponent_data + i * exponent_step;
+                    data_base[i] = (int32_t)pow(data_base[i], nnl2_convert_to_int32(exponent_elem, dtype_exponent));
+                }
+                
+                break; 
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_base);
+                return;
+            }
+        }
     }
     
-    switch(dtype_base) {
-        case FLOAT64: {
-            volatile double* base_data = (double*)base->data;
-            volatile double* exponent_data = (double*)exponent->data;
-            
-            for(size_t it = 0; it < len; it++) {
-                base_data[it] = pow(base_data[it], exponent_data[it]);
-            }
-            
-            break;
-        }
-        
-        case FLOAT32: {
-            volatile float* base_data = (float*)base->data;
-            volatile float* exponent_data = (float*)exponent->data;
-            
-            for(size_t it = 0; it < len; it++) {
-                base_data[it] = powf(base_data[it], exponent_data[it]);
-            }
-            
-            break;
-        }
-        
-        case INT32: {
-            volatile int32_t* base_data = (int32_t*)base->data;
-            volatile int32_t* exponent_data = (int32_t*)exponent->data;
-            
-            for(size_t it = 0; it < len; it++) {
-                base_data[it] = (int32_t)pow(base_data[it], exponent_data[it]);
-            }
-            
-            break;
-        }
-        
-        default: {
-            fprintf(stderr, "Error (Hello from C!): Bad data type (pow in-place)");
-            return;
-        }
-    }
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
-	
+
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for in-place power operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - naive_powinplace: Basic reference implementation
+ * 
+ * @see naive_powinplace
+ */
 Implementation powinplace_backends[] = {
 	REGISTER_BACKEND(naive_powinplace, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
-	
+};
+
+/**
+ * @brief Function pointer for in-place power operation
+ * @ingroup backend_system 
+ */
 powinplacefn powinplace;
-make_current_backend(powinplace);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(powinplace);
+
+/** 
+ * @brief Sets the backend for in-place power operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_powinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(powinplace_backends, powinplace, backend_name, current_backend(powinplace));
+    ESET_BACKEND_BY_NAME(powinplace_backends, powinplace, backend_name, CURRENT_BACKEND(powinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for in-place power operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_powinplace_backend() {
-	return current_backend(powinplace);
+	return CURRENT_BACKEND(powinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all `powinplace` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(powinplace);
+
+/**
+ * @brief Function declaration for getting the number of all `powinplace` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(powinplace);
 
+/** @brief
+ * Performs element-wise exponentiation of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the result of raising each element
+ * of the base tensor to the power of the corresponding element in the exponent tensor.
+ * It supports various data types with automatic casting to a higher type in the hierarchy.
+ *
+ ** @param base
+ * Pointer to the base tensor
+ *
+ ** @param exponent
+ * Pointer to the exponent tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the exponentiation result
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations
+ *
+ ** @note
+ * Returns NULL in case of failure or unsupported data type
+ *
+ ** @note
+ * For integer types, the result is cast back to integer which may truncate values
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
 Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	// Additional checks on maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+	
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Base tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Exponent tensor is NULL", sufficient_debug_mode_p, NULL);
+	#endif
+	
+    // Calculate the total number of elements in the tensors
     size_t len = product(base->shape, base->rank);
     
     TensorType dtype_base = base->dtype;
     TensorType dtype_exponent = exponent->dtype;
     
-    if(dtype_base != dtype_exponent) {
-        fprintf(stderr, "Error (Hello from C!): In pow data-types are different\n");
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_base, dtype_exponent);
+
+    // Create an output tensor with the same shape and winning data type
+    Tensor* result = nnl2_empty(base->shape, base->rank, winner_in_the_type_hierarchy);
+    
+    if (result == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
         return NULL;
     }
     
-    Tensor* result = nnl2_zeros(base->shape, base->rank, dtype_base);
+    if (len == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
     
-    switch(dtype_base) {
-        case FLOAT64: {
-            volatile double* data_base = (double*)base->data;
-            volatile double* data_exponent = (double*)exponent->data;
-            volatile double* data_result = (double*)result->data;
-    
-            for(size_t i = 0; i < len; i++) {
-                data_result[i] = pow(data_base[i], data_exponent[i]);
+    if (dtype_base == dtype_exponent) {
+        // Handling the case if the data types match
+        
+        switch (dtype_base) {
+            case FLOAT64: {
+                volatile double* data_base = (double*)base->data;
+                volatile double* data_exponent = (double*)exponent->data;
+                volatile double* data_result = (double*)result->data;
+            
+                // Element-wise exponentiation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = pow(data_base[i], data_exponent[i]);
+                }
+                
+                break;
             }
             
-            break;
-        }
+            case FLOAT32: {
+                volatile float* data_base = (float*)base->data;
+                volatile float* data_exponent = (float*)exponent->data;
+                volatile float* data_result = (float*)result->data;
         
-        case FLOAT32: {
-            volatile float* data_base = (float*)base->data;
-            volatile float* data_exponent = (float*)exponent->data;
-            volatile float* data_result = (float*)result->data;
-    
-            for(size_t i = 0; i < len; i++) {
-                data_result[i] = powf(data_base[i], data_exponent[i]);
+                // Element-wise exponentiation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = powf(data_base[i], data_exponent[i]);
+                }
+                
+                break;
             }
             
-            break;
-        }
+            case INT32: {
+                volatile int32_t* data_base = (int32_t*)base->data;
+                volatile int32_t* data_exponent = (int32_t*)exponent->data;
+                volatile int32_t* data_result = (int32_t*)result->data;
         
-        case INT32: {
-            volatile int32_t* data_base = (int32_t*)base->data;
-            volatile int32_t* data_exponent = (int32_t*)exponent->data;
-            volatile int32_t* data_result = (int32_t*)result->data;
-    
-            for(size_t i = 0; i < len; i++) {
-                data_result[i] = (int32_t)pow(data_base[i], data_exponent[i]);
+                // Element-wise exponentiation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = (int32_t)pow(data_base[i], data_exponent[i]);
+                }
+                
+                break;
             }
             
-            break;
+            default: {
+                NNL2_TYPE_ERROR(dtype_base);
+                return NULL;
+            }
         }
+    } else {
+        // Handling the case if the data types are NOT match
+        switch (winner_in_the_type_hierarchy) {
+            case FLOAT64: {
+                volatile double* data_result = (double*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_base = (char*)base->data + i * get_dtype_size(dtype_base);
+                    void* elem_exponent = (char*)exponent->data + i * get_dtype_size(dtype_exponent);
+                    
+                    data_result[i] = pow(nnl2_convert_to_float64(elem_base, dtype_base), nnl2_convert_to_float64(elem_exponent, dtype_exponent));
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_result = (float*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_base = (char*)base->data + i * get_dtype_size(dtype_base);
+                    void* elem_exponent = (char*)exponent->data + i * get_dtype_size(dtype_exponent);
+                    
+                    data_result[i] = powf(nnl2_convert_to_float32(elem_base, dtype_base), nnl2_convert_to_float32(elem_exponent, dtype_exponent));
+                }
+                
+                break;
+            }
         
-        default: {
-            fprintf(stderr, "Error (Hello from C!): Bad data type (pow)");
-            return NULL;
+            case INT32: {
+                volatile int32_t* data_result = (int32_t*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_base = (char*)base->data + i * get_dtype_size(dtype_base);
+                    void* elem_exponent = (char*)exponent->data + i * get_dtype_size(dtype_exponent);
+                    
+                    data_result[i] = (int32_t)pow(nnl2_convert_to_int32(elem_base, dtype_base), nnl2_convert_to_int32(elem_exponent, dtype_exponent));
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+                return NULL;
+            }
         }
     }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
     
     return result;
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for power operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - naive_pow: Basic reference implementation
+ * 
+ * @see naive_pow
+ */
 Implementation pow_backends[] = {
 	REGISTER_BACKEND(naive_pow, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
-	
+};
+
+/**
+ * @brief Function pointer for power operation
+ * @ingroup backend_system 
+ */
 powfn nnl2_pow;
-make_current_backend(pow);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(pow);
+
+/** 
+ * @brief Sets the backend for power operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_pow_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(pow_backends, pow, backend_name, current_backend(pow));
+    ESET_BACKEND_BY_NAME(pow_backends, pow, backend_name, CURRENT_BACKEND(pow));
 }
 
+/** 
+ * @brief Gets the name of the active backend for power operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_pow_backend() {
-	return current_backend(pow);
+	return CURRENT_BACKEND(pow);
 }
 
+/** 
+ * @brief Function declaration for getting all `pow` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(pow);
+
+/**
+ * @brief Function declaration for getting the number of all `pow` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(pow);
 
-void naive_expinplace(Tensor* tensor) {
+/** @brief
+ * Calculates the exponent of each tensor element in place
+ *
+ ** @details
+ * The function applies the exponential function (e^x) to each element of the tensor,
+ * replacing the original values with the calculated results
+ *
+ ** @param tensor
+ * Pointer to a tensor for processing. The function modifies
+ * the tensor data in place
+ *
+ ** @see exp
+ ** @see expf
+ **/
+void nnl2_naive_expinplace(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	size_t len = product(tensor->shape, tensor->rank);
+	
+	// If tensor empty, exiting the function
+	if(len == 0) return;
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+		
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "A NULL tensor was passed to .exp!", sufficient_debug_mode_p);
+	#endif
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -7876,92 +8865,278 @@ void naive_expinplace(Tensor* tensor) {
 		}
 			
 		case INT32: {
-			volatile int32_t* tensor_data = (int32_t*)tensor->data;		
-			for(size_t it = 0; it < len; it++) tensor_data[it] = (int32_t)exp((double)tensor_data[it]);
+			volatile int32_t* tensor_data = (int32_t*)tensor->data;	
+			
+			// 0 is the only integer for which exp gives an integer
+			for (size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 0) {
+					NNL2_FATAL("Can't apply .exp! to a passed tensor");
+				}
+			}
+			
+			for (size_t it = 0; it < len; it++) {
+				tensor_data[it] = 1;
+			}
+			
 			break;	
 		}
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (exp in-place)");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }	
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for exponential in-place operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_expinplace: Basic reference implementation
+ * 
+ * @see nnl2_naive_expinplace
+ */
 Implementation expinplace_backends[] = {
-	REGISTER_BACKEND(naive_expinplace, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_expinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for exponential in-place operation
+ * @ingroup backend_system 
+ */
 expinplacefn expinplace;
-make_current_backend(expinplace);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(expinplace);
+
+/** 
+ * @brief Sets the backend for exponential in-place operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_expinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(expinplace_backends, expinplace, backend_name, current_backend(expinplace));
+    ESET_BACKEND_BY_NAME(expinplace_backends, expinplace, backend_name, CURRENT_BACKEND(expinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for exponential in-place operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_expinplace_backend() {
-	return current_backend(expinplace);
+	return CURRENT_BACKEND(expinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all `expinplace` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(expinplace);
+
+/**
+ * @brief Function declaration for getting the number of all `expinplace` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(expinplace);
 
-Tensor* naive_exp(const Tensor* tensor) {
+/** @brief 
+ * Naive implementation of exponential operation
+ *
+ ** @details
+ * Computes element-wise exponential function e^x for each element in the input tensor
+ *
+ ** @param tensor 
+ * Input tensor for exponential operation
+ *
+ ** @param save_type 
+ * Flag to save data type for special case (all elements = 0)
+ * true - return INT32 tensor with ones
+ * false - return FLOAT64 tensor with ones
+ *
+ ** @return 
+ * New tensor with exponential values applied element-wise
+ */
+Tensor* naive_exp(Tensor* tensor, bool save_type) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+		
 	size_t len = product(tensor->shape, tensor->rank);
 	
+	// Processing a tensor with an integer data type of INT32.
+	// Calculates the exponent for each element, but only if the tensor
+	// has at least one non-zero element
+	if (tensor->dtype == INT32) {
+		int32_t* tensor_data = (int32_t*)tensor->data;
+		bool has_non_zero = false;
+		
+		// Check whether the tensor has at least one non-zero element
+		for (size_t it = 0; it < len; it++) {
+			if (tensor_data[it] != 0) {
+				has_non_zero = true;
+				break;
+			}
+		}
+		
+		if (has_non_zero) {
+			Tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+			double* result_data = (double*)result->data;
+			
+			for (size_t it = 0; it < len; it++) {
+				result_data[it] = exp((double)tensor_data[it]);
+			}
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			
+			return result;
+		} else {
+			if(save_type) {
+				return ones(tensor->shape, tensor->rank, INT32);
+			} else {
+				return ones(tensor->shape, tensor->rank, FLOAT64);
+			}
+		}
+	}
+	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	if(len == 0) return result;
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
 			volatile double* tensor_data = (double*)tensor->data;
-			volatile double* result_data = (double*)tensor->data;
+			volatile double* result_data = (double*)result->data;
 			for(size_t it = 0; it < len; it++) result_data[it] = exp(tensor_data[it]);
 			break;
 		}
 		
 		case FLOAT32: {
 			volatile float* tensor_data = (float*)tensor->data;
-			volatile float* result_data = (float*)tensor->data;
+			volatile float* result_data = (float*)result->data;
 			for(size_t it = 0; it < len; it++) result_data[it] = expf(tensor_data[it]);
 			break;
 		}
 		
-		case INT32: {
-			volatile int32_t* tensor_data = (int32_t*)tensor->data;
-			volatile int32_t* result_data = (int32_t*)tensor->data;
-			for(size_t it = 0; it < len; it++) result_data[it] = (int32_t)exp((double)tensor_data[it]);
-			break;
-		}
-		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (exp)");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return NULL;
 		}
 	}
 	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
 	return result;
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for exponential operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - naive_exp: Basic reference implementation
+ * 
+ * @see naive_exp
+ */
 Implementation exp_backends[] = {
 	REGISTER_BACKEND(naive_exp, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for exponential operation
+ * @ingroup backend_system 
+ */
 expfn nnl2_exp;
+
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
 make_current_backend(exp);
 
+/** 
+ * @brief Sets the backend for exponential operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_exp_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(exp_backends, exp, backend_name, current_backend(exp));
 }
 
+/** 
+ * @brief Gets the name of the active backend for exponential operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_exp_backend() {
 	return current_backend(exp);
 }
 
+/** 
+ * @brief Function declaration for getting all `exp` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(exp);
+
+/**
+ * @brief Function declaration for getting the number of all `exp` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(exp);
 
-void naive_loginplace(Tensor* tensor) {
+/** @brief
+ * Calculates the natural logarithm of each tensor element in place
+ *
+ ** @details
+ * The function applies the natural logarithm function (ln(x)) to each element of the tensor,
+ * replacing the original values with the calculated results
+ *
+ ** @param tensor
+ * Pointer to a tensor for processing. The function modifies
+ * the tensor data in place
+ *
+ ** @see log
+ ** @see logf
+ **/
+void nnl2_naive_loginplace(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	size_t len = product(tensor->shape, tensor->rank);
+	
+	// If tensor empty, exiting the function
+	if(len == 0) return;
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+		
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "A NULL tensor was passed to .log!", sufficient_debug_mode_p);
+	#endif
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -7977,38 +9152,141 @@ void naive_loginplace(Tensor* tensor) {
 		}
 			
 		case INT32: {
-			volatile int32_t* tensor_data = (int32_t*)tensor->data;		
-			for(size_t it = 0; it < len; it++) tensor_data[it] = (int32_t)log((double)tensor_data[it]);
+			volatile int32_t* tensor_data = (int32_t*)tensor->data;	
+			
+			// 1 is the only integer for which log gives an integer
+			for(size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 1) {
+					NNL2_FATAL("Can't apply .log! to passed tensor");
+				}
+			}
+			
+			for(size_t it = 0; it < len; it++) {
+				tensor_data[it] = 0;
+			}
+			
 			break;	
 		}
 			
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (log in-place)");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
-}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+}	
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for logarithm in-place operation
+ * @details
+ * Array follows the common backend registration pattern.
+ * Currently registered backends:
+ *  - nnl2_naive_loginplace: Basic reference implementation
+ * 
+ * @see nnl2_naive_loginplace
+ */
 Implementation loginplace_backends[] = {
-	REGISTER_BACKEND(naive_loginplace, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_loginplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for logarithm in-place operation
+ * @ingroup backend_system 
+ */
 loginplacefn loginplace;
-make_current_backend(loginplace);
 
+/** 
+ * @brief Creates an empty static string for manual backend work
+ * @ingroup backend_system
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(loginplace);
+
+/** 
+ * @brief Sets the backend for logarithm in-place operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_loginplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(loginplace_backends, loginplace, backend_name, current_backend(loginplace));
+    ESET_BACKEND_BY_NAME(loginplace_backends, loginplace, backend_name, CURRENT_BACKEND(loginplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for logarithm in-place operation
+ * @ingroup backend_system
+ * @return Name of the current backend
+ * @see CURRENT_BACKEND
+ */
 const char* get_loginplace_backend() {
-	return current_backend(loginplace);
+	return CURRENT_BACKEND(loginplace);
 }
 
+/** 
+ * @brief Function declaration for getting all `loginplace` available backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(loginplace);
+
+/**
+ * @brief Function declaration for getting the number of all `loginplace` backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(loginplace);
 
-Tensor* naive_log(const Tensor* tensor) {
+/** @brief
+ * Calculates the natural logarithm of the elements of the input tensor
+ *
+ ** @param tensor
+ * Pointer to the input tensor
+ *
+ ** @param save_type 
+ * Flag to save data type for special case (all elements = 1)
+ * true - return INT32 tensor with zeros
+ * false - return FLOAT64 tensor with zeros
+ *
+ ** @return
+ * A pointer to a new tensor with the result of calculating the logarithm
+ */
+Tensor* naive_log(const Tensor* tensor, bool save_type) {
 	size_t len = product(tensor->shape, tensor->rank);
+	
+    if (tensor->dtype == INT32) {
+        int32_t* tensor_data = (int32_t*)tensor->data;
+        int has_non_ones = 0;
+        
+        // Checking if there are elements other than 1
+        for (size_t it = 0; it < len; it++) {
+            if (tensor_data[it] != 1) {
+                has_non_ones = 1;
+                break;
+            }
+        }
+        
+        if (has_non_ones) {
+            Tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+            double* result_data = (double*)result->data;
+            
+            for (size_t it = 0; it < len; it++) {
+                result_data[it] = log((double)tensor_data[it]);
+            }
+			
+            return result;
+        } else {
+			if(save_type) {
+				return nnl2_zeros(tensor->shape, tensor->rank, INT32);
+			} else {
+				return nnl2_zeros(tensor->shape, tensor->rank, FLOAT64);
+			}
+        }
+    }
 	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
@@ -8027,15 +9305,8 @@ Tensor* naive_log(const Tensor* tensor) {
 			break;
 		}
 		
-		case INT32: {
-			volatile int32_t* tensor_data = (int32_t*)tensor->data;
-			volatile int32_t* result_data = (int32_t*)result->data;
-			for(size_t it = 0; it < len; it++) result_data[it] = (int32_t)log((double)tensor_data[it]);
-			break;
-		}
-		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Unsupported data-type (log)");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return NULL;
 		}
 	}
@@ -8043,22 +9314,64 @@ Tensor* naive_log(const Tensor* tensor) {
 	return result;
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for logarithm operation
+ * @details
+ * Array follows the common backend registration pattern for logarithm operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation log_backends[] = {
 	REGISTER_BACKEND(naive_log, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for logarithm operation
+ * @ingroup backend_system 
+ */
 logfn nnl2_logarithm;
+
+/** 
+ * @brief Makes the logarithm backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(log);
 
+/** 
+ * @brief Sets the backend for logarithm operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_log_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(log_backends, log, backend_name, current_backend(log));
 }
 
+/** 
+ * @brief Gets the name of the active backend for logarithm operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_log_backend() {
 	return current_backend(log);
 }
 
+/** 
+ * @brief Function declaration for getting all available logarithm backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(log);
+
+/**
+ * @brief Function declaration for getting the number of available logarithm backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(log);
 
 void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);

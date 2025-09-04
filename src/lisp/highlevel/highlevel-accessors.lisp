@@ -203,14 +203,14 @@
 (defun .exp! (tensor)
   (nnl2.ffi:%.exp! tensor))
 
-(defun .exp (tensor)
-  (nnl2.ffi:%.exp tensor))  
+(defun .exp (tensor &key save-type)
+  (nnl2.ffi:%.exp tensor save-type))  
   
 (defun .log! (tensor)
   (nnl2.ffi:%.log! tensor))  
   
-(defun .log (tensor)
-  (nnl2.ffi:%.log tensor))    
+(defun .log (tensor &key save-type)
+  (nnl2.ffi:%.log tensor save-type))    
     
 (defmacro size (tensor)
   `(nnl2.ffi:%get-size ,tensor))
