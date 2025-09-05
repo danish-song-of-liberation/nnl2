@@ -338,11 +338,11 @@ void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {
    
 Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {
 	return add_incf(tensor, inc);
-}    
+}     
 
 void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {
 	sub_decf_inplace(tensor, dec); 
-}  
+}   
   
 Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
 	return sub_decf(tensor, dec);

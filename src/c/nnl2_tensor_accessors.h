@@ -8356,7 +8356,7 @@ Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
                 // Element-wise division with zero check
                 for (size_t i = 0; i < len; i++) {
                     if (data_divisor[i] == 0.0) {
-                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        NNL2_ERROR("Division by zero at index %zu\n", i);
                         nnl2_free_tensor(quotient);
                         return NULL;
                     }
@@ -8374,7 +8374,7 @@ Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
                 // Element-wise division with zero check
                 for (size_t i = 0; i < len; i++) {
                     if (data_divisor[i] == 0.0f) {
-                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        NNL2_ERROR("Division by zero at index %zu\n", i);
                         nnl2_free_tensor(quotient);
                         return NULL;
                     }
@@ -8392,7 +8392,7 @@ Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
                 // Element-wise division with zero check
                 for (size_t i = 0; i < len; i++) {
                     if (data_divisor[i] == 0) {
-                        fprintf(stderr, "Error (Hello from C!): Division by zero at index %zu\n", i);
+                        NNL2_ERROR("Division by zero at index %zu\n", i);
                         nnl2_free_tensor(quotient);
                         return NULL;
                     }

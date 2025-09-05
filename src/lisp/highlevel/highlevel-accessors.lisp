@@ -492,8 +492,8 @@
     (:l2 `(l2-norm ,tensor :axes ,axes))
 	(otherwise (error "Incorrect :p key in norm~%"))))
 	
-(defmacro copy (tensor)
-  `(nnl2.ffi:%copy ,tensor))	
+(defmacro copy (tensor &key dtype)
+  `(nnl2.ffi:%copy ,tensor (if ,dtype ,dtype (dtype ,tensor))))	
   
 (defun .+/incf! (tensor increment)
   (let* ((dtype (dtype tensor))
