@@ -209,19 +209,19 @@ void lisp_call_powinplace(Tensor* base, Tensor* exponent) {
 }  
    
 void lisp_call_expinplace(Tensor* tensor) { 
-	expinplace(tensor);              
-} 
+	expinplace(tensor);               
+}  
  
-Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) { 
-	return nnl2_pow(base, exponent); 
-} 
-         
-Tensor* lisp_call_exp(Tensor* tensor, bool save_type) {
-	return nnl2_exp(tensor, save_type);
+Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {  
+	return nnl2_pow(base, exponent);   
+}   
+          
+Tensor* lisp_call_exp(Tensor* tensor, bool save_type) {  
+	return nnl2_exp(tensor, save_type); 
 }
   
 void lisp_call_loginplace(Tensor* tensor) { 
-	loginplace(tensor);      
+	loginplace(tensor);       
 }    
    
 Tensor* lisp_call_log(Tensor* tensor, bool save_type) {
@@ -232,8 +232,8 @@ void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 	scaleinplace(tensor, multiplier);     
 }
 
-Tensor* lisp_call_scale(Tensor* tensor, float multiplier) {   
-	return scale(tensor, multiplier); 
+Tensor* lisp_call_scale(Tensor* tensor, float multiplier, bool save_type) {   
+	return scale(tensor, multiplier, save_type); 
 }   
     
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
@@ -328,28 +328,28 @@ void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
 	l2norm(tensor, axes, num_axes);
 }
 
-Tensor* lisp_call_copy(Tensor* tensor) {
-	return nnl2_copy(tensor); 
+Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
+	return nnl2_copy(tensor, copy_type);  
 } 
-
-void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {
-	add_incf_inplace(tensor, inc);
-}
-
+  
+void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) { 
+	add_incf_inplace(tensor, inc);   
+}   
+   
 Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {
 	return add_incf(tensor, inc);
-}
+}    
 
 void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {
-	sub_decf_inplace(tensor, dec);
-}
-
+	sub_decf_inplace(tensor, dec); 
+}  
+  
 Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
 	return sub_decf(tensor, dec);
 }
-     
+       
 void lisp_call_mul_mulf_inplace(Tensor* tensor, void* mulf) {	
-	mul_mulf_inplace(tensor, mulf);
+	mul_mulf_inplace(tensor, mulf); 
 }	
 
 Tensor* lisp_call_mul_mulf(Tensor* tensor, void* mulf) {

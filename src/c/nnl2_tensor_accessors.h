@@ -8092,6 +8092,199 @@ DEFINE_GET_BACKENDS_FUNCTION(mul);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(mul);
 
 /** @brief
+ * Creates a copy of a tensor with possible data type conversion
+ *
+ ** @param tensor
+ * Pointer to the source tensor for copying
+ *
+ ** @param copy_type
+ * The target data type for the copy
+ *
+ ** @return 
+ * A pointer to a new tensor copy, or NULL if an error occurs
+ *
+ ** @note
+ * Can perform additional checks depending on the safety level
+ *
+ ** @see nnl2_empty
+ ** @see nnl2_convert_to_float64
+ ** @see nnl2_convert_to_float32
+ ** @see nnl2_convert_to_int32
+ **/
+Tensor* naive_copy(Tensor* tensor, TensorType copy_type) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Additional checks depending on the safety level
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX);
+		
+		// NULL checks
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", sufficient_debug_mode_p, NULL);
+	#endif
+	
+	TensorType dtype = tensor->dtype;
+	
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	Tensor* result;
+	
+	if(dtype == copy_type) {
+		result = nnl2_empty(tensor->shape, tensor->rank, dtype);
+		
+		// Element-by-element copying based on data type
+		switch(dtype) {
+			case FLOAT64: {
+				double* cast_data_original = (double*)tensor->data;
+				double* cast_data_copy = (double*)result->data;	
+				for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
+				break;
+			}
+			
+			case FLOAT32: {
+				float* cast_data_original = (float*)tensor->data;
+				float* cast_data_copy = (float*)result->data;	
+				for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
+				break;
+			}
+			
+			case INT32: {
+				int32_t* cast_data_original = (int32_t*)tensor->data;
+				int32_t* cast_data_copy = (int32_t*)result->data;	
+				for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
+				break;
+			} 
+			
+			default: {
+				NNL2_TYPE_ERROR(dtype);
+				return NULL;
+			}
+		}
+	} else {
+		// Create a tensor with the target data type
+		result = nnl2_empty(tensor->shape, tensor->rank, copy_type);
+		
+		// Data conversion and copying
+		switch(copy_type) {
+			case FLOAT64: {
+				double* cast_data_copy = (double*)result->data;
+				
+				for(size_t it = 0; it < total_elems; it++) {
+					// Getting a pointer to the current element of the source tensor
+					void* original_elem = (char*)tensor->data + it * get_dtype_size(dtype);
+					
+					// Convert and copy the element
+					cast_data_copy[it] = nnl2_convert_to_float64(original_elem, dtype);
+				}
+				
+				break;
+			}
+			
+			case FLOAT32: {
+				float* cast_data_copy = (float*)result->data;
+				
+				for(size_t it = 0; it < total_elems; it++) {
+					// Getting a pointer to the current element of the source tensor
+					void* original_elem = (char*)tensor->data + it * get_dtype_size(dtype);
+					
+					// Convert and copy the element
+					cast_data_copy[it] = nnl2_convert_to_float32(original_elem, dtype);
+				}
+				
+				break;
+			}
+			
+			case INT32: {
+				int32_t* cast_data_copy = (int32_t*)result->data;
+				
+				for(size_t it = 0; it < total_elems; it++) {
+					// Getting a pointer to the current element of the source tensor
+					void* original_elem = (char*)tensor->data + it * get_dtype_size(dtype);
+					
+					// Convert and copy the element
+					cast_data_copy[it] = nnl2_convert_to_int32(original_elem, dtype);
+				}
+				
+				break;
+			}
+			
+			default: {
+				NNL2_TYPE_ERROR(copy_type);
+				return NULL;
+			}
+		}
+	}
+
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+
+	return result;
+}
+
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for copy operation
+ * @details
+ * Array follows the common backend registration pattern for copy operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
+Implementation copy_backends[] = {
+	REGISTER_BACKEND(naive_copy, nnl2_naive, NAIVE_BACKEND_NAME),
+};
+
+/**
+ * @brief Function pointer for copy operation
+ * @ingroup backend_system 
+ */
+copyfn nnl2_copy;
+
+/** 
+ * @brief Makes the copy backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
+make_current_backend(copy);
+
+/** 
+ * @brief Sets the backend for copy operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see ESET_BACKEND_BY_NAME
+ */
+void set_copy_backend(const char* backend_name) {
+    ESET_BACKEND_BY_NAME(copy_backends, nnl2_copy, backend_name, current_backend(copy));
+}
+
+/** 
+ * @brief Gets the name of the active backend for copy operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
+const char* get_copy_backend() {
+	return current_backend(copy);
+}
+
+/** 
+ * @brief Function declaration for getting all available copy backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
+DEFINE_GET_BACKENDS_FUNCTION(copy);
+
+/**
+ * @brief Function declaration for getting the number of available copy backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(copy);
+
+/** @brief
  * Performs element-wise division of two tensors (naive implementation)
  *
  ** @details
@@ -9256,6 +9449,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(loginplace);
  * A pointer to a new tensor with the result of calculating the logarithm
  */
 Tensor* naive_log(const Tensor* tensor, bool save_type) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	size_t len = product(tensor->shape, tensor->rank);
 	
     if (tensor->dtype == INT32) {
@@ -9310,6 +9507,10 @@ Tensor* naive_log(const Tensor* tensor, bool save_type) {
 			return NULL;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 	
 	return result;
 }
@@ -9374,36 +9575,93 @@ DEFINE_GET_BACKENDS_FUNCTION(log);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(log);
 
-void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);
+/** @brief
+ * Sets a subtensor or single element in the destination tensor
+ *
+ ** @param dest
+ * Destination tensor to modify
+ *
+ ** @param dest_shape
+ * Array specifying the starting indices for each dimension
+ *
+ ** @param dest_rank
+ * Number of dimensions specified in dest_shape
+ *
+ ** @param src
+ * Source tensor to copy from
+ *
+ ** @param src_shape
+ * Array specifying which indices to copy from source
+ *
+ ** @param src_rank
+ * Number of dimensions specified in src_shape
+ */
+void nnl2_tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank);
 
-void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool is_tensor) {
+/** @brief
+ * Naive tensor reference setter for assignment operations
+ *
+ * Handles assignment of both scalar values and subtensors to a target tensor
+ * Supports wildcard indexing (-1) for iterating through dimensions
+ * In lisp wrapper, all '* are automatically converted to -1
+ *
+ ** @param tensor
+ * Target tensor to modify
+ *
+ ** @param shape
+ * Array of indices specifying the target location
+ *
+ ** @param rank
+ * Number of dimensions specified in shape array
+ *
+ ** @param change_with
+ * Pointer to the data to assign (scalar or tensor)
+ *
+ ** @param is_tensor
+ * Flag indicating if change_with is a tensor (true) or scalar (false)
+ */
+void nnl2_naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool is_tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
     TensorType tensor_dtype = tensor->dtype;
 
+	// Handle tensor assignment (subtensor to subtensor)
     if (is_tensor) {
         Tensor* sub_tensor = (Tensor*)change_with;
 
-        if (tensor->rank - rank != sub_tensor->rank) {
-            fprintf(stderr, "Error (Hello from C!): Rank mismatch in tensor assignment\n");
-            return;
-        }
+		// Additional checks depending on the security level
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+			if (tensor->rank - rank != sub_tensor->rank) {
+				NNL2_ERROR("Rank mismatch in tensor assignment");
+				return;
+			}
+			
+			if (tensor->dtype != sub_tensor->dtype) {
+				NNL2_ERROR("Data type mismatch in tensor assignment");
+				return;
+			}
+		#endif
         
-        for (int i = 0; i < sub_tensor->rank; i++) {
-            if (tensor->shape[rank + i] != sub_tensor->shape[i]) {
-                fprintf(stderr, "Error (Hello from C!): Shape mismatch in dimension %d\n", i);
-                return;
-            }
-        }
-        
-        if (tensor->dtype != sub_tensor->dtype) {
-            fprintf(stderr, "Error (Hello from C!): Data type mismatch in tensor assignment\n");
-            return;
-        }
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+			// Validate shape compatibility for all dimensionss
+			for (int i = 0; i < sub_tensor->rank; i++) {
+				if (tensor->shape[rank + i] != sub_tensor->shape[i]) {
+					NNL2_ERROR("Shape mismatch in dimension %d", i);
+					return;
+				}
+			}
+		#endif
         
         int* full_dest_shape = malloc(sizeof(int) * tensor->rank);
-        if (!full_dest_shape) {
-            fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
-            return;
-        }
+		
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+			if (!full_dest_shape) {
+				NNL2_ERROR("Memory allocation failed");
+				return;
+			}
+		#endif
         
         memcpy(full_dest_shape, shape, sizeof(int) * rank);
         
@@ -9412,28 +9670,37 @@ void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, 
         }
         
         int* src_iter_shape = malloc(sizeof(int) * sub_tensor->rank);
-        if (!src_iter_shape) {
-            free(full_dest_shape);
-            fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
-            return;
-        }
+		
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+			if (!src_iter_shape) {
+				free(full_dest_shape);
+				NNL2_ERROR("Memory allocation failed");
+				return;
+			}
+		#endif
         
         for (int i = 0; i < sub_tensor->rank; i++) {
             src_iter_shape[i] = -1;
         }
         
-        tensor_set_subtensor(tensor, full_dest_shape, rank, sub_tensor, src_iter_shape, 0);
+        nnl2_tensor_set_subtensor(tensor, full_dest_shape, rank, sub_tensor, src_iter_shape, 0);
         
         free(src_iter_shape);
         free(full_dest_shape);
+		
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+			NNL2_FUNC_EXIT();
+		#endif
+		
         return;
     }
     
+	// Handle wildcard indices by recursively iterating through those dimensions
     for(int i = 0; i < rank; i++) {
         if(shape[i] == -1) {
             for(int shape_i = 0; shape_i < tensor->shape[i]; shape_i++) {
                 shape[i] = shape_i;
-                naive_tref_setter(tensor, shape, rank, change_with, is_tensor);
+                nnl2_naive_tref_setter(tensor, shape, rank, change_with, is_tensor);
             }
             
             shape[i] = -1;
@@ -9442,6 +9709,7 @@ void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, 
     }
     
     if(rank == tensor->rank) {
+		// Handling case when reached target element for scalar assignment
         switch(tensor_dtype) {
             case FLOAT64: {
                 double* change_elem = (double*)change_with;
@@ -9465,73 +9733,143 @@ void naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, 
             }
 			
             default: {
-                fprintf(stderr, "Error (Hello from C!): Bad data-type (tref setter)\n");
+                NNL2_TYPE_ERROR(tensor_dtype);			
                 return;
             }
         }
     } else {
+		// Handling case when need to go deeper into the tensor hierarchy
         int new_rank = rank + 1;
         int* subshape = malloc(sizeof(int) * new_rank);
-        if (!subshape) {
-            fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
-            return;
-        }
+		
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+			if (!subshape) {
+				NNL2_ERROR("Memory allocation failed");
+				return;
+			}
+		#endif
 
         memcpy(subshape, shape, sizeof(int) * rank);
 
         for (int i = 0; i < tensor->shape[rank]; i++) {
             subshape[rank] = i;
-            naive_tref_setter(tensor, subshape, new_rank, change_with, is_tensor);
+            nnl2_naive_tref_setter(tensor, subshape, new_rank, change_with, is_tensor);
         }
 
         free(subshape);
     }
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
-void tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank) {
+/** @brief
+ * Recursively copies data from source tensor to destination subtensor
+ * See docs at declaration 
+ *
+ ** @see nnl2_tensor_set_subtensor
+ **/
+void nnl2_tensor_set_subtensor(Tensor* dest, int* dest_shape, int dest_rank, Tensor* src, int* src_shape, int src_rank) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_EXIT();
+	#endif
+	
     if (src_rank == src->rank) {
         void* dest_ptr = nnl2_view(dest, dest_shape, dest_rank);
         void* src_ptr = nnl2_view(src, src_shape, src_rank);
         
+		// Determine data type size for memcpy
         size_t type_size;
         switch (dest->dtype) {
             case FLOAT64: type_size = sizeof(double); break;
             case FLOAT32: type_size = sizeof(float); break;
             case INT32: type_size = sizeof(int32_t); break;
-            default: fprintf(stderr, "Error (Hello from C!): Unsupported data type\n"); return;
+            default: NNL2_TYPE_ERROR(dest->dtype); return;
         }
         
+		// Perform the actual data copy
         memcpy(dest_ptr, src_ptr, type_size);
         return;
     }
 
+    // Handle wildcard indices in source by iterating through that dimension
     if (src_shape[src_rank] == -1) {
         for (int i = 0; i < src->shape[src_rank]; i++) {
             src_shape[src_rank] = i;
             dest_shape[dest_rank] = i;
-            tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
+            nnl2_tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
         }
+		
         src_shape[src_rank] = -1;
         dest_shape[dest_rank] = -1;
     } else {
         dest_shape[dest_rank] = src_shape[src_rank];
-        tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
+        nnl2_tensor_set_subtensor(dest, dest_shape, dest_rank + 1, src, src_shape, src_rank + 1);
     }
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for tensor reference setter operation
+ * @details
+ * Array follows the common backend registration pattern for tensor reference setting operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive_tref_setter
+ * @see nnl2_naive
+ */
 Implementation tref_setter_backends[] = {
-	REGISTER_BACKEND(naive_tref_setter, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(nnl2_naive_tref_setter, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for tensor reference setter operation
+ * @ingroup backend_system 
+ */
 trefsetterfn tref_setter;
 
+/** 
+ * @brief Sets the backend for tensor reference setter operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see SET_BACKEND_BY_NAME
+ */
 void set_tref_setter_backend(const char* backend_name) {
     SET_BACKEND_BY_NAME(tref_setter_backends, tref_setter, backend_name);
 }
 
+/** @brief
+ * Scales the tensor in-place using a multiplier
+ * The function multiplies each element of the tensor by a specified multiplier
+ *
+ ** @param tensor 	
+ * Pointer to a tensor for scaling
+ *
+ ** @param multiplier
+ * Multiplier for scaling
+ *
+ ** @note
+ * For integer types, the multiplier must be an integer
+ *
+ ** @throws NNL2_ERROR
+ * If you try to multiply an INT32 tensor by a fractional number
+ */
 void naive_scaleinplace(Tensor* tensor, float multiplier) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	void* data = tensor->data;
+	
+	// Calculate the total number of elements in the tensor
 	int num_elems = product(tensor->shape, tensor->rank);
+	if(num_elems == 0) return; // If the tensor is empty, exit
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -9548,88 +9886,254 @@ void naive_scaleinplace(Tensor* tensor, float multiplier) {
 		
 		case INT32: {
 			int32_t* data_t = (int32_t*)data;
+			
+			// Check that the multiplier is integer for the INT32 tensor
+			if(round(multiplier) != multiplier) {
+				NNL2_ERROR("Can't multiply an int32 tensor by a fractional number");
+				return;
+			}
+			
 			for(int i = 0; i < num_elems; i++) data_t[i] = (int32_t)round(data_t[i] * multiplier);
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive scale in-place)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
+/** 
+ * @ingroup backend_system
+ * @brief Backend implementations for scaleinplace operation
+ * @details
+ * Array follows the common backend registration pattern for scaleinplace operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation scaleinplace_backends[] = {
 	REGISTER_BACKEND(naive_scaleinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for scaleinplace operation
+ * @ingroup backend_system 
+ */
 scaleinplacefn scaleinplace;
+
+/** 
+ * @brief Makes the scaleinplace backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(scaleinplace);
 
+/** 
+ * @brief Sets the backend for scaleinplace operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_scaleinplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(scaleinplace_backends, scaleinplace, backend_name, current_backend(scaleinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for scaleinplace operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_scaleinplace_backend() {
 	return current_backend(scaleinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available scaleinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(scaleinplace);
+
+/**
+ * @brief Function declaration for getting the number of available scaleinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(scaleinplace);
 
-Tensor* naive_scale(const Tensor* tensor, float multiplier) {
-	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
-	void* data_original = tensor->data;
-	void* data_result = result->data;
-	int num_elems = product(tensor->shape, tensor->rank);
+/** @brief
+ * Multiplies a tensor by a scalar factor
+ *
+ * Special cases (multiplication by 0 and 1) are handled optimally by creating
+ * a tensor with zeros or copying the original tensor
+ *
+ ** @param tensor
+ * Pointer to the input tensor
+ *
+ ** @param multiplier 
+ * A scalar multiplier for multiplying tensor elements
+ *
+ ** @param save_type 
+ * The flag for saving the data type (for example, by default, int32 
+ * is cast to float64. save_type attempts to preserve the type if possible)
+ *
+ ** @see nnl2_copy
+ ** @see nnl2_zeros
+ ** @see nnl2_empty
+ ** @see nnl2_free_tensor
+ **/
+Tensor* nnl2_naive_scale(const Tensor* tensor, float multiplier, bool save_type) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
 	
-	switch(tensor->dtype) {
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_SAFETY_MODE > NNL2_SAFETY_MODE_MAX);
+		
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", sufficient_debug_mode_p, NULL);
+	#endif
+	
+	Tensor* result;
+	void* data_original = tensor->data;
+	
+	// Calculate the total number of elements in the tensor
+	size_t num_elems = product(tensor->shape, tensor->rank);
+	TensorType dtype = tensor->dtype;
+	
+	if (multiplier == 1.0f) {
+		// For multiplication by 1, just return a copy
+		TensorType output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
+		return nnl2_copy(tensor, output_dtype);
+	}
+	
+	if (multiplier == 0.0f) {
+		// For multiplication by 0, return a tensor of zeros
+		TensorType output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
+		return nnl2_zeros(tensor->shape, tensor->rank, output_dtype);
+	}
+	
+	if(dtype == INT32) {
+		int32_t* data_t = (int32_t*)data_original;
+		
+		if(save_type) {
+			// Scale integer data, round, and keep as INT32
+			result = nnl2_empty(tensor->shape, tensor->rank, INT32);
+			int32_t* data_o = (int32_t*)result->data;
+			for(size_t i = 0; i < num_elems; i++) {
+				data_o[i] = (int32_t)lround(data_t[i] * multiplier);
+			}
+			return result;
+		} else {
+			// Scale integer data and promote to FLOAT64
+			result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+			double* data_o = (double*)result->data;
+			for(size_t i = 0; i < num_elems; i++) {
+				data_o[i] = data_t[i] * multiplier;
+			}
+		}
+		
+		return result;
+	}
+	
+	result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	void* data_result = result->data;
+	
+	switch(dtype) {
 		case FLOAT64: {
 			double* data_t = (double*)data_original;
 			double* data_o = (double*)data_result;
-			for(int i = 0; i < num_elems; i++) data_o[i] = data_t[i] * (double)multiplier;
+			for(size_t i = 0; i < num_elems; i++) data_o[i] = data_t[i] * (double)multiplier;
 			break;
 		}
 		
 		case FLOAT32: {
 			float* data_t = (float*)data_original;
 			float* data_o = (float*)data_result;
-			for(int i = 0; i < num_elems; i++) data_o[i] = data_t[i] * multiplier;
-			break;
-		}
-		
-		case INT32: {
-			int32_t* data_t = (int32_t*)data_original;
-			int32_t* data_o = (int32_t*)data_result;
-			for(int i = 0; i < num_elems; i++) data_o[i] = (int32_t)round(data_t[i] * multiplier);
+			for(size_t i = 0; i < num_elems; i++) data_o[i] = data_t[i] * multiplier;
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (naive scale in-place)\n");
+			NNL2_TYPE_ERROR(dtype);
+			nnl2_free_tensor(result);
 			return NULL;
 		}
 	}
 	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
 	return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for scale operation
+ * @details
+ * Array follows the common backend registration pattern for scale operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation scale_backends[] = {
-	REGISTER_BACKEND(naive_scale, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
+	REGISTER_BACKEND(nnl2_naive_scale, nnl2_naive, NAIVE_BACKEND_NAME),
+};
 
+/**
+ * @brief Function pointer for scale operation
+ * @ingroup backend_system 
+ */
 scalefn scale;
+
+/** 
+ * @brief Makes the scale backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(scale);
 
+/** 
+ * @brief Sets the backend for scale operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_scale_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(scale_backends, scale, backend_name, current_backend(scale));
 }
 
+/** 
+ * @brief Gets the name of the active backend for scale operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_scale_backend() {
 	return current_backend(scale);
 }
 
+/** 
+ * @brief Function declaration for getting all available scale backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(scale);
+
+/**
+ * @brief Function declaration for getting the number of available scale backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(scale);
 
 Tensor* empty_like(const Tensor* tensor) {
@@ -11294,61 +11798,6 @@ const char* get_l2norm_backend() {
 
 DEFINE_GET_BACKENDS_FUNCTION(l2norm);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(l2norm);
-
-Tensor* naive_copy(const Tensor* tensor) {
-	TensorType dtype = tensor->dtype;
-	
-	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
-	size_t total_elems = product(tensor->shape, tensor->rank);
-	
-	switch(dtype) {
-		case FLOAT64: {
-			double* cast_data_original = (double*)tensor->data;
-			double* cast_data_copy = (double*)result->data;	
-			for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
-			break;
-		}
-		
-		case FLOAT32: {
-			float* cast_data_original = (float*)tensor->data;
-			float* cast_data_copy = (float*)result->data;	
-			for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
-			break;
-		}
-		
-		case INT32: {
-			int32_t* cast_data_original = (int32_t*)tensor->data;
-			int32_t* cast_data_copy = (int32_t*)result->data;	
-			for(size_t it = 0; it < total_elems; it++) cast_data_copy[it] = cast_data_original[it];
-			break;
-		} 
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (copy)\n");
-			return NULL;
-		}
-	}
-
-	return result;
-}
-
-Implementation copy_backends[] = {
-	REGISTER_BACKEND(naive_copy, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
-
-copyfn nnl2_copy;
-make_current_backend(copy);
-
-void set_copy_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(copy_backends, nnl2_copy, backend_name, current_backend(copy));
-}
-
-const char* get_copy_backend() {
-	return current_backend(copy);
-}
-
-DEFINE_GET_BACKENDS_FUNCTION(copy);
-DEFINE_GET_NUMS_BACKENDS_FUNCTION(copy);
 
 void naive_add_incf_inplace(Tensor* tensor, void* inc) {
 	size_t total_elems = product(tensor->shape, tensor->rank);

@@ -65,7 +65,8 @@
    
 (cffi:defcfun ("lisp_call_scale" %scale) :pointer
   (tensor :pointer)
-  (multiplier :float))   
+  (multiplier :float)
+  (save-type :bool))
   
 (cffi:defcfun ("lisp_call_sgemm" %sgemm) :pointer
   (order nnl2-order)

@@ -283,8 +283,8 @@
 (defmacro scale! (tensor multiplier)
   `(nnl2.ffi:%scale! ,tensor (float ,multiplier)))
 
-(defmacro scale (tensor multiplier)
-  `(nnl2.ffi:%scale ,tensor (float ,multiplier)))  
+(defmacro scale (tensor multiplier &key save-type)
+  `(nnl2.ffi:%scale ,tensor (float ,multiplier) ,save-type))  
   
 (defun empty-like (tensor)
   (nnl2.ffi:%empty-like tensor))  
