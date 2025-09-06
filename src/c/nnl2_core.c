@@ -150,11 +150,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
      
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return nnl2_zeros(shape, rank, dtype);  
-}  	  	          
-                 
-Tensor* lisp_call_full(const int* shape, int rank, TensorType dtype, void* filler) {
-	return full(shape, rank, dtype, filler);
-}
+}  	  	             
          
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
@@ -279,7 +275,7 @@ Tensor* lisp_call_relu(Tensor* tensor) {
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha); 
 }
-
+ 
 Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha) {
 	return leakyrelu(tensor, alpha);  
 }
@@ -289,7 +285,7 @@ void lisp_call_sigmoidinplace(Tensor* tensor) {
 }
 
 Tensor* lisp_call_sigmoid(Tensor* tensor) {
-	return sigmoid(tensor);
+	return sigmoid(tensor); 
 }
  
 void lisp_call_tanhinplace(Tensor* tensor) { 
@@ -297,11 +293,11 @@ void lisp_call_tanhinplace(Tensor* tensor) {
 }    
 
 Tensor* lisp_call_tanh(Tensor* tensor) {
-	return nnl2_tanh(tensor);
+	return nnl2_tanh(tensor); 
 }   
 
 Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
-	return nnl2_concat(tensora, tensorb, axis);
+	return nnl2_concat(tensora, tensorb, axis); 
 }        
 
 Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
@@ -331,19 +327,19 @@ void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
 Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
 	return nnl2_copy(tensor, copy_type);  
 } 
-  
+   
 void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) { 
-	add_incf_inplace(tensor, inc);   
+	add_incf_inplace(tensor, inc);      
 }   
    
-Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {
-	return add_incf(tensor, inc);
-}     
-
-void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {
+Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {  
+	return add_incf(tensor, inc);    
+}      
+ 
+void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {  
 	sub_decf_inplace(tensor, dec); 
 }   
-  
+   
 Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
 	return sub_decf(tensor, dec);
 }

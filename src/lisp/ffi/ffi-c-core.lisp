@@ -31,12 +31,12 @@
   (rank :int)
   (dtype tensor-type))   
   
-(cffi:defcfun ("ones" %ones) :pointer
+(cffi:defcfun ("nnl2_ones" %ones) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type))  
     
-(cffi:defcfun ("lisp_call_full" %full) :pointer
+(cffi:defcfun ("nnl2_full" %full) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type)
@@ -290,16 +290,16 @@
   (sumend :pointer)
   (alpha :float))  
   
-(cffi:defcfun ("empty_like" %empty-like) :pointer
+(cffi:defcfun ("nnl2_empty_like" %empty-like) :pointer
   (tensor :pointer))   
   
-(cffi:defcfun ("zeros_like" %zeros-like) :pointer
+(cffi:defcfun ("nnl2_zeros_like" %zeros-like) :pointer
   (tensor :pointer)) 
 
-(cffi:defcfun ("ones_like" %ones-like) :pointer
+(cffi:defcfun ("nnl2_ones_like" %ones-like) :pointer
   (tensor :pointer))   
   
-(cffi:defcfun ("full_like" %full-like) :pointer
+(cffi:defcfun ("nnl2_full_like" %full-like) :pointer
   (tensor :pointer)
   (filler :pointer))
   

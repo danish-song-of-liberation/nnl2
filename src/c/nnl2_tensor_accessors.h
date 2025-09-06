@@ -2593,7 +2593,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
  ** @example
  * // Create a 3x3 matrix of ones with float32 type
  * int shape[] = {3, 3};
- * Tensor* ones_matrix = ones(shape, 2, FLOAT32); 
+ * Tensor* ones_matrix = nnl2_ones(shape, 2, FLOAT32); 
  *
  ** @exception NNL2Error
  * Shape is NULL or rank is invalid
@@ -2608,7 +2608,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(inplace_fill);
  ** @see nnl2_zeros()
  ** @see inplace_fill()
  **/
-Tensor* ones(int32_t* shape, int32_t rank, TensorType dtype) {
+Tensor* nnl2_ones(int32_t* shape, int32_t rank, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_ENTER();
 	#endif
@@ -2642,7 +2642,7 @@ Tensor* ones(int32_t* shape, int32_t rank, TensorType dtype) {
 
 		// Processing unsupported data types
         default: {
-            NNL2_ERROR("Invalid data type in ones");
+            NNL2_TYPE_ERROR(dtype);
             nnl2_free_tensor(tensor_t);  
             return NULL;
         }
@@ -2694,12 +2694,12 @@ Tensor* ones(int32_t* shape, int32_t rank, TensorType dtype) {
  * // Create a 2x3 matrix filled with 5.5 (float32)
  * int shape[] = {2, 3};
  * float value = 5.5f;
- * Tensor* filled_tensor = full(shape, 2, FLOAT32, &value);
+ * Tensor* filled_tensor = nnl2_full(shape, 2, FLOAT32, &value);
  *
  * // Create a 1D vector filled with 42 (int32)
  * int shape1d[] = {10};
  * int32_t int_value = 42;
- * Tensor* int_tensor = full(shape1d, 1, INT32, &int_value);
+ * Tensor* int_tensor = nnl2_full(shape1d, 1, INT32, &int_value);
  *
  ** @exception NNL2_ERROR_SHAPE_INVALID
  * Shape is NULL or contains invalid dimensions
@@ -2718,7 +2718,7 @@ Tensor* ones(int32_t* shape, int32_t rank, TensorType dtype) {
  *
  ** @see inplace_fill()
  **/
-Tensor* full(const int* shape, int rank, TensorType dtype, void* filler) {
+Tensor* nnl2_full(const int* shape, int rank, TensorType dtype, void* filler) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_ENTER();
 	#endif
@@ -6221,14 +6221,20 @@ Tensor* nnl2_naive_add(const Tensor* summand, const Tensor* addend) {
 		
 		switch(dtype_summand) {
 			case FLOAT64: {
-				volatile double* data_summand = (double*)summand->data;
-				volatile double* data_addend = (double*)addend->data;
-				volatile double* data_amount = (double*)amount->data;
+				volatile double* restrict data_summand = (double*)summand->data;
+				volatile double* restrict data_addend = (double*)addend->data;
+				volatile double* restrict data_amount = (double*)amount->data;
 			
 				// Element-wise addition
-				for(size_t i = 0; i < len; i++) {
-					data_amount[i] = data_summand[i] + data_addend[i];
-				}
+				for(size_t i = 0; i < len; i += 64) {
+                    size_t block_end = i + 64;
+                    if(block_end > len) block_end = len;
+                    
+                    // Обрабатываем блок
+                    for(size_t j = i; j < block_end; j++) {
+                        data_amount[j] = data_summand[j] + data_addend[j];
+                    }
+                }
 				
 				break;
 			}
@@ -9201,9 +9207,9 @@ Tensor* naive_exp(Tensor* tensor, bool save_type) {
 			return result;
 		} else {
 			if(save_type) {
-				return ones(tensor->shape, tensor->rank, INT32);
+				return nnl2_ones(tensor->shape, tensor->rank, INT32);
 			} else {
-				return ones(tensor->shape, tensor->rank, FLOAT64);
+				return nnl2_ones(tensor->shape, tensor->rank, FLOAT64);
 			}
 		}
 	}
@@ -10136,20 +10142,82 @@ DEFINE_GET_BACKENDS_FUNCTION(scale);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(scale);
 
-Tensor* empty_like(const Tensor* tensor) {
+/** @brief
+ * Creates a new tensor of the same shape and type, but with uninitialized data
+ *
+ ** @param tensor
+ * The initial tensor from which a new tensor is created
+ *
+ ** @return
+ * Tensor* Pointer to a new tensor with uninitialized data
+ *
+ ** @note
+ * The data in the returned tensor is not initialized and may contain garbage
+ *
+ ** @see nnl2_empty
+ **/
+Tensor* nnl2_empty_like(Tensor* tensor) {
 	return nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 }
 
-Tensor* zeros_like(const Tensor* tensor) {
+/** @brief
+ * Creates a new tensor of the same shape and type, filled with zeros
+ *
+ ** @param tensor
+ * The initial tensor from which a new tensor is created
+ *
+ ** @return
+ * Tensor* A pointer to a new tensor filled with zeros
+ *
+ ** @note
+ * All elements of the returned tensor are initialized with zero values
+ *
+ ** @see nnl2_zeros
+ **/
+Tensor* nnl2_zeros_like(Tensor* tensor) {
 	return nnl2_zeros(tensor->shape, tensor->rank, tensor->dtype);
 }
 
-Tensor* ones_like(const Tensor* tensor) {
-	return ones(tensor->shape, tensor->rank, tensor->dtype);
+/** @brief 
+ * Creates a new tensor of the same shape and type, filled with units
+ *
+ ** @param tensor
+ * The initial tensor from which a new tensor is created
+ *
+ ** @return
+ * Tensor* A pointer to a new tensor filled with ones
+ *
+ ** @note 
+ * All elements of the returned tensor are initialized with ones
+ *
+ ** @see nnl2_ones
+ **/
+Tensor* nnl2_ones_like(Tensor* tensor) {
+	return nnl2_ones(tensor->shape, tensor->rank, tensor->dtype);
 }
 
-Tensor* full_like(const Tensor* tensor, void* filler) {
-	return full(tensor->shape, tensor->rank, tensor->dtype, filler);
+/** @brief
+ * Creates a new tensor of the same shape and type, filled with the specified value
+ *
+ ** @param tensor
+ * The initial tensor from which a new tensor is created
+ *
+ ** @param filler
+ * A pointer to the value that will be filled into the tensor
+ *
+ ** @return 
+ * Tensor* Pointer to a new tensor filled with the specified value
+ * 
+ ** @note
+ * The filler value must be of the correct dtype tensor type
+ *
+ ** @warning
+ * It is necessary to ensure that the filler value and tensor type match
+ *
+ ** @see nnl2_full
+ **/
+Tensor* nnl2_full_like(Tensor* tensor, void* filler) {
+	return nnl2_full(tensor->shape, tensor->rank, tensor->dtype, filler);
 }
 
 void naive_maxinplace(Tensor* tensora, const Tensor* tensorb) {
