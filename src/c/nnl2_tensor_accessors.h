@@ -10394,17 +10394,12 @@ Implementation maxinplace_backends[] = {
 /**
  * @brief Function pointer for maxinplace operation
  * @ingroup backend_system 
- * @details
- * Points to the currently active implementation for element-wise maximum operation
- * that modifies the first tensor in place with maximum values.
  */
 maxinplacefn maxinplace;
 
 /** 
  * @brief Makes the maxinplace backend current
  * @ingroup backend_system
- * @details
- * Initializes the maxinplace function pointer to use the currently selected backend
  * @see MAKE_CURRENT_BACKEND
  */
 MAKE_CURRENT_BACKEND(maxinplace);
@@ -10413,10 +10408,6 @@ MAKE_CURRENT_BACKEND(maxinplace);
  * @brief Sets the backend for maxinplace operation
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
- * @details
- * Allows switching between different implementations of the element-wise maximum operation.
- * Valid backend names can be obtained using get_maxinplace_backends().
- * 
  * @see ESET_BACKEND_BY_NAME
  */
 void set_maxinplace_backend(const char* backend_name) {
@@ -10427,8 +10418,6 @@ void set_maxinplace_backend(const char* backend_name) {
  * @brief Gets the name of the active backend for maxinplace operation
  * @ingroup backend_system
  * @return Name of the current backend as constant string
- * @details
- * Returns the name of the backend currently being used for element-wise maximum operations.
  */
 const char* get_maxinplace_backend() {
 	return CURRENT_BACKEND(maxinplace);
@@ -10437,8 +10426,6 @@ const char* get_maxinplace_backend() {
 /** 
  * @brief Function declaration for getting all available maxinplace backends
  * @ingroup backend_system
- * @details
- * Returns an array of all registered backend implementations for element-wise maximum operations.
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(maxinplace);
@@ -10446,9 +10433,6 @@ DEFINE_GET_BACKENDS_FUNCTION(maxinplace);
 /**
  * @brief Function declaration for getting the number of available maxinplace backends
  * @ingroup backend_system
- * @details
- * Returns the total number of registered backend implementations for element-wise maximum operations.
- * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(maxinplace);
 
@@ -10630,17 +10614,12 @@ Implementation mininplace_backends[] = {
 /**
  * @brief Function pointer for mininplace operation
  * @ingroup backend_system 
- * @details
- * Points to the currently active implementation for element-wise minimum operation
- * that modifies the first tensor in place with minimum values.
  */
 mininplacefn mininplace;
 
 /** 
  * @brief Makes the mininplace backend current
  * @ingroup backend_system
- * @details
- * Initializes the mininplace function pointer to use the currently selected backend
  * @see make_current_backend
  */
 make_current_backend(mininplace);
@@ -10649,10 +10628,6 @@ make_current_backend(mininplace);
  * @brief Sets the backend for mininplace operation
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
- * @details
- * Allows switching between different implementations of the element-wise minimum operation.
- * Valid backend names can be obtained using get_mininplace_backends().
- * 
  * @see ESET_BACKEND_BY_NAME
  */
 void set_mininplace_backend(const char* backend_name) {
@@ -10663,8 +10638,6 @@ void set_mininplace_backend(const char* backend_name) {
  * @brief Gets the name of the active backend for mininplace operation
  * @ingroup backend_system
  * @return Name of the current backend as constant string
- * @details
- * Returns the name of the backend currently being used for element-wise minimum operations.
  */
 const char* get_mininplace_backend() {
 	return current_backend(mininplace);
@@ -10673,8 +10646,6 @@ const char* get_mininplace_backend() {
 /** 
  * @brief Function declaration for getting all available mininplace backends
  * @ingroup backend_system
- * @details
- * Returns an array of all registered backend implementations for element-wise minimum operations.
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(mininplace);
@@ -10682,8 +10653,6 @@ DEFINE_GET_BACKENDS_FUNCTION(mininplace);
 /**
  * @brief Function declaration for getting the number of available mininplace backends
  * @ingroup backend_system
- * @details
- * Returns the total number of registered backend implementations for element-wise minimum operations.
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(mininplace);
@@ -10887,17 +10856,12 @@ Implementation max_backends[] = {
 /**
  * @brief Function pointer for max operation
  * @ingroup backend_system 
- * @details
- * Points to the currently active implementation for element-wise maximum operation
- * that creates a new tensor with maximum values from two input tensors.
  */
 maxfn nnl2_max;
 
 /** 
  * @brief Makes the max backend current
  * @ingroup backend_system
- * @details
- * Initializes the nnl2_max function pointer to use the currently selected backend
  * @see make_current_backend
  */
 make_current_backend(max);
@@ -10906,10 +10870,6 @@ make_current_backend(max);
  * @brief Sets the backend for max operation
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
- * @details
- * Allows switching between different implementations of the element-wise maximum operation.
- * Valid backend names can be obtained using get_max_backends().
- * 
  * @see ESET_BACKEND_BY_NAME
  */
 void set_max_backend(const char* backend_name) {
@@ -10920,8 +10880,6 @@ void set_max_backend(const char* backend_name) {
  * @brief Gets the name of the active backend for max operation
  * @ingroup backend_system
  * @return Name of the current backend as constant string
- * @details
- * Returns the name of the backend currently being used for element-wise maximum operations.
  */
 const char* get_max_backend() {
 	return current_backend(max);
@@ -10930,8 +10888,6 @@ const char* get_max_backend() {
 /** 
  * @brief Function declaration for getting all available max backends
  * @ingroup backend_system
- * @details
- * Returns an array of all registered backend implementations for element-wise maximum operations.
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(max);
@@ -10939,8 +10895,6 @@ DEFINE_GET_BACKENDS_FUNCTION(max);
 /**
  * @brief Function declaration for getting the number of available max backends
  * @ingroup backend_system
- * @details
- * Returns the total number of registered backend implementations for element-wise maximum operations.
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(max);
@@ -11142,17 +11096,12 @@ Implementation min_backends[] = {
 /**
  * @brief Function pointer for min operation
  * @ingroup backend_system 
- * @details
- * Points to the currently active implementation for element-wise minimum operation
- * that creates a new tensor with minimum values from two input tensors.
  */
 minfn nnl2_min;
 
 /** 
  * @brief Makes the min backend current
  * @ingroup backend_system
- * @details
- * Initializes the nnl2_min function pointer to use the currently selected backend
  * @see make_current_backend
  */
 make_current_backend(min);
@@ -11161,10 +11110,6 @@ make_current_backend(min);
  * @brief Sets the backend for min operation
  * @ingroup backend_system
  * @param backend_name Name of the backend to activate
- * @details
- * Allows switching between different implementations of the element-wise minimum operation.
- * Valid backend names can be obtained using get_min_backends().
- * 
  * @see ESET_BACKEND_BY_NAME
  */
 void set_min_backend(const char* backend_name) {
@@ -11175,8 +11120,6 @@ void set_min_backend(const char* backend_name) {
  * @brief Gets the name of the active backend for min operation
  * @ingroup backend_system
  * @return Name of the current backend as constant string
- * @details
- * Returns the name of the backend currently being used for element-wise minimum operations.
  */
 const char* get_min_backend() {
 	return current_backend(min);
@@ -11185,8 +11128,6 @@ const char* get_min_backend() {
 /** 
  * @brief Function declaration for getting all available min backends
  * @ingroup backend_system
- * @details
- * Returns an array of all registered backend implementations for element-wise minimum operations.
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(min);
@@ -11194,64 +11135,138 @@ DEFINE_GET_BACKENDS_FUNCTION(min);
 /**
  * @brief Function declaration for getting the number of available min backends
  * @ingroup backend_system
- * @details
- * Returns the total number of registered backend implementations for element-wise minimum operations.
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(min);
 
+/** @brief 
+ * Calculates the absolute values of the tensor elements in place
+ *
+ ** @param tensor
+ * A pointer to a tensor that will be modified
+ *
+ ** @see fabs
+ ** @see fabsf
+ ** @see abs
+ **/
 void naive_absinplace(Tensor* tensor) {	
-	int total_elems = product(tensor->shape, tensor->rank);	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+
+	size_t total_elems = product(tensor->shape, tensor->rank);
+	if(total_elems == 0) return; // If tensor is empty then return
+	
 	void* data = tensor->data;
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
 			double* cast_data = (double*)data;	
-			for(int i = 0; i < total_elems; i++) cast_data[i] = fabs(cast_data[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = fabs(cast_data[i]);
 			break;
 		}
 		
 		case FLOAT32: {
 			float* cast_data = (float*)data;	
-			for(int i = 0; i < total_elems; i++) cast_data[i] = fabsf(cast_data[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = fabsf(cast_data[i]);
 			break;
 		}
 		
 		case INT32: {
 			int32_t* cast_data = (int32_t*)data;	
-			for(int i = 0; i < total_elems; i++) cast_data[i] = abs(cast_data[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = abs(cast_data[i]);
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (abs in-place)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for absinplace operation
+ * @details
+ * Array follows the common backend registration pattern for in-place absolute value operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation absinplace_backends[] = {
 	REGISTER_BACKEND(naive_absinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for absinplace operation
+ * @ingroup backend_system 
+ */
 absinplacefn absinplace;
+
+/** 
+ * @brief Makes the absinplace backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(absinplace);
 
+/** 
+ * @brief Sets the backend for absinplace operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_absinplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(absinplace_backends, absinplace, backend_name, current_backend(absinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for absinplace operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_absinplace_backend() {
 	return current_backend(absinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available absinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(absinplace);
+
+/**
+ * @brief Function declaration for getting the number of available absinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(absinplace);
 
+/** @brief
+ * Naive implementation of absolute value operation
+ *
+ ** @param tensor 
+ * Input tensor
+ *
+ ** @return 
+ * New tensor with absolute values of input elements
+ */
 Tensor* naive_abs(Tensor* tensor) {	
-	int total_elems = product(tensor->shape, tensor->rank);	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+
+	size_t total_elems = product(tensor->shape, tensor->rank);	
 	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	if(total_elems == 0) return result;
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -11260,49 +11275,96 @@ Tensor* naive_abs(Tensor* tensor) {
 		case FLOAT64: {
 			double* cast_data_t = (double*)data_t;	
 			double* cast_data_r = (double*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = fabs(cast_data_t[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = fabs(cast_data_t[i]);
 			break;
 		}
 		
 		case FLOAT32: {
 			float* cast_data_t = (float*)data_t;	
 			float* cast_data_r = (float*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = fabsf(cast_data_t[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = fabsf(cast_data_t[i]);
 			break;
 		}
 		
 		case INT32: {
 			int32_t* cast_data_t = (int32_t*)data_t;	
 			int32_t* cast_data_r = (int32_t*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = abs(cast_data_t[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = abs(cast_data_t[i]);
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (abs)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
+			nnl2_free_tensor(result);
 			return NULL;
 		}
 	}
 	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
 	return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for abs operation
+ * @details
+ * Array follows the common backend registration pattern for absolute value operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation abs_backends[] = {
 	REGISTER_BACKEND(naive_abs, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for abs operation
+ * @ingroup backend_system 
+ */
 absfn nnl2_abs;
+
+/** 
+ * @brief Makes the abs backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(abs);
 
+/** 
+ * @brief Sets the backend for abs operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_abs_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(abs_backends, nnl2_abs, backend_name, current_backend(abs));
 }
 
+/** 
+ * @brief Gets the name of the active backend for abs operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_abs_backend() {
 	return current_backend(abs);
 }
 
+/** 
+ * @brief Function declaration for getting all available abs backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(abs);
+
+/**
+ * @brief Function declaration for getting the number of available abs backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(abs);
 
 void* get_tensor_data(Tensor* tensor) {
