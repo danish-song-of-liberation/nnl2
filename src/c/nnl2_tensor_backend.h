@@ -193,6 +193,7 @@ typedef Tensor* (*axpybroadcastingfn)(const Tensor*, const Tensor*, float);
 typedef void* (*viewfn)(Tensor*, const int32_t*, uint8_t);
 typedef void* (*trefgetterfn)(Tensor*, const int32_t*, uint8_t);
 typedef void* (*trefsetterfn)(Tensor*, int*, int, void*, bool);
+typedef void (*convf64arrfn)(void* src, double* dst, size_t count, TensorType dtype);	
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

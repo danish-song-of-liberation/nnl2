@@ -546,7 +546,6 @@ NNL2_FORCE_INLINE static int32_t nnl2_convert_to_int32(void* value, TensorType d
  *
  ** @exception[overflow_error]
  * If the calculated total size would overflow size_t
- *
  **/
 Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
@@ -10220,284 +10219,985 @@ Tensor* nnl2_full_like(Tensor* tensor, void* filler) {
 	return nnl2_full(tensor->shape, tensor->rank, tensor->dtype, filler);
 }
 
-void naive_maxinplace(Tensor* tensora, const Tensor* tensorb) {
-	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
-	
-	if(typea != typeb) {
-		fprintf(stderr, "Error (Hello from C!): Data types are different (max in-place)\n");
-		return;
-	}
-	
-	int total_elems = product(tensora->shape, tensora->rank);
-	
-	void* data_a = tensora->data;
-	void* data_b = tensorb->data;
-	
-	switch(typea) {
-		case FLOAT64: {
-			double* cast_data_a = (double*)data_a;
-			double* cast_data_b = (double*)data_b;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MAX(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			float* cast_data_a = (float*)data_a;
-			float* cast_data_b = (float*)data_b;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MAX(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case INT32: {
-			int32_t* cast_data_a = (int32_t*)data_a;
-			int32_t* cast_data_b = (int32_t*)data_b;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MAX(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (max in-place)\n");
-			return;
-		}
-	}
+/** @brief 
+ * Performs element-wise maximum of two tensors (naive implementation)
+ * 
+ * Compares elements of the first tensor with corresponding elements 
+ * of the second tensor, storing the maximum value in the first tensor
+ *
+ ** @param tensora 
+ * Pointer to the tensor that will be modified 
+ *
+ ** @param tensorb 
+ * Pointer to the tensor whose values will be used for comparison
+ *
+ ** @note 
+ * Supports different data types through automatic conversion
+ * The second tensor's elements are converted to the first tensor's data type
+ *
+ ** @note 
+ * In max safety mode, validates tensor pointers and data pointers before access
+ *
+ ** @warning 
+ * This function modifies the first tensor directly
+ *
+ * @example
+ * // Create two tensors with the same shape
+ * Tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
+ * Tensor* b = nnl2_tensor((float[]){3.0, 1.0, 5.0}, (int[]){3}, 1, FLOAT32);
+ * 
+ * // Store element-wise maximum in tensor a
+ * naive_maxinplace(a, b);
+ * 
+ * // Now a contains [3.0, 3.0, 5.0]
+ * nnl2_print_tensor(a);
+ * 
+ * // Cleanup
+ * nnl2_free_tensor(a);
+ * nnl2_free_tensor(b);
+ */
+void naive_maxinplace(Tensor* tensora, Tensor* tensorb) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+    
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor's data is NULL", sufficient_debug_mode_p);
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor's data is NULL", sufficient_debug_mode_p);
+    #endif
+    
+    // Calculating the total number of elements in the first tensor
+    size_t total_elems = product(tensora->shape, tensora->rank);
+    
+    // If the tensor is empty, exit the function
+    if(total_elems == 0) return;
+    
+    TensorType typea = tensora->dtype;
+    TensorType typeb = tensorb->dtype;
+    
+    if(typea == typeb) {
+        // Handling case when the tensors have the same type
+        
+        switch(typea) {
+            case FLOAT64: {
+                volatile double* data_a = (double*)tensora->data;
+                volatile double* data_b = (double*)tensorb->data;
+                
+                // Element-wise maximum calculation
+                for(size_t i = 0; i < total_elems; i++) {
+                    data_a[i] = MAX(data_a[i], data_b[i]);
+                }
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_a = (float*)tensora->data;
+                volatile float* data_b = (float*)tensorb->data;
+                
+                // Element-wise maximum calculation
+                for(size_t i = 0; i < total_elems; i++) {
+                    data_a[i] = MAX(data_a[i], data_b[i]);
+                }
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_a = (int32_t*)tensora->data;
+                volatile int32_t* data_b = (int32_t*)tensorb->data;
+                
+                // Element-wise maximum calculation
+                for(size_t i = 0; i < total_elems; i++) {
+                    data_a[i] = MAX(data_a[i], data_b[i]);
+                }
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(typea);
+                return;
+            }
+        }
+    } else {
+        // Handling the case when tensors have different data types
+        // Calculating the step size for accessing second tensor elements
+        size_t typeb_step = get_dtype_size(typeb);
+        
+        // Casting second tensor data to char* for byte access
+        char* data_b = (char*)tensorb->data;
+        
+        switch(typea) {
+            case FLOAT64: {
+                volatile double* data_a = (double*)tensora->data;
+                
+                // For each element, convert the second tensor element to FLOAT64 and compare
+                for(size_t i = 0; i < total_elems; i++) {
+                    void* elem_b = data_b + i * typeb_step;
+                    data_a[i] = MAX(data_a[i], nnl2_convert_to_float64(elem_b, typeb));
+                }
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_a = (float*)tensora->data;
+                
+                // For each element, convert the second tensor element to FLOAT32 and compare
+                for(size_t i = 0; i < total_elems; i++) {
+                    void* elem_b = data_b + i * typeb_step;
+                    data_a[i] = MAX(data_a[i], nnl2_convert_to_float32(elem_b, typeb));
+                }
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_a = (int32_t*)tensora->data;
+                
+                // For each element, convert the second tensor element to INT32 and compare
+                for(size_t i = 0; i < total_elems; i++) {
+                    void* elem_b = data_b + i * typeb_step;
+                    data_a[i] = MAX(data_a[i], nnl2_convert_to_int32(elem_b, typeb));
+                }
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(typea);
+                return;
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for maxinplace operation
+ * @details
+ * Array follows the common backend registration pattern for element-wise maximum operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation maxinplace_backends[] = {
 	REGISTER_BACKEND(naive_maxinplace, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
+};
 
+/**
+ * @brief Function pointer for maxinplace operation
+ * @ingroup backend_system 
+ * @details
+ * Points to the currently active implementation for element-wise maximum operation
+ * that modifies the first tensor in place with maximum values.
+ */
 maxinplacefn maxinplace;
-make_current_backend(maxinplace);
 
+/** 
+ * @brief Makes the maxinplace backend current
+ * @ingroup backend_system
+ * @details
+ * Initializes the maxinplace function pointer to use the currently selected backend
+ * @see MAKE_CURRENT_BACKEND
+ */
+MAKE_CURRENT_BACKEND(maxinplace);
+
+/** 
+ * @brief Sets the backend for maxinplace operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @details
+ * Allows switching between different implementations of the element-wise maximum operation.
+ * Valid backend names can be obtained using get_maxinplace_backends().
+ * 
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_maxinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(maxinplace_backends, maxinplace, backend_name, current_backend(maxinplace));
+    ESET_BACKEND_BY_NAME(maxinplace_backends, maxinplace, backend_name, CURRENT_BACKEND(maxinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for maxinplace operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ * @details
+ * Returns the name of the backend currently being used for element-wise maximum operations.
+ */
 const char* get_maxinplace_backend() {
-	return current_backend(maxinplace);
+	return CURRENT_BACKEND(maxinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available maxinplace backends
+ * @ingroup backend_system
+ * @details
+ * Returns an array of all registered backend implementations for element-wise maximum operations.
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(maxinplace);
+
+/**
+ * @brief Function declaration for getting the number of available maxinplace backends
+ * @ingroup backend_system
+ * @details
+ * Returns the total number of registered backend implementations for element-wise maximum operations.
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(maxinplace);
 
+/** @brief 
+ * Performs element-wise minimum of two tensors (naive implementation)
+ * 
+ * Compares elements of the first tensor with corresponding elements 
+ * of the second tensor, storing the minimum value in the first tensor
+ *
+ ** @param tensora 
+ * Pointer to the tensor that will be modified (receives the minimum values)
+ *
+ ** @param tensorb 
+ * Pointer to the tensor whose values will be used for comparison
+ *
+ ** @note 
+ * Supports different data types through automatic conversion
+ * The second tensor's elements are converted to the first tensor's data type
+ *
+ ** @note 
+ * In max safety mode, validates tensor pointers and data pointers before access
+ *
+ ** @warning 
+ * This function modifies the first tensor directly
+ *
+ * @example
+ * // Create two tensors with the same shape
+ * Tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
+ * Tensor* b = nnl2_tensor((float[]){3.0, 1.0, 5.0}, (int[]){3}, 1, FLOAT32);
+ * 
+ * // Store element-wise minimum in tensor a
+ * naive_mininplace(a, b);
+ * 
+ * // Now a contains [2.0, 1.0, 4.0]
+ * nnl2_print_tensor(a);
+ * 
+ * // Cleanup
+ * nnl2_free_tensor(a);
+ * nnl2_free_tensor(b);
+ */
 void naive_mininplace(Tensor* tensora, const Tensor* tensorb) {
-	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
-	
-	if(typea != typeb) {
-		fprintf(stderr, "Error (Hello from C!): Data types are different (min in-place)\n");
-		return;
-	}
-	
-	int total_elems = product(tensora->shape, tensora->rank);
-	
-	void* data_a = tensora->data;
-	void* data_b = tensorb->data;
-	
-	switch(typea) {
-		case FLOAT64: {
-			double* cast_data_a = (double*)data_a;
-			double* cast_data_b = (double*)data_b;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MIN(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			float* cast_data_a = (float*)data_a;
-			float* cast_data_b = (float*)data_b;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MIN(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case INT32: {
-			int32_t* cast_data_a = (int32_t*)data_a;
-			int32_t* cast_data_b = (int32_t*)data_b;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_a[i] = MIN(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (min in-place)\n");
-			return;
-		}
-	}
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
+    
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor's data is NULL", sufficient_debug_mode_p);
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor's data is NULL", sufficient_debug_mode_p);
+    #endif
+    
+    // Calculating the total number of elements in the first tensor
+    size_t total_elems = product(tensora->shape, tensora->rank);
+    
+    // If the tensor is empty, exit the function
+    if(total_elems == 0) return;
+    
+    TensorType typea = tensora->dtype;
+    TensorType typeb = tensorb->dtype;
+    
+    if(typea == typeb) {
+        // Handling case when the tensors have the same type
+        
+        switch(typea) {
+            case FLOAT64: {
+                volatile double* data_a = (double*)tensora->data;
+                volatile double* data_b = (double*)tensorb->data;
+                
+                // Element-wise minimum calculation
+                for(size_t i = 0; i < total_elems; i++) {
+                    data_a[i] = MIN(data_a[i], data_b[i]);
+                }
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_a = (float*)tensora->data;
+                volatile float* data_b = (float*)tensorb->data;
+                
+                // Element-wise minimum calculation
+                for(size_t i = 0; i < total_elems; i++) {
+                    data_a[i] = MIN(data_a[i], data_b[i]);
+                }
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_a = (int32_t*)tensora->data;
+                volatile int32_t* data_b = (int32_t*)tensorb->data;
+                
+                // Element-wise minimum calculation
+                for(size_t i = 0; i < total_elems; i++) {
+                    data_a[i] = MIN(data_a[i], data_b[i]);
+                }
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(typea);
+                return;
+            }
+        }
+    } else {
+        // Handling the case when tensors have different data types
+        // Calculating the step size for accessing second tensor elements
+        size_t typeb_step = get_dtype_size(typeb);
+        
+        // Casting second tensor data to char* for byte access
+        char* data_b = (char*)tensorb->data;
+        
+        switch(typea) {
+            case FLOAT64: {
+                volatile double* data_a = (double*)tensora->data;
+                
+                // For each element, convert the second tensor element to FLOAT64 and compare
+                for(size_t i = 0; i < total_elems; i++) {
+                    void* elem_b = data_b + i * typeb_step;
+                    double converted_b = nnl2_convert_to_float64(elem_b, typeb);
+                    data_a[i] = MIN(data_a[i], converted_b);
+                }
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_a = (float*)tensora->data;
+                
+                // For each element, convert the second tensor element to FLOAT32 and compare
+                for(size_t i = 0; i < total_elems; i++) {
+                    void* elem_b = data_b + i * typeb_step;
+                    float converted_b = nnl2_convert_to_float32(elem_b, typeb);
+                    data_a[i] = MIN(data_a[i], converted_b);
+                }
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_a = (int32_t*)tensora->data;
+                
+                // For each element, convert the second tensor element to INT32 and compare
+                for(size_t i = 0; i < total_elems; i++) {
+                    void* elem_b = data_b + i * typeb_step;
+                    int32_t converted_b = nnl2_convert_to_int32(elem_b, typeb);
+                    data_a[i] = MIN(data_a[i], converted_b);
+                }
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(typea);
+                return;
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for mininplace operation
+ * @details
+ * Array follows the common backend registration pattern for element-wise minimum operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation mininplace_backends[] = {
 	REGISTER_BACKEND(naive_mininplace, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
+};
 
+/**
+ * @brief Function pointer for mininplace operation
+ * @ingroup backend_system 
+ * @details
+ * Points to the currently active implementation for element-wise minimum operation
+ * that modifies the first tensor in place with minimum values.
+ */
 mininplacefn mininplace;
+
+/** 
+ * @brief Makes the mininplace backend current
+ * @ingroup backend_system
+ * @details
+ * Initializes the mininplace function pointer to use the currently selected backend
+ * @see make_current_backend
+ */
 make_current_backend(mininplace);
 
+/** 
+ * @brief Sets the backend for mininplace operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @details
+ * Allows switching between different implementations of the element-wise minimum operation.
+ * Valid backend names can be obtained using get_mininplace_backends().
+ * 
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_mininplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(mininplace_backends, mininplace, backend_name, current_backend(mininplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for mininplace operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ * @details
+ * Returns the name of the backend currently being used for element-wise minimum operations.
+ */
 const char* get_mininplace_backend() {
 	return current_backend(mininplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available mininplace backends
+ * @ingroup backend_system
+ * @details
+ * Returns an array of all registered backend implementations for element-wise minimum operations.
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(mininplace);
+
+/**
+ * @brief Function declaration for getting the number of available mininplace backends
+ * @ingroup backend_system
+ * @details
+ * Returns the total number of registered backend implementations for element-wise minimum operations.
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(mininplace);
 
+// why am I doing this
+
+/** @brief
+ * Performs element-wise maximum of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the result of taking the maximum
+ * of each element from the first tensor and the corresponding element in the second tensor.
+ * It supports various data types with automatic casting to a higher type in the hierarchy.
+ *
+ ** @param tensora
+ * Pointer to the first tensor
+ *
+ ** @param tensorb
+ * Pointer to the second tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the maximum values
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations
+ *
+ ** @note
+ * Returns NULL in case of failure or unsupported data type
+ *
+ ** @note
+ * The result tensor has the same shape as input tensors and the highest data type
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
 Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
-	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
 	
-	if(typea != typeb) {
-		fprintf(stderr, "Error (Hello from C!): Data types are different (max in-place)\n");
-		return NULL;
-	}
+	// Additional checks on maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
 	
-	int total_elems = product(tensora->shape, tensora->rank);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora, "First tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora->data, "First tensor data is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb, "Second tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", sufficient_debug_mode_p, NULL);
+	#endif
 	
-	Tensor* result = nnl2_empty(tensora->shape, tensora->rank, typea);
-	
-	void* data_a = tensora->data;
-	void* data_b = tensorb->data;
-	void* data_result = result->data;
-	
-	switch(typea) {
-		case FLOAT64: {
-			double* cast_data_a = (double*)data_a;
-			double* cast_data_b = (double*)data_b;
-			double* cast_data_result = (double*)data_result;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			float* cast_data_a = (float*)data_a;
-			float* cast_data_b = (float*)data_b;
-			float* cast_data_result = (float*)data_result;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case INT32: {
-			int32_t* cast_data_a = (int32_t*)data_a;
-			int32_t* cast_data_b = (int32_t*)data_b;
-			int32_t* cast_data_result = (int32_t*)data_result;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (max in-place)\n");
-			return NULL;
-		}
-	}
-	
-	return result;
+    // Calculate the total number of elements in the tensors
+    size_t len = product(tensora->shape, tensora->rank);
+    
+    TensorType dtype_a = tensora->dtype;
+    TensorType dtype_b = tensorb->dtype;
+    
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_a, dtype_b);
+
+    // Create an output tensor with the same shape and winning data type
+    Tensor* result = nnl2_empty(tensora->shape, tensora->rank, winner_in_the_type_hierarchy);
+    
+    if (result == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return NULL;
+    }
+    
+    if (len == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
+    
+    if (dtype_a == dtype_b) {
+        // Handling the case if the data types match
+        
+        switch (dtype_a) {
+            case FLOAT64: {
+                volatile double* data_a = (double*)tensora->data;
+                volatile double* data_b = (double*)tensorb->data;
+                volatile double* data_result = (double*)result->data;
+            
+                // Element-wise maximum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MAX(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_a = (float*)tensora->data;
+                volatile float* data_b = (float*)tensorb->data;
+                volatile float* data_result = (float*)result->data;
+        
+                // Element-wise maximum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MAX(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_a = (int32_t*)tensora->data;
+                volatile int32_t* data_b = (int32_t*)tensorb->data;
+                volatile int32_t* data_result = (int32_t*)result->data;
+        
+                // Element-wise maximum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MAX(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_a);
+                return NULL;
+            }
+        }
+    } else {
+        // Handling the case if the data types are NOT match
+        switch (winner_in_the_type_hierarchy) {
+            case FLOAT64: {
+                volatile double* data_result = (double*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MAX(nnl2_convert_to_float64(elem_a, dtype_a), nnl2_convert_to_float64(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_result = (float*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MAX(nnl2_convert_to_float32(elem_a, dtype_a), nnl2_convert_to_float32(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+        
+            case INT32: {
+                volatile int32_t* data_result = (int32_t*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MAX(nnl2_convert_to_int32(elem_a, dtype_a), nnl2_convert_to_int32(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+                return NULL;
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for max operation
+ * @details
+ * Array follows the common backend registration pattern for element-wise maximum operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation max_backends[] = {
 	REGISTER_BACKEND(naive_max, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
+};
 
+/**
+ * @brief Function pointer for max operation
+ * @ingroup backend_system 
+ * @details
+ * Points to the currently active implementation for element-wise maximum operation
+ * that creates a new tensor with maximum values from two input tensors.
+ */
 maxfn nnl2_max;
+
+/** 
+ * @brief Makes the max backend current
+ * @ingroup backend_system
+ * @details
+ * Initializes the nnl2_max function pointer to use the currently selected backend
+ * @see make_current_backend
+ */
 make_current_backend(max);
 
+/** 
+ * @brief Sets the backend for max operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @details
+ * Allows switching between different implementations of the element-wise maximum operation.
+ * Valid backend names can be obtained using get_max_backends().
+ * 
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_max_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(max_backends, nnl2_max, backend_name, current_backend(max));
 }
 
+/** 
+ * @brief Gets the name of the active backend for max operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ * @details
+ * Returns the name of the backend currently being used for element-wise maximum operations.
+ */
 const char* get_max_backend() {
 	return current_backend(max);
 }
 
+/** 
+ * @brief Function declaration for getting all available max backends
+ * @ingroup backend_system
+ * @details
+ * Returns an array of all registered backend implementations for element-wise maximum operations.
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(max);
+
+/**
+ * @brief Function declaration for getting the number of available max backends
+ * @ingroup backend_system
+ * @details
+ * Returns the total number of registered backend implementations for element-wise maximum operations.
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(max);
 
+/** @brief
+ * Performs element-wise minimum of two tensors (naive implementation)
+ *
+ ** @details
+ * The function creates a new tensor containing the result of taking the minimum
+ * of each element from the first tensor and the corresponding element in the second tensor.
+ * It supports various data types with automatic casting to a higher type in the hierarchy.
+ *
+ ** @param tensora
+ * Pointer to the first tensor
+ *
+ ** @param tensorb
+ * Pointer to the second tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the minimum values
+ *
+ ** @note
+ * Uses volatile pointers to prevent compiler optimizations
+ *
+ ** @note
+ * Returns NULL in case of failure or unsupported data type
+ *
+ ** @note
+ * The result tensor has the same shape as input tensors and the highest data type
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
 Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
-	TensorType typea = tensora->dtype, typeb = tensorb->dtype;
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
 	
-	if(typea != typeb) {
-		fprintf(stderr, "Error (Hello from C!): Data types are different (min in-place)\n");
-		return NULL;
-	}
+	// Additional checks on maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
 	
-	int total_elems = product(tensora->shape, tensora->rank);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora, "First tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora->data, "First tensor data is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb, "Second tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", sufficient_debug_mode_p, NULL);
+	#endif
 	
-	Tensor* result = nnl2_empty(tensora->shape, tensora->rank, typea);
-	
-	void* data_a = tensora->data;
-	void* data_b = tensorb->data;
-	void* data_result = result->data;
-	
-	switch(typea) {
-		case FLOAT64: {
-			double* cast_data_a = (double*)data_a;
-			double* cast_data_b = (double*)data_b;
-			double* cast_data_result = (double*)data_result;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			float* cast_data_a = (float*)data_a;
-			float* cast_data_b = (float*)data_b;
-			float* cast_data_result = (float*)data_result;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		case INT32: {
-			int32_t* cast_data_a = (int32_t*)data_a;
-			int32_t* cast_data_b = (int32_t*)data_b;
-			int32_t* cast_data_result = (int32_t*)data_result;
-			
-			for(int i = 0; i < total_elems; i++) cast_data_result[i] = MIN(cast_data_a[i], cast_data_b[i]);
-			
-			break;
-		}
-		
-		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (min in-place)\n");
-			return NULL;
-		}
-	}
-	
-	return result;
+    // Calculate the total number of elements in the tensors
+    size_t len = product(tensora->shape, tensora->rank);
+    
+    TensorType dtype_a = tensora->dtype;
+    TensorType dtype_b = tensorb->dtype;
+    
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_a, dtype_b);
+
+    // Create an output tensor with the same shape and winning data type
+    Tensor* result = nnl2_empty(tensora->shape, tensora->rank, winner_in_the_type_hierarchy);
+    
+    if (result == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return NULL;
+    }
+    
+    if (len == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
+    
+    if (dtype_a == dtype_b) {
+        // Handling the case if the data types match
+        
+        switch (dtype_a) {
+            case FLOAT64: {
+                volatile double* data_a = (double*)tensora->data;
+                volatile double* data_b = (double*)tensorb->data;
+                volatile double* data_result = (double*)result->data;
+            
+                // Element-wise minimum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MIN(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_a = (float*)tensora->data;
+                volatile float* data_b = (float*)tensorb->data;
+                volatile float* data_result = (float*)result->data;
+        
+                // Element-wise minimum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MIN(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
+            
+            case INT32: {
+                volatile int32_t* data_a = (int32_t*)tensora->data;
+                volatile int32_t* data_b = (int32_t*)tensorb->data;
+                volatile int32_t* data_result = (int32_t*)result->data;
+        
+                // Element-wise minimum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MIN(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(dtype_a);
+                return NULL;
+            }
+        }
+    } else {
+        // Handling the case if the data types are NOT match
+        switch (winner_in_the_type_hierarchy) {
+            case FLOAT64: {
+                volatile double* data_result = (double*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MIN(nnl2_convert_to_float64(elem_a, dtype_a), nnl2_convert_to_float64(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                volatile float* data_result = (float*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MIN(nnl2_convert_to_float32(elem_a, dtype_a), nnl2_convert_to_float32(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+        
+            case INT32: {
+                volatile int32_t* data_result = (int32_t*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MIN(nnl2_convert_to_int32(elem_a, dtype_a), nnl2_convert_to_int32(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(winner_in_the_type_hierarchy);
+                return NULL;
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for min operation
+ * @details
+ * Array follows the common backend registration pattern for element-wise minimum operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation
+ * 
+ * @see nnl2_naive
+ */
 Implementation min_backends[] = {
 	REGISTER_BACKEND(naive_min, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
+};
 
+/**
+ * @brief Function pointer for min operation
+ * @ingroup backend_system 
+ * @details
+ * Points to the currently active implementation for element-wise minimum operation
+ * that creates a new tensor with minimum values from two input tensors.
+ */
 minfn nnl2_min;
+
+/** 
+ * @brief Makes the min backend current
+ * @ingroup backend_system
+ * @details
+ * Initializes the nnl2_min function pointer to use the currently selected backend
+ * @see make_current_backend
+ */
 make_current_backend(min);
 
+/** 
+ * @brief Sets the backend for min operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate
+ * @details
+ * Allows switching between different implementations of the element-wise minimum operation.
+ * Valid backend names can be obtained using get_min_backends().
+ * 
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_min_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(min_backends, nnl2_min, backend_name, current_backend(min));
 }
 
+/** 
+ * @brief Gets the name of the active backend for min operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ * @details
+ * Returns the name of the backend currently being used for element-wise minimum operations.
+ */
 const char* get_min_backend() {
 	return current_backend(min);
 }
 
+/** 
+ * @brief Function declaration for getting all available min backends
+ * @ingroup backend_system
+ * @details
+ * Returns an array of all registered backend implementations for element-wise minimum operations.
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(min);
+
+/**
+ * @brief Function declaration for getting the number of available min backends
+ * @ingroup backend_system
+ * @details
+ * Returns the total number of registered backend implementations for element-wise minimum operations.
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(min);
 
 void naive_absinplace(Tensor* tensor) {	

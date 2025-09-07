@@ -23,20 +23,20 @@
 #endif
 
 #ifdef __SSE4_2__
-#include <nmmintrin.h> 
-#endif
+#include <nmmintrin.h>   
+#endif   
   
-#include "nnl2_core.h"
+#include "nnl2_core.h" 
 #include "nnl2_ffi_test.h" 
 #include "nnl2_tensor_core.h" 
 #include "nnl2_log.h"
 
-#include "backends_status/nnl2_status.h" 
+#include "backends_status/nnl2_status.h"  
 
 #include <stdlib.h>
 #include <time.h> 
         
-void init_system() {     
+void init_system() {      
 	srand(time(NULL));             
 	     
 	// Initialization of the logging system          
@@ -105,10 +105,10 @@ void init_system() {
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
-	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);        
+	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);         
 	INIT_BACKEND(max_maxf, max_maxf_backends); 
-	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);   
-	INIT_BACKEND(min_minf, min_minf_backends);  
+	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);     
+	INIT_BACKEND(min_minf, min_minf_backends);    
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
 	INIT_BACKEND(sub_broadcasting_inplace, sub_broadcasting_inplace_backends);
@@ -116,9 +116,9 @@ void init_system() {
 	INIT_BACKEND(mul_broadcasting_inplace, mul_broadcasting_inplace_backends);
 	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends);
 	INIT_BACKEND(div_broadcasting_inplace, div_broadcasting_inplace_backends);
-	INIT_BACKEND(div_broadcasting, div_broadcasting_backends);
+	INIT_BACKEND(div_broadcasting, div_broadcasting_backends); 
 	INIT_BACKEND(pow_broadcasting_inplace, pow_broadcasting_inplace_backends);
-	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	 
+	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	  
 	INIT_BACKEND(max_broadcasting_inplace, max_broadcasting_inplace_backends);
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends);
 	INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
@@ -129,7 +129,7 @@ void init_system() {
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
 	INIT_BACKEND(axpf, axpf_backends);    
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
-	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends);   
+	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
 }                                   
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
@@ -137,7 +137,7 @@ void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 } 
 
 void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
-	tref_setter(tensor, shape, rank, change_with, tensor_p);
+	tref_setter(tensor, shape, rank, change_with, tensor_p); 
 }
 
 void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
@@ -223,7 +223,7 @@ void lisp_call_loginplace(Tensor* tensor) {
 Tensor* lisp_call_log(Tensor* tensor, bool save_type) {
 	return nnl2_logarithm(tensor, save_type);
 } 
-  
+   
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 	scaleinplace(tensor, multiplier);     
 }
