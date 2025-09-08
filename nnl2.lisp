@@ -53,7 +53,11 @@
 											:components ((:file "highlevel-package" :type "lisp")
 														 (:file "highlevel-accessors" :type "lisp")
 														 (:file "highlevel-utils" :type "lisp")
-														 (:file "highlevel-tensor-backends" :type "lisp")))))))
+														 (:file "highlevel-tensor-backends" :type "lisp")))
+														 
+										   (:module "lowlevel"
+											:serial t
+											:components ((:file "lowlevel-package" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

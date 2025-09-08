@@ -6196,7 +6196,7 @@ int get_size_in_bytes(Tensor* tensor) {
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_naive_add(const Tensor* summand, const Tensor* addend) {
+Tensor* nnl2_naive_add(Tensor* summand, Tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -6225,15 +6225,9 @@ Tensor* nnl2_naive_add(const Tensor* summand, const Tensor* addend) {
 				volatile double* restrict data_amount = (double*)amount->data;
 			
 				// Element-wise addition
-				for(size_t i = 0; i < len; i += 64) {
-                    size_t block_end = i + 64;
-                    if(block_end > len) block_end = len;
-                    
-                    // Обрабатываем блок
-                    for(size_t j = i; j < block_end; j++) {
-                        data_amount[j] = data_summand[j] + data_addend[j];
-                    }
-                }
+				for(size_t i = 0; i < len; i++) {
+					data_amount[i] = data_summand[i] + data_addend[i];
+				}
 				
 				break;
 			}
@@ -11367,255 +11361,907 @@ DEFINE_GET_BACKENDS_FUNCTION(abs);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(abs);
 
+/** @brief
+ * Get the raw data pointer from a tensor
+ *
+ ** @param tensor
+ * Pointer to the tensor
+ *
+ ** @return
+ * Void pointer to the tensor's underlying data storage
+ */
 void* get_tensor_data(Tensor* tensor) {
 	return tensor->data;
 }
 
-float* internal_get_float_data_tensor(Tensor* tensor) {
-	return (float*)tensor->data;
-}
+/** @brief 
+ * Performs horizontal stacking of two tensors (naive implementation)
+ *
+ ** @param tensora
+ * Pointer to the first input tensor
+ *
+ ** @param tensorb
+ * Pointer to the second input tensor
+ *
+ ** @return
+ * Pointer to a new tensor containing the horizontally stacked result
+ *
+ ** @note
+ * Tensors must have the same rank and compatible shapes (all dimensions
+ * except axis=1 must match)
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
+Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    TensorType typea = tensora->dtype;
+    TensorType typeb = tensorb->dtype;
+    
+    int ranka = tensora->rank;
+    int rankb = tensorb->rank;
 
-Tensor* naive_hstack(const Tensor* tensora, const Tensor* tensorb) {
-	TensorType typea = tensora->dtype;
-	TensorType typeb = tensorb->dtype;
-	
-	int ranka = tensora->rank;
-	int rankb = tensorb->rank;
-	
-	if(typea != typeb) {
-		fprintf(stderr, "Error (Hello from C!): Data types are different (naive-hstack)\n");
-		return NULL;
-	}
-	
-	if(ranka != rankb) {
-		fprintf(stderr, "Error (Hello from C!): Tensors ranks are different (naive-hstack)\n");
-		return NULL;
-	}
-	
-    size_t sizea = product(tensora->shape, tensora->rank);
-	size_t sizeb = product(tensorb->shape, tensorb->rank);
-	
-	int* shapea = tensora->shape;
-	int* shapeb = tensorb->shape;
-	
-	Tensor* result;
-	
-	if(ranka == 1) {
-		int* shapec = malloc(sizeof(int));
-		
-		if (shapec == NULL) {
-			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-hstack)\n");
-			return NULL; 
+	// Safety checks for tensor compatibility
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(ranka != rankb) {
+			NNL2_ERROR("Tensors dimensions are different");
+			return NULL;
 		}
-		
-		shapec[0] = shapea[0] + shapeb[0];
-		result = nnl2_empty(shapec, 1, typea);
-		free(shapec); 
-		
-		size_t item_size = get_dtype_size(typea);
-		
-		size_t total_size_a = sizea * item_size;
-        size_t total_size_b = sizeb * item_size;
-		
-		void* dataa = tensora->data;
-		void* datab = tensorb->data;
-		
-		memcpy(result->data, dataa, total_size_a);
-		memcpy((char*)result->data + total_size_a, datab, total_size_b); 
-	} else {
-		int* shapec = malloc(ranka * sizeof(int));
-		
-		if (shapec == NULL) {
-			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-hstack)\n");
-			return NULL; 
-		}
-		
+
+		// Check if all dimensions except axis=1 are equal
 		for(int i = 0; i < ranka; i++) {
-			if(i == 1) {
-				shapec[i] = shapea[i] + shapeb[i];
-			} else {
-				shapec[i] = shapea[i];
+			if(i != 1 && tensora->shape[i] != tensorb->shape[i]) {
+				NNL2_ERROR("Tensors shapes are incompatible for hstack");
+				return NULL;
 			}
 		}
+	#endif
 
-		result = nnl2_empty(shapec, ranka, typea);
-		free(shapec); 
-		
-		size_t item_size = get_dtype_size(typea);
-		
-		size_t outer_dim = shapea[0];  
+    TensorType winner_type = MAX(typea, typeb);
 
-		size_t row_size_a = product(shapea + 1, ranka - 1) * item_size;
-        size_t row_size_b = product(shapeb + 1, rankb - 1) * item_size;	
-		
-		char* src_a = tensora->data;
-        char* src_b = tensorb->data;
-        char* dst = result->data;
-		
-		for(size_t i = 0; i < outer_dim; i++) {
-            memcpy(dst, src_a, row_size_a);
-            src_a += row_size_a;
-            dst += row_size_a;
-            
-            memcpy(dst, src_b, row_size_b);
-            src_b += row_size_b;
-            dst += row_size_b;
+	// Allocate memory for result shape
+    int* shapec = malloc(ranka * sizeof(int));
+    if (shapec == NULL) {
+        NNL2_ERROR("Memory allocation failed");
+        return NULL; 
+    }
+    
+	// Calculate result shape
+    for(int i = 0; i < ranka; i++) {
+        if(i == 1) {
+            shapec[i] = tensora->shape[i] + tensorb->shape[i];
+        } else {
+            shapec[i] = tensora->shape[i];
         }
-	}
-	
-	return result;
+    }
+    
+	// Create empty result tensor with calculated shape and winning type
+    Tensor* result = nnl2_empty(shapec, ranka, winner_type);
+    free(shapec);
+    
+    if(result == NULL) {
+        NNL2_ERROR("Failed to create result tensor in hstack");
+        return NULL;
+    }
+    
+	// Handle empty tensors case
+    size_t total_elements = product(result->shape, result->rank);
+    if(total_elements == 0) {
+        return result;
+    }
+    
+    size_t shapea_0 = (size_t)tensora->shape[0];
+    size_t shapeb_0 = (size_t)tensorb->shape[0];
+    
+	// Handle 1D tensors
+    if(ranka == 1) {
+        if(typea == typeb && typea == winner_type) {
+			// Same types, use memcpy
+            size_t item_size = get_dtype_size(winner_type);
+            memcpy(result->data, tensora->data, shapea_0 * item_size);
+            memcpy((char*)result->data + shapea_0 * item_size, tensorb->data, shapeb_0 * item_size);
+        } else {
+		    // Type conversion needed
+            switch(winner_type) {
+                case FLOAT64: {
+                    volatile double* dst = (double*)result->data;
+
+					// Convert and copy first tensor
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        void* elem = (char*)tensora->data + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_float64(elem, typea);
+                    }
+                
+					// Convert and copy second tensor
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        void* elem = (char*)tensorb->data + i * get_dtype_size(typeb);
+                        dst[shapea_0 + i] = nnl2_convert_to_float64(elem, typeb);
+                    }
+                    break;
+                }
+                
+                case FLOAT32: {
+                    volatile float* dst = (float*)result->data;
+                    
+					// Convert and copy first tensor
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        void* elem = (char*)tensora->data + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_float32(elem, typea);
+                    }
+                    
+					// Convert and copy second tensor
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        void* elem = (char*)tensorb->data + i * get_dtype_size(typeb);
+                        dst[shapea_0 + i] = nnl2_convert_to_float32(elem, typeb);
+                    }
+                    break;
+                }
+                
+                case INT32: {
+                    volatile int32_t* dst = (int32_t*)result->data;
+                    
+					// Convert and copy first tensor
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        void* elem = (char*)tensora->data + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_int32(elem, typea);
+                    }
+                    
+					// Convert and copy second tensor
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        void* elem = (char*)tensorb->data + i * get_dtype_size(typeb);
+                        dst[shapea_0 + i] = nnl2_convert_to_int32(elem, typeb);
+                    }
+                    break;
+                }
+                
+                default: {
+                    NNL2_TYPE_ERROR(winner_type);
+                    free(result);
+                    return NULL;
+                }
+            }
+        }
+    } else {
+		// Handle multi-dimensional tensors
+        size_t outer_dim = (size_t)tensora->shape[0];
+        size_t inner_elements_a = product(tensora->shape + 1, ranka - 1);
+        size_t inner_elements_b = product(tensorb->shape + 1, rankb - 1);
+        
+        if(typea == typeb && typea == winner_type) {
+			// Same types, use memcpy 
+            size_t item_size = get_dtype_size(winner_type);
+            size_t row_size_a = inner_elements_a * item_size;
+            size_t row_size_b = inner_elements_b * item_size;
+            
+            char* src_a = tensora->data;
+            char* src_b = tensorb->data;
+            char* dst = result->data;
+            
+			// Process each outer dimension (e.g., each matrix in a 3D tensor)
+            for(size_t i = 0; i < outer_dim; i++) {
+				// Copy slice from first tensor
+                memcpy(dst, src_a, row_size_a);
+                dst += row_size_a;
+                src_a += row_size_a;
+                
+				// Copy slice from second tensor
+                memcpy(dst, src_b, row_size_b);
+                dst += row_size_b;
+                src_b += row_size_b;
+            }
+        } else {
+			// Type conversion needed for multi-dimensional case
+            switch(winner_type) {
+                case FLOAT64: {
+                    volatile double* dst = (double*)result->data;
+                    
+					// Process each outer dimension
+                    for(size_t i = 0; i < outer_dim; i++) {
+						// Convert and copy slice from first tensor
+                        for(size_t j = 0; j < inner_elements_a; j++) {
+                            size_t src_idx = i * inner_elements_a + j;
+                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + j;
+                            
+                            void* elem = (char*)tensora->data + src_idx * get_dtype_size(typea);
+                            dst[dst_idx] = nnl2_convert_to_float64(elem, typea);
+                        }
+						
+                        // Convert and copy slice from second tensor
+                        for(size_t j = 0; j < inner_elements_b; j++) {
+                            size_t src_idx = i * inner_elements_b + j;
+                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + inner_elements_a + j;
+                            
+                            void* elem = (char*)tensorb->data + src_idx * get_dtype_size(typeb);
+                            dst[dst_idx] = nnl2_convert_to_float64(elem, typeb);
+                        }
+                    }
+					
+                    break;
+                }
+                
+                case FLOAT32: {
+                    volatile float* dst = (float*)result->data;
+                    
+					// Process each outer dimension
+                    for(size_t i = 0; i < outer_dim; i++) {
+						// Convert and copy slice from first tensor
+                        for(size_t j = 0; j < inner_elements_a; j++) {
+                            size_t src_idx = i * inner_elements_a + j;
+                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + j;
+                            
+                            void* elem = (char*)tensora->data + src_idx * get_dtype_size(typea);
+                            dst[dst_idx] = nnl2_convert_to_float32(elem, typea);
+                        }
+                        
+						// Convert and copy slice from second tensor
+                        for(size_t j = 0; j < inner_elements_b; j++) {
+                            size_t src_idx = i * inner_elements_b + j;
+                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + inner_elements_a + j;
+                            
+                            void* elem = (char*)tensorb->data + src_idx * get_dtype_size(typeb);
+                            dst[dst_idx] = nnl2_convert_to_float32(elem, typeb);
+                        }
+                    }
+					
+                    break;
+                }
+                
+                case INT32: {
+                    volatile int32_t* dst = (int32_t*)result->data;
+                    
+					// Process each outer dimension
+                    for(size_t i = 0; i < outer_dim; i++) {
+						// Convert and copy slice from first tensor
+                        for(size_t j = 0; j < inner_elements_a; j++) {
+                            size_t src_idx = i * inner_elements_a + j;
+                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + j;
+                            
+                            void* elem = (char*)tensora->data + src_idx * get_dtype_size(typea);
+                            dst[dst_idx] = nnl2_convert_to_int32(elem, typea);
+                        }
+                        
+						// Convert and copy slice from second tensor
+                        for(size_t j = 0; j < inner_elements_b; j++) {
+                            size_t src_idx = i * inner_elements_b + j;
+                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + inner_elements_a + j;
+                            
+                            void* elem = (char*)tensorb->data + src_idx * get_dtype_size(typeb);
+                            dst[dst_idx] = nnl2_convert_to_int32(elem, typeb);
+                        }
+                    }
+					
+                    break;
+                }
+                
+                default: {
+                    NNL2_TYPE_ERROR(winner_type);
+                    free(result);
+                    return NULL;
+                }
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for hstack operation
+ * @details
+ * Array follows the common backend registration pattern for horizontal stacking operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for horizontal tensor concatenation
+ * 
+ * @see nnl2_naive
+ * @see naive_hstack
+ */
 Implementation hstack_backends[] = {
 	REGISTER_BACKEND(naive_hstack, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for hstack operation
+ * @ingroup backend_system 
+ */
 hstackfn hstack;
+
+/** 
+ * @brief Makes the hstack backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(hstack);
 
+/** 
+ * @brief Sets the backend for hstack operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for horizontal stacking
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_hstack_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(hstack_backends, hstack, backend_name, current_backend(hstack));
 }
 
+/** 
+ * @brief Gets the name of the active backend for hstack operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_hstack_backend() {
 	return current_backend(hstack);
 }
 
+/** 
+ * @brief Function declaration for getting all available hstack backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(hstack);
+
+/**
+ * @brief Function declaration for getting the number of available hstack backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ * @details
+ * Returns the total number of registered horizontal stacking backend implementations.
+ * Useful for iterating through available backends.
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(hstack);
 
+/** @brief
+ * Performs vertical stacking of two tensors (naive implementation)
+ *
+ ** @param tensora 
+ * Pointer to the first input tensor
+ *
+ ** @param tensorb
+ * Pointer to the second input tensor
+ *
+ ** @return 
+ * Pointer to a new tensor containing the vertically stacked result
+ *
+ ** @see nnl2_empty
+ ** @see get_dtype_size()
+ ** @see nnl2_convert_to_float64()
+ ** @see nnl2_convert_to_float32()
+ ** @see nnl2_convert_to_int32()
+ **/
 Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
-	TensorType typea = tensora->dtype;
-	TensorType typeb = tensorb->dtype;
-	
-	int ranka = tensora->rank;
-	int rankb = tensorb->rank;
-	
-	if(typea != typeb) {
-		fprintf(stderr, "Error (Hello from C!): Data types are different (naive-vstack)\n");
-		return NULL;
-	}
-	
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    TensorType typea = tensora->dtype;
+    TensorType typeb = tensorb->dtype;
+    
+    int ranka = tensora->rank;
+    int rankb = tensorb->rank;
+    
+    TensorType winner_type = MAX(typea, typeb);
+    
+	// Calculate total number of elements in each tensor
     size_t sizea = product(tensora->shape, tensora->rank);
-	size_t sizeb = product(tensorb->shape, tensorb->rank);
+    size_t sizeb = product(tensorb->shape, tensorb->rank);
+    
+    void* dataa = tensora->data;
+    void* datab = tensorb->data;
+    
+    int* shapea = tensora->shape;
+    int* shapeb = tensorb->shape;
+    
+    size_t shapea_0 = (size_t)shapea[0];
+    size_t shapea_1 = (size_t)(ranka > 1 ? shapea[1] : 0);
 	
-	void* dataa = tensora->data;
-	void* datab = tensorb->data;
-	
-	int* shapea = tensora->shape;
-	int* shapeb = tensorb->shape;
-	
-	Tensor* result = NULL;
-	
-	if(ranka == 1 && rankb == 1) {
-		int* shapec = malloc(2 * sizeof(int));
-		
-		if (shapec == NULL) {
-			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
-			return NULL; 
-		}
-		
-		shapec[1] = shapea[0];
-		shapec[0] = 2;
-		result = nnl2_empty(shapec, 2, typea);
-		free(shapec); 
-		
-		size_t item_size = get_dtype_size(typea);
-		
-		size_t total_size_a = sizea * item_size;
-        size_t total_size_b = sizeb * item_size;
-		
-		memcpy(result->data, dataa, total_size_a);
-		memcpy((char*)result->data + total_size_a, datab, total_size_b); 
-	} 
-	
-	else if(ranka == 2 && rankb == 1) {
-		int* shapec = malloc(2 * sizeof(int));
-		
-		if (shapec == NULL) {
-            fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
-            return NULL; 
-        }
-		
-		shapec[0] = shapea[0] + 1;
-        shapec[1] = shapea[1];
-		
-		result = nnl2_empty(shapec, 2, typea);
-        free(shapec);
+    size_t shapeb_0 = (size_t)shapeb[0];
+    size_t shapeb_1 = (size_t)(rankb > 1 ? shapeb[1] : 0);
+    
+    Tensor* result = NULL;
+    
+	// Handle 1D-1D case
+    if(ranka == 1 && rankb == 1) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+			// Vectors must have same length for vertical stacking
+            if(shapea_0 != shapeb_0) {
+                NNL2_ERROR("Vectors must have same length for vstack");
+                return NULL;
+            }
+        #endif
         
-        size_t item_size = get_dtype_size(typea);
-        size_t row_size = shapea[1] * item_size;
-		
-		memcpy(result->data, dataa, shapea[0] * row_size);
-		memcpy((char*)result->data + shapea[0] * row_size, datab, row_size);
-	} 
-	
-	else if(ranka == 1 && rankb == 2) {
-		int* shapec = malloc(2 * sizeof(int));
+		// Allocate memory for result shape [2, vector_length]
+        int* shapec = malloc(2 * sizeof(int));
         
         if (shapec == NULL) {
-            fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
+            NNL2_ERROR("Memory allocation failed");
             return NULL; 
         }
-		
-		shapec[0] = shapeb[0] + 1;
-        shapec[1] = shapeb[1];
-		
-		result = nnl2_empty(shapec, 2, typea);
+        
+        shapec[0] = 2;
+        shapec[1] = (int)shapea_0;
+        result = nnl2_empty(shapec, 2, winner_type);
+        free(shapec); 
+        
+        if(typea == typeb && typea == winner_type) {
+            // Fast path: same types
+            size_t item_size = get_dtype_size(winner_type);
+            size_t total_size_a = sizea * item_size;
+            size_t total_size_b = sizeb * item_size;
+            
+            memcpy(result->data, dataa, total_size_a);
+            memcpy((char*)result->data + total_size_a, datab, total_size_b);
+        } else {
+            // Type conversion needed
+            switch(winner_type) {
+                case FLOAT64: {
+                    volatile double* dst = (double*)result->data;
+                    
+                    // Convert and copy first vector
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        void* elem = (char*)dataa + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_float64(elem, typea);
+                    }
+                    
+                    // Convert and copy second vector
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        void* elem = (char*)datab + i * get_dtype_size(typeb);
+                        dst[shapea_0 + i] = nnl2_convert_to_float64(elem, typeb);
+                    }
+                    break;
+                }
+                
+                case FLOAT32: {
+                    volatile float* dst = (float*)result->data;
+                    
+					// Convert and copy first vector
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        void* elem = (char*)dataa + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_float32(elem, typea);
+                    }
+                    
+					// Convert and copy second vector
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        void* elem = (char*)datab + i * get_dtype_size(typeb);
+                        dst[shapea_0 + i] = nnl2_convert_to_float32(elem, typeb);
+                    }
+                    break;
+                }
+                
+                case INT32: {
+                    volatile int32_t* dst = (int32_t*)result->data;
+                    
+					// Convert and copy first vector
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        void* elem = (char*)dataa + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_int32(elem, typea);
+                    }
+                    
+					// Convert and copy second vector
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        void* elem = (char*)datab + i * get_dtype_size(typeb);
+                        dst[shapea_0 + i] = nnl2_convert_to_int32(elem, typeb);
+                    }
+                    break;
+                }
+                
+                default: {
+                    NNL2_TYPE_ERROR(winner_type);
+                    return NULL;
+                }
+            }
+        }
+    } 
+    
+	// Handle 2D-1D case
+    else if(ranka == 2 && rankb == 1) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(shapea_1 != shapeb_0) {
+                NNL2_ERROR("Matrix columns must match vector length for vstack");
+                return NULL;
+            }
+        #endif
+        
+		// Allocate memory for result shape [rows+1, columns]
+        int* shapec = malloc(2 * sizeof(int));
+        
+        if (shapec == NULL) {
+            NNL2_ERROR("Memory allocation failed");
+            return NULL; 
+        }
+        
+        shapec[0] = (int)shapea_0 + 1;
+        shapec[1] = (int)shapea_1;
+        
+        result = nnl2_empty(shapec, 2, winner_type);
         free(shapec);
-		
-		size_t item_size = get_dtype_size(typea);
-        size_t row_size = shapeb[1] * item_size;
-		
-		memcpy(result->data, dataa, row_size);
-		memcpy((char*)result->data + row_size, datab, shapeb[0] * row_size);
-	} 
+        
+        if(typea == typeb && typea == winner_type) {
+            // Same types
+            size_t item_size = get_dtype_size(winner_type);
+            size_t row_size = shapea_1 * item_size;
+            
+			// Copy matrix data
+            memcpy(result->data, dataa, shapea_0 * row_size);
+			
+			// Append vector as new row
+            memcpy((char*)result->data + shapea_0 * row_size, datab, row_size);
+        } else {
+            // Type conversion needed
+            switch(winner_type) {
+                case FLOAT64: {
+                    volatile double* dst = (double*)result->data;
+                    
+                    // Copy and convert matrix
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        for(size_t j = 0; j < shapea_1; j++) {
+                            size_t src_idx = i * shapea_1 + j;
+                            size_t dst_idx = i * shapea_1 + j;
+                            
+                            void* elem = (char*)dataa + src_idx * get_dtype_size(typea);
+                            dst[dst_idx] = nnl2_convert_to_float64(elem, typea);
+                        }
+                    }
+                    
+                    // Copy and convert vector
+                    for(size_t j = 0; j < shapeb_0; j++) {
+                        size_t dst_idx = shapea_0 * shapea_1 + j;
+                        void* elem = (char*)datab + j * get_dtype_size(typeb);
+                        dst[dst_idx] = nnl2_convert_to_float64(elem, typeb);
+                    }
+                    break;
+                }
+                
+                case FLOAT32: {
+                    volatile float* dst = (float*)result->data;
+                    
+					// Process matrix rows with type conversion
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        for(size_t j = 0; j < shapea_1; j++) {
+                            size_t src_idx = i * shapea_1 + j;
+                            size_t dst_idx = i * shapea_1 + j;
+                            
+                            void* elem = (char*)dataa + src_idx * get_dtype_size(typea);
+                            dst[dst_idx] = nnl2_convert_to_float32(elem, typea);
+                        }
+                    }
+                    
+					// Process vector with type conversion
+                    for(size_t j = 0; j < shapeb_0; j++) {
+                        size_t dst_idx = shapea_0 * shapea_1 + j;
+                        void* elem = (char*)datab + j * get_dtype_size(typeb);
+                        dst[dst_idx] = nnl2_convert_to_float32(elem, typeb);
+                    }
+                    break;
+                }
+                
+                case INT32: {
+                    volatile int32_t* dst = (int32_t*)result->data;
+                    
+					// Convert matrix elements to int32
+                    for(size_t i = 0; i < shapea_0; i++) {
+                        for(size_t j = 0; j < shapea_1; j++) {
+                            size_t src_idx = i * shapea_1 + j;
+                            size_t dst_idx = i * shapea_1 + j;
+                            
+                            void* elem = (char*)dataa + src_idx * get_dtype_size(typea);
+                            dst[dst_idx] = nnl2_convert_to_int32(elem, typea);
+                        }
+                    }
+                    
+					// Convert vector elements to int32
+                    for(size_t j = 0; j < shapeb_0; j++) {
+                        size_t dst_idx = shapea_0 * shapea_1 + j;
+                        void* elem = (char*)datab + j * get_dtype_size(typeb);
+                        dst[dst_idx] = nnl2_convert_to_int32(elem, typeb);
+                    }
+                    break;
+                }
+                
+                default: {
+                    NNL2_TYPE_ERROR(winner_type);
+                    return NULL;
+                }
+            }
+        }
+    } 
 	
-	else {
-		int* shapec = malloc(ranka * sizeof(int));
-		
-		if (shapec == NULL) {
-			fprintf(stderr, "Error (Hello from C!): Memory allocation failed! (naive-vstack)\n");
-			return NULL; 
-		}
-		
-		shapec[0] = shapea[0] + shapeb[0];
-		
-		for(int i = 1; i < ranka; i++) {
-			shapec[i] = shapea[i];
-		}
+	// Handle 1D-2D case
+    else if(ranka == 1 && rankb == 2) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+			// Vector length must match matrix columns
+            if(shapea_0 != shapeb_1) {
+                NNL2_ERROR("Vector length must match matrix columns for vstack");
+                return NULL;
+            }
+        #endif
+        
+		// Allocate memory for result shape [rows+1, columns]
+        int* shapec = malloc(2 * sizeof(int));
+        
+        if (shapec == NULL) {
+            NNL2_ERROR("Memory allocation failed");
+            return NULL; 
+        }
+        
+        shapec[0] = (int)shapeb_0 + 1;
+        shapec[1] = (int)shapeb_1;
+        
+        result = nnl2_empty(shapec, 2, winner_type);
+        free(shapec);
+        
+        if(typea == typeb && typea == winner_type) {
+            // Same types
+            size_t item_size = get_dtype_size(winner_type);
+            size_t row_size = shapeb_1 * item_size;
+            
+			// Copy vector as first row
+            memcpy(result->data, dataa, row_size);
+			
+			// Copy matrix data after the vector
+            memcpy((char*)result->data + row_size, datab, shapeb_0 * row_size);
+        } else {
+            // Type conversion needed
+            switch(winner_type) {
+                case FLOAT64: {
+                    volatile double* dst = (double*)result->data;
+                    
+                    // Copy and convert vector as first row
+                    for(size_t j = 0; j < shapea_0; j++) {
+                        void* elem = (char*)dataa + j * get_dtype_size(typea);
+                        dst[j] = nnl2_convert_to_float64(elem, typea);
+                    }
+                    
+                    // Copy and convert matrix rows
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        for(size_t j = 0; j < shapeb_1; j++) {
+                            size_t src_idx = i * shapeb_1 + j;
+                            size_t dst_idx = (i + 1) * shapeb_1 + j;
+                            
+                            void* elem = (char*)datab + src_idx * get_dtype_size(typeb);
+                            dst[dst_idx] = nnl2_convert_to_float64(elem, typeb);
+                        }
+                    }
+                    break;
+                }
+                
+                case FLOAT32: {
+                    volatile float* dst = (float*)result->data;
+                    
+					// Convert vector to float32 for first row
+                    for(size_t j = 0; j < shapea_0; j++) {
+                        void* elem = (char*)dataa + j * get_dtype_size(typea);
+                        dst[j] = nnl2_convert_to_float32(elem, typea);
+                    }
+                    
+					// Convert matrix to float32 for remaining rows
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        for(size_t j = 0; j < shapeb_1; j++) {
+                            size_t src_idx = i * shapeb_1 + j;
+                            size_t dst_idx = (i + 1) * shapeb_1 + j;
+                            
+                            void* elem = (char*)datab + src_idx * get_dtype_size(typeb);
+                            dst[dst_idx] = nnl2_convert_to_float32(elem, typeb);
+                        }
+                    }
+                    break;
+                }
+                
+                case INT32: {
+                    volatile int32_t* dst = (int32_t*)result->data;
+                    
+                    // Convert vector to int32 for first row
+					for(size_t j = 0; j < shapea_0; j++) {
+                        void* elem = (char*)dataa + j * get_dtype_size(typea);
+                        dst[j] = nnl2_convert_to_int32(elem, typea);
+                    }
+                    
+					// Convert matrix to int32 for remaining rows
+                    for(size_t i = 0; i < shapeb_0; i++) {
+                        for(size_t j = 0; j < shapeb_1; j++) {
+                            size_t src_idx = i * shapeb_1 + j;
+                            size_t dst_idx = (i + 1) * shapeb_1 + j;
+                            
+                            void* elem = (char*)datab + src_idx * get_dtype_size(typeb);
+                            dst[dst_idx] = nnl2_convert_to_int32(elem, typeb);
+                        }
+                    }
+                    break;
+                }
+                
+                default: {
+                    NNL2_TYPE_ERROR(winner_type);
+                    return NULL;
+                }
+            }
+        }
+    } 
 
-		result = nnl2_empty(shapec, ranka, typea);
-		free(shapec); 
-		
-		size_t item_size = get_dtype_size(typea);
-		
-		size_t total_size_a = sizea * item_size;
-        size_t total_size_b = sizeb * item_size;
+	// Handle general ND-ND case
+    else {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN	
+            if(ranka != rankb) {
+                NNL2_ERROR("Tensors must have same rank for general vstack");
+                return NULL;
+            }
+            
+			// All dimensions except axis=0 must match
+            for(int i = 1; i < ranka; i++) {
+                if(shapea[i] != shapeb[i]) {
+                    NNL2_ERROR("Tensors must have same dimensions except axis=0 for vstack");
+                    return NULL;
+                }
+            }
+        #endif
+        
+		// Allocate memory for result shape
+        int* shapec = malloc(ranka * sizeof(int));
+        
+        if (shapec == NULL) {
+            NNL2_ERROR("Memory allocation failed");
+            return NULL; 
+        }
+        
+		// Concatenate along axis=0, keep other dimensions
+        shapec[0] = (int)(shapea_0 + shapeb_0);
+        
+        for(int i = 1; i < ranka; i++) {
+            shapec[i] = shapea[i];
+        }
 
-		memcpy(result->data, dataa, total_size_a); 
-        memcpy((char*)result->data + total_size_a, datab, total_size_b); 
-	}
-	
-	return result;
+        result = nnl2_empty(shapec, ranka, winner_type);
+        free(shapec); 
+        
+        if(typea == typeb && typea == winner_type) {
+			// Same types
+            size_t item_size = get_dtype_size(winner_type);
+            size_t total_size_a = sizea * item_size;
+            size_t total_size_b = sizeb * item_size;
+			
+			// Copy first tensor
+            memcpy(result->data, dataa, total_size_a); 
+			
+			// Append second tensor
+            memcpy((char*)result->data + total_size_a, datab, total_size_b);
+        } else {
+			// Type conversion needed 
+            switch(winner_type) {
+                case FLOAT64: {
+                    volatile double* dst = (double*)result->data;
+                    
+                    // Convert and copy first tensor
+                    for(size_t i = 0; i < sizea; i++) {
+                        void* elem = (char*)dataa + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_float64(elem, typea);
+                    }
+                    
+                    // Convert and copy second tensor
+                    for(size_t i = 0; i < sizeb; i++) {
+                        void* elem = (char*)datab + i * get_dtype_size(typeb);
+                        dst[sizea + i] = nnl2_convert_to_float64(elem, typeb);
+                    }
+					
+                    break;
+                }
+                
+                case FLOAT32: {
+                    volatile float* dst = (float*)result->data;
+                    
+					// Convert and copy first tensor
+                    for(size_t i = 0; i < sizea; i++) {
+                        void* elem = (char*)dataa + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_float32(elem, typea);
+                    }
+                    
+					// Convert and copy second tensor
+                    for(size_t i = 0; i < sizeb; i++) {
+                        void* elem = (char*)datab + i * get_dtype_size(typeb);
+                        dst[sizea + i] = nnl2_convert_to_float32(elem, typeb);
+                    }
+					
+                    break;
+                }
+                
+                case INT32: {
+                    volatile int32_t* dst = (int32_t*)result->data;
+                    
+			    	// Convert and copy first tensor
+                    for(size_t i = 0; i < sizea; i++) {
+                        void* elem = (char*)dataa + i * get_dtype_size(typea);
+                        dst[i] = nnl2_convert_to_int32(elem, typea);
+                    }
+                    
+					// Convert and copy second tensor
+                    for(size_t i = 0; i < sizeb; i++) {
+                        void* elem = (char*)datab + i * get_dtype_size(typeb);
+                        dst[sizea + i] = nnl2_convert_to_int32(elem, typeb);
+                    }
+					
+                    break;
+                }
+                
+                default: {
+                    NNL2_TYPE_ERROR(winner_type);
+                    return NULL;
+                }
+            }
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for vstack operation
+ * @details
+ * Array follows the common backend registration pattern for vertical stacking operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for vertical tensor concatenation
+ * 
+ * @see nnl2_naive
+ * @see naive_vstack
+ */
 Implementation vstack_backends[] = {
 	REGISTER_BACKEND(naive_vstack, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for vstack operation
+ * @ingroup backend_system 
+ */
 vstackfn vstack;
+
+/** 
+ * @brief Makes the vstack backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(vstack);
 
+/** 
+ * @brief Sets the backend for vstack operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for vertical stacking
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_vstack_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(vstack_backends, vstack, backend_name, current_backend(vstack));
 }
 
+/** 
+ * @brief Gets the name of the active backend for vstack operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_vstack_backend() {
 	return current_backend(vstack);
 }
 
+/** 
+ * @brief Function declaration for getting all available vstack backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(vstack);
+
+/**
+ * @brief Function declaration for getting the number of available vstack backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(vstack);
 
 void naive_reluinplace(Tensor* tensor) {

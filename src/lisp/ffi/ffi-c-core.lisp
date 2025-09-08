@@ -482,9 +482,6 @@
   (shape :pointer)
   (rank :int)
   (dtype tensor-type))
-
-(cffi:defcfun ("internal_get_float_data_tensor" %%%internal-get-float-data-tensor) :pointer
-  (tensor :pointer))
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
   (backend-name :string))   
