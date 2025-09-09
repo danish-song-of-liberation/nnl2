@@ -12523,6 +12523,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(relu);
  * Slope coefficient for negative values (usually a small positive number)
  */
 void naive_leakyreluinplace(Tensor* tensor, float alpha) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	int total_elems = product(tensor->shape, tensor->rank);	
 	if(total_elems == 0) return; // If tensor is empty return
 	
@@ -12552,6 +12556,10 @@ void naive_leakyreluinplace(Tensor* tensor, float alpha) {
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
 /**
@@ -12637,6 +12645,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(leakyreluinplace);
  * New tensor with Leaky ReLU applied
  */
 Tensor* naive_leakyrelu(Tensor* tensor, float alpha, bool save_type) {	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	// Calculate total number of elements
 	int total_elems = product(tensor->shape, tensor->rank);	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype); 
@@ -12714,6 +12726,10 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
 			return NULL;	
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 	
 	return result;
 }
@@ -12800,6 +12816,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(leakyrelu);
  ** @see nnl2_product
  **/
 void naive_sigmoidinplace(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	// Calculate total number of elements
 	int total_elems = product(tensor->shape, tensor->rank);	
 	if(total_elems == 0) return; // If 0 elems then return
@@ -12829,6 +12849,10 @@ void naive_sigmoidinplace(Tensor* tensor) {
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
 /**
@@ -12912,6 +12936,10 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(sigmoidinplace);
  ** @see nnl2_empty
  **/
 Tensor* naive_sigmoid(Tensor* tensor) {	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	size_t total_elems = product(tensor->shape, tensor->rank);	
 	TensorType dtype = tensor->dtype;
 	
@@ -12954,6 +12982,10 @@ Tensor* naive_sigmoid(Tensor* tensor) {
 			return NULL;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 	
 	return result;
 }
@@ -13019,8 +13051,31 @@ DEFINE_GET_BACKENDS_FUNCTION(sigmoid);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(sigmoid);
 
+/** @brief
+ * Calculates the hyperbolic tangent for all tensor elements in place
+ *
+ ** @details
+ * Look up the hyperbolic tangent formula on the internet
+ * I'm too lazy to write it manually
+ *
+ ** @param tensor
+ * A pointer to a tensor for processing
+ *
+ ** @note
+ * Does not work with integer data types
+ * 
+ ** @see nnl2_product
+ ** @see tanh
+ ** @see tanhf
+ **/
 void naive_tanhinplace(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
 	int total_elems = product(tensor->shape, tensor->rank);	
+	if(total_elems == 0) return; // If tensor is empty then return
+	
 	void* data = tensor->data;
 	
 	switch(tensor->dtype) {
@@ -13037,44 +13092,113 @@ void naive_tanhinplace(Tensor* tensor) {
 		}
 		
 		case INT32: {
-			fprintf(stderr, "Error (Hello from C!): Tanh in-place cannot be applied to the provided tensor\n");
-			exit(EXIT_FAILURE);
+			NNL2_FATAL("Tanh (in-place) cannot be applied to the provided tensor");
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (tanh in-place)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for tanh in-place operation
+ * @details
+ * Array follows the common backend registration pattern for hyperbolic tangent 
+ * in-place operations. Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for tanh activation function
+ * 
+ * @see nnl2_naive
+ * @see naive_tanhinplace
+ */
 Implementation tanhinplace_backends[] = {
 	REGISTER_BACKEND(naive_tanhinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for tanh in-place operation
+ * @ingroup backend_system 
+ */
 tanhinplacefn tanhinplace;
+
+/** 
+ * @brief Makes the tanh in-place backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(tanhinplace);
 
+/** 
+ * @brief Sets the backend for tanh in-place operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for tanh in-place
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_tanhinplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(tanhinplace_backends, tanhinplace, backend_name, current_backend(tanhinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for tanh in-place operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_tanhinplace_backend() {
 	return current_backend(tanhinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available tanh in-place backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(tanhinplace);
+
+/**
+ * @brief Function declaration for getting the number of available tanh in-place backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(tanhinplace);
 
+/** @brief
+ * Calculates the hyperbolic tangent (tanh) for each tensor element
+ *
+ ** @details
+ * You can see all the details in nnl2_naive_tanhinplace including the full formula
+ *
+ ** @param tensor
+ * Pointer to the input tensor
+ *
+ ** @note
+ * For integer types, always returns float64
+ *
+ ** @return
+ * Pointer to the resulting tensor
+ *
+ ** @see nnl2_naive_tanhinplace
+ ** @see tanh
+ ** @see tanhf
+ **/
 Tensor* naive_tanh(Tensor* tensor) {	
-	int total_elems = product(tensor->shape, tensor->rank);	
-	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+
+	int total_elems = product(tensor->shape, tensor->rank);
 	TensorType dtype = tensor->dtype;
 	
 	if(dtype == INT32) dtype = FLOAT64;
 	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
+	if(total_elems == 0) return result;
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -13102,30 +13226,77 @@ Tensor* naive_tanh(Tensor* tensor) {
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (tanh)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return NULL;
 		}
 	}
 	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
 	return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for tanh operation
+ * @details
+ * Array follows the common backend registration pattern for hyperbolic tangent 
+ * operations. Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for tanh activation function
+ * 
+ * @see nnl2_naive
+ * @see naive_tanh
+ */
 Implementation tanh_backends[] = {
 	REGISTER_BACKEND(naive_tanh, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for tanh operation
+ * @ingroup backend_system 
+ */
 tanhfn nnl2_tanh;
+
+/** 
+ * @brief Makes the tanh backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(tanh);
 
+/** 
+ * @brief Sets the backend for tanh operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for tanh
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_tanh_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(tanh_backends, nnl2_tanh, backend_name, current_backend(tanh));
 }
 
+/** 
+ * @brief Gets the name of the active backend for tanh operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_tanh_backend() {
 	return current_backend(tanh);
 }
 
+/** 
+ * @brief Function declaration for getting all available tanh backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(tanh);
+
+/**
+ * @brief Function declaration for getting the number of available tanh backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(tanh);
 
 Tensor* naive_concat(const Tensor* tensora, const Tensor* tensorb, int axis) {
