@@ -12779,62 +12779,148 @@ DEFINE_GET_BACKENDS_FUNCTION(leakyrelu);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(leakyrelu);
 
+/** @brief
+ * Applies a sigmoid function to a tensor in place
+ *
+ ** @details
+ * Sigmoid function (I write from memory): sigmoid(x) = 1/exp(-x)
+ *
+ * Example 1: sigmoid(1) = 1/exp(-1) = 0.731
+ * Example 2: sigmoid(0.5) = 1/exp(-0.5) = 0.622
+ *
+ * oh, look, I think I've miscalculated the formula. Okay. Here's the correct formula:
+ * sigmoid(x) = 1 / (1 + exp(-x))
+ *
+ ** @param tensor
+ * A pointer to a tensor for conversion
+ *
+ * This @param is very useful, and without its documentation, 
+ * you probably wouldn't know what it does or why it's needed
+ *
+ ** @see nnl2_product
+ **/
 void naive_sigmoidinplace(Tensor* tensor) {
+	// Calculate total number of elements
 	int total_elems = product(tensor->shape, tensor->rank);	
+	if(total_elems == 0) return; // If 0 elems then return
+	
 	void* data = tensor->data;
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
 			double* cast_data = (double*)data;	
-			for(int i = 0; i < total_elems; i++) nnl2_sigmoid_float64_inplace(&cast_data[i]);
+			for(int i = 0; i < total_elems; i++) nnl2_sigmoid_float64_inplace(&cast_data[i]); // Maximum efficiency
 			break;
 		}
 		
 		case FLOAT32: {
 			float* cast_data = (float*)data;	
-			for(int i = 0; i < total_elems; i++) nnl2_sigmoid_float32_inplace(&cast_data[i]);
+			for(int i = 0; i < total_elems; i++) nnl2_sigmoid_float32_inplace(&cast_data[i]); // Maximum efficiency
 			break;
 		}
 		
 		case INT32: {
-			fprintf(stderr, "Error (Hello from C!): Sigmoid in-place cannot be applied to the provided tensor\n");
-			exit(EXIT_FAILURE);
+			NNL2_FATAL("Sigmoid in-place cannot be applied to the provided tensor");
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (sigmoid in-place)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for sigmoidinplace operation
+ * @details
+ * Array follows the common backend registration pattern for sigmoidinplace operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for in-place sigmoid activation function
+ * 
+ * @see nnl2_naive
+ * @see naive_sigmoidinplace
+ */
 Implementation sigmoidinplace_backends[] = {
 	REGISTER_BACKEND(naive_sigmoidinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for sigmoidinplace operation
+ * @ingroup backend_system 
+ */
 sigmoidinplacefn sigmoidinplace;
+
+/** 
+ * @brief Makes the sigmoidinplace backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(sigmoidinplace);
 
+/** 
+ * @brief Sets the backend for sigmoidinplace operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for sigmoidinplace
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_sigmoidinplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(sigmoidinplace_backends, sigmoidinplace, backend_name, current_backend(sigmoidinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for sigmoidinplace operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_sigmoidinplace_backend() {
 	return current_backend(sigmoidinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available sigmoidinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(sigmoidinplace);
+
+/**
+ * @brief Function declaration for getting the number of available sigmoidinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(sigmoidinplace);
 
+/** @brief
+ * Calculates the sigmoid function for each tensor element
+ *
+ ** @details
+ * Sigmoid function: sigmoid(x) = sigmoid(x) = 1 / (1 + exp(-x))
+ *
+ * Example 1: sigmoid(1) = 1 / (1 + exp(-1)) = 0.731
+ * Example 2: sigmoid(0.5) = 1 / (1 + exp(-0.5)) = 0.622
+ *
+ ** @note
+ * int32 Is automatically converted to float64
+ *
+ ** @return
+ * Pointer to a new tensor with the result of applying a sigmoid function
+ *
+ ** @see nnl2_sigmoid_float64
+ ** @see nnl2_sigmoid_float32
+ ** @see nnl2_empty
+ **/
 Tensor* naive_sigmoid(Tensor* tensor) {	
-	int total_elems = product(tensor->shape, tensor->rank);	
-	
+	size_t total_elems = product(tensor->shape, tensor->rank);	
 	TensorType dtype = tensor->dtype;
 	
 	if(dtype == INT32) dtype = FLOAT64;
 	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
+	
+	// Ultra mega super optimization
+	if(total_elems == 0) return result; // Increases speed by 100-150% (If tensor is empty then return empty result)
 	
 	void* data_t = tensor->data;
 	void* data_r = result->data;
@@ -12843,26 +12929,28 @@ Tensor* naive_sigmoid(Tensor* tensor) {
 		case INT32: {
 			int32_t* cast_data_t = (int32_t*)data_t;
 			double* cast_data_r = (double*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float64((double)cast_data_t[i]); 
+			
+			// For int32 return float64 tensor
+			for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float64((double)cast_data_t[i]); 
 			break;
 		}
 		
 		case FLOAT64: {
 			double* cast_data_t = (double*)data_t;	
 			double* cast_data_r = (double*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float64(cast_data_t[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float64(cast_data_t[i]);
 			break;
 		}
 		
 		case FLOAT32: {
 			float* cast_data_t = (float*)data_t;	
 			float* cast_data_r = (float*)data_r;
-			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float32(cast_data_t[i]);
+			for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_sigmoid_float32(cast_data_t[i]);
 			break;
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (sigmoid)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return NULL;
 		}
 	}
@@ -12870,23 +12958,65 @@ Tensor* naive_sigmoid(Tensor* tensor) {
 	return result;
 }
 
-
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for sigmoid operation
+ * @details
+ * Array follows the common backend registration pattern for sigmoid operations.
+ * Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for sigmoid activation function
+ * 
+ * @see nnl2_naive
+ * @see naive_sigmoid
+ */
 Implementation sigmoid_backends[] = {
 	REGISTER_BACKEND(naive_sigmoid, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for sigmoid operation
+ * @ingroup backend_system 
+ */
 sigmoidfn sigmoid;
+
+/** 
+ * @brief Makes the sigmoid backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(sigmoid);
 
+/** 
+ * @brief Sets the backend for sigmoid operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for sigmoid
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_sigmoid_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(sigmoid_backends, sigmoid, backend_name, current_backend(sigmoid));
 }
 
+/** 
+ * @brief Gets the name of the active backend for sigmoid operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_sigmoid_backend() {
 	return current_backend(sigmoid);
 }
 
+/** 
+ * @brief Function declaration for getting all available sigmoid backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(sigmoid);
+
+/**
+ * @brief Function declaration for getting the number of available sigmoid backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(sigmoid);
 
 void naive_tanhinplace(Tensor* tensor) {

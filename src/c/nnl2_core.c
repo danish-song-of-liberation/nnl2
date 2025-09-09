@@ -255,7 +255,7 @@ void lisp_call_absinplace(Tensor* tensor) {
 Tensor* lisp_call_abs(Tensor* tensor) {
 	return nnl2_abs(tensor);       
 }            
-      
+       
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
 }  
