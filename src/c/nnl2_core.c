@@ -125,7 +125,7 @@ void init_system() {
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));
-	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	 
+	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	     
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
 	INIT_BACKEND(axpf, axpf_backends);     
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
@@ -255,7 +255,7 @@ void lisp_call_absinplace(Tensor* tensor) {
 Tensor* lisp_call_abs(Tensor* tensor) {
 	return nnl2_abs(tensor);       
 }            
-    
+      
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
 }  
@@ -265,7 +265,7 @@ Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 }
   
 void lisp_call_reluinplace(Tensor* tensor) {
-	reluinplace(tensor);
+	reluinplace(tensor); 
 }  	
   
 Tensor* lisp_call_relu(Tensor* tensor) {
@@ -276,8 +276,8 @@ void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha); 
 }
  
-Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha) {
-	return leakyrelu(tensor, alpha);  
+Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
+	return leakyrelu(tensor, alpha, save_type);  
 }
 
 void lisp_call_sigmoidinplace(Tensor* tensor) {

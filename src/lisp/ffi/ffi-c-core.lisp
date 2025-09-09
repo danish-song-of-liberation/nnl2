@@ -403,7 +403,8 @@
   
 (cffi:defcfun ("lisp_call_leakyrelu" %.leaky-relu) :pointer
   (tensor :pointer)
-  (alpha :float))    
+  (alpha :float)
+  (save-type :bool))  
   
 (cffi:defcfun ("lisp_call_sigmoidinplace" %.sigmoid!) :void
   (tensor :pointer))  
