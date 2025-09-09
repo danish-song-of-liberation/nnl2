@@ -143,19 +143,27 @@ void nnl2_log_set_min_level(nnl2_log_level_t min_level);
 void nnl2_log_get_config(nnl2_log_config_t* out_config);
 
 // Main logging function
-void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* func, const char* format, ...);
+void nnl2_log(nnl2_log_level_t level, bool show_errno, const char* file, int line, const char* func, const char* format, ...);
 
 /// @name Logging Macros
 /// @brief Convenience macros for different log levels
 /// @{
 	
-/// @brief Generic log macro with auto file/line/function capture	
-#define NNL2_LOG(level, ...) nnl2_log(level, __FILE__, __LINE__, __func__, __VA_ARGS__) 
-#define NNL2_DEBUG(...)      NNL2_LOG(NNL2_LOG_LEVEL_DEBUG, __VA_ARGS__)
-#define NNL2_INFO(...)       NNL2_LOG(NNL2_LOG_LEVEL_INFO, __VA_ARGS__)
-#define NNL2_WARN(...)       NNL2_LOG(NNL2_LOG_LEVEL_WARNING, __VA_ARGS__)
-#define NNL2_ERROR(...)      NNL2_LOG(NNL2_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define NNL2_FATAL(...)      NNL2_LOG(NNL2_LOG_LEVEL_FATAL, __VA_ARGS__)
+/// @brief Generic log macro with auto file/line/function capture (without errno)	
+#define NNL2_LOG(level, show_errno, ...) nnl2_log(level, show_errno, __FILE__, __LINE__, __func__, __VA_ARGS__) 
+#define NNL2_DEBUG(...)      NNL2_LOG(NNL2_LOG_LEVEL_DEBUG, false, __VA_ARGS__)
+#define NNL2_INFO(...)       NNL2_LOG(NNL2_LOG_LEVEL_INFO, false, __VA_ARGS__)
+#define NNL2_WARN(...)       NNL2_LOG(NNL2_LOG_LEVEL_WARNING, false, __VA_ARGS__)
+#define NNL2_ERROR(...)      NNL2_LOG(NNL2_LOG_LEVEL_ERROR, false, __VA_ARGS__)
+#define NNL2_FATAL(...)      NNL2_LOG(NNL2_LOG_LEVEL_FATAL, false, __VA_ARGS__)
+	
+/// @brief Generic log macro with auto file/line/function capture (with errno)	
+#define NNL2_LOG(level, show_errno, ...) nnl2_log(level, show_errno, __FILE__, __LINE__, __func__, __VA_ARGS__) 
+#define NNL2_DEBUG_WITH_ERRNO(...)      NNL2_LOG(NNL2_LOG_LEVEL_DEBUG, true, __VA_ARGS__)
+#define NNL2_INFO_WITH_ERRNO(...)       NNL2_LOG(NNL2_LOG_LEVEL_INFO, true, __VA_ARGS__)
+#define NNL2_WARN_WITH_ERRNO(...)       NNL2_LOG(NNL2_LOG_LEVEL_WARNING, true, __VA_ARGS__)
+#define NNL2_ERROR_WITH_ERRNO(...)      NNL2_LOG(NNL2_LOG_LEVEL_ERROR, true, __VA_ARGS__)
+#define NNL2_FATAL_WITH_ERRNO(...)      NNL2_LOG(NNL2_LOG_LEVEL_FATAL, true, __VA_ARGS__)
 
 /** 
  * @brief Log function entry (debug level)
@@ -244,9 +252,11 @@ void nnl2_log_get_config(nnl2_log_config_t* out_config) {
  * and function, automatic handling of system errors (errno), and filtering 
  * by logging levels
  *
- **
  ** @param level
  * Message importance level (from nnl2_log_level_t)
+ *
+ ** @param show_errno
+ * Whether to include system error information from errno
  *
  ** @param file 
  * Name of the source file (usually __FILE__)
@@ -272,6 +282,7 @@ void nnl2_log_get_config(nnl2_log_config_t* out_config) {
  *
  ** @note
  * For system errors, a description is automatically added from strerror()
+ * only if show_errno is true and errno is set
  *
  **	
  ** @warning
@@ -284,10 +295,11 @@ void nnl2_log_get_config(nnl2_log_config_t* out_config) {
  ** @par Example:
  ** @code
  * // Instead of a direct call:
- * // nnl2_log(NNL2_LOG_LEVEL_ERROR, "file.c", 42, "main", "Error: %s", "message");
+ * // nnl2_log(NNL2_LOG_LEVEL_ERROR, true, "file.c", 42, "main", "Error: %s", "message");
  *
  * // Use macros:
- * NNL2_ERROR("Error: %s", "message");
+ * NNL2_ERROR("Error without system info: %s", "message");
+ * NNL2_ERROR_WITH_ERRNO("Error: %s", "message");
  ** @endcode
  **
  ** @see nnl2_log_config_t
@@ -298,10 +310,15 @@ void nnl2_log_get_config(nnl2_log_config_t* out_config) {
  ** @see NNL2_WARN()
  ** @see NNL2_ERROR()
  ** @see NNL2_FATAL()
+ ** @see NNL2_DEBUG_WITH_ERRNO()
+ ** @see NNL2_INFO_WITH_ERRNO()
+ ** @see NNL2_WARN_WITH_ERRNO()
+ ** @see NNL2_ERROR_WITH_ERRNO()
+ ** @see NNL2_FATAL_WITH_ERRNO()
  **
  ** @ingroup logging
  **/
-void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* func, const char* format, ...) {
+void nnl2_log(nnl2_log_level_t level, bool show_errno, const char* file, int line, const char* func, const char* format, ...) {
     // Checking the logging level	
     if (level < nnl2_log_current_config.min_log_level) {
         return;
@@ -342,12 +359,13 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
     }
 
     // Saving a system error
-	int saved_errno = errno;
-	
+    int saved_errno = errno;
+    
+    // For DEBUG level, always ignore errno
     if (level == NNL2_LOG_LEVEL_DEBUG) {
         saved_errno = 0;
     }
-	
+
     const char* sys_error = (saved_errno != 0) ? strerror(saved_errno) : "";
 
     va_list args;
@@ -389,10 +407,9 @@ void nnl2_log(nnl2_log_level_t level, const char* file, int line, const char* fu
     // Main message
     vfprintf(stderr, format, args);
 
-    // System error
-    if (saved_errno != 0) {
-        fprintf(stderr, NNL2_LOG_SYSTEM_ERROR_PREFIX "%d" NNL2_LOG_SYSTEM_ERROR_SUFFIX "%s" NNL2_LOG_SYSTEM_ERROR_END, 
-                saved_errno, sys_error);
+    // Show system error only if errno was actually set and show_errno is true
+    if (saved_errno != 0 && show_errno) {
+        fprintf(stderr, NNL2_LOG_SYSTEM_ERROR_PREFIX "%d" NNL2_LOG_SYSTEM_ERROR_SUFFIX "%s" NNL2_LOG_SYSTEM_ERROR_END, saved_errno, sys_error);
     }
 
     // Reset color and translate rows

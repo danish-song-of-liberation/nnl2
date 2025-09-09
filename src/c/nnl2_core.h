@@ -5,6 +5,8 @@
 #include <math.h>
 #include <time.h>
 
+#include "nnl2_log.h"
+
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H
 
@@ -64,7 +66,7 @@ static inline void nnl2_leaky_relu_int32_inplace(int32_t* a, float alpha) {
 		float result = (*a * alpha);
 		
 		if(fmodf(result, 1.0f) != 0.0f) {
-			fprintf(stderr, "Error (Hello from C!): Leaky ReLU cannot be applied to the provided tensor\n");
+			NNL2_FATAL("Leaky ReLU cannot be applied to the provided tensor");
 			exit(EXIT_FAILURE);
 		} else {
 			*a = (int32_t)result;

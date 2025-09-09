@@ -125,12 +125,12 @@ void init_system() {
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));
-	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	
+	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	 
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
 	INIT_BACKEND(axpf, axpf_backends);     
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
-}                                                
+}                                                  
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_view(tensor, indices, num_indices); 
