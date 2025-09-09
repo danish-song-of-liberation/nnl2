@@ -258,7 +258,7 @@ Tensor* lisp_call_abs(Tensor* tensor) {
         
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
-}         
+}            
 
 Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {  
 	return vstack(tensora, tensorb);

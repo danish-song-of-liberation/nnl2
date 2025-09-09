@@ -13911,12 +13911,32 @@ DEFINE_GET_BACKENDS_FUNCTION(xavier);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(xavier);
 
+/** @brief
+ * Transposes a matrix in place (naive implementation)
+ *
+ ** @warning
+ * Not thread-safe
+ *
+ ** @param tensor
+ * Pointer to a tensor for transposition
+ *
+ ** @see product
+ ** @see https://en.wikipedia.org/wiki/Dont_repeat_yourself 
+ **/
 void naive_transposeinplace(Tensor* tensor) {
-	if(tensor->rank < 2) {
-		fprintf(stderr, "Error (Hello from C!): Provided an incorrect tensor at transpose in-place\n");
-		return;
-	}
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
 	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		int32_t tensor_rank = tensor->rank;
+		if(tensor_rank < 2 || tensor_rank > 2) {
+			NNL2_FATAL("Tensor have an incorrect rank: %d (expected 2)", tensor_rank);
+			return;
+		}
+	#endif
+	
+	// Calculating the total number of elements in a tensor
 	size_t total_elems = product(tensor->shape, tensor->rank);
 	
 	int* shape = tensor->shape;
@@ -13928,23 +13948,26 @@ void naive_transposeinplace(Tensor* tensor) {
 		case FLOAT64: {
 			size_t total_bytes = total_elems * sizeof(double);
 			
+			// Allocating memory for temporary storage of the transposed matrix
 			double* trans_data = (double*)malloc(total_bytes);
 			double* cast_data = (double*)tensor->data;
 			
 			if (trans_data == NULL) {
-				fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+				NNL2_ERROR("Memory allocation failed");
 				return;
 			}
 			
+			// Matrix transposition: element [i][j] -> [j][i]
 			for(int i = 0; i < rows; i++) {
 				for(int j = 0; j < cols; j++) {
-					int orig_index = i * cols + j;
-					int trans_index = j * rows + i;
+					int orig_index = i * cols + j;   // Index in the original matrix
+					int trans_index = j * rows + i;  // Index in the transposed matrix
 					
 					trans_data[trans_index] = cast_data[orig_index];
 				}
 			}
 			
+			// Copying the result back to the original tensor
 			memcpy(cast_data, trans_data, total_bytes);
 			free(trans_data);
 			
@@ -13954,23 +13977,26 @@ void naive_transposeinplace(Tensor* tensor) {
 		case FLOAT32: {
 			size_t total_bytes = total_elems * sizeof(float);
 			
+			// Allocating memory for temporary storage of the transposed matrix
 			float* trans_data = (float*)malloc(total_bytes);
 			float* cast_data = (float*)tensor->data;
 			
 			if (trans_data == NULL) {
-				fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+				NNL2_ERROR("Memory allocation failed");
 				return;
 			}
 			
+			// Matrix transposition: element [i][j] -> [j][i]
 			for(int i = 0; i < rows; i++) {
 				for(int j = 0; j < cols; j++) { 
-					int orig_index = i * cols + j;
-					int trans_index = j * rows + i;
+					int orig_index = i * cols + j;   // Index in the original matrix
+					int trans_index = j * rows + i;  // Index in the transposed matrix
 					
 					trans_data[trans_index] = cast_data[orig_index];
 				}
 			}
 			
+			// Copying the result back to the original tensor
 			memcpy(cast_data, trans_data, total_bytes);
 			free(trans_data);
 			
@@ -13980,23 +14006,26 @@ void naive_transposeinplace(Tensor* tensor) {
 		case INT32: {
 			size_t total_bytes = total_elems * sizeof(int32_t);
 			
+			// Allocating memory for temporary storage of the transposed matrix
 			int32_t* trans_data = (int32_t*)malloc(total_bytes);
 			int32_t* cast_data = (int32_t*)tensor->data;
 			
 			if (trans_data == NULL) {
-				fprintf(stderr, "Error (Hello from C!): Memory allocation failed\n");
+				NNL2_ERROR("Memory allocation failed");
 				return;
 			}
 			
+			// Matrix transposition: element [i][j] -> [j][i]
 			for(int i = 0; i < rows; i++) {
 				for(int j = 0; j < cols; j++) { 
-					int orig_index = i * cols + j;
-					int trans_index = j * rows + i;
+					int orig_index = i * cols + j;   // Index in the original matrix
+					int trans_index = j * rows + i;  // Index in the transposed matrix
 					
 					trans_data[trans_index] = cast_data[orig_index];
 				}
 			}
 			
+			// Copying the result back to the original tensor
 			memcpy(cast_data, trans_data, total_bytes);
 			free(trans_data);
 			
@@ -14004,37 +14033,108 @@ void naive_transposeinplace(Tensor* tensor) {
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (transpose in-place)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return;
 		}
 	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for transposeinplace operation
+ * @details
+ * Array follows the common backend registration pattern for in-place transpose
+ * operations. Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for in-place transpose
+ * 
+ * @see nnl2_naive
+ * @see naive_transposeinplace
+ */
 Implementation transposeinplace_backends[] = {
 	REGISTER_BACKEND(naive_transposeinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for transposeinplace operation
+ * @ingroup backend_system 
+ */
 transposeinplacefn transposeinplace;
+
+/** 
+ * @brief Makes the transposeinplace backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(transposeinplace);
 
+/** 
+ * @brief Sets the backend for transposeinplace operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for transposeinplace
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_transposeinplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(transposeinplace_backends, transposeinplace, backend_name, current_backend(transposeinplace));
 }
 
+/** 
+ * @brief Gets the name of the active backend for transposeinplace operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_transposeinplace_backend() {
 	return current_backend(transposeinplace);
 }
 
+/** 
+ * @brief Function declaration for getting all available transposeinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(transposeinplace);
+
+/**
+ * @brief Function declaration for getting the number of available transposeinplace backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(transposeinplace);
 
-Tensor* naive_transpose(const Tensor* tensor) {
-	if(tensor->rank < 2) {
-		fprintf(stderr, "Error (Hello from C!): Provided an incorrect tensor at transpose in-place\n");
-		return NULL;
-	}
+/** @brief 
+ * Performs 2D tensor transposition using a naive method
+ *
+ ** @param tensor 
+ * Pointer to the original tensor
+ *
+ ** @return
+ * Tensor* Pointer to a transposed tensor
+ *
+ ** @see https://en.wikipedia.org/wiki/Dont_repeat_yourself 
+ **/
+Tensor* naive_transpose(Tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
 	
+	// Make sure the tensor is 2D
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		int32_t tensor_rank = tensor->rank;
+		if(tensor_rank < 2 || tensor_rank > 2) {
+			NNL2_FATAL("Tensor have an incorrect rank: %d (expected 2)", tensor_rank);
+			return NULL;
+		}
+	#endif
+	
+	// Create a tensor result with the same parameters, but swap the shape
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	if (result == NULL) {
+        NNL2_FATAL("Failed to initialize the tensor in transposition");
+		return NULL;
+    }
 
 	int rows = tensor->shape[0];
 	int cols = tensor->shape[1];
@@ -14044,10 +14144,11 @@ Tensor* naive_transpose(const Tensor* tensor) {
 			double* src_data = (double*)tensor->data;
 			double* dest_data = (double*)result->data;
 
+			// Transposition: element [i][j] becomes [j][i]
 			for(int i = 0; i < rows; i++) {
 				for(int j = 0; j < cols; j++) {
-					int orig_index = i * cols + j;
-					int trans_index = j * rows + i;
+					int orig_index = i * cols + j;   // Index in the original matrix
+					int trans_index = j * rows + i;  // Index in the transposed matrix
 
 					dest_data[trans_index] = src_data[orig_index];
 				}
@@ -14060,10 +14161,11 @@ Tensor* naive_transpose(const Tensor* tensor) {
 			float* src_data = (float*)tensor->data;
 			float* dest_data = (float*)result->data;
 
+			// Transposition: element [i][j] becomes [j][i]
 			for(int i = 0; i < rows; i++) {
 				for(int j = 0; j < cols; j++) {
-					int orig_index = i * cols + j;
-					int trans_index = j * rows + i;
+					int orig_index = i * cols + j;   // Index in the original matrix
+					int trans_index = j * rows + i;  // Index in the transposed matrix
 
 					dest_data[trans_index] = src_data[orig_index];
 				}
@@ -14076,10 +14178,11 @@ Tensor* naive_transpose(const Tensor* tensor) {
 			int32_t* src_data = (int32_t*)tensor->data;
 			int32_t* dest_data = (int32_t*)result->data;
 
+			// Transposition: element [i][j] becomes [j][i]
 			for(int i = 0; i < rows; i++) {
 				for(int j = 0; j < cols; j++) {
-					int orig_index = i * cols + j;
-					int trans_index = j * rows + i;
+					int orig_index = i * cols + j;   // Index in the original matrix
+					int trans_index = j * rows + i;  // Index in the transposed matrix
 
 					dest_data[trans_index] = src_data[orig_index];
 				}
@@ -14089,30 +14192,77 @@ Tensor* naive_transpose(const Tensor* tensor) {
 		}
 		
 		default: {
-			fprintf(stderr, "Error (Hello from C!): Bad data-type (transpose)\n");
+			NNL2_TYPE_ERROR(tensor->dtype);
 			return NULL;
 		}
 	}
 	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+	
 	return result;
 }
 
+/**
+ * @ingroup backend_system
+ * @brief Backend implementations for transpose operation
+ * @details
+ * Array follows the common backend registration pattern for transpose
+ * operations. Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for transpose
+ * 
+ * @see nnl2_naive
+ * @see naive_transpose
+ */
 Implementation transpose_backends[] = {
-	REGISTER_BACKEND(naive_transpose, nnl2_naive, NAIVE_BACKEND_NAME),
+    REGISTER_BACKEND(naive_transpose, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
+/**
+ * @brief Function pointer for transpose operation
+ * @ingroup backend_system 
+ */
 transposefn transpose;
+
+/** 
+ * @brief Makes the transpose backend current
+ * @ingroup backend_system
+ * @see make_current_backend
+ */
 make_current_backend(transpose);
 
+/** 
+ * @brief Sets the backend for transpose operation
+ * @ingroup backend_system
+ * @param backend_name Name of the backend to activate for transpose
+ * @see ESET_BACKEND_BY_NAME
+ */
 void set_transpose_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(transpose_backends, transpose, backend_name, current_backend(transpose));
 }
 
+/** 
+ * @brief Gets the name of the active backend for transpose operation
+ * @ingroup backend_system
+ * @return Name of the current backend as constant string
+ */
 const char* get_transpose_backend() {
-	return current_backend(transpose);
+    return current_backend(transpose);
 }
 
+/** 
+ * @brief Function declaration for getting all available transpose backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_BACKENDS_FUNCTION
+ */
 DEFINE_GET_BACKENDS_FUNCTION(transpose);
+
+/**
+ * @brief Function declaration for getting the number of available transpose backends
+ * @ingroup backend_system
+ * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
+ */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(transpose);
 
 void naive_sum(const Tensor* tensor, int* axes, int num_axes, void* result) {
