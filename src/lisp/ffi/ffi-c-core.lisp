@@ -424,11 +424,13 @@
 (cffi:defcfun ("lisp_call_transpose" %transpose) :pointer
   (tensor :pointer))  
   
-(cffi:defcfun ("lisp_call_sum" %sum) :void
+(cffi:defcfun ("lisp_call_sum_without_axis" %sum-without-axis) :void
   (tensor :pointer)
-  (axes :pointer)
-  (num-axes :int)
   (out :pointer))  
+  
+(cffi:defcfun ("lisp_call_sum_with_axis" %sum-with-axis) tensor
+  (tensor :pointer)
+  (axis :int))    
   
 (cffi:defcfun ("lisp_call_l2norm" %l2norm) :void
   (tensor :pointer)
@@ -619,8 +621,11 @@
 (cffi:defcfun ("set_transpose_backend" %set-transpose-backend) :void
   (backend-name :string))  
   	
-(cffi:defcfun ("set_sum_backend" %set-sum-backend) :void
+(cffi:defcfun ("set_sum_without_axis_backend" %set-sum-without-axis-backend) :void
   (backend-name :string))  
+  
+(cffi:defcfun ("set_sum_with_axis_backend" %set-sum-with-axis-backend) :void
+  (backend-name :string))   
   	
 (cffi:defcfun ("set_l2norm_backend" %set-l2norm-backend) :void
   (backend-name :string))  
@@ -776,7 +781,7 @@
 (cffi:defcfun ("get_xavier_backend" %get-xavier-backend) :string) 
 (cffi:defcfun ("get_transposeinplace_backend" %get-transposeinplace-backend) :string) 
 (cffi:defcfun ("get_transpose_backend" %get-transpose-backend) :string) 
-(cffi:defcfun ("get_sum_backend" %get-sum-backend) :string) 
+(cffi:defcfun ("get_sum_without_axis_backend" %get-sum-without-axis-backend) :string) 
 (cffi:defcfun ("get_l2norm_backend" %get-l2norm-backend) :string) 
 (cffi:defcfun ("get_copy_backend" %get-copy-backend) :string) 
 (cffi:defcfun ("get_axpy_inplace_backend" %get-axpy-inplace-backend) :string) 
@@ -868,8 +873,8 @@
 (cffi:defcfun ("get_transposeinplace_backends" %get-transposeinplace-backends) :pointer)
 (cffi:defcfun ("get_transpose_num_backends" %get-transpose-num-backends) :int)
 (cffi:defcfun ("get_transpose_backends" %get-transpose-backends) :pointer)
-(cffi:defcfun ("get_sum_num_backends" %get-sum-num-backends) :int)
-(cffi:defcfun ("get_sum_backends" %get-sum-backends) :pointer)
+(cffi:defcfun ("get_sum_without_axis_num_backends" %get-sum-without-axis-num-backends) :int)
+(cffi:defcfun ("get_sum_without_axis_backends" %get-sum-without-axis-backends) :pointer)
 (cffi:defcfun ("get_l2norm_num_backends" %get-l2norm-num-backends) :int)
 (cffi:defcfun ("get_l2norm_backends" %get-l2norm-backends) :pointer)
 (cffi:defcfun ("get_copy_num_backends" %get-copy-num-backends) :int)

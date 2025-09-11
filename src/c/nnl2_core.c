@@ -13,7 +13,7 @@
 #ifdef __SSE3__ 
 #include <pmmintrin.h>   
 #endif 
-  
+         
 #ifdef __SSSE3__
 #include <tmmintrin.h>
 #endif 
@@ -92,8 +92,9 @@ void init_system() {
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));  
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
-	EINIT_BACKEND(nnl2_sum, sum_backends, current_backend(sum));    
-	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));  
+	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
+	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);
+	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));      
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
 	INIT_BACKEND(add_incf, add_incf_backends);    
@@ -106,7 +107,7 @@ void init_system() {
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(pow_powf, pow_powf_backends);   
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);         
-	INIT_BACKEND(max_maxf, max_maxf_backends); 
+	INIT_BACKEND(max_maxf, max_maxf_backends);    
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);     
 	INIT_BACKEND(min_minf, min_minf_backends);    
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
@@ -150,7 +151,7 @@ Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
      
 Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
 	return nnl2_zeros(shape, rank, dtype);  
-}  	  	             
+}  	  	                     
          
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
@@ -244,21 +245,21 @@ Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
 	return nnl2_max(tensora, tensorb);  
 } 
   
-Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) {
-	return nnl2_min(tensora, tensorb);   
+Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) { 
+	return nnl2_min(tensora, tensorb);    
 }  
   
 void lisp_call_absinplace(Tensor* tensor) {
 	absinplace(tensor);     
 }
   
-Tensor* lisp_call_abs(Tensor* tensor) {
+Tensor* lisp_call_abs(Tensor* tensor) {     
 	return nnl2_abs(tensor);       
 }            
         
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
-}            
+}               
 
 Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {  
 	return vstack(tensora, tensorb);
@@ -313,19 +314,23 @@ void lisp_call_transposeinplace(Tensor* tensor) {
 }  
 
 Tensor* lisp_call_transpose(Tensor* tensor) {
-	return transpose(tensor);  
+	return transpose(tensor);    
 }
 
-void lisp_call_sum(Tensor* tensor, int* axes, int num_axes) {
-	nnl2_sum(tensor, axes, num_axes);
+void lisp_call_sum_without_axis(Tensor* tensor, void* filler) {
+	nnl2_sum_without_axis(tensor, filler);
+}
+
+void lisp_call_sum_with_axis(Tensor* tensor, int axis) {
+	nnl2_sum_with_axis(tensor, axis);
 }
 
 void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
-	l2norm(tensor, axes, num_axes);
+	l2norm(tensor, axes, num_axes); 
 }
 
 Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
-	return nnl2_copy(tensor, copy_type);  
+	return nnl2_copy(tensor, copy_type);    
 } 
    
 void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) { 

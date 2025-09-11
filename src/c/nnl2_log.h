@@ -190,7 +190,7 @@ void nnl2_log(nnl2_log_level_t level, bool show_errno, const char* file, int lin
 
 /// @}
 
-#define NNL2_DEBUG_MODE NNL2_DEBUG_MODE_OFF // 0
+#define NNL2_DEBUG_MODE NNL2_DEBUG_MODE_FULL // 0
 
 // --------------- Realization ---------------
 

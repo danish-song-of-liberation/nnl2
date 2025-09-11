@@ -64,7 +64,8 @@
    #:%xavier
    #:%transpose!
    #:%transpose
-   #:%sum
+   #:%sum-without-axis	
+   #:%sum-with-axis	
    #:%l2norm
    #:%copy
    #:%.+/incf!
@@ -148,7 +149,8 @@
    #:%set-xavier-backend
    #:%set-transposeinplace-backend
    #:%set-transpose-backend
-   #:%set-sum-backend
+   #:%set-sum-without-axis-backend
+   #:%set-sum-with-axis-backend
    #:%set-l2norm-backend
    #:%set-copy-backend
    #:%set-add-incf-inplace-backend
@@ -230,7 +232,7 @@
    #:%get-xavier-backend
    #:%get-transpose-backend
    #:%get-transposeinplace-backend
-   #:%get-sum-backend
+   #:%get-sum-without-axis-backend
    #:%get-l2norm-backend
    #:%get-copy-backend
    #:%get-axpy-inplace-backend
@@ -325,8 +327,8 @@
    #:%get-transposeinplace-backends
    #:%get-transpose-num-backends
    #:%get-transpose-backends
-   #:%get-sum-num-backends
-   #:%get-sum-backends
+   #:%get-sum-without-axis-num-backends
+   #:%get-sum-without-axis-backends
    #:%get-l2norm-num-backends
    #:%get-l2norm-backends
    #:%get-copy-num-backends

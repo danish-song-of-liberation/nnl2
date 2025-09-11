@@ -213,7 +213,8 @@
 
 (defun use-backend/sum (name)	
   (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-sum-backend sig)))
+    (nnl2.ffi:%set-sum-without-axis-backend sig)
+	(nnl2.ffi:%set-sum-with-axis-backend sig)))
 
 (defun use-backend/l2norm (name)	
   (let ((sig (symbol-to-uppercase-string name)))
@@ -548,14 +549,14 @@
   (use-backend/transpose name))
 	
 (defun get-backend/sum ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-sum-backend)))	
+  (uppercase-string-to-symbol (nnl2.ffi:%get-sum-without-axis-backend)))	
   
 (defun (setf get-backend/sum) (name)
   (use-backend/sum name))  
   
 (defun get-backend/norm (&key (p :l2))
   (case p
-    (:l2 (uppercase-string-to-symbol (nnl2.ffi:%get-sum-backend)))
+    (:l2 (uppercase-string-to-symbol (nnl2.ffi:%get-l2norm-backend)))
 	(otherwise (error "Incorrect :p key in norm~%"))))
 
 (defun (setf get-backend/norm) (name &key (p :l2))
@@ -899,8 +900,8 @@
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
 		  
 (defun get-backends/sum ()
-  (let ((num-backends (nnl2.ffi:%get-sum-num-backends))
-	    (backends (nnl2.ffi:%get-sum-backends)))
+  (let ((num-backends (nnl2.ffi:%get-sum-without-axis-num-backends))
+	    (backends (nnl2.ffi:%get-sum-without-axis-backends)))
 		
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
