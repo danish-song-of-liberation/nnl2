@@ -13,7 +13,7 @@
 #ifdef __SSE3__ 
 #include <pmmintrin.h>   
 #endif 
-          
+             
 #ifdef __SSSE3__
 #include <tmmintrin.h>
 #endif 
@@ -87,7 +87,7 @@ void init_system() {
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(tanhinplace, tanhinplace_backends, current_backend(tanhinplace)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
-	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));     
+	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));        
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn));  
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));  
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
