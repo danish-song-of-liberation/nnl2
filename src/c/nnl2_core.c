@@ -34,7 +34,7 @@
 #include "backends_status/nnl2_status.h"  
 
 #include <stdlib.h>
-#include <time.h> 
+#include <time.h>     
         
 void init_system() {      
 	srand(time(NULL));             
@@ -56,9 +56,9 @@ void init_system() {
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
-	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));      
-	EINIT_BACKEND(add, add_backends, current_backend(add));   
-	EINIT_BACKEND(sub, sub_backends, current_backend(sub));       
+	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));            
+	EINIT_BACKEND(add, add_backends, current_backend(add));               
+	EINIT_BACKEND(sub, sub_backends, current_backend(sub));        
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace));  
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));         
 	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	       
@@ -87,9 +87,9 @@ void init_system() {
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(tanhinplace, tanhinplace_backends, current_backend(tanhinplace)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
-	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));        
+	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));           
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn));  
-	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));  
+	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
@@ -101,7 +101,7 @@ void init_system() {
 	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends); 
 	INIT_BACKEND(sub_decf, sub_decf_backends); 
 	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends);  
-	INIT_BACKEND(mul_mulf, mul_mulf_backends); 
+	INIT_BACKEND(mul_mulf, mul_mulf_backends);          
 	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);    
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
@@ -441,7 +441,7 @@ Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) {
 	return max_broadcasting(a, b);
 }
 
-Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) { 
+Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) {        
 	return min_broadcasting(a, b);
 } 
 
@@ -451,7 +451,7 @@ void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 
 Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 	return axpy(summand, sumend, alpha);    
-} 
+}     
 
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 	axpf_inplace(summand, sumend, alpha); 
