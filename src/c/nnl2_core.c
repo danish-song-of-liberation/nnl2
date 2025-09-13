@@ -430,13 +430,13 @@ Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) {
 }
 	 
 void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {
-	return max_broadcasting_inplace(a, b);
+	return max_broadcasting_inplace(a, b); 
 }
 
 void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {
 	return min_broadcasting_inplace(a, b);
 }
-
+ 
 Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) { 
 	return max_broadcasting(a, b);
 }

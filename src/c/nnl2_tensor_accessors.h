@@ -103,21 +103,15 @@
 #define NNL2_ORDER_ERROR(transmitted_order) NNL2_ERROR("Invalid order: %d", transmitted_order)
 #define NNL2_TRANS_ERROR(transmitted_trans) NNL2_ERROR("Invalid trans: %d", transmitted_trans)
 
-#define NNL2_CHECK_NULL_IF_ERR_RETURN(ptr, msg, exit_p) \
+#define NNL2_CHECK_NULL_IF_ERR_RETURN(ptr, msg) \
         if (ptr == NULL) { \
             NNL2_ERROR(msg); \
-			if(exit_p) { \
-				NNL2_FUNC_EXIT(); \
-			} \
             return; \
         }
 		
-#define NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ptr, msg, exit_p, val) \
+#define NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ptr, msg, val) \
         if (ptr == NULL) { \
             NNL2_ERROR(msg); \
-			if(exit_p) { \
-				NNL2_FUNC_EXIT(); \
-			} \
             return val; \
         }		
 
@@ -4578,13 +4572,11 @@ void nnl2_naive_addinplace(Tensor* summand, const Tensor* addend) {
 	
 	// Additional checks at the maximum safety level
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-	
-		NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL", sufficient_debug_mode_p);
-		NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL", sufficient_debug_mode_p);
+		NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL");
 		
-		NNL2_CHECK_NULL_IF_ERR_RETURN(addend, "Addend tensor is NULL", sufficient_debug_mode_p);
-		NNL2_CHECK_NULL_IF_ERR_RETURN(addend->data, "Addend tensor's data is NULL", sufficient_debug_mode_p);
+		NNL2_CHECK_NULL_IF_ERR_RETURN(addend, "Addend tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(addend->data, "Addend tensor's data is NULL");
 	#endif
 	
 	// Calculating the total number of elements in the summand tensor
@@ -4799,14 +4791,12 @@ void nnl2_avx256_addinplace(Tensor* summand, const Tensor* addend) {
     #endif
 	
 	// Additional checks at the maximum safety level
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL", sufficient_debug_mode_p);
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX  
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(addend, "Addend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(addend->data, "Addend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(addend, "Addend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(addend->data, "Addend tensor's data is NULL");
     #endif
 	
 	// Calculating the total number of elements in the summand tensor
@@ -5380,13 +5370,11 @@ void nnl2_naive_subinplace(Tensor* minuend, const Tensor* subtrahend) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->data, "Minuend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->data, "Minuend tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->data, "Subtrahend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->data, "Subtrahend tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the minuend tensor
@@ -5602,13 +5590,11 @@ void nnl2_avx256_subinplace(Tensor* minuend, const Tensor* subtrahend) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->data, "Minuend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->data, "Minuend tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->data, "Subtrahend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->data, "Subtrahend tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the minuend tensor
@@ -7466,14 +7452,12 @@ void nnl2_naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
     #endif
     
     // Additional checks at the maximum safety level
-    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand, "Multiplicand tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand->data, "Multiplicand tensor's data is NULL", sufficient_debug_mode_p);
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX   
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand, "Multiplicand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand->data, "Multiplicand tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier->data, "Multiplier tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier->data, "Multiplier tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the multiplicand tensor
@@ -7685,13 +7669,11 @@ void nnl2_naive_divinplace(Tensor* dividend, const Tensor* divisor) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend, "Dividend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend->data, "Dividend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend, "Dividend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend->data, "Dividend tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor->data, "Divisor tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor->data, "Divisor tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the dividend tensor
@@ -8117,12 +8099,10 @@ Tensor* naive_copy(Tensor* tensor, TensorType copy_type) {
 	
 	// Additional checks depending on the safety level
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX);
-		
 		// NULL checks
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", NULL);
 	#endif
 	
 	TensorType dtype = tensor->dtype;
@@ -8594,13 +8574,11 @@ void naive_powinplace(Tensor* base, const Tensor* exponent) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(base, "Base tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(base->data, "Base tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(base, "Base tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(base->data, "Base tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent, "Exponent tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent->data, "Exponent tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent, "Exponent tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent->data, "Exponent tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the base tensor
@@ -8812,10 +8790,8 @@ Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
 	
 	// Additional checks on maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-	
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Base tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Exponent tensor is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Base tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Exponent tensor is NULL", NULL);
 	#endif
 	
     // Calculate the total number of elements in the tensors
@@ -9038,9 +9014,7 @@ void nnl2_naive_expinplace(Tensor* tensor) {
 	if(len == 0) return;
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "A NULL tensor was passed to .exp!", sufficient_debug_mode_p);
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "A NULL tensor was passed to .exp!");
 	#endif
 	
 	switch(tensor->dtype) {
@@ -9325,9 +9299,7 @@ void nnl2_naive_loginplace(Tensor* tensor) {
 	if(len == 0) return;
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "A NULL tensor was passed to .log!", sufficient_debug_mode_p);
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "A NULL tensor was passed to .log!");
 	#endif
 	
 	switch(tensor->dtype) {
@@ -9994,11 +9966,9 @@ Tensor* nnl2_naive_scale(const Tensor* tensor, float multiplier, bool save_type)
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_SAFETY_MODE > NNL2_SAFETY_MODE_MAX);
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", NULL);
 	#endif
 	
 	Tensor* result;
@@ -10257,13 +10227,11 @@ void naive_maxinplace(Tensor* tensora, Tensor* tensorb) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the first tensor
@@ -10474,13 +10442,11 @@ void naive_mininplace(Tensor* tensora, const Tensor* tensorb) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the first tensor
@@ -10692,12 +10658,10 @@ Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
 	
 	// Additional checks on maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-	
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora, "First tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora->data, "First tensor data is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb, "Second tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora, "First tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora->data, "First tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb, "Second tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", NULL);
 	#endif
 	
     // Calculate the total number of elements in the tensors
@@ -10932,12 +10896,10 @@ Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
 	
 	// Additional checks on maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-	
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora, "First tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora->data, "First tensor data is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb, "Second tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora, "First tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensora->data, "First tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb, "Second tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", NULL);
 	#endif
 	
     // Calculate the total number of elements in the tensors
@@ -16152,12 +16114,10 @@ void naive_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	
 	// Additional checks for max safety level 
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL", sufficient_debug_mode_p);
-		NNL2_CHECK_NULL_IF_ERR_RETURN(sumend, "Sumend tensor is NULL", sufficient_debug_mode_p);
-		NNL2_CHECK_NULL_IF_ERR_RETURN(summand->shape, "Summand shape is NULL", sufficient_debug_mode_p);
-		NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->shape, "Sumend shape is NULL", sufficient_debug_mode_p);
+		NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(sumend, "Sumend tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(summand->shape, "Summand shape is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->shape, "Sumend shape is NULL");
 	#endif
 	
 	// Calculate the total number of elements in each tensor
@@ -16335,12 +16295,10 @@ Tensor* naive_add_broadcasting(Tensor* summand, Tensor* sumend) {
 	
 	// Additional checks for max safety level 
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->shape, "Summand shape is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->shape, "Sumend shape is NULL", sufficient_debug_mode_p, NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->shape, "Summand shape is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->shape, "Sumend shape is NULL", NULL);
 	#endif
  
 	// Calculate the total number of elements in each tensor
@@ -16548,13 +16506,11 @@ void naive_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend) {
     #endif
     
     // Additional checks for max safety level 
-    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->shape, "Minuend shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->shape, "Subtrahend shape is NULL", sufficient_debug_mode_p);
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX     
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->shape, "Minuend shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->shape, "Subtrahend shape is NULL");
     #endif
     
     // Calculate the total number of elements in each tensor
@@ -16731,13 +16687,11 @@ Tensor* naive_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
     #endif
 	
 	// Additional checks for max safety level 
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(minuend, "Minuend tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(subtrahend, "Subtrahend tensor is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(minuend->shape, "Minuend shape is NULL", sufficient_debug_mode_p, NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(subtrahend->shape, "Subtrahend shape is NULL", sufficient_debug_mode_p, NULL);
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX	
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(minuend, "Minuend tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(subtrahend, "Subtrahend tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(minuend->shape, "Minuend shape is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(subtrahend->shape, "Subtrahend shape is NULL", NULL);
 	#endif
  
 	// Calculate the total number of elements in each tensor
@@ -16934,12 +16888,10 @@ void naive_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multipli
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand, "Multiplicand tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand->shape, "Multiplicand shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier->shape, "Multiplier shape is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand, "Multiplicand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplicand->shape, "Multiplicand shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier->shape, "Multiplier shape is NULL");
     #endif
     
     size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
@@ -17103,12 +17055,10 @@ Tensor* naive_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand, "Multiplicand tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier, "Multiplier tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand->shape, "Multiplicand shape is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->shape, "Multiplier shape is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand, "Multiplicand tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier, "Multiplier tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand->shape, "Multiplicand shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->shape, "Multiplier shape is NULL", NULL);
     #endif
  
     size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
@@ -17298,12 +17248,10 @@ void naive_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend, "Dividend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend->shape, "Dividend shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor->shape, "Divisor shape is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend, "Dividend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(dividend->shape, "Dividend shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(divisor->shape, "Divisor shape is NULL");
     #endif
     
     size_t numel_dividend = product(dividend->shape, dividend->rank);
@@ -17467,12 +17415,10 @@ Tensor* naive_div_broadcasting(Tensor* dividend, Tensor* divisor) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(dividend, "Dividend tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(divisor, "Divisor tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(dividend->shape, "Dividend shape is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(divisor->shape, "Divisor shape is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(dividend, "Dividend tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(divisor, "Divisor tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(dividend->shape, "Dividend shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(divisor->shape, "Divisor shape is NULL", NULL);
     #endif
  
     size_t numel_dividend = product(dividend->shape, dividend->rank);
@@ -17662,12 +17608,10 @@ void naive_pow_broadcasting_inplace(Tensor* base, const Tensor* exponent) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(base, "Base tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent, "Exponent tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(base->shape, "Base shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent->shape, "Exponent shape is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(base, "Base tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent, "Exponent tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(base->shape, "Base shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(exponent->shape, "Exponent shape is NULL");
     #endif
     
     size_t numel_base = product(base->shape, base->rank);
@@ -17831,12 +17775,10 @@ Tensor* naive_pow_broadcasting(Tensor* base, Tensor* exponent) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Base tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(exponent, "Exponent tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base->shape, "Base shape is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(exponent->shape, "Exponent shape is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base, "Base tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(exponent, "Exponent tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(base->shape, "Base shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(exponent->shape, "Exponent shape is NULL", NULL);
     #endif
  
     size_t numel_base = product(base->shape, base->rank);
@@ -18026,12 +17968,10 @@ void naive_max_broadcasting_inplace(Tensor* x, const Tensor* y) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(x, "X tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(y, "Y tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(x->shape, "X shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(y->shape, "Y shape is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(x, "X tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(y, "Y tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(x->shape, "X shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(y->shape, "Y shape is NULL");
     #endif
     
     size_t numel_x = product(x->shape, x->rank);
@@ -18192,12 +18132,10 @@ void naive_min_broadcasting_inplace(Tensor* x, Tensor* y) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(x, "X tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(y, "Y tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(x->shape, "X shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(y->shape, "Y shape is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(x, "X tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(y, "Y tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(x->shape, "X shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(y->shape, "Y shape is NULL");
     #endif
     
     size_t numel_x = product(x->shape, x->rank);
@@ -18364,12 +18302,10 @@ Tensor* naive_max_broadcasting(Tensor* x, Tensor* y) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x, "X tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y, "Y tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x->shape, "X shape is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x, "X tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y, "Y tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x->shape, "X shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", NULL);
     #endif
  
     size_t numel_x = product(x->shape, x->rank);
@@ -18571,12 +18507,10 @@ Tensor* naive_min_broadcasting(Tensor* x, Tensor* y) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x, "X tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y, "Y tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x->shape, "X shape is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x, "X tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y, "Y tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x->shape, "X shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", NULL);
     #endif
  
     size_t numel_x = product(x->shape, x->rank);
@@ -18774,10 +18708,8 @@ inline static void naive_fill_tensor_with_data(Tensor* tensor, void* data, size_
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-		bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL);
-		
-		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "Passed tensor is NULL", sufficient_debug_mode_p);
-		NNL2_CHECK_NULL_IF_ERR_RETURN(data, "Passed data pointer is NULL", sufficient_debug_mode_p);
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "Passed tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(data, "Passed data pointer is NULL");
 	#endif
 	
 	if(num_elems == 0) return;
@@ -18925,13 +18857,11 @@ void naive_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL");
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend, "Sumend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->data, "Sumend tensor's data is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend, "Sumend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->data, "Sumend tensor's data is NULL");
     #endif
     
     // Calculating the total number of elements in the summand tensor
@@ -19136,13 +19066,11 @@ Tensor* naive_axpy(Tensor* summand, Tensor* sumend, float alpha) {
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = (NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE);
-    
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->data, "Summand tensor's data is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->data, "Summand tensor's data is NULL", NULL);
         
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->data, "Sumend tensor's data is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->data, "Sumend tensor's data is NULL", NULL);
     #endif
     
     // Calculate the total number of elements in the tensors
@@ -19222,8 +19150,7 @@ Tensor* naive_axpy(Tensor* summand, Tensor* sumend, float alpha) {
                     void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
                     void* elem_sumend = (char*)sumend->data + i * get_dtype_size(dtype_sumend);
                     
-                    data_result[i] = nnl2_convert_to_float64(elem_summand, dtype_summand) + 
-                                    (nnl2_convert_to_float64(elem_sumend, dtype_sumend) * alpha_double);
+                    data_result[i] = nnl2_convert_to_float64(elem_summand, dtype_summand) + (nnl2_convert_to_float64(elem_sumend, dtype_sumend) * alpha_double);
                 }
                 
                 break;
@@ -19237,8 +19164,7 @@ Tensor* naive_axpy(Tensor* summand, Tensor* sumend, float alpha) {
                     void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
                     void* elem_sumend = (char*)sumend->data + i * get_dtype_size(dtype_sumend);
                     
-                    data_result[i] = nnl2_convert_to_float32(elem_summand, dtype_summand) + 
-                                    (nnl2_convert_to_float32(elem_sumend, dtype_sumend) * alpha);
+                    data_result[i] = nnl2_convert_to_float32(elem_summand, dtype_summand) + (nnl2_convert_to_float32(elem_sumend, dtype_sumend) * alpha);
                 }
                 
                 break;
@@ -19516,12 +19442,10 @@ void naive_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, floa
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend, "Sumend tensor is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->shape, "Summand shape is NULL", sufficient_debug_mode_p);
-        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->shape, "Sumend shape is NULL", sufficient_debug_mode_p);
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend, "Sumend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->shape, "Summand shape is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->shape, "Sumend shape is NULL");
     #endif
     
     size_t numel_summand = product(summand->shape, summand->rank);
@@ -19693,12 +19617,10 @@ Tensor* naive_axpy_broadcasting(Tensor* summand, Tensor* sumend, float alpha) {
     
     // Additional checks for max safety level 
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        bool sufficient_debug_mode_p = NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE;
-        
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->shape, "Summand shape is NULL", sufficient_debug_mode_p, NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->shape, "Sumend shape is NULL", sufficient_debug_mode_p, NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->shape, "Summand shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->shape, "Sumend shape is NULL", NULL);
     #endif
  
     size_t numel_summand = product(summand->shape, summand->rank);
