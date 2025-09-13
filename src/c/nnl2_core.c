@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <time.h>     
         
-void init_system() {      
+void nnl2_init_system() {      
 	srand(time(NULL));             
 	     
 	// Initialization of the logging system          
@@ -430,7 +430,7 @@ Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) {
 }
 	 
 void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {
-	return max_broadcasting_inplace(a, b); 
+	return max_broadcasting_inplace(a, b);  
 }
 
 void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {

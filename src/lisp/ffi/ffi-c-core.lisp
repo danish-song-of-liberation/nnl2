@@ -1,6 +1,6 @@
 (in-package :nnl2.ffi)
 
-(cffi:defcfun ("init_system" nnl-init-system) :void)
+(cffi:defcfun ("nnl2_init_system" nnl-init-system) :void)
 
 (cffi:defcenum tensor-type
   :int32

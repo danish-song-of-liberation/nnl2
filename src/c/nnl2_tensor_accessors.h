@@ -1803,8 +1803,7 @@ bool nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
  * Throws error if value pointer is NULL (only in NNL2_SAFETY_MODE_MAX)
  *
  ** @exception NNL2Error
- * Throws error if unsupported data type is specified
- *
+ * Throws error if unsupported data type is specifieds
  */
 bool nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -3474,6 +3473,7 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 			return;
 		}
 	}
+	
 	// Call the actual BLAS DGEMM function for double-precision matrices
     // This is the highly optimized matrix multiplication routine from OpenBLAS
     // Performs: C = alpha * op(A) * op(B) + beta * Cы					   
@@ -4412,6 +4412,22 @@ void nnl2_print_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_
 }
 
 /** @brief
+ * Function for quick debugging in C without specifying 
+ * all the arguments in nnl2_print_tensor
+ *
+ ** @param tensor
+ * Tensor to print
+ */
+void nnl2_quick_print_tensor(Tensor* tensor) {
+	nnl2_print_tensor(tensor, 
+					  false, // Full print?
+					  20, // Max rows to print
+					  10, // Max cols to print
+					  10, // Show rows non in skip 
+					  5); // Show cols non in skip
+}
+
+/** @brief
  * Get rank (ndim) of  tensor
  *
  ** @param tensor 
@@ -4559,7 +4575,7 @@ int32_t* nnl2_get_tensor_shape(Tensor* tensor) {
  * naive_addinplace(a, b);
  * 
  * // Now a contains 2.0 in all elements
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -5357,7 +5373,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(addinplace);
  * naive_subinplace(a, b);
  * 
  * // Now a contains 0.0 in all elements
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -7440,7 +7456,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(sub);
  * naive_mulinplace(a, b);
  * 
  * // Now a contains 1.0 in all elements
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -7656,7 +7672,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(mulinplace);
  * nnl2_naive_divinplace(a, b);
  * 
  * // Now a contains 1.0 in all elements
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -8561,7 +8577,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(div);
  * naive_powinplace(a, b);
  * 
  * // Now a contains [4.0, 3.0, 2.0]
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -10214,7 +10230,7 @@ Tensor* nnl2_full_like(Tensor* tensor, void* filler) {
  * naive_maxinplace(a, b);
  * 
  * // Now a contains [3.0, 3.0, 5.0]
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -10429,7 +10445,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(maxinplace);
  * naive_mininplace(a, b);
  * 
  * // Now a contains [2.0, 1.0, 4.0]
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
@@ -18844,7 +18860,7 @@ Tensor* make_tensor_from_flatten(void* arr, size_t num_elems_arr, int* shape, in
  * naive_axpy_inplace(a, b, 2.5f);
  * 
  * // Now a contains 3.5 in all elements
- * nnl2_print_tensor(a);
+ * nnl2_quick_print_tensor(a);
  * 
  * // Cleanup
  * nnl2_free_tensor(a);
