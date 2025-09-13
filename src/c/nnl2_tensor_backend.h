@@ -90,6 +90,7 @@ typedef enum {
 	nnl2_unroll_512,
 	nnl2_avx128,
 	nnl2_avx256,
+	nnl2_own,
 	nnl2_blas,
 	nnl2_implver_count
 } implver;

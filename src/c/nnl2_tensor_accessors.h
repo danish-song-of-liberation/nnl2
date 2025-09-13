@@ -82,6 +82,7 @@
 #define AVX128_BACKEND_NAME "AVX128"
 #define AVX256_BACKEND_NAME "AVX256"
 #define BLAS_BACKEND_NAME "BLAS"
+#define NNL2_OWN_NAME "NNL2 OWN IMPLEMENTATION"
 
 #define MIN_TENSOR_DIMENSION 0
 
@@ -5273,6 +5274,67 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
 
 #endif
 
+#ifdef OPENBLAS_AVAILABLE
+void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	// Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL");
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(addend, "Addend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(addend->data, "Addend tensor's data is NULL");
+    #endif
+	
+	// Calculating the total number of elements in the summand tensor
+    size_t len_summand = product(summand->shape, summand->rank);
+	
+	// If the tensor is empty, exit the function
+    if(len_summand == 0) return;
+	
+	TensorType dtype_summand = summand->dtype;
+    TensorType dtype_addend = addend->dtype;
+	
+	if(dtype_summand == dtype_addend) {
+        // Handling case when the tensors have the same type
+		
+		switch(dtype_summand) {
+            case FLOAT64: {
+                double* data_summand = (double*)summand->data;
+                double* data_addend = (double*)addend->data;
+				
+				cblas_daxpy(len_summand, 1.0, data_addend, 1, data_summand, 1);
+				break;
+			}
+			
+			case FLOAT32: {
+                float* data_summand = (float*)summand->data;
+                float* data_addend = (float*)addend->data;
+				
+				cblas_saxpy(len_summand, 1.0, data_addend, 1, data_summand, 1);
+				break;
+			}
+			
+			default: {
+				NNL2_TYPE_ERROR(dtype_summand);
+				return;
+			}
+		}
+	}
+	
+	else {
+		// No yet...
+	}
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+}
+#endif
+
 /** @ingroup backend_system
  ** @brief Backend implementations for add in-place
  ** @details
@@ -5287,11 +5349,13 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
 Implementation addinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_addinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
-	#ifdef __AVX__
-		#if TENSOR_MEM_ALIGNMENT == 32
-			REGISTER_BACKEND(nnl2_avx256_addinplace, nnl2_avx256, AVX256_BACKEND_NAME),
-		#endif
+	#if defined(__AVX__) && TENSOR_MEM_ALIGNMENT == 32
+		REGISTER_BACKEND(nnl2_avx256_addinplace, nnl2_avx256, AVX256_BACKEND_NAME),
 	#endif
+	
+	#ifdef OPENBLAS_AVAILABLE
+		REGISTER_BACKEND(nnl2_blas_addinplace, nnl2_blas, BLAS_BACKEND_NAME),
+	#endif	
 };
 
 /**

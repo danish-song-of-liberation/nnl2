@@ -8,11 +8,11 @@
 
 #ifdef __SSE2__
 #include <emmintrin.h>
-#endif
- 
+#endif  
+   
 #ifdef __SSE3__ 
 #include <pmmintrin.h>   
-#endif 
+#endif                    
              
 #ifdef __SSSE3__
 #include <tmmintrin.h>
@@ -221,7 +221,7 @@ void lisp_call_loginplace(Tensor* tensor) {
 	loginplace(tensor);       
 }    
    
-Tensor* lisp_call_log(Tensor* tensor, bool save_type) {
+Tensor* lisp_call_log(Tensor* tensor, bool save_type) {     
 	return nnl2_logarithm(tensor, save_type);
 } 
    
@@ -322,7 +322,7 @@ void lisp_call_sum_without_axis(Tensor* tensor, void* filler) {
 }
 
 void lisp_call_sum_with_axis(Tensor* tensor, int axis) {
-	nnl2_sum_with_axis(tensor, axis);
+	nnl2_sum_with_axis(tensor, axis); 
 }
 
 void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
