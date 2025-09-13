@@ -485,6 +485,10 @@
   (shape :pointer)
   (rank :int)
   (dtype tensor-type))
+  
+(cffi:defcfun ("nnl2_cast" %cast) :pointer
+  (tensor :pointer)
+  (cast-to tensor-type))
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
   (backend-name :string))   

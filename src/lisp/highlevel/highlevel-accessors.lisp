@@ -991,7 +991,10 @@
                   `(,form ,tensor))
             ,@rest)
 			
-          `(-> (,form ,tensor) ,@rest)))))		  
+          `(-> (,form ,tensor) ,@rest)))))		
+
+(defun ncast (tensor cast-to)
+  (nnl2.ffi:%cast tensor cast-to))		  
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

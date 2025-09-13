@@ -68,6 +68,7 @@
    #:%sum-with-axis	
    #:%l2norm
    #:%copy
+   #:%cast
    #:%.+/incf!
    #:%.+/incf
    #:%.-/decf!

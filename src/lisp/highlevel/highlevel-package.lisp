@@ -76,6 +76,7 @@
    #:sum
    #:norm
    #:copy
+   #:ncast
    #:.+/incf!
    #:.+/incf
    #:.-/decf!
