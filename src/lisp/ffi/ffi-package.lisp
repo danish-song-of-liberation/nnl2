@@ -69,6 +69,7 @@
    #:%l2norm
    #:%copy
    #:%cast
+   #:%reshape
    #:%.+/incf!
    #:%.+/incf
    #:%.-/decf!
@@ -190,6 +191,7 @@
    #:%set-axpf-backend
    #:%set-axpy-broadcasting-inplace-backend
    #:%set-axpy-broadcasting-backend
+   #:%set-reshape-backend
    #:%get-tref-getter-backend
    #:%get-view-backend
    #:%get-empty-backend
@@ -238,6 +240,7 @@
    #:%get-copy-backend
    #:%get-axpy-inplace-backend
    #:%get-axpy-backend
+   #:%get-reshape-backend
    #:%get-view-backends
    #:%get-view-num-backends
    #:%get-tref-setter-num-backends
@@ -337,5 +340,7 @@
    #:%get-axpy-inplace-num-backends
    #:%get-axpy-inplace-backends
    #:%get-axpy-num-backends
-   #:%get-axpy-backends))
+   #:%get-axpy-backends
+   #:%get-reshape-backends
+   #:%get-reshape-num-backends))
    

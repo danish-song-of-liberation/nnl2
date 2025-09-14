@@ -6,7 +6,7 @@
 #include <immintrin.h>
 #endif
 
-#ifdef __SSE2__
+#ifdef __SSE2__ 
 #include <emmintrin.h>
 #endif  
    
@@ -17,7 +17,7 @@
 #ifdef __SSSE3__
 #include <tmmintrin.h>
 #endif 
-
+ 
 #ifdef __SSE4_1__ 
 #include <smmintrin.h>
 #endif
@@ -114,7 +114,7 @@ void nnl2_init_system() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
 	INIT_BACKEND(sub_broadcasting_inplace, sub_broadcasting_inplace_backends);
 	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);
-	INIT_BACKEND(mul_broadcasting_inplace, mul_broadcasting_inplace_backends);
+	INIT_BACKEND(mul_broadcasting_inplace, mul_broadcasting_inplace_backends); 
 	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends);
 	INIT_BACKEND(div_broadcasting_inplace, div_broadcasting_inplace_backends);
 	INIT_BACKEND(div_broadcasting, div_broadcasting_backends); 
@@ -131,6 +131,7 @@ void nnl2_init_system() {
 	INIT_BACKEND(axpf, axpf_backends);     
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
+	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape)); 
 }                                                  
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
@@ -327,7 +328,7 @@ void lisp_call_sum_with_axis(Tensor* tensor, int axis) {
 
 void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
 	l2norm(tensor, axes, num_axes); 
-}
+}   
 
 Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
 	return nnl2_copy(tensor, copy_type);    
@@ -468,11 +469,11 @@ void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float 
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
 	return axpy_broadcasting(summand, sumend, alpha); 
 } 
-
+   
 void debug_implementation(Implementation* implementation, char* name, size_t size) {  
 	printf("Implementation: %s\n", name);
 	
-	for(size_t i = 0; i < size; i++) {
+	for(size_t i = 0; i < size; i++) {          
 		printf("	Backend: %s\n", implementation[i].name);
 		printf("		Speed: %d\n", implementation[i].speed_priority);
 		printf("		Availble?: %d\n", implementation[i].available);
@@ -482,4 +483,8 @@ void debug_implementation(Implementation* implementation, char* name, size_t siz
 void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 	debug_implementation(sgemminplace_backends, "sgemm in place", check_to);
 }		   
+
+Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
+	return nnl2_reshape(tensor, new_shape, new_shape_len, force); 
+}
 		             

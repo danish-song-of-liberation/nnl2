@@ -19,7 +19,7 @@ ifeq ($(OS),Windows_NT)
 else
     TARGET = src/c/libnnl.so
     LIBSUFFIX = .so
-    LDFLAGS = -shared
+    LDFLAGS = -shared 
 endif
 
 ifeq ($(openblas0330woa64static_available), 1)

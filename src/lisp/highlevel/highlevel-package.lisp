@@ -20,6 +20,7 @@
    #:rank
    #:dtype
    #:int-dtype
+   #:reshape
    #:shape-pointer
    #:shape
    #:.log!
@@ -171,6 +172,7 @@
    #:use-backend/.tanh!
    #:use-backend/transpose
    #:use-backend/transpose!
+   #:use-backend/reshape
    #:get-backend/view
    #:get-backend/tref
    #:get-backend/empty
@@ -226,6 +228,7 @@
    #:get-backend/copy
    #:get-backend/axpy!
    #:get-backend/axpy
+   #:get-backend/reshape
    #:get-backends/tref
    #:get-backends/view
    #:get-backends/empty
@@ -281,6 +284,7 @@
    #:get-backends/copy
    #:get-backends/axpy!
    #:get-backends/axpy
+   #:get-backends/reshape
    #:with-backend/view
    #:with-backend/tref
    #:with-backend/full
@@ -332,6 +336,7 @@
    #:with-backend/copy
    #:with-backend/axpy!
    #:with-backend/axpy
+   #:with-backend/reshape
    #:tensor-p
    #:->
    #:<-))

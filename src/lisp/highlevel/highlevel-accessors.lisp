@@ -995,6 +995,10 @@
 
 (defun ncast (tensor cast-to)
   (nnl2.ffi:%cast tensor cast-to))		  
+  
+(defun reshape (tensor new-shape &key force)
+  (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
+    (nnl2.ffi:%reshape tensor shape rank force)))
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

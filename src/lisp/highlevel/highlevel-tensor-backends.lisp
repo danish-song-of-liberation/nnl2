@@ -224,6 +224,10 @@
   (let ((sig (symbol-to-uppercase-string name)))
     (nnl2.ffi:%set-copy-backend sig)))
 
+(defun use-backend/reshape (name)
+  (let ((sig (symbol-to-uppercase-string name)))
+    (nnl2.ffi:%set-reshape-backend sig)))
+
 (defun use-backend (name)
   (use-backend/tref name)
   (use-backend/view name)
@@ -265,7 +269,8 @@
   (use-backend/.tanh name)
   (use-backend/.tanh! name)
   (use-backend/transpose name)
-  (use-backend/transpose! name))
+  (use-backend/transpose! name)
+  (use-backend/reshape name))
   
 (defun get-backend/tref ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-tref-getter-backend)))      
@@ -553,6 +558,12 @@
   
 (defun (setf get-backend/sum) (name)
   (use-backend/sum name))  
+  
+(defun get-backend/reshape ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-reshape-backend)))	
+  
+(defun (setf get-backend/reshape) (name)
+  (use-backend/reshape name))
   
 (defun get-backend/norm (&key (p :l2))
   (case p
@@ -938,6 +949,13 @@
 		
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+	
+(defun get-backends/reshape ()
+  (let ((num-backends (nnl2.ffi:%get-reshape-num-backends))
+	    (backends (nnl2.ffi:%get-reshape-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))	
 	
 (defmacro with-backend/tref (name &body body)
   (let ((old-backend-sym (gensym "old-backend-")))
@@ -1379,4 +1397,13 @@
              (setf (get-backend/axpy) ,name)
              ,@body)
          (setf (get-backend/axpy) ,old-backend-sym)))))
+
+(defmacro with-backend/reshape (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/reshape)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/reshape) ,name)
+             ,@body)
+         (setf (get-backend/reshape) ,old-backend-sym)))))
 		 
