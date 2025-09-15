@@ -999,6 +999,10 @@
 (defun reshape (tensor new-shape &key force)
   (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
     (nnl2.ffi:%reshape tensor shape rank force)))
+	
+(defun reinterpret (tensor new-shape &key force)
+  (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
+    (nnl2.ffi:%reinterpret tensor shape rank force)))
 
 (declaim (inline gemm))
 (declaim (inline gemm!))																			 

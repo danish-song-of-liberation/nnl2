@@ -21,6 +21,7 @@
    #:dtype
    #:int-dtype
    #:reshape
+   #:reinterpret
    #:shape-pointer
    #:shape
    #:.log!
@@ -173,6 +174,7 @@
    #:use-backend/transpose
    #:use-backend/transpose!
    #:use-backend/reshape
+   #:use-backend/reinterpret
    #:get-backend/view
    #:get-backend/tref
    #:get-backend/empty
@@ -229,6 +231,7 @@
    #:get-backend/axpy!
    #:get-backend/axpy
    #:get-backend/reshape
+   #:get-backend/reinterpret
    #:get-backends/tref
    #:get-backends/view
    #:get-backends/empty
@@ -285,6 +288,7 @@
    #:get-backends/axpy!
    #:get-backends/axpy
    #:get-backends/reshape
+   #:get-backends/reinterpret
    #:with-backend/view
    #:with-backend/tref
    #:with-backend/full
@@ -337,6 +341,7 @@
    #:with-backend/axpy!
    #:with-backend/axpy
    #:with-backend/reshape
+   #:with-backend/reinterpret
    #:tensor-p
    #:->
    #:<-))

@@ -25,7 +25,6 @@
 
 /** @brief 
  * Enumerations of available tensor types (INT32/INT, FLOAT32/FLOAT, FLOAT64/DOUBLE)
- *
  */
 typedef enum {
 	INT32,
@@ -33,30 +32,6 @@ typedef enum {
 	FLOAT64
 } TensorType;
 
-/** @brief 
- * Tensor structure with an arbitrary number of dimensions
- *
- *** dtype :
- *
- * Type of tensor (INT32, FLOAT32/FLOAT, FLOAT64/DOUBLE) 
- *
- *** data :
- *
- * Void pointer to tensor data
- *
- *** shape :
- *
- * Pointer to an int array of tensor dimensions
- *
- *** rank :
- *
- * The number of dimensions of the tensor
- *
- ** numel:
- *
- * Total number of elements in the tensor
- *
- */
 typedef struct {
 	TensorType dtype;
 	void* data;
@@ -64,6 +39,7 @@ typedef struct {
 	int32_t* strides;
 	int32_t rank;
 	size_t numel;
+	bool is_view;
 } Tensor;
 
 typedef struct {
@@ -197,6 +173,7 @@ typedef void* (*trefgetterfn)(Tensor*, const int32_t*, uint8_t);
 typedef void* (*trefsetterfn)(Tensor*, int*, int, void*, bool);
 typedef void (*convf64arrfn)(void*, double*, size_t, TensorType);	
 typedef Tensor* (*reshapefn)(Tensor*, int32_t*, int32_t, bool);
+typedef Tensor* (*reinterpretfn)(Tensor*, int32_t*, int32_t, bool);
 
 char* get_tensortype_name(TensorType dtype) {
 	switch(dtype) {

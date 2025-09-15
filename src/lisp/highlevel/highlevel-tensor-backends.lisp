@@ -227,6 +227,10 @@
 (defun use-backend/reshape (name)
   (let ((sig (symbol-to-uppercase-string name)))
     (nnl2.ffi:%set-reshape-backend sig)))
+	
+(defun use-backend/reinterpret (name)
+  (let ((sig (symbol-to-uppercase-string name)))
+    (nnl2.ffi:%set-reinterpret-backend sig)))
 
 (defun use-backend (name)
   (use-backend/tref name)
@@ -270,7 +274,8 @@
   (use-backend/.tanh! name)
   (use-backend/transpose name)
   (use-backend/transpose! name)
-  (use-backend/reshape name))
+  (use-backend/reshape name)
+  (use-backend/reinterpret name))
   
 (defun get-backend/tref ()
   (uppercase-string-to-symbol (nnl2.ffi:%get-tref-getter-backend)))      
@@ -564,6 +569,12 @@
   
 (defun (setf get-backend/reshape) (name)
   (use-backend/reshape name))
+  
+(defun get-backend/reinterpret ()
+  (uppercase-string-to-symbol (nnl2.ffi:%get-reinterpret-backend)))	  
+  
+(defun (setf get-backend/reinterpret) (name)
+  (use-backend/reinterpret name))
   
 (defun get-backend/norm (&key (p :l2))
   (case p
@@ -953,6 +964,13 @@
 (defun get-backends/reshape ()
   (let ((num-backends (nnl2.ffi:%get-reshape-num-backends))
 	    (backends (nnl2.ffi:%get-reshape-backends)))
+		
+    (loop for i from 0 below num-backends
+		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))	
+		  
+(defun get-backends/reinterpret ()
+  (let ((num-backends (nnl2.ffi:%get-reinterpret-num-backends))
+	    (backends (nnl2.ffi:%get-reinterpret-backends)))
 		
     (loop for i from 0 below num-backends
 		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))	
@@ -1406,4 +1424,13 @@
              (setf (get-backend/reshape) ,name)
              ,@body)
          (setf (get-backend/reshape) ,old-backend-sym)))))
+		 
+(defmacro with-backend/reinterpret (name &body body)
+  (let ((old-backend-sym (gensym "old-backend-")))
+    `(let ((,old-backend-sym (get-backend/reinterpret)))
+       (unwind-protect
+           (progn
+             (setf (get-backend/reinterpret) ,name)
+             ,@body)
+         (setf (get-backend/reinterpret) ,old-backend-sym)))))
 		 

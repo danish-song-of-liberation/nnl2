@@ -131,8 +131,9 @@ void nnl2_init_system() {
 	INIT_BACKEND(axpf, axpf_backends);     
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
-	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape)); 
-}                                                  
+	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));  
+	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
+}                                                    
 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_view(tensor, indices, num_indices); 
@@ -464,7 +465,7 @@ Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
 
 void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 	axpy_broadcasting_inplace(summand, sumend, alpha); 
-}   
+}       
 
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
 	return axpy_broadcasting(summand, sumend, alpha); 
@@ -486,5 +487,9 @@ void lisp_call_debug_blas_sgemminplace(size_t check_to) {
 
 Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
 	return nnl2_reshape(tensor, new_shape, new_shape_len, force); 
+}
+
+Tensor* lisp_call_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
+	return nnl2_reinterpret(tensor, new_shape, new_shape_len, force); 
 }
 		             
