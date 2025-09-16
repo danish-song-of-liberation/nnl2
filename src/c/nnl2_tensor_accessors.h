@@ -8,8 +8,8 @@
 #include <float.h>
 #include <math.h>
 
-#ifndef NNL2_TENSOR_ACCESSORS
-#define NNL2_TENSOR_ACCESSORS
+#ifndef NNL2_TENSOR_ACCESSORS_H
+#define NNL2_TENSOR_ACCESSORS_H
 
 #ifdef _WIN32
  
@@ -163,7 +163,7 @@
  * i.e. tref getters and setters, as well as 
  * some additional functions
  *
- ** Filepath: nnl2/src/c/nnl2_tensor_accessors.h
+ ** Filepath: c
  ** File: nnl2_tensor_accessors.h
  **
  ** The file contains tensor accessories
@@ -1273,12 +1273,6 @@ void* nnl2_naive_view(Tensor* tensor, const int32_t* indices, uint8_t num_indice
 	// Copy stride information for non-indexed dimensions
 	memcpy(subtensor->strides, tensor->strides + num_indices, subtensor->rank * sizeof(int32_t));
 
-	// Calculate total elements in subtensor
-	subtensor->numel = 1;
-    for (int i = 0; i < subtensor->rank; i++) {
-        subtensor->numel *= subtensor->shape[i];
-    }
-
 	// Set data pointer to shared memory with calculated offset
     const size_t element_size = get_dtype_size(tensor->dtype);
     subtensor->data = (char*)tensor->data + offset * element_size;
@@ -1530,13 +1524,13 @@ void* nnl2_naive_tref_getter(Tensor* tensor, const int32_t* indices, uint8_t num
     memcpy(subtensor->strides, tensor->strides + num_indices, subtensor->rank * sizeof(int32_t));
 
     // Calculate total elements in subtensor
-    subtensor->numel = 1;
+    size_t numel = 1;
     for (int i = 0; i < subtensor->rank; i++) {
-        subtensor->numel *= subtensor->shape[i];
+        numel *= subtensor->shape[i];
     }
 
     // Allocate independent aligned memory for data and copy from source
-    size_t data_size = subtensor->numel * element_size;
+    size_t data_size = numel * element_size;
     void* data = NULL;
     ALLOC_ALIGNED(data, TENSOR_MEM_ALIGNMENT, data_size);
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
@@ -20315,7 +20309,6 @@ Tensor* nnl2_naive_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_s
     view_tensor->dtype = tensor->dtype;
     view_tensor->rank = new_shape_len;
     view_tensor->data = tensor->data; // Shared data
-    view_tensor->numel = total_elems;
 	view_tensor->is_view = true;
     
     // Allocate and copy shape
@@ -20373,8 +20366,7 @@ static Tensor* nnl2_create_view(Tensor* tensor, int32_t* indices, uint8_t num_in
     
     view->dtype = tensor->dtype;
     view->rank = tensor->rank;
-    view->numel = tensor->numel;
-    
+
     // Allocate and copy shape
     view->shape = (int32_t*)malloc(tensor->rank * sizeof(int32_t));
     if (!view->shape) {
@@ -20470,4 +20462,4 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(reinterpret);
 
 // Reinterpret definition (end)
 
-#endif
+#endif  /** NNL2_TENSOR_ACCESSORS_H **/ 

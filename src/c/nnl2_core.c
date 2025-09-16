@@ -124,7 +124,7 @@ void nnl2_init_system() {
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends);
 	INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 
-	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
+	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);   
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	     
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
