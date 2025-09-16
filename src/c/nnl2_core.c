@@ -9,22 +9,6 @@
 #ifdef __SSE2__ 
 #include <emmintrin.h>
 #endif  
-   
-#ifdef __SSE3__ 
-#include <pmmintrin.h>   
-#endif                    
-             
-#ifdef __SSSE3__
-#include <tmmintrin.h>
-#endif 
- 
-#ifdef __SSE4_1__ 
-#include <smmintrin.h>
-#endif
-
-#ifdef __SSE4_2__
-#include <nmmintrin.h>   
-#endif   
   
 #include "nnl2_core.h" 
 #include "nnl2_ffi_test.h" 

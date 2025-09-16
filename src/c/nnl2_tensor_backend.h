@@ -11,6 +11,7 @@
 /** @file nnl2_tensor_backend.h
  ** @brief Contains the tensor and implemenets structures
  ** @copyright MIT License
+ ** @date 2025
  *
  * The file contains full declarations of various structures, 
  * including tensors and everything related to them
