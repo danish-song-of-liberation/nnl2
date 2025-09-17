@@ -106,6 +106,8 @@
    #:%axpy/broadcasting
    #:%axpy
    #:%axpy!
+   #:%lowlevel-tref
+   #:%lowlevel-tref-with-coords
    #:%set-view-backend
    #:%set-tref-setter-backend
    #:%set-tref-getter-backend

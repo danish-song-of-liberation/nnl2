@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-// NNL2
+/// NNL2
 
 /** @file nnl2_tensor_backend.h
  ** @brief Contains the tensor and implemenets structures

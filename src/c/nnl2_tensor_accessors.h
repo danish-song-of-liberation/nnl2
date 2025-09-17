@@ -11,7 +11,7 @@
 #ifndef NNL2_TENSOR_ACCESSORS_H
 #define NNL2_TENSOR_ACCESSORS_H
 
-// NNL2
+/// NNL2
 
 /** @file nnl2_tensor_accessors.h
  ** @brief Contains all operations for accessing tensors of type tref
@@ -272,9 +272,9 @@
 ///@{ [format_parameters]
 	#define NNL2_MAX_1D_TENSOR_PRINT_ELEMENTS 100  ///< Maximum number of elements that can be printed in a 1d tensor before skipping
 	#define NNL2_LARGE_TENSOR_THRESHOLD 500 	   /**< I have no idea what this does... I couldn't find a single macro with this name. 
-												   /**  when I was making a smart tensor output, I was thinking about threashold as in torch, 
-												   /**  but I abandoned this solution in favor of my own solution. these may be experimental 
-												   /**  macros that I later removed in format function **/
+												    **  when I was making a smart tensor output, I was thinking about threashold as in torch, 
+												    **  but I abandoned this solution in favor of my own solution. these may be experimental 
+												    **  macros that I later removed in format function **/
 	#define NNL2_LARGE_TENSOR_SAMPLE_SIZE 10	   ///< Same
 	#define NNL2_1D_TENSOR_SHOW_ELEMENTS 5		   ///< Show items BEFORE and AFTER skipping
 	#define NNL2_FLOAT64_FORMAT "%.6f"			   ///< Format string for double precision floating point 
@@ -20603,5 +20603,30 @@ DEFINE_GET_BACKENDS_FUNCTION(reinterpret);
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(reinterpret);
 
 // Reinterpret definition (end)
+
+void* get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		size_t total_elems = product(tensor->shape, tensor->rank) - 1;
+		if(at > total_elems) {
+			NNL2_ERROR("Index out of bounds: index %zd exceeds tensor size %zd", at, total_elems);
+		}
+	#endif
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_EXIT();
+	#endif
+	
+	return ((char*)tensor->data + at * get_dtype_size(tensor->dtype));
+}
+
+void* get_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len) {
+	size_t offset = 0;
+	for(int i = 0; i < coords_len; i++) offset += coords[i] * tensor->strides[i];
+	return (char*)tensor->data + offset * get_dtype_size(tensor->dtype);
+}	
 
 #endif  /** NNL2_TENSOR_ACCESSORS_H **/ 

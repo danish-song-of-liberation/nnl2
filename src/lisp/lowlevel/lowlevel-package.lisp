@@ -4,5 +4,5 @@
   
 (defpackage :nnl2.lli.ts
   (:use :cl)
-  (:export))
+  (:export :trefd :trefw))
   

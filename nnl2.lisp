@@ -57,7 +57,8 @@
 														 
 										   (:module "lowlevel"
 											:serial t
-											:components ((:file "lowlevel-package" :type "lisp")))))))
+											:components ((:file "lowlevel-package" :type "lisp")
+														 (:file "lowlevel-accessors" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

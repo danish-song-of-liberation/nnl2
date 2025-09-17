@@ -501,6 +501,15 @@
   (new-shape :pointer)
   (new-shape-len :int)
   (force :bool))  
+  
+(cffi:defcfun ("get_raw_tensor_elem_at" %lowlevel-tref) :pointer
+  (tensor :pointer)
+  (at :size))
+  
+(cffi:defcfun ("get_raw_tensor_elem" %lowlevel-tref-with-coords) :pointer
+  (tensor :pointer)
+  (coords :pointer)
+  (coords-len :int))
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
   (backend-name :string))   
