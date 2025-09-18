@@ -58,4 +58,6 @@
 		 do (let ((,iterator (nnl2.ffi:shape-at ,tensor i)))
 			  (progn ,@body))))
 			  			  
+(defun alignment ()
+  (nnl2.ffi:%get-mem-alignment))						  
 			  

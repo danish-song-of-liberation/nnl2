@@ -13,14 +13,14 @@
 #include <emmintrin.h>
 #endif  
   
-#include "nnl2_core.h" 
+#include "nnl2_core.h"   
 #include "nnl2_ffi_test.h" 
-#include "nnl2_tensor_core.h" 
+#include "nnl2_tensor_core.h"
 #include "nnl2_log.h"
 
 #include "backends_status/nnl2_status.h"  
 
-#include <stdlib.h>
+#include <stdlib.h> 
 #include <time.h>      
 
 /// NNL2
@@ -40,7 +40,7 @@
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
  **/
-
+   
 ///@{ [initilizing]
 
 ///@{ [subinitializers_declaration]
@@ -207,10 +207,10 @@ void nnl2_init_reshaping();
  ** @see nnl2_init_reshaping
  **/
 void nnl2_init_system() {      
-	// Initialization of 
+	// Initialization of random number generator
 	srand(time(NULL));               
 	          
-	// Initialization of random number generator         
+	// Initialization of logger      
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,            

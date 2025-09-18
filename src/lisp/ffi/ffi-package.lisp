@@ -17,6 +17,7 @@
    #:get-int-tensor-dtype
    #:get-pointer-to-tensor-shape
    #:get-pointer-to-tensor-strides
+   #:%get-mem-alignment
    #:%gemm!
    #:%+=
    #:%-=
