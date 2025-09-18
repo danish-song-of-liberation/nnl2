@@ -185,7 +185,7 @@ void nnl2_init_reshaping();
  *	   // ... use the framework ...
  *	   return 0;
  * }	 
- ** @endcode
+ ** @endcode  
  ** 
  ** @note
  * The initialization order of the functions is not important

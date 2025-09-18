@@ -10,6 +10,8 @@
  ** @copyright MIT License
  ** @date 2025
  **
+ ** Filepath: nnl2/src/c/accessors/nnl2_tensor_direct_accessors.h
+ **
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2		
  **/ 
