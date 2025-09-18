@@ -465,10 +465,13 @@
 (cffi:defcfun ("nnl2_get_tensor_shape" get-pointer-to-tensor-shape) :pointer
   (tensor :pointer))        
   
-(cffi:defcfun ("get_tensor_data" get-tensor-data) :pointer
+(cffi:defcfun ("nnl2_get_tensor_data" get-tensor-data) :pointer
   (tensor :pointer))  
   
-(cffi:defcfun ("shape_at" shape-at) :int
+(cffi:defcfun ("nnl2_get_tensor_strides" get-pointer-to-tensor-strides) :pointer
+  (tensor :pointer))    
+  
+(cffi:defcfun ("nnl2_shape_at" shape-at) :int
   (tensor :pointer)
   (index :int))
   
@@ -506,21 +509,21 @@
   (new-shape-len :int)
   (force :bool))  
   
-(cffi:defcfun ("get_raw_tensor_elem_at" %lowlevel-tref) :pointer
+(cffi:defcfun ("nnl2_get_raw_tensor_elem_at" %lowlevel-tref) :pointer
   (tensor :pointer)
   (at :size))
   
-(cffi:defcfun ("set_raw_tensor_elem_at" %lowlevel-tref-setter) :void
+(cffi:defcfun ("nnl2_set_raw_tensor_elem_at" %lowlevel-tref-setter) :void
   (tensor :pointer)
   (at :size)
   (with :pointer))
   
-(cffi:defcfun ("get_raw_tensor_elem" %lowlevel-tref-with-coords) :pointer
+(cffi:defcfun ("nnl2_get_raw_tensor_elem" %lowlevel-tref-with-coords) :pointer
   (tensor :pointer)
   (coords :pointer)
   (coords-len :int))
   
-(cffi:defcfun ("set_raw_tensor_elem" %lowlevel-tref-with-coords-setter) :void
+(cffi:defcfun ("nnl2_set_raw_tensor_elem" %lowlevel-tref-with-coords-setter) :void
   (tensor :pointer)
   (coords :pointer)
   (coords-len :int)

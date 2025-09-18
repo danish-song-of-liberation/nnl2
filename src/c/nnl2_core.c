@@ -691,7 +691,7 @@ void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {
  
 Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) { 
 	return max_broadcasting(a, b);
-}
+} 
 
 Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) {        
 	return min_broadcasting(a, b);
@@ -708,7 +708,7 @@ Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 	axpf_inplace(summand, sumend, alpha); 
 } 
-      
+       
 Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
 	return axpf(summand, sumend, alpha);  
 } 

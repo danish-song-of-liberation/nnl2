@@ -4687,6 +4687,19 @@ int32_t* nnl2_get_tensor_shape(Tensor* tensor) {
 }
 
 /** @brief 
+ * Get the pointer to the tensor's strides array
+ *
+ ** @param tensor 
+ * Input tensor
+ *
+ ** @return 
+ * Pointer to the tensor's strides array
+ */
+int32_t* nnl2_get_tensor_strides(Tensor* tensor) {
+	return tensor->strides;
+}
+
+/** @brief 
  * Performs element-wise addition of two tensors (naive implementation)
  * 
  * Adds the elements of the addend tensor to the corresponding elements 
@@ -11553,7 +11566,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(abs);
  ** @return
  * Void pointer to the tensor's underlying data storage
  */
-void* get_tensor_data(Tensor* tensor) {
+void* nnl2_get_tensor_data(Tensor* tensor) {
 	return tensor->data;
 }
 
@@ -20616,7 +20629,7 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(reinterpret);
  ** @return void* 
  * Pointer to the requested tensor element
  */
-void* get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
+void* nnl2_get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();
 	#endif
@@ -20648,7 +20661,7 @@ void* get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
  ** @param with
  * Pointer to data to set
  */
-void set_raw_tensor_elem_at(Tensor* tensor, size_t at, void* with) {
+void nnl2_set_raw_tensor_elem_at(Tensor* tensor, size_t at, void* with) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -20685,7 +20698,7 @@ void set_raw_tensor_elem_at(Tensor* tensor, size_t at, void* with) {
  ** @return void* 
  * Pointer to the requested tensor element
  */
-void* get_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len) {
+void* nnl2_get_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();
 	#endif
@@ -20734,7 +20747,7 @@ void* get_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len) {
  ** @param with
  * Pointer to data to set
  */
-void set_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len, void* with) {
+void nnl2_set_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len, void* with) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -20765,8 +20778,6 @@ void set_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len, vo
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_EXIT();
     #endif
-    
-    return 0;
 }
 
 /** @brief 
@@ -20781,7 +20792,7 @@ void set_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len, vo
  ** @return int32_t
  * The size of the dimension at the specified index
  */
-int32_t shape_at(Tensor* tensor, int32_t index) {
+int32_t nnl2_shape_at(Tensor* tensor, int32_t index) {
 	return tensor->shape[index];
 }
 

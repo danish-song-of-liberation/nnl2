@@ -12,9 +12,11 @@
    #:%sgemm
    #:%gemm
    #:get-tensor-rank
+   #:get-tensor-strides
    #:get-tensor-dtype
    #:get-int-tensor-dtype
    #:get-pointer-to-tensor-shape
+   #:get-pointer-to-tensor-strides
    #:%gemm!
    #:%+=
    #:%-=

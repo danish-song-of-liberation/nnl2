@@ -194,12 +194,12 @@ typedef enum {
  * It supports various data types and can represent both owned data and views
  */
 typedef struct {
-	TensorType dtype;	///< Data type of tensor elements
-	void* data;			///< Pointer to the raw tensor data
-	int32_t* shape;		///< Array of dimension sizes 
-	int32_t* strides;	///< Array of byte strides for each dimension
-	int32_t rank;		///< Number of dimensions (ndim)
-	bool is_view;		///< Flag indicating if this is a view (not owning data)
+	TensorType dtype;	 ///< Data type of tensor elements
+	void* data;			 ///< Pointer to the raw tensor data
+	int32_t* shape;		 ///< Array of dimension sizes 
+	int32_t* strides;	 ///< Array of byte strides for each dimension
+	int32_t rank;		 ///< Number of dimensions (ndim)
+	bool is_view;		 ///< Flag indicating if this is a view (not owning data)
 } Tensor;
 
 /// @}

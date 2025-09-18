@@ -173,8 +173,32 @@
 	
 (defmacro shape (tensor &key (as :vector) (rank nil))
   (case as
-    (:list `(get-shape-as-list ,tensor ,rank))
-	(:vector `(get-shape-as-vector ,tensor ,rank))
+    (:list    `(get-shape-as-list ,tensor ,rank))
+	(:vector  `(get-shape-as-vector ,tensor ,rank))
+	(:pointer `(shape-pointer tensor))
+	(otherwise (error "Unknown type: ~a~%" as))))
+	
+(defun get-strides-as-list (tensor)
+  (loop with len = (nnl2.ffi:get-tensor-rank tensor)
+		with strides-pointer = (nnl2.ffi:get-pointer-to-tensor-strides tensor)
+		for i from 0 below len
+		collect (cffi:mem-aref strides-pointer :int i)))	
+	
+(defun get-strides-as-vector (tensor)
+  (let* ((len (nnl2.ffi:get-tensor-rank tensor))
+         (vec (make-array len))
+		 (strides-pointer (nnl2.ffi:get-pointer-to-tensor-strides tensor)))
+		
+	(dotimes (i len)
+	  (setf (aref vec i) (cffi:mem-aref strides-pointer :int i)))
+	  
+	vec))
+	
+(defmacro strides (tensor &key (as :vector))
+  (case as
+    (:list    `(get-strides-as-list ,tensor))
+    (:vector  `(get-strides-as-vector ,tensor))
+	(:pointer `(nnl2.ffi:get-pointer-to-tensor-strides ,tensor))
 	(otherwise (error "Unknown type: ~a~%" as))))
 
 (defun gemm (a b &key (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb)

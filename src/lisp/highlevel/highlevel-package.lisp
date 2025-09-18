@@ -18,6 +18,7 @@
    #:full-with-pntr
    #:print-tensor
    #:rank
+   #:strides
    #:dtype
    #:int-dtype
    #:reshape
