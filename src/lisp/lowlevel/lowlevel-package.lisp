@@ -4,5 +4,5 @@
   
 (defpackage :nnl2.lli.ts
   (:use :cl)
-  (:export :trefd :trefw))
+  (:export :flat :trefw :data :mem-aref :iterate-across-tensor-data))
   

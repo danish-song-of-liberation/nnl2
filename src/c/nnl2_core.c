@@ -679,7 +679,7 @@ void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 
 Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) { 
 	return pow_broadcasting(base, exponent);
-}
+} 
 	 
 void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {
 	return max_broadcasting_inplace(a, b);  
@@ -708,7 +708,7 @@ Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
 	axpf_inplace(summand, sumend, alpha); 
 } 
-
+      
 Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
 	return axpf(summand, sumend, alpha);  
 } 
@@ -729,7 +729,7 @@ Tensor* lisp_call_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_sh
 	return nnl2_reinterpret(tensor, new_shape, new_shape_len, force); 
 }
 
-///@} [lisp_wrappers]
+///@} [lisp_wrappers]      
 		             
 #endif /** NNL2_CORE_C **/					 
 					 

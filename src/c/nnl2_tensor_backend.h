@@ -37,7 +37,7 @@
  ** @param name 
  * Human-readable backend name
  */
-#define REGISTER_BACKEND(fn, speed, name) { fn, speed, true, name }
+#define REGISTER_BACKEND(fn, speed, name) { fn, speed, name }
 
 /// @} 
 
@@ -216,7 +216,6 @@ typedef struct {
 typedef struct {
     void* fn;			  ///< Pointer to the function implementation
     int speed_priority;	  ///< Speed priority (lower = slower, higher = faster)
-    bool available;		  ///< Availability status of this implementation
     const char* name;	  ///< Human-readable name of the implementation	
 } Implementation;
 

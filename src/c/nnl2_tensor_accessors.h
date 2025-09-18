@@ -20604,15 +20604,28 @@ DEFINE_GET_NUMS_BACKENDS_FUNCTION(reinterpret);
 
 // Reinterpret definition (end)
 
+/** @brief
+ * Gets a pointer to a tensor element by linear index
+ *
+ ** @param tensor 
+ * Tensor to take element with linear index
+ *
+ ** @param at
+ * Linear index
+ *
+ ** @return void* 
+ * Pointer to the requested tensor element
+ */
 void* get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		size_t total_elems = product(tensor->shape, tensor->rank) - 1;
-		if(at > total_elems) {
+		size_t total_elems = product(tensor->shape, tensor->rank);
+		if(at >= total_elems) {
 			NNL2_ERROR("Index out of bounds: index %zd exceeds tensor size %zd", at, total_elems);
+			return NULL;
 		}
 	#endif
 	
@@ -20623,10 +20636,153 @@ void* get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
 	return ((char*)tensor->data + at * get_dtype_size(tensor->dtype));
 }
 
+/** @brief
+ * Sets a tensor element by linear index
+ *
+ ** @param tensor 
+ * Tensor to set element in
+ *
+ ** @param at
+ * Linear index
+ *
+ ** @param with
+ * Pointer to data to set
+ */
+void set_raw_tensor_elem_at(Tensor* tensor, size_t at, void* with) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        size_t total_elems = product(tensor->shape, tensor->rank);
+        if(at >= total_elems) {
+            NNL2_ERROR("Index out of bounds: index %zd exceeds tensor size %zd", at, total_elems);
+            return;
+        }
+    #endif
+	
+	size_t elem_size = get_dtype_size(tensor->dtype);
+    char* dest = (char*)tensor->data + at * elem_size;
+	memcpy(dest, with, elem_size);
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief
+ * Gets a pointer to a tensor element by coordinates (indexes)
+ *
+ ** @param tensor
+ * Tensor to take element from
+ *
+ ** @param coords
+ * Indices to get element
+ *
+ ** @param coords_len
+ * Length of indices 
+ *
+ ** @return void* 
+ * Pointer to the requested tensor element
+ */
 void* get_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (coords_len != tensor->rank) {
+			NNL2_ERROR("Length of indexes (%d) doesn't match tensor dimension (%d)", coords_len, tensor->rank);
+			return NULL;
+		}
+		
+		for (int i = 0; i < coords_len; i++) {
+			if (coords[i] < 0 || coords[i] >= tensor->shape[i]) {
+				NNL2_ERROR("Index at %d is out of bounds (tensor shape at %d is %d)", coords[i], i, tensor->shape[i]);
+				return NULL;
+			}
+		}
+	#endif
+	
+			
 	size_t offset = 0;
-	for(int i = 0; i < coords_len; i++) offset += coords[i] * tensor->strides[i];
-	return (char*)tensor->data + offset * get_dtype_size(tensor->dtype);
-}	
+	for (int i = 0; i < coords_len; i++) {
+		offset += coords[i] * tensor->strides[i];
+	}
+	
+	char* elem = (char*)tensor->data + offset * get_dtype_size(tensor->dtype);
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+		NNL2_FUNC_EXIT();
+	#endif
+    
+    return elem;
+}
+
+/** @brief
+ * Sets a tensor element by coordinates (indexes)
+ *
+ ** @param tensor
+ * Tensor to set element in
+ *
+ ** @param coords
+ * Indices to set element at
+ *
+ ** @param coords_len
+ * Length of indices
+ *
+ ** @param with
+ * Pointer to data to set
+ */
+void set_raw_tensor_elem(Tensor* tensor, int32_t* coords, int32_t coords_len, void* with) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (coords_len != tensor->rank) {
+            NNL2_ERROR("Length of indexes (%d) doesn't match tensor dimension (%d)", coords_len, tensor->rank);
+            return;
+        }
+        
+        for (int i = 0; i < coords_len; i++) {
+            if (coords[i] < 0 || coords[i] >= tensor->shape[i]) {
+                NNL2_ERROR("Index at %d is out of bounds (tensor shape at %d is %d)", coords[i], i, tensor->shape[i]);
+                return;
+            }
+        }
+    #endif
+    
+    size_t offset = 0;
+    for (int i = 0; i < coords_len; i++) {
+        offset += coords[i] * tensor->strides[i];
+    }
+    
+    size_t elem_size = get_dtype_size(tensor->dtype);
+    char* dest = (char*)tensor->data + offset * elem_size;
+    memcpy(dest, with, elem_size);
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return 0;
+}
+
+/** @brief 
+ * Get the dimension size at the specified index of a tensor's shape
+ * 
+ ** @param tensor 
+ * Pointer to the tensor
+ *
+ ** @param index 
+ * Index of the dimension to retrieve 
+ *
+ ** @return int32_t
+ * The size of the dimension at the specified index
+ */
+int32_t shape_at(Tensor* tensor, int32_t index) {
+	return tensor->shape[index];
+}
 
 #endif  /** NNL2_TENSOR_ACCESSORS_H **/ 

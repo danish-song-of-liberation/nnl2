@@ -468,6 +468,10 @@
 (cffi:defcfun ("get_tensor_data" get-tensor-data) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("shape_at" shape-at) :int
+  (tensor :pointer)
+  (index :int))
+  
 (cffi:defcfun ("lisp_call_debug_blas_sgemminplace" %%internal-debug-sgemm!) :void
   (check-to :unsigned-long))  
   
@@ -506,10 +510,21 @@
   (tensor :pointer)
   (at :size))
   
+(cffi:defcfun ("set_raw_tensor_elem_at" %lowlevel-tref-setter) :void
+  (tensor :pointer)
+  (at :size)
+  (with :pointer))
+  
 (cffi:defcfun ("get_raw_tensor_elem" %lowlevel-tref-with-coords) :pointer
   (tensor :pointer)
   (coords :pointer)
   (coords-len :int))
+  
+(cffi:defcfun ("set_raw_tensor_elem" %lowlevel-tref-with-coords-setter) :void
+  (tensor :pointer)
+  (coords :pointer)
+  (coords-len :int)
+  (with :pointer))  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
   (backend-name :string))   

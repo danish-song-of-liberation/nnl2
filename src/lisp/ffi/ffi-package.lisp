@@ -108,6 +108,8 @@
    #:%axpy!
    #:%lowlevel-tref
    #:%lowlevel-tref-with-coords
+   #:%lowlevel-tref-setter
+   #:%lowlevel-tref-with-coords-setter
    #:%set-view-backend
    #:%set-tref-setter-backend
    #:%set-tref-getter-backend
@@ -349,5 +351,6 @@
    #:%get-reshape-backends
    #:%get-reshape-num-backends
    #:%get-reinterpret-backends
-   #:%get-reinterpret-num-backends))
+   #:%get-reinterpret-num-backends
+   #:shape-at))
    
