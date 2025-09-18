@@ -182,17 +182,17 @@ void nnl2_init_reshaping();
  * #include "input_here_pass_to_nnl2"
  * int main() {
  *     nnl2_init_system(); // Initialize the framefork first!
- *	   // ... use the framework ...
+ *	   // ... use the framework ...   
  *	   return 0;
  * }	 
- ** @endcode  
+ ** @endcode
  ** 
  ** @note
  * The initialization order of the functions is not important
  *
  ** @see nnl2_init_accessors
  ** @see nnl2_init_tensor_creating
- ** @see nnl2_init_standard
+ ** @see nnl2_init_standard 
  ** @see nnl2_init_standard_inplace
  ** @see nnl2_init_stack
  ** @see nnl2_init_activations_inplace
@@ -201,11 +201,11 @@ void nnl2_init_reshaping();
  ** @see nnl2_init_transposition
  ** @see nnl2_init_auxiliary
  ** @see nnl2_init_correspondence_inplace
- ** @see nnl2_init_correspondence
- ** @see nnl2_init_broadcasting_inplace
+ ** @see nnl2_init_correspondence 
+ ** @see nnl2_init_broadcasting_inplace   
  ** @see nnl2_init_broadcasting
- ** @see nnl2_init_reshaping
- **/
+ ** @see nnl2_init_reshaping  
+ **/ 
 void nnl2_init_system() {      
 	// Initialization of random number generator
 	srand(time(NULL));               
@@ -232,7 +232,7 @@ void nnl2_init_system() {
 	nnl2_init_correspondence();
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
-	nnl2_init_reshaping();
+	nnl2_init_reshaping();  
 }                    
 
 ///@{ [subinitializers]     

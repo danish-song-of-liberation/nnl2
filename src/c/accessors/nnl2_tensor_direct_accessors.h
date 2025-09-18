@@ -199,4 +199,34 @@ int32_t nnl2_shape_at(Tensor* tensor, int32_t index) {
 	return tensor->shape[index];
 }
 
+/**
+ * @brief Gets the memory alignment requirement for tensors
+ * @ingroup backend_system
+ * @return Memory alignment in bytes
+ */
+int get_mem_alignment() {
+	return TENSOR_MEM_ALIGNMENT;
+}
+
+/**
+ * @brief Gets the total number of elements in a tensor
+ * @ingroup tensor_utils
+ * @param tensor Pointer to the tensor
+ * @return Total number of elements (product of all dimensions)
+ */
+int get_size(Tensor* tensor) {
+	return product(tensor->shape, tensor->rank);
+}
+
+/**
+ * @brief Gets the total memory size of a tensor in bytes
+ * @ingroup tensor_utils
+ * @param tensor Pointer to the tensor
+ * @return Total memory size in bytes
+ */
+int get_size_in_bytes(Tensor* tensor) {
+	return product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
+}
+
+
 #endif /** NNL2_TENSOR_DIRECT_ACCESSORS_H **/
