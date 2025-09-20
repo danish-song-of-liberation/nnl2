@@ -67,14 +67,14 @@ void nnl2_init_tensor_creating();
  ** @details 
  * These operations (e.g., add, sub, mul) take input tensors and return a new result tensor
  */
-void nnl2_init_standard();
+void nnl2_init_standard();    
 
 /** @brief 
  * Registers standard in-place mathematical operations
  *
  ** @details 
  * These operations (e.g., addinplace, subinplace) modify the target tensor directly
- */
+ */ 
 void nnl2_init_standard_inplace();
 
 /** @brief 
@@ -213,7 +213,7 @@ void nnl2_init_system() {
 	// Initialization of logger      
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
-		NNL2_LOG_DEFAULT_TIMESTAMPS,            
+		NNL2_LOG_DEFAULT_TIMESTAMPS,             
 		NNL2_LOG_DEFAULT_DEBUG_INFO,          
 		NNL2_LOG_LEVEL_DEBUG   
 	);  
@@ -225,7 +225,7 @@ void nnl2_init_system() {
 	nnl2_init_standard_inplace();       
 	nnl2_init_stack();
 	nnl2_init_activations_inplace();       
-	nnl2_init_activations();
+	nnl2_init_activations();  
 	nnl2_init_initializers();
 	nnl2_init_transposition(); 
 	nnl2_init_correspondence_inplace();
@@ -234,7 +234,7 @@ void nnl2_init_system() {
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  	
 }                    
-
+ 
 ///@{ [subinitializers]     
 
 /** @brief See all doxygen at [subinitializers_declaration] **/
