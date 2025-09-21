@@ -1,4 +1,4 @@
 (defpackage :nnl2.backends
   (:use :cl)
-  (:export :get-openblas0330woa64-status))
+  (:export :get-test-path :get-openblas0330woa64-status :get-avx128-status))
   

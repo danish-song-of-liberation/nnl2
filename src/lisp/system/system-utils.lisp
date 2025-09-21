@@ -18,7 +18,7 @@
   (cond
     ((eq str *alist-true*) t)
 	((eq str *alist-false*) nil)
-	(t (error "(~a): Unknown value: ~a~%" #'alist-string-to-bool str))))
+	(t (error "(~a): Unknown value: ~a~%" #'alist-symbol-to-bool str))))
 	
 (defun bool-to-alist (bool)
   #| if T returns "true" otherwise "false" |#
