@@ -12,5 +12,5 @@
 	nnl2.intern-system:*current-dir*
 	nnl2.intern-system:*current-dir*))
 			   
-(when *first-launch*	
+(when (alist-symbol-to-bool *first-launch*)	
   (greet-the-user))		   

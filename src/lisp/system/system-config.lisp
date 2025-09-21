@@ -6,6 +6,7 @@
 (defparameter *naive-available* t)  
 (defparameter *openblas0330woa64static-available* nil)
 (defparameter *avx128-available* nil)
+(defparameter *avx512-available* nil)
 
 (defparameter *default-tensor-type* :float64)
 
@@ -14,7 +15,8 @@
 (defparameter *implementations* (list 
 								  (cons 'naive *alist-true*)
 								  (cons 'openblas0330woa64static *alist-false*)
-								  (cons 'avx128 *alist-false*))
+								  (cons 'avx128 *alist-false*)
+								  (cons 'avx512 *alist-false*))
 								 
   "Contains an associative list for subsequent conversion 
    to json format in the format (implementation . *is-it-working-or-not*)")  
@@ -59,11 +61,13 @@
 				   (first-launch-p (alist-symbol-to-bool first-launch-alist))
 				   (naive-available-alist (assoc-key 'naive (assoc-key 'implementations data)))
 				   (openblas0330woa64static-available-alist (assoc-key 'openblas0330woa64static (assoc-key 'implementations data)))
-				   (avx128-available-alist (assoc-key 'avx128 (assoc-key 'implementations data))))
+				   (avx128-available-alist (assoc-key 'avx128 (assoc-key 'implementations data)))
+				   (avx512-available-alist (assoc-key 'avx512 (assoc-key 'implementations data))))
 				   
 			  (setf *naive-available* naive-available-alist
 					*openblas0330woa64static-available* openblas0330woa64static-available-alist   
 					*avx128-available* avx128-available-alist
+					*avx512-available* avx512-available-alist
 					*first-launch* first-launch-alist)
 				   
     		  (when first-launch-p (setf (assoc-key 'first-launch data) *alist-false*)) 
@@ -80,5 +84,6 @@
   (list
     (cons '*naive* *naive-available*)
 	(cons '*openblas0330woa64static* *openblas0330woa64static-available*)
-	(cons '*avx128* *avx128-available*)))
+	(cons '*avx128* *avx128-available*)
+	(cons '*avx512* *avx512-available*)))
   
