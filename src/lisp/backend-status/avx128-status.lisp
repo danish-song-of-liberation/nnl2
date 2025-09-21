@@ -6,8 +6,9 @@
 			 (space " ")
 			 (nnl2-path nnl2.intern-system:*current-dir*)
 			 (avx128-status-path "avx128_test")
+			 (avx128-flag "-mavx")
 			 (full-path-to-avx128-status-c (get-test-path nnl2-path avx128-status-path))
-			 (command (concatenate 'string compiler space (namestring full-path-to-avx128-status-c))))
+			 (command (concatenate 'string compiler space (namestring full-path-to-avx128-status-c) space avx128-flag)))
 			 
 		(unless (probe-file full-path-to-avx128-status-c)
           (error (format nil "File not found: ~a" full-path-to-avx128-status-c)))	 

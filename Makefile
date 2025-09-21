@@ -28,6 +28,10 @@ ifeq ($(openblas0330woa64static_available), 1)
     LDFLAGS += -L$(OPENBLAS0330WOA64STATIC_LIB) -l$(OPENBLAS0330WOA64STATIC_SHARED)
 endif
 
+ifeq ($(avx256_available), 1)
+	CFLAGS += -DNNL2_AVX256_AVAILABLE
+endif
+
 all: $(TARGET)
 	@echo OS=$(OS)
 	@echo Building $(TARGET)

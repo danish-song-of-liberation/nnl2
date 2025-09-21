@@ -154,7 +154,9 @@ void nnl2_naive_subinplace(Tensor* minuend, const Tensor* subtrahend) {
     #endif
 }
 
-#ifdef __AVX__
+
+
+#ifdef NNL2_AVX256_AVAILABLE
 
 // Declarations
 
@@ -744,10 +746,8 @@ static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const Tensor* 
 Implementation subinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_subinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
-	#ifdef __AVX__
-		#if TENSOR_MEM_ALIGNMENT == 32
-			REGISTER_BACKEND(nnl2_avx256_subinplace, nnl2_avx256, AVX256_BACKEND_NAME),
-		#endif
+	#if defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
+		REGISTER_BACKEND(nnl2_avx256_subinplace, nnl2_avx256, AVX256_BACKEND_NAME),
 	#endif
 };
 

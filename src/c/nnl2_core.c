@@ -2,15 +2,15 @@
 #define NNL2_CORE_C
 
 #ifdef __SSE__
-#include <xmmintrin.h>
+	#include <xmmintrin.h>
 #endif
 
-#ifdef __AVX__
-#include <immintrin.h>
+#ifdef NNL2_AVX256_AVAILABLE
+	#include <immintrin.h>
 #endif
 
 #ifdef __SSE2__ 
-#include <emmintrin.h>
+	#include <emmintrin.h>
 #endif  
   
 #include "nnl2_core.h"   
@@ -691,7 +691,7 @@ void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {
  
 Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) { 
 	return max_broadcasting(a, b);
-} 
+}  
 
 Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) {        
 	return min_broadcasting(a, b);

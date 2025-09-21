@@ -4,7 +4,6 @@
   "loads C library `libnnl.dll (or libnnl.so)` from the directory"
 
   (let ((dll-path (uiop:merge-pathnames* "libnnl.dll" c-dir)))
-    
 	(assert (probe-file dll-path) nil (format nil "File ~a is missing" dll-path))
 
     (handler-case
@@ -22,7 +21,10 @@
 	(assert (probe-file makefile-path) nil (format nil "File ~a is missing" makefile-path))
 	
 	(multiple-value-bind (output error-output exit-code)
-	  (uiop:run-program (format nil "make openblas0330woa64static_available=~d" (nnl2.system:bool-to-int nnl2.system:*openblas0330woa64static-available*))
+	  (uiop:run-program (format nil "make openblas0330woa64static_available=~d avx256_available=~d" 
+						  (nnl2.system:alist-to-int nnl2.system:*openblas0330woa64static-available*)
+						  (nnl2.system:alist-to-int nnl2.system:*avx256-available*))
+						  
 	    :error-output :interactive 
 		:output :string
 		:directory project-path)

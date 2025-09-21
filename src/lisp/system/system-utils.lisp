@@ -36,3 +36,6 @@
 
 (defmacro assoc-key (list alist)
   `(cdr (assoc ,list ,alist)))	 
+  
+(defmacro alist-to-int (alist)
+  `(bool-to-int (alist-symbol-to-bool ,alist)))

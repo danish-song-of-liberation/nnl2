@@ -26,6 +26,7 @@
 											:components ((:file "backend-status-package" :type "lisp")	
 														 (:file "backend-path-util" :type "lisp")
 														 (:file "avx128-status" :type "lisp")
+														 (:file "avx256-status" :type "lisp")
 														 (:file "avx512-status" :type "lisp")
 														 (:file "openblas0330woa64static-status" :type "lisp")))
 											

@@ -44,10 +44,12 @@
 		   (blas-lib (get-openblas0330woa64static-backend-lib-path path))
 		   (blas-available-p (zerop (nnl2.backends:get-openblas0330woa64-status path blas-include blas-lib)))
 		   (avx128-available-p (zerop (nnl2.backends:get-avx128-status)))
+		   (avx256-available-p (zerop (nnl2.backends:get-avx256-status)))
 		   (avx512-available-p (zerop (nnl2.backends:get-avx512-status))))
 		   
 	  (setf (assoc-key 'openblas0330woa64static (assoc-key 'implementations data)) (bool-to-alist blas-available-p)
 			(assoc-key 'avx128 (assoc-key 'implementations data)) (bool-to-alist avx128-available-p)
+			(assoc-key 'avx256 (assoc-key 'implementations data)) (bool-to-alist avx256-available-p)
 			(assoc-key 'avx512 (assoc-key 'implementations data)) (bool-to-alist avx512-available-p))
 		   
 	  (with-open-file (out list-path :direction :output
