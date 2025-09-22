@@ -35,9 +35,23 @@
 	  (when debug
 	    (format t "~%Exit code (~a): ~d~%Output (~a): ~a~%" #'compile-makefile exit-code output #'compile-makefile)))))
   
+(defun clean-makefile (project-path &optional debug)
+  "Сleans the project by running `make clean`"
+  
+  (multiple-value-bind (output error-output exit-code)
+      (uiop:run-program "make clean"
+        :error-output :interactive 
+        :output :string
+        :directory project-path
+		:ignore-error-status t)
+    
+    (when debug
+      (format t "~%Clean exit code: ~d~%Clean output: ~a~%" exit-code output))))
+
 ;; compiles and loads the C library  
 (let* ((c-dir (uiop:merge-pathnames* "src/c/" nnl2.intern-system:*current-dir*)))
   (assert (uiop:directory-exists-p c-dir) nil (format nil "Path ~a is not exists" c-dir))
 
-  (compile-makefile nnl2.intern-system:*current-dir*)
+  (compile-makefile nnl2.intern-system:*current-dir* nil)
+  (clean-makefile nnl2.intern-system:*current-dir* nil)
   (load-c-library c-dir))

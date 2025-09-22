@@ -43,6 +43,6 @@ $(OBJ): $(SRC)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f $(OBJ) $(TARGET) *.o
+	git clean -fdX -- $(MAKEFILE_DIR)src/c/nnl2_core.o
 
 .PHONY: all clean
