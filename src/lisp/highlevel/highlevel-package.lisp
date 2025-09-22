@@ -1,7 +1,8 @@
 (defpackage #:nnl2.hli
   (:use #:cl)
   (:export 
-   #:make-foreign-pointer))
+   #:make-foreign-pointer
+   #:fastcall))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -345,5 +346,7 @@
    #:with-backend/reinterpret
    #:tensor-p
    #:->
-   #:<-))
+   #:<-
+   #:type/nnl2->lisp
+   #:type/lisp->nnl2))
    

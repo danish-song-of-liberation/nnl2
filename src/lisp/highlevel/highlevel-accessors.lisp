@@ -1,32 +1,74 @@
+(in-package :nnl2.hli)
+
+(defmacro fastcall (&body body)
+  "A macro inspired by __fastcall (C) that 
+  accelerates the performance of everything 
+  inside it"
+  
+  `(locally (declare (optimize (speed 3)))
+     ,@body))
+
 (in-package :nnl2.hli.ts)
 
-(deftype nnl2-tensor () 'sb-sys:system-area-pointer)
+(deftype nnl2-tensor () 
+  #+sbcl 'sb-sys:system-area-pointer
+  #+clisp 'fi:foreign-data)
 
-(defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer)))
+(defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer))
+  "All types of nnl2 tensors and lisp types in an associative list")
 
-(defun ts-type-to-lisp (tensor-type)
-  (case tensor-type (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))	
+(defun type/nnl2->lisp (tensor-type)
+  "Converts the tensor system type to a lisp type
+   tensor-type: type for conversion
+   
+   Example: (type/nnl2->lisp :float64) -> 'DOUBLE-FLOAT"
+
+  (declare (type keyword tensor-type))
   
-(defun lisp-type-to-ts (lisp-type)
-  (cond ((eql lisp-type 'double-float) :float64) ((eql lisp-type 'single-float) :float32) ((eql lisp-type 'integer) :int32))) 
+  (nnl2.hli:fastcall 
+    (case (the keyword tensor-type) 
+	  (:float64 (the symbol 'double-float)) 
+	  (:float32 (the symbol 'single-float))
+	  (:int32 (the symbol 'integer)))))
+	
+(declaim (ftype (function (keyword) symbol) type/nnl2->lisp)) ;; Inline not needed	
+  
+(defun type/lisp->nnl2 (lisp-type)
+  "Converts a lisp type to a tensor type
+   lisp-type: lisp type for conversion into nnl2 tensor type
+   
+   Example: (type/lisp->nnl2 'double-float) -> :FLOAT64"
+   
+  (declare (type symbol lisp-type))
+
+  (nnl2.hli:fastcall
+    (cond ((eql lisp-type 'double-float) :float64) 
+		  ((eql lisp-type 'single-float) :float32) 
+		  ((eql lisp-type 'integer)      :int32))))
+		  
+(declaim (ftype (function (symbol) keyword) type/lisp->nnl2)) ;; Inline not needed			  
 
 (defun make-shape-pntr (shape)
+  "Creates a pointer to a C integers array from a lisp array/list
+   shape: A sequence (vector or list) of integers (shape for tensor)
+   Returns: (values foreign-pointer length) - A pointer to a C array and its length"
+  
   (let* ((len (the (integer 0 *) (length shape)))
 	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
 		
 	(declare (type (integer 0 *) len))
 	(declare (type cffi:foreign-pointer shape-pntr))
 		
-	(if (typep shape 'vector)	
-      (loop for i from 0 below len
-            do (setf (cffi:mem-aref shape-pntr :int i) (aref shape i)))
+	(etypecase shape	
+      (vector
+	    (loop for i from 0 below len
+              do (setf (cffi:mem-aref shape-pntr :int i) (aref shape i))))
 			
-	  (loop for i from 0 below len
-		    do (setf (cffi:mem-aref shape-pntr :int i) (nth i shape))))
+	  (list
+	    (loop for i from 0 below len
+		      do (setf (cffi:mem-aref shape-pntr :int i) (nth i shape)))))
 		  
     (values shape-pntr len)))
-	
-(declaim (inline make-shape-pntr))	
 	
 (defmacro free (tensor)
   `(nnl2.ffi:free-tensor ,tensor))
