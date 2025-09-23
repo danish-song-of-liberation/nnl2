@@ -71,9 +71,17 @@
     (values shape-pntr len)))
 	
 (defmacro free (tensor)
+  "Releases the transmitted tensor
+   tensor: Input tensor"
+
   `(nnl2.ffi:free-tensor ,tensor))
+  
+(declaim (inline free))  
 	
 (defmacro tlet ((&rest bindings) &body body)
+  "nnl2 Own let form for tensors automatically 
+   releasing created tensors at the end"
+   
   (let ((vars (mapcar #'car bindings)))
     `(let ,bindings
 	   (unwind-protect
@@ -84,6 +92,8 @@
 		           collect `(when (typep ,var 'nnl2-tensor) (free ,var))))))))
 
 (defmacro tlet* ((&rest bindings) &body body)
+  "The eigenform of let* for nnl2 tensors"
+  
   (if (null bindings)
    `(progn ,@body)
     (let* ((binding (first bindings))
@@ -95,13 +105,24 @@
           (when (typep ,var 'nnl2-tensor) (free ,var)))))))
 
 (defun empty (indices &key (dtype nnl2.system:*default-tensor-type*))
-  (declare (speed 3))
-  
+  "Makes an empty tensor of the specified shape
+   indices: Input shape
+   dtype (key): The type for the tensor"
+
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    (nnl2.ffi:%empty shape rank dtype))) 
+    (nnl2.ffi:%empty shape rank dtype)))
 	
 (defmacro empty-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
-  `(nnl2.ffi:%empty ,shape-pntr ,rank ,dtype))
+  "Creates an empty tensor (filled with garbage) 
+   using a pre-computed shape (gives a speed boost)
+   
+   shape-pntr: Pointer to a C array with shape
+   rank: Length shape"
+  
+  `(nnl2.hli:fastcall 
+     (nnl2.ffi:%empty ,shape-pntr ,rank ,dtype)))
+   
+(declaim (inline empty-with-pntr))
 
 (defun zeros (indices &key (dtype nnl2.system:*default-tensor-type*))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
@@ -109,6 +130,8 @@
 
 (defmacro zeros-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%zeros ,shape-pntr ,rank ,dtype))
+  
+(declaim (ftype (function ((or vector list) &key (:dtype keyword)) nnl2-tensor) empty zeros))
 
 (defun ones (indices &key (dtype nnl2.system:*default-tensor-type*))
   (multiple-value-bind (shape rank) (make-shape-pntr indices)
@@ -386,10 +409,10 @@
 				  (:float32 :float)
 				  (:int32 :int))))
 		
-	(loop for i from 0 below numel
-		  do (setf
-        	   (cffi:mem-aref (car aggreg-data) type-t i) (apply funct (loop for it in aggreg-data 
-																			 collect (cffi:mem-aref it type-t i)))))))  
+	(nnl2.threading:pdotimes (i numel)	
+	  (setf
+        (cffi:mem-aref (car aggreg-data) type-t i) (apply funct (loop for it in aggreg-data 
+															          collect (cffi:mem-aref it type-t i)))))))  
 																			 
 (defun .map (funct &rest tensors &aux (first-tensor (car tensors)))
   (let* ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
@@ -403,10 +426,10 @@
 		 (new-tensor (empty-like first-tensor))
 		 (new-tensor-data (nnl2.ffi:get-tensor-data new-tensor)))
 		
-	(loop for i from 0 below numel
-		  do (setf
-        	   (cffi:mem-aref new-tensor-data type-t i) (apply funct (loop for it in aggreg-data 
-																           collect (cffi:mem-aref it type-t i)))))
+	(nnl2.threading:pdotimes (i numel)
+	  (setf
+        (cffi:mem-aref new-tensor-data type-t i) (apply funct (loop for it in aggreg-data 
+																    collect (cffi:mem-aref it type-t i)))))
 
 	new-tensor))
 	
@@ -417,10 +440,10 @@
 				  (:float32 :float)
 				  (:int32 :int))))
 		
-	(loop for i from 0 below first-shape
-		  do (setf
-        	   (tref first-tensor i) (apply funct (loop for it in tensors
-														collect (tref it i)))))))
+	(nnl2.threading:pdotimes (i first-shape)
+	  (setf
+        (tref first-tensor i) (apply funct (loop for it in tensors
+												 collect (tref it i)))))))
 														
 (defun /map (funct &rest tensors &aux (first-tensor (car tensors)))
   (let ((first-shape (aref (shape first-tensor :as :vector) 0))
@@ -431,10 +454,10 @@
 		
 		(new-tensor (empty-like first-tensor)))
 		
-	(loop for i from 0 below first-shape
-		  do (setf
-        	   (tref new-tensor i) (apply funct (loop for it in tensors
-														collect (tref it i)))))
+	(nnl2.threading:pdotimes (i first-shape)
+	  (setf
+        (tref new-tensor i) (apply funct (loop for it in tensors
+											       collect (tref it i)))))
 
 	new-tensor))
 

@@ -26,6 +26,8 @@
   (rank :int)
   (dtype tensor-type))
   
+(declaim (ftype (function (:pointer :int tensor-type) :pointer) %empty))
+  
 (cffi:defcfun ("lisp_call_zeros" %zeros) :pointer
   (shape :pointer)
   (rank :int)

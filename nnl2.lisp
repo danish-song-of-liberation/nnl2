@@ -1,6 +1,9 @@
 (defpackage :nnl2.intern-system
   (:use :cl)
-  (:export #:*current-dir*))
+  (:export 
+    #:*current-dir*
+	#:*kernel-count*
+	#:*lparallel-available*))
   
 (in-package :nnl2.intern-system)
 
@@ -45,6 +48,13 @@
 														 (:file "ffi-with-c" :type "lisp")
 														 (:file "ffi-c-core" :type "lisp")
 														 (:file "ffi-status" :type "lisp")))
+														 
+										   (:module "threading"
+										    :serial t
+											:components ((:file "threading-package" :type "lisp")
+														 (:file "threading-loops" :type "lisp")
+														 (:file "threading-map" :type "lisp")
+														 (:file "threading-let" :type "lisp")))
 														 
 										   (:module "format"
 										    :serial t
@@ -112,8 +122,33 @@
 							 (:file "tests" :type "lisp"))))
 							 
   :perform (asdf:test-op (o c)
-			 (uiop:symbol-call :nnl2.tests :run-all-tests)))
+			 (uiop:symbol-call :nnl2.tests :run-all-tests)))			 
+			 
+(defun get-processor-core-count ()
+  "Returns the number of processor cores"
   
+  (handler-case
+      (cond
+        ((uiop:os-unix-p)    (parse-integer (string-trim '(#\Newline) (uiop:run-program "nproc" :output :string))))	   
+        ((uiop:os-windows-p) (parse-integer (string-trim '(#\Newline) (uiop:run-program "echo %NUMBER_OF_PROCESSORS%" :output :string)))) 
+        (t 1))
+		
+    (error () 1)))
+			 
+(defvar *kernel-count* (get-processor-core-count))
+(defvar *lparallel-available* nil)
+			 
+(handler-case 
+    (progn
+      (ql:quickload :sb-cltl2 :silent t)
+	  (ql:quickload :lparallel :silent t)
+	  (setq *lparallel-available* t))
+	  
+  (error (e)))
+  
+#+lparallel
+(setf lparallel:*kernel* (lparallel:make-kernel *kernel-count*))
+
 (defvar *nnl2-framework-name* "nnl2" 
   "Stores the name of the framework used for the build. 
    This allows you to identify the build in the debugger 

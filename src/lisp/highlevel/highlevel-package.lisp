@@ -348,5 +348,6 @@
    #:->
    #:<-
    #:type/nnl2->lisp
-   #:type/lisp->nnl2))
+   #:type/lisp->nnl2
+   #:free))
    
