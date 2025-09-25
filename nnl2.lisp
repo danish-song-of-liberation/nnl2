@@ -144,7 +144,7 @@
 	  (ql:quickload :lparallel :silent t)
 	  (setq *lparallel-available* t))
 	  
-  (error (e)))
+  (error ()))
   
 #+lparallel
 (setf lparallel:*kernel* (lparallel:make-kernel *kernel-count*))

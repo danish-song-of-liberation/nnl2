@@ -34,9 +34,11 @@ to be more specific, due to problems with BPTT, recurrent graphs, and poor libra
 
 The framework is divided into three main components:
 
-1. Tensor System (95% complete)
+1. Tensor System (99% complete) (it remains to redo the interface)
 2. Autodiff System (with 5 different modes)
 3. Neural Networks Implementations
+
+I'm sorry, but I have VERY, VERY little time right now, so the code is writing slowly
 
 # Documentation
 
