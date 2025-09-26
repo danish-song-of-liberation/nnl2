@@ -7,12 +7,68 @@
   
   `(locally (declare (optimize (speed 3)))
      ,@body))
+	 
+(defun make-shape-pntr (shape)
+  "Creates a pointer to a C integers array from a lisp array/list
+   shape: A sequence (vector or list) of integers (shape for tensor)
+   Returns: (values foreign-pointer length) - A pointer to a C array and its length"
+  
+  (let* ((len (the (integer 0 *) (length shape)))
+	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
+		
+	(declare (type (integer 0 *) len))
+	(declare (type cffi:foreign-pointer shape-pntr))
+		
+	(etypecase shape	
+      (vector
+	    (loop for i from 0 below len
+              do (setf (cffi:mem-aref shape-pntr :int i) (aref shape i))))
+			
+	  (list
+	    (loop for i from 0 below len
+		      do (setf (cffi:mem-aref shape-pntr :int i) (nth i shape)))))
+		  
+    (values shape-pntr len)))
+	
+(declaim (ftype (function ((or vector list)) (values cffi:foreign-pointer (integer 0 *))) make-shape-pntr))	
+
+(defmacro free-shape-pntr (pntr)
+  "Frees the memory allocated through the make-shape-pntr function
+   pntr: Pointer obtained through make-shape-pntr
+   
+   Example: 
+   (let ((foo (make-shape-pntr #(1 2 3))))
+     ...
+	 
+	 (free-shape-pntr foo))
+   
+   see: #'make-shape-pntr"
+   
+  `(cffi:foreign-free ,pntr))	
+  
+(defmacro with-automatic-memory-freeing (&body body)
+  "Macro that calls the unwind-protect macro (created for better self-documentation)
+  
+   Example: 
+   (nnl2.hli:with-automatic-memory-freeing
+     ...)
+	 
+   See: unwind-protect"
+  
+  `(unwind-protect ,@body))
 
 (in-package :nnl2.hli.ts)
 
 (deftype nnl2-tensor () 
-  #+sbcl 'sb-sys:system-area-pointer
-  #+clisp 'fi:foreign-data)
+  "Type representing a foreign tensor pointer"
+  
+  #+sbcl      'sb-sys:system-area-pointer
+  #+clisp     'fi:foreign-data
+  #+ccl       'ccl:macptr
+  #+ecl       'si:foreign-data
+  #+abcl      'system:foreign-pointer
+  #+lispworks 'fli:pointer
+  #+allegro   'excl:foreign-pointer)
 
 (defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer))
   "All types of nnl2 tensors and lisp types in an associative list")
@@ -47,28 +103,22 @@
 		  ((eql lisp-type 'integer)      :int32))))
 		  
 (declaim (ftype (function (symbol) keyword) type/lisp->nnl2)) ;; Inline not needed			  
+	
+(defun type/nnl2->cffi (cffi-type)
+  "Converts the tensor system type to a cffi type
+   cffi-type: type for conversion
+   
+   Example: (type/nnl2->cffi :float64) -> :double"
 
-(defun make-shape-pntr (shape)
-  "Creates a pointer to a C integers array from a lisp array/list
-   shape: A sequence (vector or list) of integers (shape for tensor)
-   Returns: (values foreign-pointer length) - A pointer to a C array and its length"
+  (declare (type keyword cffi-type))
   
-  (let* ((len (the (integer 0 *) (length shape)))
-	     (shape-pntr (the cffi:foreign-pointer (cffi:foreign-alloc :int :count len))))
-		
-	(declare (type (integer 0 *) len))
-	(declare (type cffi:foreign-pointer shape-pntr))
-		
-	(etypecase shape	
-      (vector
-	    (loop for i from 0 below len
-              do (setf (cffi:mem-aref shape-pntr :int i) (aref shape i))))
-			
-	  (list
-	    (loop for i from 0 below len
-		      do (setf (cffi:mem-aref shape-pntr :int i) (nth i shape)))))
-		  
-    (values shape-pntr len)))
+  (nnl2.hli:fastcall 
+    (case (the keyword cffi-type) 
+	  (:float64 (the keyword :double)) 
+	  (:float32 (the keyword :float))
+	  (:int32 (the keyword :int)))))	
+	  
+(declaim (ftype (function (keyword) keyword) type/lisp->cffi)) ;; Inline not needed		  
 	
 (defmacro free (tensor)
   "Releases the transmitted tensor
@@ -106,18 +156,20 @@
 
 (defun empty (indices &key (dtype nnl2.system:*default-tensor-type*))
   "Makes an empty tensor of the specified shape
-   indices: Input shape
-   dtype (key): The type for the tensor"
+  
+   indices: A list or vector with the dimensions of a tensor
+   dtype (key): Type of tensor"
 
-  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%empty shape rank dtype)))
 	
-(defmacro empty-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
+(defmacro empty-with-shape-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
   "Creates an empty tensor (filled with garbage) 
    using a pre-computed shape (gives a speed boost)
    
    shape-pntr: Pointer to a C array with shape
-   rank: Length shape"
+   rank: Length of shape
+   dtype (key): Type of tensor"
   
   `(nnl2.hli:fastcall 
      (nnl2.ffi:%empty ,shape-pntr ,rank ,dtype)))
@@ -125,32 +177,78 @@
 (declaim (inline empty-with-pntr))
 
 (defun zeros (indices &key (dtype nnl2.system:*default-tensor-type*))
-  (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    (nnl2.ffi:%zeros shape rank dtype)))	 
+  "Creates a tensor filled with zeros
+  
+   indices: A list or vector with the dimensions of a tensor
+   dtype (key): Type of tensor"
+   
+  (declare (type keyword dtype))		
+  
+  (nnl2.hli:fastcall
+    (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+      (declare (type integer rank))
+      (nnl2.ffi:%zeros shape rank dtype))))	 
 
 (defmacro zeros-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
+  "Creates an tensor filled with zeros
+   using a pre-computed shape (gives a speed boost)
+   
+   shape-pntr: Pointer to a C array with shape
+   rank: Length of shape
+   dtype (key): Type of tensor"
+   
   `(nnl2.ffi:%zeros ,shape-pntr ,rank ,dtype))
-  
-(declaim (ftype (function ((or vector list) &key (:dtype keyword)) nnl2-tensor) empty zeros))
 
 (defun ones (indices &key (dtype nnl2.system:*default-tensor-type*))
-  (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    (nnl2.ffi:%ones shape rank dtype))) 
+  "Creates a tensor filled with ones
+  
+   indices: A list or vector with the dimensions of a tensor
+   dtype (key): Type of tensor"
+   
+  (declare (type keyword dtype))		
+  
+  (nnl2.hli:fastcall
+    (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+      (declare (type integer rank))
+      (nnl2.ffi:%ones shape rank dtype))))
 
 (defmacro ones-with-pntr (shape-pntr rank &key (dtype nnl2.system:*default-tensor-type*))
+  "Creates a tensor filled with ones
+   using a pre-computed shape (gives a speed boost)
+   
+   shape-pntr: Pointer to a C array with shape
+   rank: Length of shape
+   dtype (key): Type of tensor"
+   
   `(nnl2.ffi:%ones ,shape-pntr ,rank ,dtype))
+  
+(declaim (ftype (function ((or vector list) &key (:dtype keyword)) nnl2-tensor) empty zeros ones))  
 
 (defun full (indices &key (dtype nnl2.system:*default-tensor-type*) (filler 0.0d0))
-  (multiple-value-bind (shape rank) (make-shape-pntr indices)
-    (let* ((cffi-type (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		   (filler-pntr (cffi:foreign-alloc cffi-type)))
+  "Creates a tensor filled with a dtype key specified value
+   
+   indices: A list or vector with the dimensions of a tensor
+   dtype (key): Type of tensor
+   filler (key): Value to fill tensor
+   
+   Example:
+   (nnl2.hli.ts:full #(5) :filler 2.0d0) -> #<NNL2:TENSOR ...: 2.0d0 2.0d0 2.0d0 2.0d0 2.0d0>"
+   
+  (declare (type keyword dtype))
+
+  (nnl2.hli:fastcall
+    (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+      (let* ((cffi-type (type/nnl2->cffi dtype))
+	    	 (filler-pntr (cffi:foreign-alloc cffi-type)))
 		  
-	  (setf (cffi:mem-ref filler-pntr cffi-type) filler)
+	    (setf (cffi:mem-ref filler-pntr cffi-type) filler)
 	  
-      (nnl2.ffi:%full shape rank dtype filler-pntr))))
-	  
+        (let ((tensor (nnl2.ffi:%full shape rank dtype filler-pntr)))
+	      (cffi:foreign-free filler-pntr)		  
+		  tensor)))))
+
 (defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
-  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (let* ((total-elems (length flatten-data))
 		   (cffi-type (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
 		   (lisp-type (ts-type-to-lisp dtype))
@@ -490,7 +588,7 @@
   (nnl2.ffi:%.tanh tensor))    
   
 (defmacro randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
-  (multiple-value-bind (shape rank) (make-shape-pntr indices)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (case dtype
 	  (:float64 `(let ((from-pntr (cffi:foreign-alloc :double))
 					   (to-pntr (cffi:foreign-alloc :double)))

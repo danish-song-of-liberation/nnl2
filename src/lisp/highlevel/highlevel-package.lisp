@@ -2,14 +2,15 @@
   (:use #:cl)
   (:export 
    #:make-foreign-pointer
-   #:fastcall))
+   #:fastcall
+   #:make-shape-pntr
+   #:free-shape-pntr
+   #:with-automatic-memory-freeing))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
   (:export 
-   #:make-shape-pntr
    #:empty
-   #:empty-with-pntr
    #:zeros
    #:zeros-with-pntr
    #:ones
@@ -349,5 +350,7 @@
    #:<-
    #:type/nnl2->lisp
    #:type/lisp->nnl2
-   #:free))
+   #:type/nnl2->cffi
+   #:free
+   #:empty-with-shape-pntr))
    

@@ -24,14 +24,14 @@
    (nnl2.ffi:%lowlevel-tref-setter tensor at filler-pntr)))
   
 (defun trefw (tensor &rest at)
-  (multiple-value-bind (shape rank) (nnl2.hli.ts:make-shape-pntr at)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr at)
     (let ((elem (nnl2.ffi:%lowlevel-tref-with-coords tensor shape rank)))
 	  (if (cffi:null-pointer-p elem)
 	    (error "Pointer can't be NULL")
 		(cffi:mem-ref elem (case (nnl2.hli.ts:dtype tensor) (:float64 :double) (:float32 :float) (:int32 :int)))))))
 	    
 (defun (setf trefw) (with tensor &rest at)
-  (multiple-value-bind (shape rank) (nnl2.hli.ts:make-shape-pntr at)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr at)
     (let* ((cffi-type (case (nnl2.hli.ts:dtype tensor)
 				        (:float64 :double)
 				        (:float32 :float)
