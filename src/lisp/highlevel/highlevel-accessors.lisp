@@ -238,8 +238,10 @@
 
   (nnl2.hli:fastcall
     (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-      (let* ((cffi-type (type/nnl2->cffi dtype))
+      (let* ((cffi-type (the keyword (type/nnl2->cffi dtype)))
 	    	 (filler-pntr (cffi:foreign-alloc cffi-type)))
+			 
+		(declare (type keyword cffi-type))	 
 		  
 	    (setf (cffi:mem-ref filler-pntr cffi-type) filler)
 	  
@@ -248,22 +250,60 @@
 		  tensor)))))
 
 (defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
-  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-    (let* ((total-elems (length flatten-data))
-		   (cffi-type (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		   (lisp-type (ts-type-to-lisp dtype))
-		   (data-pntr (cffi:foreign-alloc cffi-type :count total-elems)))
-	
-      (cond
-	    ((listp flatten-data)
-	       (dotimes (i total-elems)	  
-	         (setf (cffi:mem-aref data-pntr cffi-type i) (coerce (nth i flatten-data) lisp-type))))
-			 
-		((vectorp flatten-data)
-		   (dotimes (i total-elems)	  
-	         (setf (cffi:mem-aref data-pntr cffi-type i) (coerce (aref flatten-data i) lisp-type)))))
+  "Creates a tensor from a flat list/vector with the specified shapes
+   Example: (from-flatten '(1 2 3 4 5 6) '(2 3)) -> #<NNL2:TENSOR ... [2x3]: 1.0d0 2.0d0 3.0d0\n4.0d0 5.0d0 6.0d0>
+   
+   flatten-data: list/vector Data
+   indices: Tensor shapes (list/vector)
+   dtype (key): Type of tensor" 
+   
+  (nnl2.hli:fastcall 
+    (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+	  ;; Creating a pointer to the tensor shape and obtaining the rank 
+      (let* ((total-elems (length flatten-data))
+		     (cffi-type (the keyword (type/nnl2->cffi dtype)))
+		     (lisp-type (the symbol (type/nnl2->lisp dtype)))
+		     (data-pntr (cffi:foreign-alloc cffi-type :count total-elems)))
+		   
+	    (declare (type symbol lisp-type) 
+			     (type keyword cffi-type)
+			     (type (integer 0 *) rank total-elems))
+				 
+	    (unwind-protect
+	      (progn
+            (etypecase flatten-data
+	          (list 
+			    ;; If the data is in the form of a list, iterate over the elements
+	            (let ((lst flatten-data))
+                 (nnl2.threading:pdotimes (i total-elems) ; Parallel iteration
+                   (setf (cffi:mem-aref data-pntr cffi-type i) 
+                         (coerce (car lst) lisp-type)
+                         lst (cdr lst)))))
+          
+		      (vector
+			    ;; If the data is in the form of a vector, it is more efficient to process it
+		        (locally
+                  (declare (type (simple-array * (*)) flatten-data))
+                  (case cffi-type
+                    (:float
+                      (nnl2.threading:pdotimes (i total-elems)
+                        (setf (cffi:mem-aref data-pntr :float i)
+                              (the single-float (coerce (aref flatten-data i) 'single-float)))))
+							 
+                    (:double
+                      (nnl2.threading:pdotimes (i total-elems)
+                        (setf (cffi:mem-aref data-pntr :double i)
+                              (the double-float (coerce (aref flatten-data i) 'double-float)))))
+							 
+                    (t
+                      (nnl2.threading:pdotimes (i total-elems)
+                        (setf (cffi:mem-aref data-pntr cffi-type i)
+                              (coerce (aref flatten-data i) lisp-type))))))))))
 	  
-      (nnl2.ffi:%make-tensor-from-flatten data-pntr total-elems shape rank dtype))))
+	    ;; Creating a tensor from C data and freeing temporary memory
+        (let ((result (nnl2.ffi:%make-tensor-from-flatten data-pntr total-elems shape rank dtype)))
+		  (cffi:foreign-free data-pntr) ; Freeing up C memory
+		  result))))) ; Return of the created tensor
 
 (defun reduce-list-shape (lst)
   (if (atom lst)

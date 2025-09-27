@@ -6,7 +6,7 @@
 #endif
 
 #ifdef NNL2_AVX256_AVAILABLE
-	#include <immintrin.h>
+	#include <immintrin.h> 
 #endif
 
 #ifdef __SSE2__ 
@@ -226,6 +226,7 @@ void nnl2_init_system() {
 	nnl2_init_stack();
 	nnl2_init_activations_inplace();       
 	nnl2_init_activations();  
+	nnl2_init_auxiliary();
 	nnl2_init_initializers();
 	nnl2_init_transposition(); 
 	nnl2_init_correspondence_inplace();
