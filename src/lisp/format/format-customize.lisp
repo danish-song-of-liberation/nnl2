@@ -1,5 +1,15 @@
 (in-package :nnl2.format)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/format/format-customize.lisp
+;; File: format-customize.lisp
+
+;; File contains function to cuztomize format of tensors
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun customize-tensor-format (&key max-rows max-cols show-rows-after-skip show-cols-after-skip)
   (when max-rows
     (assert (and (not (zerop max-rows)) (plusp max-rows)) nil "```:max-rows``` Should be positive (not zero and non-negative)")

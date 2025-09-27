@@ -1,10 +1,20 @@
 (in-package :nnl2.backends)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/backend-status/openblas0330woa64static-status.lisp
+;; File: openblas0330woa64static-status.lisp
+
+;; Contains the function for check openblas status
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun get-openblas0330woa64-status (dir-path include-path lib-path)
-  "compiles c file with openblas0330woa64static code
+  "Compiles c file with openblas0330woa64static code
    
-   if works correctly returns 0
-   else returns 1"
+   If openblas is available returns 0
+   Else returns 1"
 
   (handler-case
       (let* ((path nnl2.intern-system:*current-dir*)
