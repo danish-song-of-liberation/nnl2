@@ -431,63 +431,102 @@
             (from-flatten flat-vector shape :dtype dtype))))))
   
 (defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
+   "Creates a tensor filled with specified value
+    using a pre-computed shape (gives a speed boost)
+   
+    shape-pntr: Pointer to a C array with shape
+    rank: Length of shape
+	filler (key): Value to fill
+    dtype (key): Type of tensor"
+	
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 
 
-(defmacro print-tensor (tensor &key full-print)
-  `(progn
-     (nnl2.ffi:print-tensor 
-       ,tensor 
-	   ,full-print 
-	   nnl2.format:*nnl2-max-rows-format* 
-	   nnl2.format:*nnl2-max-cols-format* 
-	   nnl2.format:*nnl2-show-rows-after-skip* 
-	   nnl2.format:*nnl2-show-cols-after-skip*)
+(defun print-tensor (tensor &key full-print)
+  "Prints a tensor with formatted output"
+  
+  (nnl2.ffi:print-tensor 
+    tensor 
+	full-print 
+	nnl2.format:*nnl2-max-rows-format* 
+	nnl2.format:*nnl2-max-cols-format* 
+	nnl2.format:*nnl2-show-rows-after-skip* 
+	nnl2.format:*nnl2-show-cols-after-skip*)
 	
-	,tensor))
-
-(defmacro rank (tensor)
-  `(nnl2.ffi:get-tensor-rank ,tensor))
+  tensor)
   
-(defmacro dtype (tensor)
-  `(nnl2.ffi:get-tensor-dtype ,tensor))  
-
-(defmacro int-dtype (tensor)
-  `(nnl2.ffi:get-int-tensor-dtype ,tensor))    
+(cffi:defcfun ("nnl2_get_tensor_rank" rank) :int
+  (tensor :pointer))    
   
-(defmacro shape-pointer (tensor)
-  `(nnl2.ffi:get-pointer-to-tensor-shape ,tensor))
+(cffi:defcfun ("nnl2_get_tensor_dtype" dtype) nnl2.ffi:tensor-type
+  (tensor :pointer))      
+
+(cffi:defcfun ("nnl2_get_tensor_dtype" int-dtype) :int
+  (tensor :pointer))         
   
 (defun get-shape-as-list (tensor rank)
+  "Gets the form of the specified tensor as a list
+   tensor: Input tensor
+   rank: Rank of input tensor"
+   
   (loop with rank-t = (if rank rank (rank tensor))
-		with shape-pointer = (shape-pointer tensor)
+		with shape-pointer = (nnl2.ffi:get-pointer-to-tensor-shape tensor)
 		for i from 0 below rank-t
-		collect (cffi:mem-aref shape-pointer :int i)))
+		collect (cffi:mem-aref shape-pointer :int i)))		
 
 (defun get-shape-as-vector (tensor rank)
+  "Gets the form of the specified tensor as a vector
+   tensor: Input tensor
+   rank: Rank of input tensor"
+   
   (let* ((rank-t (if rank rank (rank tensor)))
 		 (vec (make-array rank-t))
-		 (shape-pointer (shape-pointer tensor)))
+		 (shape-pointer (nnl2.ffi:get-pointer-to-tensor-shape tensor)))
 		 
 	(dotimes (i rank-t)
 	  (setf (aref vec i) (cffi:mem-aref shape-pointer :int i)))
 	  
 	vec))
 	
-(defmacro shape (tensor &key (as :vector) (rank nil))
-  (case as
-    (:list    `(get-shape-as-list ,tensor ,rank))
-	(:vector  `(get-shape-as-vector ,tensor ,rank))
-	(:pointer `(shape-pointer tensor))
-	(otherwise (error "Unknown type: ~a~%" as))))
+(declaim (ftype (function (nnl2-tensor (integer 0 *)) list) get-shape-as-list)
+		 (ftype (function (nnl2-tensor (integer 0 *)) vector) get-shape-as-vector))
+	
+(defun shape (tensor &key (as :vector))
+  "Function for getting the shape of a tensor
+  
+   tensor: Input tensor
+   as (key): Return type
+   
+   Available returnable type: (:list :vector :pointer)
+   
+   Example 1: (shape foo :as :list) -> '(3 3)
+   Example 2: (shape foo :as :vector) -> #(3 3)
+   Example 3: (shape foo :as :pointer) -> Depends on the lisp implementation"
+   
+  (let ((rank (rank tensor)))
+    (case as
+      (:list    (get-shape-as-list tensor rank))
+	  (:vector  (get-shape-as-vector tensor rank))
+	  (:pointer (nnl2.ffi:get-pointer-to-tensor-shape tensor))
+	  (otherwise (error "Unknown type: ~a~%" as)))))
+	  
+(declaim (inline shape))	  
 	
 (defun get-strides-as-list (tensor)
-  (loop with len = (nnl2.ffi:get-tensor-rank tensor)
+  "Gets the strides of the specified tensor as a list
+   tensor: Input tensor
+   rank: Rank of input tensor"
+   
+  (loop with len = (rank tensor)
 		with strides-pointer = (nnl2.ffi:get-pointer-to-tensor-strides tensor)
 		for i from 0 below len
 		collect (cffi:mem-aref strides-pointer :int i)))	
 	
 (defun get-strides-as-vector (tensor)
-  (let* ((len (nnl2.ffi:get-tensor-rank tensor))
+  "Gets the strides of the specified tensor as a vector
+   tensor: Input tensor
+   rank: Rank of input tensor"
+   
+  (let* ((len (rank tensor))
          (vec (make-array len))
 		 (strides-pointer (nnl2.ffi:get-pointer-to-tensor-strides tensor)))
 		
@@ -497,6 +536,17 @@
 	vec))
 	
 (defmacro strides (tensor &key (as :vector))
+  "Function for getting the strides of a tensor
+  
+   tensor: Input tensor
+   as (key): Return type
+   
+   Available returnable type: (:list :vector :pointer)
+   
+   Example 1: (strides foo :as :list) -> '(5 1)
+   Example 2: (strides foo :as :vector) -> #(5 1)
+   Example 3: (strides foo :as :pointer) -> Depends on the lisp implementation"
+   
   (case as
     (:list    `(get-strides-as-list ,tensor))
     (:vector  `(get-strides-as-vector ,tensor))
@@ -504,30 +554,83 @@
 	(otherwise (error "Unknown type: ~a~%" as))))
 
 (defun gemm (a b &key (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb)
-  (declare (optimize (speed 3) (safety 0)))
+  "General Matrix Multiplication (GEMM) operation
+   C = alpha * op(A) * op(B) + beta * C
+   
+   Args:
+   a, b: Input tensors
+   order: Storage order (:nnl2rowmajor or :nnl2colmajor)
+   transa, transb: Transpose flags (:nnl2notrans or :nnl2trans)
+   alpha, beta: Scaling factors
+   m, n, k: Matrix dimensions (automatically determined if not provided)
+   lda, ldb: Leading dimensions (automatically determined if not provided)"
+   
+  (declare (optimize (speed 3) (safety 1)))
+  
+  (declare (type nnl2-tensor a b)
+		   (type keyword order transa transb)
+		   (type double-float alpha beta))
 
-  (let* ((shape-a (shape a :as :vector :rank 2))
-		 (shape-b (shape b :as :vector :rank 2))
-		 (m (if m m (aref shape-a 0)))
-		 (n (if n n (aref shape-b 1)))
-		 (k (if k k (aref shape-a 1)))
-		 (lda (if lda lda k))
-		 (ldb (if ldb ldb n)))
+  (let* ((shape-a (shape a :as :vector))
+		 (shape-b (shape b :as :vector))
+		 
+		 (m (or m (if (eq transa :nnl2notrans) 
+                      (aref shape-a 0) 
+                      (aref shape-a 1))))
+					  
+		 (n (or n (if (eq transb :nnl2notrans) 
+                      (aref shape-b 1) 
+                      (aref shape-b 0))))
+					  
+		 (k (or k (if (eq transa :nnl2notrans) 
+                      (aref shape-a 1) 
+                      (aref shape-a 0))))
+					  
+		 (lda (or lda (if (eq transa :nnl2notrans) k m)))
+         (ldb (or ldb (if (eq transb :nnl2notrans) n k))))
 		 
 	(nnl2.ffi:%gemm order transa transb m n k alpha a lda b ldb beta)))
   
-(defun gemm! (a b &key out (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb ldc)
-  (let* ((shape-a (shape a :as :vector :rank 2))
-		 (shape-b (shape b :as :vector :rank 2))
-		 (shape-out (shape out :as :vector :rank 2))
-		 (m (if m m (aref shape-a 0)))
-		 (n (if n n (aref shape-b 1)))
-		 (k (if k k (aref shape-a 1)))
-		 (lda (if lda lda k))
-		 (ldb (if ldb ldb n))
-		 (ldc (if ldc ldc (aref shape-out 1))))
-		 
-	(nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))         
+(defun gemm! (a b &key (out a) (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb ldc)
+  "General Matrix Multiplication (GEMM) operation with in-place modification
+   C = alpha * op(A) * op(B) + beta * C
+   
+   Args:
+   a, b: Input tensors
+   out: Output tensor (defaults to a for in-place operation)
+   order: Storage order (:nnl2rowmajor or :nnl2colmajor)
+   transa, transb: Transpose flags (:nnl2notrans or :nnl2trans)
+   alpha, beta: Scaling factors
+   m, n, k: Matrix dimensions (automatically determined if not provided)
+   lda, ldb, ldc: Leading dimensions (automatically determined if not provided)"
+   
+  (declare (optimize (speed 3) (safety 1)))
+  
+  (declare (type nnl2-tensor a b out)
+           (type keyword order transa transb)
+           (type double-float alpha beta))
+
+  (let* ((shape-a (shape a :as :vector))
+         (shape-b (shape b :as :vector))
+         (shape-out (shape out :as :vector))
+         
+         (m (or m (if (eq transa :nnl2notrans) 
+                     (aref shape-a 0) 
+                     (aref shape-a 1))))
+                     
+         (n (or n (if (eq transb :nnl2notrans) 
+                     (aref shape-b 1) 
+                     (aref shape-b 0))))
+                     
+         (k (or k (if (eq transa :nnl2notrans) 
+                     (aref shape-a 1) 
+                     (aref shape-a 0))))
+                     
+         (lda (or lda (if (eq transa :nnl2notrans) k m)))
+         (ldb (or ldb (if (eq transb :nnl2notrans) n k)))
+         (ldc (or ldc (aref shape-out 1))))
+         
+    (nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))      
 
 (defun .exp! (tensor)
   (nnl2.ffi:%.exp! tensor))

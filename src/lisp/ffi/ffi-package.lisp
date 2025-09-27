@@ -11,10 +11,8 @@
    #:%dgemm
    #:%sgemm
    #:%gemm
-   #:get-tensor-rank
+   #:tensor-type
    #:get-tensor-strides
-   #:get-tensor-dtype
-   #:get-int-tensor-dtype
    #:get-pointer-to-tensor-shape
    #:get-pointer-to-tensor-strides
    #:%get-mem-alignment
