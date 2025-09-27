@@ -1,5 +1,15 @@
 (in-package :nnl2.system)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/system/system-impl-upd.lisp
+;; File: system-impl-upd.lisp
+
+;; File contains utilities for updating config.alist
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun get-openblas0330woa64static-backend-include-path (dir-path)
   "Return a filepath to openblas0330woa64static include directory.
    dir-path is path to nnl2 project

@@ -1,5 +1,15 @@
 (in-package :nnl2.system)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/system/system-config.lisp
+;; File: system-config.lisp
+
+;; File contains system configuration initialization (config.alist)
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defparameter *first-launch* nil
   "Flag indicating if this is the first system launch")
   
@@ -21,7 +31,7 @@
 								  (cons 'avx512 *alist-false*))
 								 
   "Contains an associative list for subsequent conversion 
-   to json format in the format (implementation . *is-it-working-or-not*)")  
+   to alist format in the format (implementation . *is-it-working-or-not*)")  
 
 (defun get-config-path ()
   (uiop:merge-pathnames*
@@ -32,7 +42,7 @@
 	nnl2.intern-system:*current-dir*))
 
 (defun create-default-config (path)
-  "creates json config file"
+  "Creates alist config file"
   
   (assert (not (probe-file path)) nil (format nil "(~a): File ~a does not exist" #'create-default-config path))
 
@@ -44,7 +54,7 @@
 	  (format out "~a~%" default-config))))	  	  
 	  
 (defun init-system ()
-  "creates a json file if it doesn't exist and then reads it"
+  "Creates a alist file if it doesn't exist and then reads it"
 
   (let* ((config-filepath (get-config-path)))
 	  

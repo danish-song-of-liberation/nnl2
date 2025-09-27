@@ -1,5 +1,15 @@
 (in-package :nnl2.system)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/system/system-greetings.lisp
+;; File: system-greetings.lisp
+
+;; File contains a function for greeting if the library is loaded for the first time
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun greet-the-user ()
   (format t "~%~%~%Welcome to nnl2!
 			 ~%This message is informational and appears only once.~%If you want to call it again, write `(nnl2.system:greet-the-user)`
