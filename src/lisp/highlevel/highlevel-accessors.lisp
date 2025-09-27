@@ -56,6 +56,107 @@
    See: unwind-protect"
   
   `(unwind-protect ,@body))
+  
+(defun reduce-list-shape (lst)
+  "Returns the shape of the list
+   Example: (nnl2.hli:reduce-list-shape '((0 0 0) (0 0 0))) -> '(2 3)"
+   
+  (when (consp lst)
+    (let ((result '()))
+      (loop for current = lst then (car current)
+            while (consp current)
+            do (push (length current) result))
+      (nreverse result))))
+	
+(defun flatten (lst)
+  "Accepts any list and returns it flat
+   Example: (nnl2.hli:flatten '((1 2) (3 4))) -> '(1 2 3 4)
+   Same speed as alexandria:flatten"
+
+  (let ((result (the list '()))
+        (stack (the list (list lst))))
+	
+	(declare (type list result stack))
+		
+    (loop while stack 
+	      do (let ((current (the list (pop stack))))
+			   (loop for elem in current do
+				 (if (listp elem)
+				   (push (the list elem) stack)
+				   (push elem result)))))
+				   
+    (nreverse (the list result))))
+
+(declaim (ftype (function (list) list) flatten reduce-list-shape))	
+
+(defun reduce-list-size (lst)
+  "Calculates the product of the lengths of all nested 
+   lists using the first element of each level of nesting"
+   
+  (let ((size (the (integer 0 *) 1))
+        (current lst))
+		
+	(declare (type (integer 0 *) size))
+		
+    (loop while (consp current)
+          do (setf size (* size (length current))
+                   current (car current)))
+				   
+    (the (integer 0 *) size)))
+	
+(declaim (inline reduce-list-size)
+		 (ftype (function (list) (integer 0 *)) reduce-list-size))
+	  
+(defun list-to-flat-vector-and-shape (lst total-size)
+  "Converts a nested list into a flat vector and calculates its shape
+   
+   lst: Nested list for conversion
+   total-size: The total number of elements in the flattened list
+   
+   Return: (value flat-data shape) - 1. A flat vector of elements; 2. List of dimensions (shape) of the initial structure
+   
+   Example: (list-to-flat-vector-and-shape '((1 2) (3 4)) 4) -> (values #(1 2 3 4) (2 2))"
+   
+  (declare (type (fixnum 0 *) total-size)
+		   (type list lst))
+		   
+  (let ((flat-data (the (simple-array * (*)) (make-array total-size)))
+        (shape (the list '()))
+        (index (the fixnum 0))
+        (current lst))
+		
+	(declare (type fixnum index)
+			 (type list shape)
+			 (type (simple-array * (*)) flat-data))
+    
+	;; Iterate over nested lists, collecting their lengths
+    (loop while (consp current)			    ; While the current item is a list
+          do (push (length current) shape)  ; Adding the length of the current level to the shape
+             (setf current (car current)))  ; Move to the next level of nesting
+    
+    (setf shape (nreverse shape))
+    
+    (labels ((fill-array (x)
+			   "Recursively fills flat-data with elements from a nested structure
+			    x: Current element (list or atom)"
+				
+               (if (consp x)
+			     ;; If the element is a list, process each element recursively
+                 (dolist (item x) (fill-array item))
+				 ;; If the element is an atom
+                 (progn
+				   ;; Place the element in the array at the current index
+                   (setf (aref flat-data index) x)
+				   ;; Increment the index for the next element
+                   (setq index (+ index 1))))))		 
+			
+      ;; Start recursive filling from the root element
+      (fill-array lst)
+	  
+      (values flat-data shape))))	  
+
+;; I know that (integer 0 *) is incorrect, but for some reason it works much faster than fixnum (0.210s+ vs 0.195s-)
+(declaim (ftype (function (list (integer 0 *)) (values (simple-array * (*)) list)) list-to-flat-vector-and-shape)) 
 
 (in-package :nnl2.hli.ts)
 
@@ -282,54 +383,52 @@
           
 		      (vector
 			    ;; If the data is in the form of a vector, it is more efficient to process it
-		        (locally
-                  (declare (type (simple-array * (*)) flatten-data))
-                  (case cffi-type
-                    (:float
-                      (nnl2.threading:pdotimes (i total-elems)
-                        (setf (cffi:mem-aref data-pntr :float i)
-                              (the single-float (coerce (aref flatten-data i) 'single-float)))))
+                (case cffi-type
+                  (:float
+                    (nnl2.threading:pdotimes (i total-elems)
+                      (setf (cffi:mem-aref data-pntr :float i)
+                            (the single-float (coerce (aref flatten-data i) 'single-float)))))
 							 
-                    (:double
-                      (nnl2.threading:pdotimes (i total-elems)
-                        (setf (cffi:mem-aref data-pntr :double i)
-                              (the double-float (coerce (aref flatten-data i) 'double-float)))))
+                  (:double
+                    (nnl2.threading:pdotimes (i total-elems)
+                      (setf (cffi:mem-aref data-pntr :double i)
+                            (the double-float (coerce (aref flatten-data i) 'double-float)))))
 							 
-                    (t
-                      (nnl2.threading:pdotimes (i total-elems)
-                        (setf (cffi:mem-aref data-pntr cffi-type i)
-                              (coerce (aref flatten-data i) lisp-type))))))))))
+                  (t
+                    (nnl2.threading:pdotimes (i total-elems)
+                      (setf (cffi:mem-aref data-pntr cffi-type i)
+                            (coerce (aref flatten-data i) lisp-type)))))))))
 	  
 	    ;; Creating a tensor from C data and freeing temporary memory
         (let ((result (nnl2.ffi:%make-tensor-from-flatten data-pntr total-elems shape rank dtype)))
 		  (cffi:foreign-free data-pntr) ; Freeing up C memory
 		  result))))) ; Return of the created tensor
 
-(defun reduce-list-shape (lst)
-  (if (atom lst)
-    nil
-	(cons (length lst) (reduce-list-shape (car lst)))))
-	
-(defun flatten (lst)
-  (loop for elem in lst
-        if (listp elem) append (flatten elem)
-        else collect elem))	
-
 (defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
-  (declare (optimize (speed 3) (safety 0)))
-  
+  "Makes a tensor from the specified data
+   Example: (make-tensor #2A((1 2 3) (4 5 6))) or (make-tensor '((1 2 3) (4 5 6)))
+   Tip: Try to use vectors instead of lists. This will give you a speed boost of ~2-3+ times"
+   
   (etypecase data
     (array
 	  (let* ((data-shape (array-dimensions data))
-			 (flat-data (make-array (array-total-size data) :element-type (array-element-type data) :displaced-to data)))
+			 ;; Create a flat view of the array without copying data
+			 (flat-data (make-array (array-total-size data) 
+						  :element-type (array-element-type data) 
+						  :displaced-to data)))
 		 
+		;; Convert flat array to tensor 
 	    (from-flatten flat-data data-shape :dtype dtype)))
 		
 	(list
-	  (let* ((data-shape (reduce-list-shape data))
-			 (flat-data (coerce (flatten data) 'vector)))
-
-	    (from-flatten flat-data data-shape)))))
+      (let ((total-size (the (integer 0 *) (nnl2.hli:reduce-list-size data))))
+	    (declare (type (integer 0 *) total-size))
+		
+		;; Convert nested list to flat vector and extract shape information
+        (multiple-value-bind (flat-vector shape)
+          (nnl2.hli:list-to-flat-vector-and-shape data total-size)
+		    ;; Convert the flat vector to tensor
+            (from-flatten flat-vector shape :dtype dtype))))))
   
 (defmacro full-with-pntr (shape-pntr rank &key filler (dtype nnl2.system:*default-tensor-type*))
   `(nnl2.ffi:%full ,shape-pntr ,rank ,dtype ,filler))	 

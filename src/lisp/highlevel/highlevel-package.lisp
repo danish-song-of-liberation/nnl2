@@ -5,7 +5,11 @@
    #:fastcall
    #:make-shape-pntr
    #:free-shape-pntr
-   #:with-automatic-memory-freeing))
+   #:with-automatic-memory-freeing
+   #:reduce-list-shape
+   #:flatten
+   #:reduce-list-size
+   #:list-to-flat-vector-and-shape))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
