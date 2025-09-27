@@ -470,12 +470,6 @@
   
 (cffi:defcfun ("lisp_call_debug_blas_sgemminplace" %%internal-debug-sgemm!) :void
   (check-to :unsigned-long))  
-  
-(cffi:defcfun ("get_size" %get-size) :int
-  (tensor :pointer))
-
-(cffi:defcfun ("get_size_in_bytes" %get-size-in-bytes) :int
-  (tensor :pointer))  
 
 (cffi:defcfun ("get_mem_alignment" %get-mem-alignment) :int)
 

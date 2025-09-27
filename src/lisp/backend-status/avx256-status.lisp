@@ -1,6 +1,21 @@
 (in-package :nnl2.backends)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/backend-status/avx256-status.lisp
+;; File: avx256-status.lisp
+
+;; Checks if AVX256 is available
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun get-avx256-status ()
+  "Checks if AVX256 is available
+   Returns:
+     0 if available
+	 1 if not available"
+	 
   (handler-case
       (let* ((compiler "gcc")
 			 (space " ")

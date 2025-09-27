@@ -633,22 +633,36 @@
     (nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))      
 
 (defun .exp! (tensor)
+  "Applies the exponent to the tensor in place
+   tensor: Input tensor"
+   
   (nnl2.ffi:%.exp! tensor))
 
 (defun .exp (tensor &key save-type)
+  "Applies the exponent to the tensor
+   tensor: Input tensor
+   save-type (key): Try to preserve the type as much as possible (for example, for int32)"
+   
   (nnl2.ffi:%.exp tensor save-type))  
   
 (defun .log! (tensor)
+  "Applies the natural logarithm to the tensor in place
+   tensor: Input tensor"
+  
   (nnl2.ffi:%.log! tensor))  
   
 (defun .log (tensor &key save-type)
+  "Applies the natural logarithm to the tensor
+   tensor: Input tensor
+   save-type (key): Try to preserve the type as much as possible (for example, for int32)"
+   
   (nnl2.ffi:%.log tensor save-type))    
     
-(defmacro size (tensor)
-  `(nnl2.ffi:%get-size ,tensor))
+(cffi:defcfun ("get_size" size) :int
+  (tensor :pointer))  
 
-(defmacro size-in-bytes (tensor)
-  `(nnl2.ffi:%get-size-in-bytes ,tensor))  
+(cffi:defcfun ("get_size_in_bytes" size-in-bytes) :int
+  (tensor :pointer))  
   
 (defun view (tensor &rest shape)
   (declare (optimize (speed 3)))
