@@ -79,4 +79,32 @@ Tensor* nnl2_full_like(Tensor* tensor, void* filler) {
 	return nnl2_full(tensor->shape, tensor->rank, tensor->dtype, filler);
 }
 
+/** @brief
+ * Creates a new tensor of the same shape and type, with random values from a normal distribution
+ *
+ ** @param tensor
+ * The initial tensor from which shape, rank and dtype are taken
+ *
+ ** @param from
+ * A pointer to the lower bound of the random range (optional, can be NULL)
+ *
+ ** @param to
+ * A pointer to the upper bound of the random range (optional, can be NULL)
+ *
+ ** @return 
+ * Tensor* Pointer to a new tensor filled with random values from normal distribution
+ * 
+ ** @note
+ * If 'from' and 'to' are NULL, uses default range for the dtype
+ * The range parameters must match the tensor's dtype
+ *
+ ** @warning
+ * It is necessary to ensure that the range parameters match the tensor's dtype
+ *
+ ** @see nnl2_randn
+ **/
+Tensor* nnl2_randn_like(Tensor* tensor, void* from, void* to) {
+	return randn(tensor->shape, tensor->rank, tensor->dtype, from, to);
+}
+
 #endif /** NNL2_LIKE_CONSTRUCTORS_H **/

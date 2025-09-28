@@ -942,82 +942,65 @@
 (declaim (ftype (function (&rest nnl2-tensor) nnl2-tensor) hstack vstack) 
 		 (ftype (function ((integer 0 *) &rest nnl2-tensor) nnl2-tensor) concat))  
 
-(defun .relu! (tensor)
-  (nnl2.ffi:%.relu! tensor))
+(cffi:defcfun ("lisp_call_reluinplace" .relu!) :void
+  (tensor :pointer))  
   
-(defun .relu (tensor)
-  (nnl2.ffi:%.relu tensor))  
-  
-(defun .leaky-relu! (tensor &key (alpha 0.01))
-  (nnl2.ffi:%.leaky-relu! tensor alpha))  
-  
-(defun .leaky-relu (tensor &key (alpha 0.01) save-type)
-  (nnl2.ffi:%.leaky-relu tensor alpha save-type))  
-  
-(defun .sigmoid! (tensor)
-  (nnl2.ffi:%.sigmoid! tensor))  
-  
-(defun .sigmoid (tensor)
-  (nnl2.ffi:%.sigmoid tensor))  
-  
-(defun .tanh! (tensor)
-  (nnl2.ffi:%.tanh! tensor))  
-  
-(defun .tanh (tensor)
-  (nnl2.ffi:%.tanh tensor))    
-  
-(defmacro randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
-  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-    (case dtype
-	  (:float64 `(let ((from-pntr (cffi:foreign-alloc :double))
-					   (to-pntr (cffi:foreign-alloc :double)))
-					   
-				   (setf (cffi:mem-ref from-pntr :double) ,from
-						 (cffi:mem-ref to-pntr :double) ,to)
-						 
-				   (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr)))
-				   
-      (:float32 `(let ((from-pntr (cffi:foreign-alloc :float))
-					   (to-pntr (cffi:foreign-alloc :float)))
-					   
-				   (setf (cffi:mem-ref from-pntr :float) ,from
-						 (cffi:mem-ref to-pntr :float) ,to)
-						 
-				   (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr)))
+(cffi:defcfun ("lisp_call_relu" .relu) :pointer
+  (tensor :pointer)) 
 
-	  (:int32 `(let ((from-pntr (cffi:foreign-alloc :int))
-					 (to-pntr (cffi:foreign-alloc :int)))
-					   
-				 (setf (cffi:mem-ref from-pntr :int) ,from
-					   (cffi:mem-ref to-pntr :int) ,to)
-						 
-				 (nnl2.ffi:%randn ,shape ,rank ,dtype from-pntr to-pntr))))))
+(cffi:defcfun ("lisp_call_leakyreluinplace" .leaky-relu!) :void
+  (tensor :pointer)
+  (alpha :float))  
+  
+(cffi:defcfun ("lisp_call_leakyrelu" .leaky-relu) :pointer
+  (tensor :pointer)
+  (alpha :float)
+  (save-type :bool))  
+
+(cffi:defcfun ("lisp_call_sigmoidinplace" .sigmoid!) :void
+  (tensor :pointer))  
+  
+(cffi:defcfun ("lisp_call_sigmoid" .sigmoid) :pointer
+  (tensor :pointer))    
+  
+(cffi:defcfun ("lisp_call_tanhinplace" .tanh!) :void
+  (tensor :pointer))
+  
+(cffi:defcfun ("lisp_call_tanh" .tanh) :pointer
+  (tensor :pointer))  
+  
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
+  "Creates a tensor of the specified shape from random numbers
+   indices: Input shape
+   dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
+   from (&key) (default: 0.0d0): Value to fill from
+   to (&key) (default: 1.0d0): Value to fill to"
+   
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (let* ((cffi-type (type/nnl2->cffi dtype))
+	       (from-pntr (cffi:foreign-alloc cffi-type))
+		   (to-pntr   (cffi:foreign-alloc cffi-type)))
+		  
+	  (setf (cffi:mem-ref from-pntr cffi-type) from
+			(cffi:mem-ref to-pntr 	cffi-type)  to)
+			
+	  (nnl2.ffi:%randn shape rank dtype from-pntr to-pntr))))
 
 (defun randn-like (tensor &key (from 0.0d0) (to 1.0d0) (dtype (dtype tensor)))
-  (case dtype
-    (:float64 (let ((from-pntr (cffi:foreign-alloc :double))
-			    	(to-pntr (cffi:foreign-alloc :double)))
+  "Сreates a tensor filled with random numbers of the same shape as the passed tensor
+   tensor: Input tensor
+   dtype (&key): Type of new tensor
+   from (&key): Value to fill from
+   to (&key): Value to fill to"
+   
+  (let* ((cffi-type (type/nnl2->cffi dtype))
+         (from-pntr (cffi:foreign-alloc cffi-type))
+		 (to-pntr (cffi:foreign-alloc cffi-type)))
 					   
-			    (setf (cffi:mem-ref from-pntr :double) from
-					  (cffi:mem-ref to-pntr :double) to)
+	(setf (cffi:mem-ref from-pntr cffi-type) from
+		  (cffi:mem-ref to-pntr cffi-type) to)
 						 
-				(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
-				
-	(:float32 (let ((from-pntr (cffi:foreign-alloc :float))
-			        (to-pntr (cffi:foreign-alloc :float)))
-					   
-			    (setf (cffi:mem-ref from-pntr :float) from
-					  (cffi:mem-ref to-pntr :float) to)
-						 
-				(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
-				
-	(:int (let ((from-pntr (cffi:foreign-alloc :int))
-			    (to-pntr (cffi:foreign-alloc :int)))
-					   
-		    (setf (cffi:mem-ref from-pntr :int) from
-				  (cffi:mem-ref to-pntr :int) to)
-						 
-			(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))))		
+	(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
 				 
 (defmacro xavier (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   (progn

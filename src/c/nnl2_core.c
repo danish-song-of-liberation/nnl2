@@ -305,7 +305,7 @@ void nnl2_init_activations() {
 }
 
 void nnl2_init_initializers() {
-	EINIT_BACKEND(randn, randn_backends, current_backend(randn));   
+	EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
 }
 

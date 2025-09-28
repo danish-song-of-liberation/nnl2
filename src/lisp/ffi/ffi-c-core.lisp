@@ -296,7 +296,7 @@
   (tensor :pointer)
   (filler :pointer))
   
-(cffi:defcfun ("randn_like" %randn-like) :pointer
+(cffi:defcfun ("nnl2_randn_like" %randn-like) :pointer
   (tensor :pointer)
   (from :pointer)
   (to :pointer))
@@ -383,33 +383,6 @@
   
 (cffi:defcfun ("lisp_call_abs" %.abs) :pointer
   (tensora :pointer))
-  
-(cffi:defcfun ("lisp_call_reluinplace" %.relu!) :void
-  (tensor :pointer))  
-  
-(cffi:defcfun ("lisp_call_relu" %.relu) :pointer
-  (tensor :pointer)) 
-
-(cffi:defcfun ("lisp_call_leakyreluinplace" %.leaky-relu!) :void
-  (tensor :pointer)
-  (alpha :float))  
-  
-(cffi:defcfun ("lisp_call_leakyrelu" %.leaky-relu) :pointer
-  (tensor :pointer)
-  (alpha :float)
-  (save-type :bool))  
-  
-(cffi:defcfun ("lisp_call_sigmoidinplace" %.sigmoid!) :void
-  (tensor :pointer))  
-  
-(cffi:defcfun ("lisp_call_sigmoid" %.sigmoid) :pointer
-  (tensor :pointer))    
-  
-(cffi:defcfun ("lisp_call_tanhinplace" %.tanh!) :void
-  (tensor :pointer))
-  
-(cffi:defcfun ("lisp_call_tanh" %.tanh) :pointer
-  (tensor :pointer))  
   
 (cffi:defcfun ("lisp_call_transposeinplace" %transpose!) :void
   (tensor :pointer))
