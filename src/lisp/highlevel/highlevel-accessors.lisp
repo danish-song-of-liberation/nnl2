@@ -664,67 +664,80 @@
 (cffi:defcfun ("get_size_in_bytes" size-in-bytes) :int
   (tensor :pointer))  
   
+(defun get-scalar-value (pntr dtype)
+  "Extracts a scalar value from a pointer, depending on the data type
+   pntr: Value to extract
+   dtype: Type of value"
+   
+  (case dtype
+    (:float64 (cffi:mem-ref pntr :double))
+    (:float32 (cffi:mem-ref pntr :float))
+    (:int32 (cffi:mem-ref pntr :int))
+    (otherwise (error "Unsupported type: ~A" dtype))))  
+  
 (defun view (tensor &rest shape)
-  (declare (optimize (speed 3)))
-
-  (let* ((shape-rank (length shape))
-		 (tensor-rank (rank tensor))
-	     (tensor-dtype (dtype tensor))
-		 (shape (make-shape-pntr (subst -1 '* shape)))
-		 (void-ptr (nnl2.ffi:%view tensor shape shape-rank)))	 
-	
-	(unless (cffi:null-pointer-p void-ptr)
-	  (if (= shape-rank tensor-rank)	 
-	    (case tensor-dtype
-	      (:float64 (cffi:mem-ref void-ptr :double))	 
-          (:float32 (cffi:mem-ref void-ptr :float))
-	      (:int32 (cffi:mem-ref void-ptr :int)))
-	  
-	    void-ptr))))
+  "Creates a tensor representation with a new shape 
+   Returns a pointer or a scalar value
+   tensor: Input tensor
+   shape (&rest): Indices to extract subtensor/scalar"
+   
+  (nnl2.hli:fastcall
+    (let* ((shape-rank (length shape))
+           (tensor-rank (rank tensor))
+           (tensor-dtype (dtype tensor))
+           (shape-pntr (nnl2.hli:make-shape-pntr (subst -1 '* shape)))
+           (void-ptr (nnl2.ffi:%view tensor shape-pntr shape-rank)))     
+    
+      (cond
+        ((cffi:null-pointer-p void-ptr)
+          (error "Couldn't create tensor representation"))
+      
+        ((= shape-rank tensor-rank)
+          (get-scalar-value void-ptr tensor-dtype))
+      
+        (t void-ptr)))))
 		
 (defun tref (tensor &rest shape)
-  (declare (optimize (speed 3)))
-
-  (let* ((shape-rank (length shape))
-		 (tensor-rank (rank tensor))
-	     (tensor-dtype (dtype tensor))
-		 (shape (make-shape-pntr (subst -1 '* shape)))
-		 (void-ptr (nnl2.ffi:%tref-getter tensor shape shape-rank)))	 
+  "Extracts a copy of the tensor from the selected indices
+  
+   tensor: Input tensor
+   shape: Input indices"
+   
+  (nnl2.hli:fastcall
+    (let* ((shape-rank (length shape))
+		   (tensor-rank (rank tensor))
+	       (tensor-dtype (dtype tensor))
+		   (shape (nnl2.hli:make-shape-pntr (subst -1 '* shape)))
+		   (void-ptr (nnl2.ffi:%tref-getter tensor shape shape-rank)))	 
 	
-	(unless (cffi:null-pointer-p void-ptr)
-	  (if (= shape-rank tensor-rank)	 
-	    (case tensor-dtype
-	      (:float64 (cffi:mem-ref void-ptr :double))	 
-          (:float32 (cffi:mem-ref void-ptr :float))
-	      (:int32 (cffi:mem-ref void-ptr :int)))
+	  (cond 
+	    ((cffi:null-pointer-p void-ptr)
+		  (error "Couldn't create tensor representation"))
+		  
+		((= shape-rank tensor-rank)		
+	      (get-scalar-value void-ptr tensor-dtype))
 	  
-	    void-ptr))))		
+	    (t void-ptr)))))		
 	  
 (defun (setf tref) (change-to tensor &rest shape)
-  (let* ((shape-rank (length shape))
-		 (shape (make-shape-pntr (subst -1 '* shape)))
-	     (tensor-dtype (dtype tensor))
-		 (is-tensor-p (typep change-to 'nnl2-tensor)))
+  "Sets a new value for the tensor at the specified indices
+   change-to: New value (scalar or tensor)
+   tensor: Input tensor
+   shape: Indices"
+   
+  (nnl2.hli:fastcall
+    (let* ((shape-rank (length shape))	
+		   (shape (nnl2.hli:make-shape-pntr (subst -1 '* shape)))
+	       (tensor-dtype (dtype tensor))
+		   (is-tensor-p (typep change-to 'nnl2-tensor)))
 		 
-	(cond
-	  (is-tensor-p (nnl2.ffi:%tref-setter tensor shape shape-rank change-to t))
-	  
-	  (t	 
-		(case tensor-dtype
-		  (:float64 
-			(let ((changer (cffi:foreign-alloc :double)))
-			  (setf (cffi:mem-ref changer :double) change-to)
-			  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil)))
-			  
-		  (:float32
-			(let ((changer (cffi:foreign-alloc :float)))
-			  (setf (cffi:mem-ref changer :float) change-to)
-			  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil)))
-
-		  (:int32
-			(let ((changer (cffi:foreign-alloc :int)))
-			  (setf (cffi:mem-ref changer :int) change-to)
-			  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil))))))))
+	  (if is-tensor-p 
+	    (nnl2.ffi:%tref-setter tensor shape shape-rank change-to t)
+		(let* ((cffi-type (type/nnl2->cffi tensor-dtype))
+			   (changer (cffi:foreign-alloc cffi-type)))
+			   
+		  (setf (cffi:mem-ref changer cffi-type) change-to)
+		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil))))))
 		  
 (defmacro scale! (tensor multiplier)
   `(nnl2.ffi:%scale! ,tensor (float ,multiplier)))
