@@ -899,11 +899,13 @@
                               collect (funcall getter it i))))))
 	
 (defun /map! (funct &rest tensors &aux (first-tensor (car tensors)))
+  "Applies the function to each slice of the tensor in place (applies the changes in first tensor)
+  
+   funct: Function to apply
+   tensors (&rest): Input tensors"
+   
   (let ((first-shape (aref (shape first-tensor :as :vector) 0))
-		(type-t (case (dtype first-tensor)
-				  (:float64 :double)
-				  (:float32 :float)
-				  (:int32 :int))))
+		(type-t (type/nnl2->cffi (dtype first-tensor))))
 		
 	(nnl2.threading:pdotimes (i first-shape)
 	  (setf
@@ -911,12 +913,13 @@
 												 collect (tref it i)))))))
 														
 (defun /map (funct &rest tensors &aux (first-tensor (car tensors)))
+  "Applies the function to each slice of the tensor
+  
+   funct: Function to apply
+   tensors (&rest): Input tensors"
+
   (let ((first-shape (aref (shape first-tensor :as :vector) 0))
-		(type-t (case (dtype first-tensor)
-				  (:float64 :double)
-				  (:float32 :float)
-				  (:int32 :int)))
-		
+		(type-t (type/nnl2->cffi (dtype first-tensor))))
 		(new-tensor (empty-like first-tensor)))
 		
 	(nnl2.threading:pdotimes (i first-shape)
@@ -924,11 +927,20 @@
         (tref new-tensor i) (apply funct (loop for it in tensors
 											       collect (tref it i)))))
 
-	new-tensor))
+	new-tensor)
 
-(defun hstack (&rest tensors) (reduce #'nnl2.ffi:%hstack tensors))	
-(defun vstack (&rest tensors) (reduce #'nnl2.ffi:%vstack tensors))	
-(defun concat (axis &rest tensors) (reduce #'(lambda (acc tensor) (nnl2.ffi:%concat acc tensor axis)) tensors))
+(defun hstack (&rest tensors) "Combines the transmitted tensors horizontally" (reduce #'nnl2.ffi:%hstack tensors))	
+(defun vstack (&rest tensors) "Combines the transmitted tensors verticallys" (reduce #'nnl2.ffi:%vstack tensors))	
+
+(defun concat (axis &rest tensors) 
+  "Concatenates tensors by the specified dimension
+   axis: Dimension to concat
+   tensors (&rest): Input tensors"
+   
+  (reduce #'(lambda (acc tensor) (nnl2.ffi:%concat acc tensor axis)) tensors))
+  
+(declaim (ftype (function (&rest nnl2-tensor) nnl2-tensor) hstack vstack) 
+		 (ftype (function ((integer 0 *) &rest nnl2-tensor) nnl2-tensor) concat))  
 
 (defun .relu! (tensor)
   (nnl2.ffi:%.relu! tensor))

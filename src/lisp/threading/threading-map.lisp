@@ -1,5 +1,15 @@
 (in-package :nnl2.threading)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/threading/threading-map.lisp
+;; File: threading-map.lisp
+
+;; File contains lparallel map definitions
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun pmapcar (function &rest sequences)
   #+lparallel
   (apply #'lparallel:pmapcar function sequences)

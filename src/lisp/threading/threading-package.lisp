@@ -1,7 +1,7 @@
 ;; NNL2
 
-;; Filepath: nnl2/src/lisp/threading/threading.lisp
-;; File: system-vars.lisp
+;; Filepath: nnl2/src/lisp/threading/threading-package.lisp
+;; File: threading-package.lisp
 
 ;; File contains definition of :nnl2.threading package
 

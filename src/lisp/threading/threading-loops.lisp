@@ -1,5 +1,15 @@
 (in-package :nnl2.threading)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/threading/threading-loops.lisp
+;; File: threading-loops.lisp
+
+;; File contains lparallel loop definitions
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defvar *pdotimes-threshold* nil
   "Auto determined threshold for parallel execution")
   
