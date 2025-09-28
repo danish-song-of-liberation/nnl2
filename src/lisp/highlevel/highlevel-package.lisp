@@ -355,6 +355,7 @@
    #:type/nnl2->lisp
    #:type/lisp->nnl2
    #:type/nnl2->cffi
+   #:type/lisp->cffi
    #:free
    #:empty-with-shape-pntr))
    

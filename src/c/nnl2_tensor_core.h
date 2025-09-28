@@ -2,6 +2,7 @@
 #include "nnl2_config.h"
 #include "nnl2_convert.h"
 #include "nnl2_product.h"
+#include "nnl2_ffi_accessors.h"
 #include "tensorgen/nnl2_inplace_fill.h"
 #include "tensorgen/nnl2_free.h"
 #include "tensorgen/nnl2_empty.h"

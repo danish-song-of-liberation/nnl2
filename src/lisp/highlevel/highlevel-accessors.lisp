@@ -205,6 +205,21 @@
 		  
 (declaim (ftype (function (symbol) keyword) type/lisp->nnl2)) ;; Inline not needed			  
 	
+(defun type/lisp->cffi (lisp-type)
+  "Converts a lisp type to a cffi type
+   lisp-type: lisp type for conversion into cffi type
+   
+   Example: (type/lisp->cffi 'double-float) -> :double"
+   
+  (declare (type symbol lisp-type))
+
+  (nnl2.hli:fastcall
+    (cond ((eql lisp-type 'double-float) :double) 
+		  ((eql lisp-type 'single-float) :double) 
+		  ((eql lisp-type 'integer)      :double))))
+		  
+(declaim (ftype (function (symbol) keyword) type/lisp->nnl2 type/lisp->cffi)) ;; Inline not needed		
+	
 (defun type/nnl2->cffi (cffi-type)
   "Converts the tensor system type to a cffi type
    cffi-type: type for conversion
@@ -740,65 +755,148 @@
 		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil))))))
 		  
 (defmacro scale! (tensor multiplier)
+  "Increases the tensor in-place by a multiplier
+   tensor: Input tensor
+   multiplier: Tensor is multiplied by"
+   
   `(nnl2.ffi:%scale! ,tensor (float ,multiplier)))
 
 (defmacro scale (tensor multiplier &key save-type)
+  "Increases the tensor by a multiplier
+   tensor: Input tensor
+   multiplier: Tensor is multiplied by"
+   
   `(nnl2.ffi:%scale ,tensor (float ,multiplier) ,save-type))  
   
-(defun empty-like (tensor)
-  (nnl2.ffi:%empty-like tensor))  
+(cffi:defcfun ("nnl2_empty_like" empty-like) :pointer
+  (tensor :pointer))   
   
-(defun zeros-like (tensor)
-  (nnl2.ffi:%zeros-like tensor))  
+(cffi:defcfun ("nnl2_zeros_like" zeros-like) :pointer
+  (tensor :pointer)) 
 	
-(defun ones-like (tensor)
-  (nnl2.ffi:%ones-like tensor))  
+(cffi:defcfun ("nnl2_ones_like" ones-like) :pointer
+  (tensor :pointer))   
 		
 (defun full-like (tensor &key (filler 0.0d0))
+  "Creates a tensor filled with the specified numbers 
+   of the same type and shape as the passed tensor
+   
+   tensor: Tensor from which to take the shape and type
+   filler (&key): Value to fill new tensor"
+   
   (let* ((filler-type (type-of filler))
-		 (keyword-type (cond ((eql filler-type 'double-float) :double) ((eql filler-type 'single-float) :float) ((eql filler-type 'integer) :int)))
+		 (keyword-type (type/lisp->cffi filler-type))
 		 (filler-pntr (cffi:foreign-alloc keyword-type)))
 		 
     (setf (cffi:mem-ref filler-pntr keyword-type) filler)
 	  (nnl2.ffi:%full-like tensor filler-pntr)))
   
 (defun .abs! (tensor)
+  "Applies the modulus of a number to a tensor in-place"
   (nnl2.ffi:%.abs! tensor))  
   
 (defun .abs (tensor)
+  "Applies the modulus of a number to a tensor"
   (nnl2.ffi:%.abs tensor))    
 
 (defun .map! (funct &rest tensors &aux (first-tensor (car tensors)))
+  "Applies the passed function to the first tensor element-wise
+   
+   funct: Function to apply
+   tensors (&rest): Tensors for element-wise transmission to a function"
+   
   (let ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
-		(numel (size first-tensor))
-		(type-t (case (dtype first-tensor)
-				  (:float64 :double)
-				  (:float32 :float)
-				  (:int32 :int))))
-		
-	(nnl2.threading:pdotimes (i numel)	
-	  (setf
-        (cffi:mem-aref (car aggreg-data) type-t i) (apply funct (loop for it in aggreg-data 
-															          collect (cffi:mem-aref it type-t i)))))))  
+        (numel (size first-tensor))
+        (type-t (dtype first-tensor)))
+        
+    (ecase type-t    
+      (:float32 (.map!-process-tensors funct aggreg-data numel #'nnl2.ffi:mem-aref-getter-float32 #'nnl2.ffi:mem-aref-setter-float32))
+      (:float64 (.map!-process-tensors funct aggreg-data numel #'nnl2.ffi:mem-aref-getter-float64 #'nnl2.ffi:mem-aref-setter-float64))
+      (:int32   (.map!-process-tensors funct aggreg-data numel #'nnl2.ffi:mem-aref-getter-int32   #'nnl2.ffi:mem-aref-setter-int32)))))
+
+(defun .map!-process-tensors (funct aggreg-data numel getter setter)
+  "Process tensors with the given getter/setter functions"
+  
+  (let ((ntensors (length aggreg-data))
+        (data0 (car aggreg-data)))
+    
+    (ecase ntensors
+      (1 (.map!-process-single-tensor funct data0 numel getter setter))
+      (2 (.map!-process-double-tensor funct data0 (cadr aggreg-data) numel getter setter))
+      (t (.map!-process-multiple-tensors funct aggreg-data numel getter setter)))))
+
+(defun .map!-process-single-tensor (funct data0 numel getter setter)
+  "Process single tensor case"
+  
+  (nnl2.threading:pdotimes (i numel)
+    (funcall setter data0 i (funcall funct (funcall getter data0 i)))))
+
+(defun .map!-process-double-tensor (funct data0 data1 numel getter setter)
+  "Process two tensors case"
+  
+  (nnl2.threading:pdotimes (i numel)
+    (funcall setter data0 i (funcall funct (funcall getter data0 i) (funcall getter data1 i)))))
+
+(defun .map!-process-multiple-tensors (funct aggreg-data numel getter setter)
+  "Process multiple tensors case"
+  
+  (let ((data0 (car aggreg-data)))
+    (nnl2.threading:pdotimes (i numel)
+      (funcall setter data0 i 
+               (apply funct (loop for it in aggreg-data
+                                collect (funcall getter it i)))))))						  
 																			 
 (defun .map (funct &rest tensors &aux (first-tensor (car tensors)))
+  "Applies the passed function to tensors element-wise and returns new tensor
+   
+   funct: Function to apply
+   tensors (&rest): Tensors for element-wise transmission to a function"
+   
   (let* ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
-		 (numel (size (car tensors)))
-		
-		 (type-t (case (dtype first-tensor)
-				   (:float64 :double)
-				   (:float32 :float)
-				   (:int32 :int)))
-				  
-		 (new-tensor (empty-like first-tensor))
-		 (new-tensor-data (nnl2.ffi:get-tensor-data new-tensor)))
-		
-	(nnl2.threading:pdotimes (i numel)
-	  (setf
-        (cffi:mem-aref new-tensor-data type-t i) (apply funct (loop for it in aggreg-data 
-																    collect (cffi:mem-aref it type-t i)))))
+         (numel (size first-tensor))
+         (type-t (dtype first-tensor))
+         (new-tensor (empty-like first-tensor))
+         (new-tensor-data (nnl2.ffi:get-tensor-data new-tensor)))
+        
+    (ecase type-t    
+      (:float32 (.map-process-tensors funct aggreg-data new-tensor-data numel #'nnl2.ffi:mem-aref-getter-float32 #'nnl2.ffi:mem-aref-setter-float32))
+      (:float64 (.map-process-tensors funct aggreg-data new-tensor-data numel #'nnl2.ffi:mem-aref-getter-float64 #'nnl2.ffi:mem-aref-setter-float64))
+      (:int32   (.map-process-tensors funct aggreg-data new-tensor-data numel #'nnl2.ffi:mem-aref-getter-int32   #'nnl2.ffi:mem-aref-setter-int32)))
+    
+    new-tensor))
 
-	new-tensor))
+(defun .map-process-tensors (funct aggreg-data new-tensor-data numel getter setter)
+  "Process tensors with the given getter/setter functions and write to new tensor"
+  
+  (let ((ntensors (length aggreg-data)))
+    
+    (ecase ntensors
+      (1 (.map-process-single-tensor funct aggreg-data new-tensor-data numel getter setter))
+      (2 (.map-process-double-tensor funct aggreg-data new-tensor-data numel getter setter))
+      (t (.map-process-multiple-tensors funct aggreg-data new-tensor-data numel getter setter)))))
+
+(defun .map-process-single-tensor (funct aggreg-data new-tensor-data numel getter setter)
+  "Process single tensor case"
+  
+  (let ((data0 (car aggreg-data)))
+    (nnl2.threading:pdotimes (i numel)
+      (funcall setter new-tensor-data i (funcall funct (funcall getter data0 i))))))
+
+(defun .map-process-double-tensor (funct aggreg-data new-tensor-data numel getter setter)
+  "Process two tensors case"
+  
+  (let ((data0 (car aggreg-data))
+        (data1 (cadr aggreg-data)))
+    (nnl2.threading:pdotimes (i numel)
+      (funcall setter new-tensor-data i (funcall funct (funcall getter data0 i) (funcall getter data1 i))))))
+
+(defun .map-process-multiple-tensors (funct aggreg-data new-tensor-data numel getter setter)
+  "Process multiple tensors case"
+  
+  (nnl2.threading:pdotimes (i numel)
+    (funcall setter new-tensor-data i 
+             (apply funct (loop for it in aggreg-data
+                              collect (funcall getter it i))))))
 	
 (defun /map! (funct &rest tensors &aux (first-tensor (car tensors)))
   (let ((first-shape (aref (shape first-tensor :as :vector) 0))

@@ -17,7 +17,7 @@
 #include "nnl2_ffi_test.h" 
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"
-
+ 
 #include "backends_status/nnl2_status.h"  
 
 #include <stdlib.h> 
@@ -113,9 +113,9 @@ void nnl2_init_transposition();
 
 /** @brief 
  * Registers backend implementations for auxiliary/utility operations
- *
+ *   
  ** @details
- * Includes summation, normalization, copying, and data filling
+ * Includes summation, normalization, copying, and data filling 
  */
 void nnl2_init_auxiliary();
 
@@ -142,7 +142,7 @@ void nnl2_init_correspondence();
  * In-place operations that can handle tensors of different shapes via broadcasting
  */
 void nnl2_init_broadcasting_inplace();
-
+ 
 /** @brief 
  * Registers out-of-place operations with broadcasting support
  *
@@ -150,7 +150,7 @@ void nnl2_init_broadcasting_inplace();
  * Out-of-place operations that can handle tensors of different shapes via broadcasting
  */
 void nnl2_init_broadcasting();
-
+ 
 /** @brief 
  * Registers backend implementations for tensor reshaping operations
  *
@@ -182,7 +182,7 @@ void nnl2_init_reshaping();
  * #include "input_here_pass_to_nnl2"
  * int main() {
  *     nnl2_init_system(); // Initialize the framefork first!
- *	   // ... use the framework ...   
+ *	   // ... use the framework ...    
  *	   return 0;
  * }	 
  ** @endcode
@@ -216,7 +216,7 @@ void nnl2_init_system() {
 		NNL2_LOG_DEFAULT_TIMESTAMPS,             
 		NNL2_LOG_DEFAULT_DEBUG_INFO,          
 		NNL2_LOG_LEVEL_DEBUG   
-	);  
+	);    
 			
 	// Initialization of all functions having several implementations
 	nnl2_init_accessors();	
@@ -230,7 +230,7 @@ void nnl2_init_system() {
 	nnl2_init_initializers();
 	nnl2_init_transposition(); 
 	nnl2_init_correspondence_inplace();
-	nnl2_init_correspondence();
+	nnl2_init_correspondence();  
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  	
@@ -305,7 +305,7 @@ void nnl2_init_activations() {
 }
 
 void nnl2_init_initializers() {
-	EINIT_BACKEND(randn, randn_backends, current_backend(randn));  
+	EINIT_BACKEND(randn, randn_backends, current_backend(randn));   
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
 }
 

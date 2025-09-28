@@ -292,15 +292,6 @@
   (sumend :pointer)
   (alpha :float))  
   
-(cffi:defcfun ("nnl2_empty_like" %empty-like) :pointer
-  (tensor :pointer))   
-  
-(cffi:defcfun ("nnl2_zeros_like" %zeros-like) :pointer
-  (tensor :pointer)) 
-
-(cffi:defcfun ("nnl2_ones_like" %ones-like) :pointer
-  (tensor :pointer))   
-  
 (cffi:defcfun ("nnl2_full_like" %full-like) :pointer
   (tensor :pointer)
   (filler :pointer))
@@ -926,4 +917,31 @@
 (cffi:defcfun ("get_reinterpret_num_backends" %get-reinterpret-num-backends) :int)
 (cffi:defcfun ("get_reinterpret_backends" %get-reinterpret-backends) :pointer)
 
+(cffi:defcfun ("nnl2_fast_float64_set" mem-aref-setter-float64) :void
+  (data :pointer)
+  (index :int)
+  (value :double))
+
+(cffi:defcfun ("nnl2_fast_float64_get" mem-aref-getter-float64) :double
+  (data :pointer)
+  (index :int))
+
+(cffi:defcfun ("nnl2_fast_float32_set" mem-aref-setter-float32) :void
+  (data :pointer)
+  (index :int)
+  (value :float))
+
+(cffi:defcfun ("nnl2_fast_float32_get" mem-aref-getter-float32) :float
+  (data :pointer)
+  (index :int))
+
+(cffi:defcfun ("nnl2_fast_int32_set" mem-aref-setter-int32) :void
+  (data :pointer)
+  (index :int)
+  (value :int))
+
+(cffi:defcfun ("nnl2_fast_int32_get" mem-aref-getter-int32) :int
+  (data :pointer)
+  (index :int))
+  
 (nnl-init-system)

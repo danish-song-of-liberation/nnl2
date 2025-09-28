@@ -353,5 +353,11 @@
    #:%get-reshape-num-backends
    #:%get-reinterpret-backends
    #:%get-reinterpret-num-backends
-   #:shape-at))
+   #:shape-at
+   #:mem-aref-getter-float64
+   #:mem-aref-getter-float32
+   #:mem-aref-getter-int32
+   #:mem-aref-setter-float64
+   #:mem-aref-setter-float32
+   #:mem-aref-setter-int32))
    
