@@ -1,3 +1,15 @@
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/highlevel/highlevel-package.lisp
+;; File: highlevel-package.lisp
+
+;; Definition of :nnl2.hli and :nnl2.hli.ts packages 
+;; where hli stays for high-level-interface, ts stays
+;; for tensor system
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defpackage #:nnl2.hli
   (:use #:cl)
   (:export 

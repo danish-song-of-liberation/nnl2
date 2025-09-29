@@ -1,5 +1,34 @@
 (in-package :nnl2.hli.ts)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/highlevel/highlevel-tensor-backends.lisp
+;; File: highlevel-tensor-backends.lisp
+
+;; The file contains the implementation of dispatching by tensor implementations
+
+;; I had a choice: expand the automatic dispatching and 
+;; backend architecture in C, increasing the code size 
+;; and complexity tenfold, or delegate all the logic to 
+;; Lisp, leaving only the C-specific capabilities for 
+;; backend switching. Unprofessional? Perhaps, but it's 
+;; at least better than spending hundreds of hours 
+;; completely redesigning the backends for the sake of 
+;; a "good architecture" that complicates the structure 
+;; a thousandfold. Both options produce the same effect
+
+;; I chose the latter.
+
+;; Note:
+;;	 I only left the docstring in functions that will be 
+;;	 called regularly. I won't/will leave little documentation 
+;;	 in copy-paste functions that do things that are already 
+;;	 clear, leaving normal documentation only in functions that 
+;;	 may be called regularly in a high-level interface
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defun symbol-to-uppercase-string (symbol)
   (string-upcase (symbol-name symbol)))
 
