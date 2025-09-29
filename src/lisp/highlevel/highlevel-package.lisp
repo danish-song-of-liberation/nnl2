@@ -9,7 +9,9 @@
    #:reduce-list-shape
    #:flatten
    #:reduce-list-size
-   #:list-to-flat-vector-and-shape))
+   #:list-to-flat-vector-and-shape
+   #:->
+   #:<-))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -350,8 +352,6 @@
    #:with-backend/reshape
    #:with-backend/reinterpret
    #:tensor-p
-   #:->
-   #:<-
    #:type/nnl2->lisp
    #:type/lisp->nnl2
    #:type/nnl2->cffi

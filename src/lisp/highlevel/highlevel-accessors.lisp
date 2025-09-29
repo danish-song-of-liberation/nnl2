@@ -158,6 +158,34 @@
 ;; I know that (integer 0 *) is incorrect, but for some reason it works much faster than fixnum (0.210s+ vs 0.195s-)
 (declaim (ftype (function (list (integer 0 *)) (values (simple-array * (*)) list)) list-to-flat-vector-and-shape)) 
 
+(defmacro <- (tensor &rest forms)
+  (if (null forms)
+      tensor
+      (let ((form (first forms))
+            (rest (rest forms)))
+			
+        (if (listp form)
+          `(<- ,(if (cdr form)
+                  `(,(car form) ,tensor ,@(cdr form))
+                  `(,form ,tensor))
+            ,@rest)
+			
+          `(<- (,form ,tensor) ,@rest)))))
+		  
+(defmacro -> (tensor &rest forms)
+  (if (null forms)
+      tensor
+      (let ((form (first forms))
+            (rest (rest forms)))
+			
+        (if (listp form)
+          `(-> ,(if (cdr form)
+                  `(,(car form) ,@(cdr form) ,tensor)
+                  `(,form ,tensor))
+            ,@rest)
+			
+          `(-> (,form ,tensor) ,@rest)))))
+
 (in-package :nnl2.hli.ts)
 
 (deftype nnl2-tensor () 
@@ -646,6 +674,8 @@
          (ldc (or ldc (aref shape-out 1))))
          
     (nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))      
+
+(declaim (inline gemm gemm!))
 
 (defun .exp! (tensor)
   "Applies the exponent to the tensor in place
@@ -1648,49 +1678,35 @@
 (defun .min! (&rest args)
   "Reduce tensors with in-place element-wise minimum"
   (reduce #'.min!/internal args))
+  
+(declaim (ftype (function (&rest (or nnl2-tensor real)) nnl2-tensor) .+ .- .* ./ .^ .min .max axpy += -= *= /! ^= .min! .max! axpy!)
+		 (inline .+ .- .* ./ .^ .min .max += -= *= /! ^= .min! .max!))
 			
 (defun tensor-p (obj)
-  (typep obj 'nnl2-tensor))			
-  
-(defmacro <- (tensor &rest forms)
-  (if (null forms)
-      tensor
-      (let ((form (first forms))
-            (rest (rest forms)))
-			
-        (if (listp form)
-          `(<- ,(if (cdr form)
-                  `(,(car form) ,tensor ,@(cdr form))
-                  `(,form ,tensor))
-            ,@rest)
-			
-          `(<- (,form ,tensor) ,@rest)))))
-		  
-(defmacro -> (tensor &rest forms)
-  (if (null forms)
-      tensor
-      (let ((form (first forms))
-            (rest (rest forms)))
-			
-        (if (listp form)
-          `(-> ,(if (cdr form)
-                  `(,(car form) ,@(cdr form) ,tensor)
-                  `(,form ,tensor))
-            ,@rest)
-			
-          `(-> (,form ,tensor) ,@rest)))))		
+  "Predicate that determines whether an object is a tensor or not"
+  (and (typep obj 'nnl2-tensor) (= (length (shape obj)) (rank obj))))						
 
-(defun ncast (tensor cast-to)
-  (nnl2.ffi:%cast tensor cast-to))		  
+(declaim (inline tensor-p))
+
+(cffi:defcfun ("nnl2_cast" ncast) :pointer
+  (tensor :pointer)
+  (cast-to nnl2.ffi:tensor-type))		  
   
 (defun reshape (tensor new-shape &key force)
+  "Changes the tensor's shape to a new value and returns a copy of the tensor with the new shape
+   tensor: Input tensor
+   new-shape: Input new shape
+   force (&key): Should the incompatibility of the form be ignored (5x5) -> (1x24)"
+   
   (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
     (nnl2.ffi:%reshape tensor shape rank force)))
 	
 (defun reinterpret (tensor new-shape &key force)
+  "Changes the tensor's shape to a new value and returns a view of the tensor with the new shape
+   tensor: Input tensor
+   new-shape: Input new shape
+   force (&key): Should the incompatibility of the form be ignored (5x5) -> (1x24)"
+   
   (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
-    (nnl2.ffi:%reinterpret tensor shape rank force)))
-
-(declaim (inline gemm))
-(declaim (inline gemm!))																			 
+    (nnl2.ffi:%reinterpret tensor shape rank force)))																			 
 																			 

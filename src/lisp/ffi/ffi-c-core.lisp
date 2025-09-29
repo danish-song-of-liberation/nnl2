@@ -372,10 +372,6 @@
   (rank :int)
   (dtype tensor-type))
   
-(cffi:defcfun ("nnl2_cast" %cast) :pointer
-  (tensor :pointer)
-  (cast-to tensor-type))
-  
 (cffi:defcfun ("lisp_call_reshape" %reshape) :pointer
   (tensor :pointer)
   (new-shape :pointer)
