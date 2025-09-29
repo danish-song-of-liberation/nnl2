@@ -144,21 +144,9 @@
   (tensor :pointer)
   (increment :pointer))    
   
-(cffi:defcfun ("lisp_call_add_broadcasting_inplace" %.+/broadcasting!) :void  
-  (summand :pointer)
-  (sumend :pointer))
-  
-(cffi:defcfun ("lisp_call_sub_broadcasting_inplace" %.-/broadcasting!) :void  
-  (minuend :pointer)
-  (subtrahend :pointer))  
-  
 (cffi:defcfun ("lisp_call_add" %+) :pointer
   (summand :pointer)
   (addend :pointer))  
-  
-(cffi:defcfun ("lisp_call_add_broadcasting" %.+/broadcasting) :pointer
-  (summand :pointer)
-  (sumend :pointer))
   
 (cffi:defcfun ("lisp_call_add_incf" %.+/incf) :pointer
   (tensor :pointer)
@@ -167,10 +155,6 @@
 (cffi:defcfun ("lisp_call_sub" %-) :pointer
   (summand :pointer)
   (addend :pointer))    
-  
-(cffi:defcfun ("lisp_call_sub_broadcasting" %.-/broadcasting) :pointer
-  (minuend :pointer)
-  (subtrahend :pointer))
  
 (cffi:defcfun ("lisp_call_sub_decf" %.-/decf) :pointer
   (tensor :pointer)
@@ -184,10 +168,6 @@
   (tensor :pointer)
   (multiplier :pointer))  
   
-(cffi:defcfun ("lisp_call_mul_broadcasting_inplace" %.*/broadcasting!) :void
-  (multiplicand :pointer)
-  (multiplier :pointer)) 
-  
 (cffi:defcfun ("lisp_call_divinplace" %/=) :void
   (dividend :pointer)
   (divisor :pointer))  
@@ -195,10 +175,6 @@
 (cffi:defcfun ("lisp_call_div_divf_inplace" %.//divf!) :void
   (tensor :pointer)
   (dif :pointer))
-
-(cffi:defcfun ("lisp_call_div_broadcasting_inplace" %.//broadcasting!) :void
-  (dividend :pointer)
-  (divisor :pointer))   
   
 (cffi:defcfun ("lisp_call_mul" %*) :pointer
   (multiplicand :pointer)
@@ -208,10 +184,6 @@
   (tensor :pointer)
   (multiplier :pointer)) 
 
-(cffi:defcfun ("lisp_call_mul_broadcasting" %.*/broadcasting) :pointer   
-  (multiplicand :pointer)
-  (multiplier :pointer))
-
 (cffi:defcfun ("lisp_call_div" %/) :pointer
   (dividend :pointer)
   (divisor :pointer))
@@ -220,10 +192,6 @@
   (tensor :pointer)
   (dif :pointer))  
   
-(cffi:defcfun ("lisp_call_div_broadcasting" %.//broadcasting) :pointer
-  (dividend :pointer)
-  (divisor :pointer))    
-  
 (cffi:defcfun ("lisp_call_powinplace" %^=) :void
   (base :pointer)
   (exponent :pointer))  
@@ -231,10 +199,6 @@
 (cffi:defcfun ("lisp_call_pow_powf_inplace" %.^/powf!) :void
   (tensor :pointer)
   (powf :pointer))  
-  
-(cffi:defcfun ("lisp_call_pow_broadcasting_inplace" %.^/broadcasting!) :void
-  (base :pointer)
-  (exponent :pointer))  
   
 (cffi:defcfun ("lisp_call_expinplace" %.exp!) :void
   (tensor :pointer))
@@ -246,10 +210,6 @@
 (cffi:defcfun ("lisp_call_pow_powf" %.^/powf) :pointer
   (tensor :pointer)
   (powf :pointer)) 
-
-(cffi:defcfun ("lisp_call_pow_broadcasting" %.^/broadcasting) :pointer
-  (base :pointer)
-  (exponent :pointer))    
   
 (cffi:defcfun ("lisp_call_exp" %.exp) :pointer
   (tensor :pointer)
@@ -281,16 +241,6 @@
   (summand :pointer)
   (sumend :pointer)
   (alpha :float))      
-  
-(cffi:defcfun ("lisp_call_axpy_broadcasting_inplace" %axpy/broadcasting!) :void
-  (summand :pointer)
-  (sumend :pointer)
-  (alpha :float))  
-  
-(cffi:defcfun ("lisp_call_axpy_broadcasting" %axpy/broadcasting) :pointer
-  (summand :pointer)
-  (sumend :pointer)
-  (alpha :float))  
   
 (cffi:defcfun ("nnl2_full_like" %full-like) :pointer
   (tensor :pointer)
@@ -338,21 +288,13 @@
   (tensor :pointer)
   (maxf :pointer))    
   
-(cffi:defcfun ("lisp_call_max_broadcasting_inplace" %.max/broadcasting!) :void
-  (a :pointer)
-  (b :pointer))    
-  
 (cffi:defcfun ("lisp_call_mininplace" %.min!) :void
   (tensora :pointer)
   (tensorb :pointer))  
   
 (cffi:defcfun ("lisp_call_min_minf_inplace" %.min/minf!) :void
   (tensor :pointer)
-  (minf :pointer))  
-  
-(cffi:defcfun ("lisp_call_min_broadcasting_inplace" %.min/broadcasting!) :void
-  (a :pointer)
-  (b :pointer))      
+  (minf :pointer))   
 
 (cffi:defcfun ("lisp_call_max" %.max) :pointer
   (tensora :pointer)
@@ -361,14 +303,6 @@
 (cffi:defcfun ("lisp_call_max_maxf" %.max/maxf) :pointer
   (tensor :pointer)
   (maxf :pointer))  
-  
-(cffi:defcfun ("lisp_call_max_broadcasting" %.max/broadcasting) :pointer
-  (a :pointer)
-  (b :pointer))
-
-(cffi:defcfun ("lisp_call_min_broadcasting" %.min/broadcasting) :pointer
-  (a :pointer)
-  (b :pointer))      
   
 (cffi:defcfun ("lisp_call_min" %.min) :pointer
   (tensora :pointer)
@@ -383,12 +317,6 @@
   
 (cffi:defcfun ("lisp_call_abs" %.abs) :pointer
   (tensora :pointer))
-  
-(cffi:defcfun ("lisp_call_transposeinplace" %transpose!) :void
-  (tensor :pointer))
-
-(cffi:defcfun ("lisp_call_transpose" %transpose) :pointer
-  (tensor :pointer))  
   
 (cffi:defcfun ("lisp_call_sum_without_axis" %sum-without-axis) :void
   (tensor :pointer)

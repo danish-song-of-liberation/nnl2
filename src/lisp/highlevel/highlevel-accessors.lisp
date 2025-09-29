@@ -1002,25 +1002,41 @@
 						 
 	(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
 				 
-(defmacro xavier (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal))
+(defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal))
+  "Makes a tensor with the xavier distribution in the specified shape
+   indices: Input shape (vector/list)
+   dtype (&key): Tensor Type
+   in (&key): Number of inputs
+   out (&key): Number of outputs
+   gain (&key): Autologous
+   distribution (&key): Available: (:normal :uniform)"
+
   (progn
     (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier")
 	(assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to xavier")
   
     (multiple-value-bind (shape rank) (make-shape-pntr indices)
       (case distribution
-	    (:normal `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 2.0s0))
-	    (:uniform `(nnl2.ffi:%xavier ,shape ,rank ,dtype ,in ,out ,gain 6.0s0))
+	    (:normal   (nnl2.ffi:%xavier shape rank dtype in out gain 2.0s0))
+	    (:uniform  (nnl2.ffi:%xavier shape rank dtype in out gain 6.0s0))
 	    (otherwise (error "Unknown xavier distribution: ~a%" distribution))))))
 		
-(defmacro transpose! (tensor)
-  `(nnl2.ffi:%transpose! ,tensor))		
+(cffi:defcfun ("lisp_call_transposeinplace" transpose!) :void
+  (tensor :pointer))
   
-(defmacro transpose (tensor)
-  `(nnl2.ffi:%transpose ,tensor))	  
+(cffi:defcfun ("lisp_call_transpose" transpose) :pointer
+  (tensor :pointer))    
   
 (defun sum (tensor &key axis &aux (dtype (dtype tensor)))
-  (let* ((type-t (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+  "WARNING: YET NOT SUPPORT MULTIPLE AXES
+  
+   Summarizes all tensor elements 
+   along the selected axis
+   
+   tensor: Input tensor
+   axis (&key): Axis to sum"
+   
+  (let* ((type-t (type/nn2->cffi dtype))
 		 (out (cffi:foreign-alloc type-t)))
 					
 	(if axis				
@@ -1030,7 +1046,14 @@
 		(cffi:mem-ref out type-t)))))
 	
 (defun l2-norm (tensor &key (axes #(0)) &aux (dtype (dtype tensor)))
-  (let* ((type-t (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
+  "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
+   
+   Applies l2 norm to passed tensor
+  
+   tensor: Input tensor
+   axes (&key): Axes to apply the norm. DOES NOT WORK YET"
+   
+  (let* ((type-t (type/nn2->cffi dtype))
 		 (axes-pntr (make-shape-pntr axes))
 		 (axes-len (length axes))
 		 (out (cffi:foreign-alloc type-t)))
@@ -1039,18 +1062,33 @@
 				
 	(cffi:mem-ref out type-t)))
 	
-(defmacro norm (tensor &key (axes #(0)) (p :l2))
+(defun norm (tensor &key (axes #(0)) (p :l2))
+  "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
+   
+   Applies passed norm to passed norm (available: (:l2))
+   
+   tensor: Input tensor
+   axes (&key): Axes to apply the norm. DOES NOT FULLY WORK YET"
+   
   (case p
-    (:l2 `(l2-norm ,tensor :axes ,axes))
+    (:l2 (l2-norm tensor :axes axes))
 	(otherwise (error "Incorrect :p key in norm~%"))))
 	
-(defmacro copy (tensor &key dtype)
-  `(nnl2.ffi:%copy ,tensor (if ,dtype ,dtype (dtype ,tensor))))	
+(defun copy (tensor &key dtype)
+  "Copies the passed tensor
+   tensor: Tensor to copy
+   dtype (&key): Type of new tensor"
+   
+  (nnl2.ffi:%copy tensor (if dtype dtype (dtype tensor))))	
   
 (defun .+/incf! (tensor increment)
+  "Applies in-place addition to a tensor with a scalar
+   tensor: Input tensor
+   increment: Value to increment"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (incf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
@@ -1058,9 +1096,13 @@
 	(nnl2.ffi:%.+/incf! tensor incf-pntr)))
 
 (defun .+/incf (tensor increment)
+  "Applies addition to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   increment: Value to increment"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (incf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
@@ -1068,9 +1110,13 @@
 	(nnl2.ffi:%.+/incf tensor incf-pntr)))
 	
 (defun .-/decf! (tensor decrement)
+  "Applies in-place subtraction to a tensor with a scalar
+   tensor: Input tensor
+   decrement: Value to decrement"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (incf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce decrement lisp-dtype))
@@ -1078,9 +1124,13 @@
 	(nnl2.ffi:%.-/decf! tensor incf-pntr)))	
 	
 (defun .-/decf (tensor decrement)
+  "Applies subtraction to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   decrement: Value to decrement"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (incf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce decrement lisp-dtype))
@@ -1088,9 +1138,13 @@
 	(nnl2.ffi:%.-/decf tensor incf-pntr)))	
 	
 (defun .*/mulf! (tensor multiplier)
+  "Applies in-place multiplication to a tensor with a scalar
+   tensor: Input tensor
+   multiplier: Value to multiply"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (incf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
@@ -1098,9 +1152,13 @@
 	(nnl2.ffi:%.*/mulf! tensor incf-pntr)))		
 	
 (defun .*/mulf (tensor multiplier)
+  "Applies multiplication to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   multiplier: Value to multiply"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (incf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
@@ -1108,9 +1166,13 @@
 	(nnl2.ffi:%.*/mulf tensor incf-pntr)))	
 
 (defun .//divf! (tensor divf)
+  "Applies in-place division to a tensor with a scalar
+   tensor: Input tensor
+   divf: Value to divide by"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (divf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divf lisp-dtype))
@@ -1118,9 +1180,13 @@
 	(nnl2.ffi:%.//divf! tensor divf-pntr)))		
 
 (defun .//divf (tensor divf)
+  "Applies division to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   divf: Value to divide by"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (divf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divf lisp-dtype))
@@ -1128,9 +1194,13 @@
 	(nnl2.ffi:%.//divf tensor divf-pntr)))	
 
 (defun .^/powf! (tensor powf)
+  "Applies in-place exponentiation to a tensor with a scalar
+   tensor: Input tensor
+   powf: Exponent value"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (powf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce powf lisp-dtype))
@@ -1138,9 +1208,13 @@
 	(nnl2.ffi:%.^/powf! tensor powf-pntr)))
 
 (defun .^/powf (tensor powf)
+  "Applies exponentiation to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   powf: Exponent value"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (powf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce powf lisp-dtype))
@@ -1148,9 +1222,13 @@
 	(nnl2.ffi:%.^/powf tensor powf-pntr)))	
 	
 (defun .max/maxf! (tensor maxf)
+  "Applies in-place maximum operation to a tensor with a scalar
+   tensor: Input tensor
+   maxf: Maximum value threshold"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (maxf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce maxf lisp-dtype))
@@ -1158,9 +1236,13 @@
 	(nnl2.ffi:%.max/maxf! tensor maxf-pntr)))
 	
 (defun .max/maxf (tensor maxf)
+  "Applies maximum operation to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   maxf: Maximum value threshold"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (maxf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce maxf lisp-dtype))
@@ -1168,9 +1250,13 @@
 	(nnl2.ffi:%.max/maxf tensor maxf-pntr)))	
 	
 (defun .min/minf! (tensor minf)
+  "Applies in-place minimum operation to a tensor with a scalar
+   tensor: Input tensor
+   minf: Minimum value threshold"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (minf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce minf lisp-dtype))
@@ -1178,9 +1264,13 @@
 	(nnl2.ffi:%.min/minf! tensor minf-pntr)))	
 	
 (defun .min/minf (tensor minf)
+  "Applies minimum operation to a tensor with a scalar, returning a new tensor
+   tensor: Input tensor
+   minf: Minimum value threshold"
+   
   (let* ((dtype (dtype tensor))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (minf-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce minf lisp-dtype))
@@ -1188,9 +1278,14 @@
 	(nnl2.ffi:%.min/minf tensor minf-pntr)))
 
 (defun axpy/axpf! (summand sumend alpha)
+  "Applies in-place AXPY operation: summand = summand + alpha * sumend
+   summand: Input tensor to be updated
+   sumend: Tensor to add
+   alpha: Scalar multiplier"
+   
   (let* ((dtype (dtype summand))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (sumend-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref sumend-pntr cffi-dtype) (coerce sumend lisp-dtype))
@@ -1198,318 +1293,361 @@
 	(nnl2.ffi:%axpy/axpf! summand sumend-pntr alpha)))	
 	
 (defun axpy/axpf (summand sumend alpha)
+  "Applies AXPY operation, returning a new tensor: result = summand + alpha * sumend
+   summand: Input tensor
+   sumend: Tensor to add
+   alpha: Scalar multiplier"
+   
   (let* ((dtype (dtype summand))
-		 (cffi-dtype (case dtype (:float64 :double) (:float32 :float) (:int32 :int)))
-		 (lisp-dtype (case dtype (:float64 'double-float) (:float32 'single-float) (:int32 'integer)))
+		 (cffi-dtype (type/nnl2->cffi dtype))
+		 (lisp-dtype (type/nnl2->lisp dtype))
 		 (sumend-pntr (cffi:foreign-alloc cffi-dtype)))
 		 
 	(setf (cffi:mem-ref sumend-pntr cffi-dtype) (coerce sumend lisp-dtype))
 	
-	(nnl2.ffi:%axpy/axpf summand sumend-pntr alpha)))		
+	(nnl2.ffi:%axpy/axpf summand sumend-pntr alpha)))
 	
-(defmacro .+/broadcasting! (summand sumend)
-  `(nnl2.ffi:%.+/broadcasting! ,summand ,sumend))
+(cffi:defcfun ("lisp_call_add_broadcasting_inplace" .+/broadcasting!) :void  
+  (summand :pointer)
+  (sumend :pointer))
   
-(defmacro .+/broadcasting (summand sumend)
-  `(nnl2.ffi:%.+/broadcasting ,summand ,sumend))
+(cffi:defcfun ("lisp_call_add_broadcasting" .+/broadcasting) :pointer
+  (summand :pointer)
+  (sumend :pointer))
 
-(defmacro .-/broadcasting! (minuend subtrahend)
-  `(nnl2.ffi:%.-/broadcasting! ,minuend ,subtrahend))
+(cffi:defcfun ("lisp_call_sub_broadcasting_inplace" .-/broadcasting!) :void  
+  (minuend :pointer)
+  (subtrahend :pointer))  
   
-(defmacro .-/broadcasting (minuend subtrahend)
-  `(nnl2.ffi:%.-/broadcasting ,minuend ,subtrahend))
+(cffi:defcfun ("lisp_call_sub_broadcasting" .-/broadcasting) :pointer
+  (minuend :pointer)
+  (subtrahend :pointer))
   
-(defmacro .*/broadcasting! (multiplicand multiplier)
-  `(nnl2.ffi:%.*/broadcasting! ,multiplicand ,multiplier))  
+(cffi:defcfun ("lisp_call_mul_broadcasting_inplace" .*/broadcasting!) :void
+  (multiplicand :pointer)
+  (multiplier :pointer)) 
   
-(defmacro .*/broadcasting (multiplicand multiplier)
-  `(nnl2.ffi:%.*/broadcasting ,multiplicand ,multiplier))   
+(cffi:defcfun ("lisp_call_mul_broadcasting" .*/broadcasting) :pointer   
+  (multiplicand :pointer)
+  (multiplier :pointer))
 
-(defmacro .//broadcasting! (dividend diviser)
-  `(nnl2.ffi:%.//broadcasting! ,dividend ,diviser))    
+(cffi:defcfun ("lisp_call_div_broadcasting_inplace" .//broadcasting!) :void
+  (dividend :pointer)
+  (divisor :pointer))   
   
-(defmacro .//broadcasting (dividend diviser)
-  `(nnl2.ffi:%.//broadcasting ,dividend ,diviser))  
+(cffi:defcfun ("lisp_call_div_broadcasting" .//broadcasting) :pointer
+  (dividend :pointer)
+  (divisor :pointer))    
   
-(defmacro .^/broadcasting! (base exponent)
-  `(nnl2.ffi:%.^/broadcasting! ,base ,exponent))
+(cffi:defcfun ("lisp_call_pow_broadcasting_inplace" .^/broadcasting!) :void
+  (base :pointer)
+  (exponent :pointer))  
 
-(defmacro .^/broadcasting (base exponent)
-  `(nnl2.ffi:%.^/broadcasting ,base ,exponent))  
+(cffi:defcfun ("lisp_call_pow_broadcasting" .^/broadcasting) :pointer
+  (base :pointer)
+  (exponent :pointer))    
   
-(defmacro .max/broadcasting! (tensora tensorb)
-  `(nnl2.ffi:%.max/broadcasting! ,tensora ,tensorb)) 
+(cffi:defcfun ("lisp_call_max_broadcasting_inplace" .max/broadcasting!) :void
+  (a :pointer)
+  (b :pointer))     
   
-(defmacro .max/broadcasting (tensora tensorb)
-  `(nnl2.ffi:%.max/broadcasting ,tensora ,tensorb)) 
+(cffi:defcfun ("lisp_call_max_broadcasting" .max/broadcasting) :pointer
+  (a :pointer)
+  (b :pointer))
 
-(defmacro .min/broadcasting! (tensora tensorb)
-  `(nnl2.ffi:%.min/broadcasting! ,tensora ,tensorb))   
+(cffi:defcfun ("lisp_call_min_broadcasting_inplace" .min/broadcasting!) :void
+  (a :pointer)
+  (b :pointer))     
   
-(defmacro .min/broadcasting (tensora tensorb)
-  `(nnl2.ffi:%.min/broadcasting ,tensora ,tensorb))     
+(cffi:defcfun ("lisp_call_min_broadcasting" .min/broadcasting) :pointer
+  (a :pointer)
+  (b :pointer))      
+
+(cffi:defcfun ("lisp_call_axpy_broadcasting_inplace" axpy/broadcasting!) :void
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))   
   
-(defmacro axpy/broadcasting! (summand sumend alpha)
-  `(nnl2.ffi:%axpy/broadcasting! ,summand ,sumend ,alpha))  
+(cffi:defcfun ("lisp_call_axpy_broadcasting" axpy/broadcasting) :pointer
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float))     
   
-(defmacro axpy/broadcasting (summand sumend alpha)
-  `(nnl2.ffi:%axpy/broadcasting ,summand ,sumend ,alpha))    
+(defun both-scalars-p (a b)
+  "Checks whether both arguments are scalars"
+  (nnl2.hli:fastcall (and (typep a 'real) (typep b 'real))))
+
+(defun any-scalar-p (a b)
+  "Checks whether at least one argument is a scalar"
+  (nnl2.hli:fastcall (or (typep a 'real) (typep b 'real))))
+
+(defun shapes-equal-p (a b)
+  "Checks whether the tensor shapes match"
+  (nnl2.hli:fastcall (equal (shape a :as :list) (shape b :as :list))))
+
+(defun higher-rank-tensor (a b)
+  "Returns a pair (higher lower) depending on the rank"
+  (nnl2.hli:fastcall (if (> (rank a) (rank b))
+					   (values a b)
+					   (values b a))))  
+					   
+(declaim (inline both-scalars-p any-scalar-p shapes-equal-p higher-rank-tensor))					   
+
+(defmacro with-tensor-dispatch ((a b) scalar-case tensor-case same-shape-case broadcast-case)
+  "Universal dispatcher for tensor operations"
+  
+  (let ((a-sym (gensym "A"))
+        (b-sym (gensym "B")))
+		
+    `(let ((,a-sym ,a)
+           (,b-sym ,b))
+   
+       (cond
+         ((both-scalars-p ,a-sym ,b-sym) ,scalar-case)
+         ((typep ,a-sym 'real) (error "You can't apply a tensor function to a scalar"))
+         ((typep ,b-sym 'real) ,tensor-case)
+         ((shapes-equal-p ,a-sym ,b-sym) ,same-shape-case)
+         (t (multiple-value-bind (higher lower) (higher-rank-tensor ,a-sym ,b-sym) ,broadcast-case))))))
 
 (defun axpy (a b &key (alpha 1.0))
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (+ a (* b alpha))
-          (error "You can't apply a tensor function to a scalar"))
-        (axpy/axpf a b alpha))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%axpy a b alpha)
-          (if (> (rank a) (rank b))
-            (axpy/broadcasting a b alpha)
-            (axpy/broadcasting b a alpha)))))))  
+  "Calculates A * X + Y
+   a: A
+   b: Y
+   alpha (&key): X"
+  
+  (declare (type real alpha))
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+	  (+ a (* b alpha))
+	  (axpy/axpf a b alpha)
+	  (nnl2.ffi:%axpy a b alpha)
+	  (axpy/broadcasting higher lower alpha))))
 			
 (defun axpy! (a b &key (alpha 1.0))
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (+ a (* b alpha)))
-          (error "You can't apply a tensor function to a scalar"))
-        (axpy/axpf! a b alpha))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%axpy! a b alpha)
-          (if (> (rank a) (rank b))
-            (axpy/broadcasting! a b alpha)
-            (axpy/broadcasting! b a alpha)))))))  			
+  "In-place version of A * X + Y
+   a: A (modified in-place)
+   b: Y
+   alpha (&key): X"
+  
+  (declare (type real alpha))
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (setq a (+ a (* b alpha)))
+      (axpy/axpf! a b alpha)
+      (nnl2.ffi:%axpy! a b alpha)
+      (axpy/broadcasting! higher lower alpha))))		
 
-(defun .+ (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (+ a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.+/incf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%+ a b)
-          (if (> (rank a) (rank b))
-            (.+/broadcasting a b)
-            (.+/broadcasting b a)))))))  
+(defun .+/internal (a b)
+  "Element-wise addition"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (+ a b)
+      (.+/incf a b)
+      (nnl2.ffi:%+ a b)
+      (.+/broadcasting higher lower))))
+	  
+(defun .+ (&rest args)
+  "Reduce tensors with element-wise addition"
+  (reduce #'.+/internal args))  
 
-(defun += (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (incf a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.+/incf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%+= a b)
-          (if (> (rank a) (rank b))
-            (.+/broadcasting! a b)
-            (.+/broadcasting! b a)))))))  
+(defun +=/internal (a b)
+  "In-place element-wise addition"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (incf a b)
+      (.+/incf! a b)
+      (nnl2.ffi:%+= a b)
+      (.+/broadcasting! higher lower)))
+	  
+  a)
+  
+(defun += (&rest args)
+  "Reduce tensors with in-place element-wise addition"
+  (reduce #'+=/internal args))  
 
-(defun .- (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (- a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.-/decf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%- a b)
-          (if (> (rank a) (rank b))
-            (.-/broadcasting a b)
-            (.-/broadcasting b a))))))) 
+(defun .-/internal (a b)
+  "Element-wise subtraction"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (- a b)
+      (.-/decf a b)
+      (nnl2.ffi:%- a b)
+      (.-/broadcasting higher lower))))
+	  
+(defun .- (&rest args)
+  "Reduce tensors with element-wise subtraction"
+  (reduce #'.-/internal args))
 
-(defun -= (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (decf a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.-/decf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%-= a b)
-          (if (> (rank a) (rank b))
-            (.-/broadcasting! a b)
-            (.-/broadcasting! b a)))))))	
-			
-(defun .* (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (* a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.*/mulf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%* a b)
-          (if (> (rank a) (rank b))
-            (.*/broadcasting a b)
-            (.*/broadcasting b a)))))))	 	
-		
-(defun *= (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (* a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.*/mulf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%*= a b)
-          (if (> (rank a) (rank b))
-            (.*/broadcasting! a b)
-            (.*/broadcasting! b a)))))))
-			
-(defun ./ (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (/ a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.//divf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%/ a b)
-          (if (> (rank a) (rank b))
-            (.//broadcasting a b)
-            (.//broadcasting b a)))))))				
-		
-(defun /! (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (/ a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.//divf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%/= a b)
-          (if (> (rank a) (rank b))
-            (.//broadcasting! a b)
-            (.//broadcasting! b a)))))))	  			
-		
-(defun .^ (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (expt a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.^/powf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%.^ a b)
-          (if (> (rank a) (rank b))
-            (.^/broadcasting a b)
-            (.^/broadcasting b a)))))))	  
+(defun -=/internal (a b)
+  "In-place element-wise subtraction"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (decf a b)
+      (.-/decf! a b)
+      (nnl2.ffi:%-= a b)
+      (.-/broadcasting! higher lower)))
+	  
+  a)
+  
+(defun -= (&rest args)
+  "Reduce tensors with in-place element-wise subtraction"
+  (reduce #'-=/internal args))
 
-(defun ^= (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (expt a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.^/powf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%^= a b)
-          (if (> (rank a) (rank b))
-            (.^/broadcasting! a b)
-            (.^/broadcasting! b a)))))))	
-			
-(defun .max (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (max a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.max/maxf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%.max a b)
-          (if (> (rank a) (rank b))
-            (.max/broadcasting a b)
-            (.max/broadcasting b a))))))) 
+(defun .*/internal (a b)
+  "Element-wise multiplication"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (* a b)
+      (.*/mulf a b)
+      (nnl2.ffi:%* a b)
+      (.*/broadcasting higher lower))))
+	  
+(defun .* (&rest args)
+  "Reduce tensors with element-wise multiplication"
+  (reduce #'.*/internal args))
 
-(defun .max! (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (max a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.max/maxf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%.max! a b)
-          (if (> (rank a) (rank b))
-            (.max/broadcasting! a b)
-            (.max/broadcasting! b a)))))))	  				
+(defun *=/internal (a b)
+  "In-place element-wise multiplication"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (setq a (* a b))
+      (.*/mulf! a b)
+      (nnl2.ffi:%*= a b)
+      (.*/broadcasting! higher lower)))
+	  
+  a)
+  
+(defun *= (&rest args)
+  "Reduce tensors with in-place element-wise multiplication"
+  (reduce #'*=/internal args))
 
-(defun .min (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (min a b)
-          (error "You can't apply a tensor function to a scalar"))
-        (.min/minf a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%.min a b)
-          (if (> (rank a) (rank b))
-            (.min/broadcasting a b)
-            (.min/broadcasting b a)))))))	
+(defun .//internal (a b)
+  "Element-wise division"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (/ a b)
+      (.//divf a b)
+      (nnl2.ffi:%/ a b)
+      (.//broadcasting higher lower))))
+	  
+(defun ./ (&rest args)
+  "Reduce tensors with element-wise division"
+  (reduce #'.//internal args))
 
-(defun .min! (a b)
-  (let ((scalar-a-p (typep a 'real)))
-    (if (or scalar-a-p (typep b 'real))
-      (if scalar-a-p
-        (if (typep b 'real)
-          (setq a (min a b))
-          (error "You can't apply a tensor function to a scalar"))
-        (.min/minf! a b))
-      (let ((shapea (shape a :as :list))
-            (shapeb (shape b :as :list)))
-        (if (equal shapea shapeb)
-		  (nnl2.ffi:%.min! a b)
-          (if (> (rank a) (rank b))
-            (.min/broadcasting! a b)
-            (.min/broadcasting! b a)))))))	  		
+(defun /!/internal (a b)
+  "In-place element-wise division"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (setq a (/ a b))
+      (.//divf! a b)
+      (nnl2.ffi:%/= a b)
+      (.//broadcasting! higher lower)))
+	  
+  a)
+  
+(defun /! (&rest args)
+  "Reduce tensors with in-place element-wise division"
+  (reduce #'/!/internal args))
+
+(defun .^/internal (a b)
+  "Element-wise exponentiation"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (expt a b)
+      (.^/powf a b)
+      (nnl2.ffi:%.^ a b)
+      (.^/broadcasting higher lower))))
+	  
+(defun .^ (&rest args)
+  "Reduce tensors with element-wise exponentiation"
+  (reduce #'.^/internal args))
+
+(defun ^=/internal (a b)
+  "In-place element-wise exponentiation"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (setq a (expt a b))
+      (.^/powf! a b)
+      (nnl2.ffi:%^= a b)
+      (.^/broadcasting! higher lower)))
+	  
+  a)
+  
+(defun ^= (&rest args)
+  "Reduce tensors with in-place element-wise exponentiation"
+  (reduce #'^=/internal args))
+
+(defun .max/internal (a b)
+  "Element-wise maximum"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (max a b)
+      (.max/maxf a b)
+      (nnl2.ffi:%.max a b)
+      (.max/broadcasting higher lower))))
+	  
+(defun .max (&rest args)
+  "Reduce tensors with element-wise maximum"
+  (reduce #'.max/internal args))	  
+
+(defun .max!/internal (a b)
+  "In-place element-wise maximum"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (setq a (max a b))
+      (.max/maxf! a b)
+      (nnl2.ffi:%.max! a b)
+      (.max/broadcasting! higher lower)))
+	  
+  a)
+  
+(defun .max! (&rest args)
+  "Reduce tensors with in-place element-wise maximum"
+  (reduce #'.max!/internal args))
+
+(defun .min/internal (a b)
+  "Element-wise minimum"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (min a b)
+      (.min/minf a b)
+      (nnl2.ffi:%.min a b)
+      (.min/broadcasting higher lower))))
+	  
+(defun .min (&rest args)
+  "Reduce tensors with element-wise minimum"
+  (reduce #'.min/internal args))
+
+(defun .min!/internal (a b)
+  "In-place element-wise minimum"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (a b)
+      (setq a (min a b))
+      (.min/minf! a b)
+      (nnl2.ffi:%.min! a b)
+      (.min/broadcasting! higher lower)))
+	  
+  a)
+  
+(defun .min! (&rest args)
+  "Reduce tensors with in-place element-wise minimum"
+  (reduce #'.min!/internal args))
 			
 (defun tensor-p (obj)
   (typep obj 'nnl2-tensor))			
