@@ -1,32 +1,59 @@
 (in-package :nnl2.ffi)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/ffi/ffi-c-core.lisp
+;; File: ffi-c-core.lisp
+
+;; The file contains the import of almost all libnnl.dll 
+;; functions into the lisp environment
+
+;; Note:
+;;	 I only left the docstring in functions that will be 
+;;	 called regularly. I won't/will leave little documentation 
+;;	 in copy-paste functions that do things that are already 
+;;	 clear, leaving normal documentation only in functions that 
+;;	 may be called regularly in a high-level interface
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (cffi:defcfun ("nnl2_init_system" nnl-init-system) :void)
 
+;; -- Main structures --
+
 (cffi:defcenum tensor-type
-  :int32
-  :float32
-  :float64)
+  "nnl2 Type system import into cffi"
+  :int32    ;; aka 'integer (lisp), int32_t (c), int (c), :int (cffi)
+  :float32  ;; aka 'single-float (lisp), float (c), :float (cffi)
+  :float64) ;; aka 'double-float (lisp), double (c), :double (cffi)"
   
 (cffi:defcenum nnl2-order
-  (:nnl2colmajor 101)
-  (:nnl2rowmajor 102))
-  
+  "Enum for storage order (made for BLAS)"
+  (:nnl2colmajor 101)  ;; Column-major order
+  (:nnl2rowmajor 102)) ;; Row-major order
+   
 (cffi:defcenum nnl2-transpose
-  (:nnl2notrans 111)
+  "nnl2 BLAS-Like enum for operations that 
+   may require transposition (like GEMM)"
+  (:nnl2notrans 111) 
   (:nnl2trans 112))  
   
 (cffi:defcstruct tensor
-  (tensor-type tensor-type)
-  (data :pointer)
-  (shape :pointer)
-  (rank :int))
+  "Tensor structure representing a multi-dimensional array"
+  (tensor-type tensor-type)  ;; Data type of tensor elements
+  (data :pointer)			 ;; Pointer to the raw tensor data
+  (shape :pointer)			 ;; Array of dimension sizes 
+  (strides :pointer)  		 ;; Array of byte strides for each dimension
+  (rank :int)				 ;; Number of dimensions (ndim)
+  (is-view :bool))			 ;; Flag indicating if this is a view (not owning data)
+  
+;; -- Main operations --  
   
 (cffi:defcfun ("lisp_call_empty" %empty) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type))
-  
-(declaim (ftype (function (:pointer :int tensor-type) :pointer) %empty))
   
 (cffi:defcfun ("lisp_call_zeros" %zeros) :pointer
   (shape :pointer)
@@ -403,6 +430,8 @@
   (coords :pointer)
   (coords-len :int)
   (with :pointer))  
+  
+;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
   (backend-name :string))   
@@ -814,6 +843,8 @@
 (cffi:defcfun ("get_reinterpret_num_backends" %get-reinterpret-num-backends) :int)
 (cffi:defcfun ("get_reinterpret_backends" %get-reinterpret-backends) :pointer)
 
+;; -- mem-aref setters/getters --
+
 (cffi:defcfun ("nnl2_fast_float64_set" mem-aref-setter-float64) :void
   (data :pointer)
   (index :int)
@@ -841,4 +872,4 @@
   (data :pointer)
   (index :int))
   
-(nnl-init-system)
+(nnl-init-system) ;; Initializing backends. Calling the nnl2_init_system function from src/c/nnl2_core.c

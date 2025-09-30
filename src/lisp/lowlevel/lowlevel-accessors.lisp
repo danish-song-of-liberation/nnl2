@@ -99,7 +99,7 @@
 	 (nnl2.ffi:%lowlevel-tref-with-coords-setter tensor shape rank filler-pntr))))
 		
 (defun data (tensor)
-  "Returns the underlying data pointer of the tensor
+  "Returns the raw data pointer of the tensor
    tensor: Input tensor"
    
   (nnl2.ffi:get-tensor-data tensor))
