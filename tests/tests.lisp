@@ -1,3 +1,12 @@
+;; Filepath: nnl2/tests/tests.lisp
+;; File: tests.lisp
+
+;; General test file. Contains the :nnl2.tests package 
+;; declaration and basic testing functions
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defpackage :nnl2.tests
   (:use :cl)
   (:export :run-all-tests :run-ffi-tests :run-system-tests :run-ts-tests))

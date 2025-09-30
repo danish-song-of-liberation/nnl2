@@ -34,1432 +34,621 @@
 
 (defun uppercase-string-to-symbol (upstring)
   (intern (string-downcase upstring) :keyword))
-  
-(defun use-backend/tref (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-tref-getter-backend sig)
-	(nnl2.ffi:%set-tref-setter-backend sig)))
-	
-(defun use-backend/view (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-	(nnl2.ffi:%set-view-backend sig)))	
-
-(defun use-backend/.abs (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-abs-backend sig)))
-	
-(defun use-backend/.abs! (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-abs-inplace-backend sig)))	
-	
-(defun use-backend/full (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-inplace-fill-backend sig)))  
-  
-(defun use-backend/empty (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-empty-backend sig)))
-  
-(defun use-backend/zeros (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-zeros-backend sig)))  
-
-(defun use-backend/ones (name)
-  (use-backend/full name))
-	
-(defun use-backend/full-like (name) (use-backend/full name))	
-(defun use-backend/empty-like (name) (use-backend/empty name))	
-(defun use-backend/zeros-like (name) (use-backend/zeros name))	
-(defun use-backend/ones-like (name) (use-backend/ones name))	
-	
-(defun use-backend/gemm (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-sgemminplace-backend sig)
-	(nnl2.ffi:%set-dgemminplace-backend sig)))
-	
-(defun use-backend/+= (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-addinplace-backend sig)
-	(nnl2.ffi:%set-add-incf-inplace-backend sig)
-	(nnl2.ffi:%set-add-broadcasting-inplace-backend sig)))
-	
-(defun use-backend/-= (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-subinplace-backend sig)
-	(nnl2.ffi:%set-sub-decf-inplace-backend sig)
-	(nnl2.ffi:%set-sub-broadcasting-inplace-backend sig)))
  
-(defun use-backend/*= (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-mulinplace-backend sig)
-	(nnl2.ffi:%set-mul-mulf-inplace-backend sig)
-	(nnl2.ffi:%set-mul-broadcasting-inplace-backend sig)))
+(defmacro define-backend-setter (function-name &rest backend-functions)
+  "Creates a function for configuring the backend with the specified backend functions"
+  (let ((sigsym (gensym "SIG"))
+        (namesym (gensym "NAME")))
+    `(defun ,function-name (,namesym)
+       ,(format nil "Sets new backend for ~A. NAME: New backend symbol (e.g., 'naive, 'avx256, 'blas)	 (Documentation was generated automatically)" function-name)
+       (let ((,sigsym (symbol-to-uppercase-string ,namesym)))
+         ,@(loop for backend-fn in backend-functions
+                 collect `(,backend-fn ,sigsym))))))
   
-(defun use-backend//! (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-divinplace-backend sig)
-	(nnl2.ffi:%set-div-divf-inplace-backend sig)
-	(nnl2.ffi:%set-div-broadcasting-inplace-backend sig)))
-	
-(defun use-backend/^= (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-powinplace-backend sig)
-	(nnl2.ffi:%set-pow-powf-inplace-backend sig)
-	(nnl2.ffi:%set-pow-broadcasting-inplace-backend sig)))
+(define-backend-setter use-backend/tref
+  nnl2.ffi:%set-tref-getter-backend
+  nnl2.ffi:%set-tref-setter-backend)
 
-(defun use-backend/.log! (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-loginplace-backend sig)))	
+(define-backend-setter use-backend/view
+  nnl2.ffi:%set-view-backend)
 
-(defun use-backend/scale! (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-scaleinplace-backend sig)))	
+(define-backend-setter use-backend/.abs
+  nnl2.ffi:%set-abs-backend)
 
-(defun use-backend/.min! (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-mininplace-backend sig)
-	(nnl2.ffi:%set-min-minf-inplace-backend sig)
-	(nnl2.ffi:%set-min-broadcasting-inplace-backend sig)))
+(define-backend-setter use-backend/.abs!
+  nnl2.ffi:%set-abs-inplace-backend)
 
-(defun use-backend/.max! (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-maxinplace-backend sig)
-	(nnl2.ffi:%set-max-maxf-inplace-backend sig)
-	(nnl2.ffi:%set-max-broadcasting-inplace-backend sig)))
+(define-backend-setter use-backend/full
+  nnl2.ffi:%set-inplace-fill-backend)
 
-(defun use-backend/.+ (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-add-backend sig)
-	(nnl2.ffi:%set-add-incf-backend sig)
-	(nnl2.ffi:%set-add-broadcasting-backend sig)))
-    
-(defun use-backend/.- (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-sub-backend sig)
-	(nnl2.ffi:%set-sub-decf-backend sig)
-	(nnl2.ffi:%set-sub-broadcasting-backend sig)))
- 
-(defun use-backend/.* (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-div-backend sig)
-	(nnl2.ffi:%set-mul-mulf-backend sig)
-	(nnl2.ffi:%set-mul-broadcasting-backend sig)))
-    
-(defun use-backend/./ (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-div-backend sig)
-	(nnl2.ffi:%set-div-divf-backend sig)
-	(nnl2.ffi:%set-div-broadcasting-backend sig)))
+(define-backend-setter use-backend/empty
+  nnl2.ffi:%set-empty-backend)
 
-(defun use-backend/.^ (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-pow-backend sig)
-	(nnl2.ffi:%set-pow-powf-backend sig)
-	(nnl2.ffi:%set-pow-broadcasting-backend sig)))
+(define-backend-setter use-backend/zeros
+  nnl2.ffi:%set-zeros-backend)
 
-(defun use-backend/.log (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-log-backend sig)))  
- 	
-(defun use-backend/scale (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-scale-backend sig)))		
-	
-(defun use-backend/.min (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-min-backend sig)
-	(nnl2.ffi:%set-min-minf-backend sig)
-	(nnl2.ffi:%set-min-broadcasting-backend sig)))
-	
-(defun use-backend/.max (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-max-backend sig)
-    (nnl2.ffi:%set-max-maxf-backend sig)
-	(nnl2.ffi:%set-max-broadcasting-backend sig)))
-	
-(defun use-backend/hstack (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-hstack-backend sig)))		
+(define-backend-setter use-backend/gemm
+  nnl2.ffi:%set-sgemminplace-backend
+  nnl2.ffi:%set-dgemminplace-backend)
 
-(defun use-backend/vstack (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-vstack-backend sig)))
+(define-backend-setter use-backend/+=
+  nnl2.ffi:%set-addinplace-backend
+  nnl2.ffi:%set-add-incf-inplace-backend
+  nnl2.ffi:%set-add-broadcasting-inplace-backend)
 
-(defun use-backend/.relu! (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-reluinplace-backend sig)))		
-	
-(defun use-backend/.relu (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-relu-backend sig)))			
-	
-(defun use-backend/.leaky-relu! (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-leakyreluinplace-backend sig)))		
-	
-(defun use-backend/.leaky-relu (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-leakyrelu-backend sig)))	
-	
-(defun use-backend/.sigmoid! (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-sigmoidinplace-backend sig)))		
-	
-(defun use-backend/.sigmoid (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-sigmoid-backend sig)))	
-	
-(defun use-backend/.tanh! (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-tanhinplace-backend sig)))		
-	
-(defun use-backend/.tanh (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-tanh-backend sig)))	
-	
-(defun use-backend/concat (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-concat-backend sig)))		
-	
-(defun use-backend/randn (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-randn-backend sig)))			
+(define-backend-setter use-backend/-=
+  nnl2.ffi:%set-subinplace-backend
+  nnl2.ffi:%set-sub-decf-inplace-backend
+  nnl2.ffi:%set-sub-broadcasting-inplace-backend)
 
-(defun use-backend/randn-like (name) 
-  (use-backend/randn name))	
+(define-backend-setter use-backend/*=
+  nnl2.ffi:%set-mulinplace-backend
+  nnl2.ffi:%set-mul-mulf-inplace-backend
+  nnl2.ffi:%set-mul-broadcasting-inplace-backend)
 
-(defun use-backend/xavier (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-xavier-backend sig)))		
+(define-backend-setter use-backend//!
+  nnl2.ffi:%set-divinplace-backend
+  nnl2.ffi:%set-div-divf-inplace-backend
+  nnl2.ffi:%set-div-broadcasting-inplace-backend)
 
-(defun use-backend/transpose! (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-transposeinplace-backend sig)))		
-	
-(defun use-backend/transpose (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-transpose-backend sig)))
+(define-backend-setter use-backend/^=
+  nnl2.ffi:%set-powinplace-backend
+  nnl2.ffi:%set-pow-powf-inplace-backend
+  nnl2.ffi:%set-pow-broadcasting-inplace-backend)
 
-(defun use-backend/sum (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-sum-without-axis-backend sig)
-	(nnl2.ffi:%set-sum-with-axis-backend sig)))
+(define-backend-setter use-backend/.log!
+  nnl2.ffi:%set-loginplace-backend)
 
-(defun use-backend/l2norm (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-l2norm-backend sig)))
+(define-backend-setter use-backend/scale!
+  nnl2.ffi:%set-scaleinplace-backend)
 
-(defun use-backend/copy (name)	
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-copy-backend sig)))
+(define-backend-setter use-backend/.min!
+  nnl2.ffi:%set-mininplace-backend
+  nnl2.ffi:%set-min-minf-inplace-backend
+  nnl2.ffi:%set-min-broadcasting-inplace-backend)
 
-(defun use-backend/reshape (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-reshape-backend sig)))
-	
-(defun use-backend/reinterpret (name)
-  (let ((sig (symbol-to-uppercase-string name)))
-    (nnl2.ffi:%set-reinterpret-backend sig)))
+(define-backend-setter use-backend/.max!
+  nnl2.ffi:%set-maxinplace-backend
+  nnl2.ffi:%set-max-maxf-inplace-backend
+  nnl2.ffi:%set-max-broadcasting-inplace-backend)
+
+(define-backend-setter use-backend/.+
+  nnl2.ffi:%set-add-backend
+  nnl2.ffi:%set-add-incf-backend
+  nnl2.ffi:%set-add-broadcasting-backend)
+
+(define-backend-setter use-backend/.-
+  nnl2.ffi:%set-sub-backend
+  nnl2.ffi:%set-sub-decf-backend
+  nnl2.ffi:%set-sub-broadcasting-backend)
+
+(define-backend-setter use-backend/.*
+  nnl2.ffi:%set-div-backend
+  nnl2.ffi:%set-mul-mulf-backend
+  nnl2.ffi:%set-mul-broadcasting-backend)
+
+(define-backend-setter use-backend/./
+  nnl2.ffi:%set-div-backend
+  nnl2.ffi:%set-div-divf-backend
+  nnl2.ffi:%set-div-broadcasting-backend)
+
+(define-backend-setter use-backend/.^
+  nnl2.ffi:%set-pow-backend
+  nnl2.ffi:%set-pow-powf-backend
+  nnl2.ffi:%set-pow-broadcasting-backend)
+
+(define-backend-setter use-backend/.log
+  nnl2.ffi:%set-log-backend)
+
+(define-backend-setter use-backend/scale
+  nnl2.ffi:%set-scale-backend)
+
+(define-backend-setter use-backend/.min
+  nnl2.ffi:%set-min-backend
+  nnl2.ffi:%set-min-minf-backend
+  nnl2.ffi:%set-min-broadcasting-backend)
+
+(define-backend-setter use-backend/.max
+  nnl2.ffi:%set-max-backend
+  nnl2.ffi:%set-max-maxf-backend
+  nnl2.ffi:%set-max-broadcasting-backend)
+
+(define-backend-setter use-backend/hstack
+  nnl2.ffi:%set-hstack-backend)
+
+(define-backend-setter use-backend/vstack
+  nnl2.ffi:%set-vstack-backend)
+
+(define-backend-setter use-backend/.relu!
+  nnl2.ffi:%set-reluinplace-backend)
+
+(define-backend-setter use-backend/.relu
+  nnl2.ffi:%set-relu-backend)
+
+(define-backend-setter use-backend/.leaky-relu!
+  nnl2.ffi:%set-leakyreluinplace-backend)
+
+(define-backend-setter use-backend/.leaky-relu
+  nnl2.ffi:%set-leakyrelu-backend)
+
+(define-backend-setter use-backend/.sigmoid!
+  nnl2.ffi:%set-sigmoidinplace-backend)
+
+(define-backend-setter use-backend/.sigmoid
+  nnl2.ffi:%set-sigmoid-backend)
+
+(define-backend-setter use-backend/.tanh!
+  nnl2.ffi:%set-tanhinplace-backend)
+
+(define-backend-setter use-backend/.tanh
+  nnl2.ffi:%set-tanh-backend)
+
+(define-backend-setter use-backend/concat
+  nnl2.ffi:%set-concat-backend)
+
+(define-backend-setter use-backend/randn
+  nnl2.ffi:%set-randn-backend)
+
+(define-backend-setter use-backend/xavier
+  nnl2.ffi:%set-xavier-backend)
+
+(define-backend-setter use-backend/transpose!
+  nnl2.ffi:%set-transposeinplace-backend)
+
+(define-backend-setter use-backend/transpose
+  nnl2.ffi:%set-transpose-backend)
+
+(define-backend-setter use-backend/sum
+  nnl2.ffi:%set-sum-without-axis-backend
+  nnl2.ffi:%set-sum-with-axis-backend)
+
+(define-backend-setter use-backend/l2norm
+  nnl2.ffi:%set-l2norm-backend)
+
+(define-backend-setter use-backend/copy
+  nnl2.ffi:%set-copy-backend)
+
+(define-backend-setter use-backend/reshape
+  nnl2.ffi:%set-reshape-backend)
+
+(define-backend-setter use-backend/reinterpret
+  nnl2.ffi:%set-reinterpret-backend)
+
+(defun use-backend/ones (name) (use-backend/full name))
+(defun use-backend/full-like (name) (use-backend/full name))  
+(defun use-backend/empty-like (name) (use-backend/empty name))  
+(defun use-backend/zeros-like (name) (use-backend/zeros name))  
+(defun use-backend/ones-like (name) (use-backend/ones name))
+(defun use-backend/randn-like (name) (use-backend/randn name))
 
 (defun use-backend (name)
-  (use-backend/tref name)
-  (use-backend/view name)
-  (use-backend/+= name)
-  (use-backend/-= name)
-  (use-backend/*= name)
-  (use-backend//! name)
-  (use-backend/^= name)
-  (use-backend/.log! name)
-  (use-backend/.max! name)
-  (use-backend/.min! name)
-  (use-backend/scale! name)
-  (use-backend/.+ name)
-  (use-backend/.- name)
-  (use-backend/.* name)
-  (use-backend/./ name)
-  (use-backend/.^ name)
-  (use-backend/.log name)
-  (use-backend/.min name)
-  (use-backend/.max name)
-  (use-backend/scale name)
-  (use-backend/empty name)
-  (use-backend/.abs name)
-  (use-backend/xavier name)
-  (use-backend/randn name)
-  (use-backend/full name)	
-  (use-backend/empty name)
-  (use-backend/zeros name)
-  (use-backend/sum name)
-  (use-backend/l2norm name)
-  (use-backend/copy name)
-  (use-backend/gemm name)
-  (use-backend/.relu name)
-  (use-backend/.relu! name)
-  (use-backend/.leaky-relu name)
-  (use-backend/.leaky-relu! name)
-  (use-backend/.sigmoid name)
-  (use-backend/.sigmoid! name)
-  (use-backend/.tanh name)
-  (use-backend/.tanh! name)
-  (use-backend/transpose name)
-  (use-backend/transpose! name)
-  (use-backend/reshape name)
-  (use-backend/reinterpret name))
-  
-(defun get-backend/tref ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-tref-getter-backend)))      
- 
-(defun (setf get-backend/tref) (name)
-  (use-backend/tref name))    
-  
-(defun get-backend/view ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-view-backend)))      
- 
-(defun (setf get-backend/view) (name)
-  (use-backend/view name))      
- 
-(defun get-backend/empty ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-empty-backend)))    
-  
-(defun (setf get-backend/empty) (name)
-  (use-backend/empty name))    
-  
-(defun get-backend/zeros ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-zeros-backend)))
-
-(defun (setf get-backend/zeros) (name)
-  (use-backend/zeros name))  
-
-(defun get-backend/ones ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
-  
-(defun (setf get-backend/ones) (name)
-  (use-backend/ones name))    
-  
-(defun get-backend/full ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-inplace-fill-backend)))  
-  
-(defun (setf get-backend/full) (name)
-  (use-backend/full name))    
-  
-(defun get-backend/full-like () (get-backend/full))	
-(defun get-backend/empty-like () (get-backend/empty))	
-(defun get-backend/zeros-like () (get-backend/zeros))	
-(defun get-backend/ones-like () (get-backend/ones))
-  
-(defun get-backend/gemm ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))
-
-(defun (setf get-backend/gemm) (name)
-  (use-backend/gemm name))  
+  "Sets a new backend for all supported operations
+   name: Backend symbol (e.g., 'naive, 'avx256, 'blas, ...)"
+   
+  (dolist (backend-function '(use-backend/tref use-backend/view use-backend/+= 
+                              use-backend/-= use-backend/*= use-backend//! 
+                              use-backend/^= use-backend/.log! use-backend/.max!
+                              use-backend/.min! use-backend/scale! use-backend/.+
+                              use-backend/.- use-backend/.* use-backend/./
+                              use-backend/.^ use-backend/.log use-backend/.min
+                              use-backend/.max use-backend/scale use-backend/empty
+                              use-backend/.abs use-backend/xavier use-backend/randn
+                              use-backend/full use-backend/zeros use-backend/sum
+                              use-backend/l2norm use-backend/copy use-backend/gemm
+                              use-backend/.relu use-backend/.relu! use-backend/.leaky-relu
+                              use-backend/.leaky-relu! use-backend/.sigmoid use-backend/.sigmoid!
+                              use-backend/.tanh use-backend/.tanh! use-backend/transpose
+                              use-backend/transpose! use-backend/reshape use-backend/reinterpret))
+							  
+      (funcall backend-function name)))
+	  
+(defmacro define-backend-getter-setter (getter-name setter-name backend-get-function &key (like nil))
+  "Creates getter and setter functions for backend configuration
+   getter-name: Name of the getter function
+   setter-name: Name of the setter function  
+   backend-get-function: CFFI function to get current backend
+   like (&key): If specified, creates alias to another getter"
+   
+  (if like
+    `(progn
+       (defun ,getter-name ()
+         ,(format nil "Gets current backend for ~A. Returns keyword symbol.    (Documentation was generated automatically)" getter-name)
+          (,like))
+       
+       (defun (setf ,getter-name) (name)
+         ,(format nil "Sets backend for ~A to NAME.    (Documentation was generated automatically)" getter-name)
+          (funcall (function ,setter-name) name)))
     
-(defun get-backend/gemm! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-gemm-backend)))    
-  
-(defun (setf get-backend/gemm!) (name)
-  (use-backend/gemm! name))  
- 
-(defun get-backend/+= ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-addinplace-backend))) 
+    `(progn
+       (defun ,getter-name ()
+         ,(format nil "Gets current backend for ~A. Returns keyword symbol.    (Documentation was generated automatically)" getter-name)
+          (uppercase-string-to-symbol (,backend-get-function)))
 
-(defun (setf get-backend/+=) (name)
-  (use-backend/+= name))  
- 
-(defun get-backend/-= ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-subinplace-backend)))
+       (defun (setf ,getter-name) (name)
+         ,(format nil "Sets backend for ~A to NAME.    (Documentation was generated automatically)" getter-name)
+          (,setter-name name)))))
 
-(defun (setf get-backend/-=) (name)
-  (use-backend/-= name))  
-  
-(defun get-backend/.+ ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-add-backend)))
+(define-backend-getter-setter get-backend/tref use-backend/tref nnl2.ffi:%get-tref-getter-backend)
+(define-backend-getter-setter get-backend/view use-backend/view nnl2.ffi:%get-view-backend)
+(define-backend-getter-setter get-backend/copy use-backend/copy nnl2.ffi:%get-copy-backend)
+(define-backend-getter-setter get-backend/empty use-backend/empty nnl2.ffi:%get-empty-backend)
+(define-backend-getter-setter get-backend/zeros use-backend/zeros nnl2.ffi:%get-zeros-backend)
+(define-backend-getter-setter get-backend/full use-backend/full nnl2.ffi:%get-inplace-fill-backend)
+(define-backend-getter-setter get-backend/ones use-backend/ones nnl2.ffi:%get-inplace-fill-backend)
+(define-backend-getter-setter get-backend/full-like use-backend/full-like nil :like get-backend/full)
+(define-backend-getter-setter get-backend/empty-like use-backend/empty-like nil :like get-backend/empty)
+(define-backend-getter-setter get-backend/zeros-like use-backend/zeros-like nil :like get-backend/zeros)
+(define-backend-getter-setter get-backend/ones-like use-backend/ones-like nil :like get-backend/ones)
+(define-backend-getter-setter get-backend/gemm use-backend/gemm nnl2.ffi:%get-gemm-backend)
+(define-backend-getter-setter get-backend/gemm! use-backend/gemm! nnl2.ffi:%get-gemm-backend)
+(define-backend-getter-setter get-backend/axpy use-backend/axpy nnl2.ffi:%get-axpy-backend)
+(define-backend-getter-setter get-backend/axpy! use-backend/axpy! nnl2.ffi:%get-axpy-inplace-backend)
+(define-backend-getter-setter get-backend/+= use-backend/+= nnl2.ffi:%get-addinplace-backend)
+(define-backend-getter-setter get-backend/-= use-backend/-= nnl2.ffi:%get-subinplace-backend)
+(define-backend-getter-setter get-backend/*= use-backend/*= nnl2.ffi:%get-mulinplace-backend)
+(define-backend-getter-setter get-backend//! use-backend//! nnl2.ffi:%get-divinplace-backend)
+(define-backend-getter-setter get-backend/^= use-backend/^= nnl2.ffi:%get-powinplace-backend)
+(define-backend-getter-setter get-backend/.+ use-backend/.+ nnl2.ffi:%get-add-backend)
+(define-backend-getter-setter get-backend/.- use-backend/.- nnl2.ffi:%get-sub-backend)
+(define-backend-getter-setter get-backend/.* use-backend/.* nnl2.ffi:%get-mul-backend)
+(define-backend-getter-setter get-backend/./ use-backend/./ nnl2.ffi:%get-div-backend)
+(define-backend-getter-setter get-backend/.^ use-backend/.^ nnl2.ffi:%get-pow-backend)
+(define-backend-getter-setter get-backend/.exp use-backend/.exp nnl2.ffi:%get-exp-backend)
+(define-backend-getter-setter get-backend/.exp! use-backend/.exp! nnl2.ffi:%get-expinplace-backend)
+(define-backend-getter-setter get-backend/.log use-backend/.log nnl2.ffi:%get-log-backend)
+(define-backend-getter-setter get-backend/.log! use-backend/.log! nnl2.ffi:%get-loginplace-backend)
+(define-backend-getter-setter get-backend/scale use-backend/scale nnl2.ffi:%get-scale-backend)
+(define-backend-getter-setter get-backend/scale! use-backend/scale! nnl2.ffi:%get-scaleinplace-backend)
+(define-backend-getter-setter get-backend/.min use-backend/.min nnl2.ffi:%get-min-backend)
+(define-backend-getter-setter get-backend/.min! use-backend/.min! nnl2.ffi:%get-mininplace-backend)
+(define-backend-getter-setter get-backend/.max use-backend/.max nnl2.ffi:%get-max-backend)
+(define-backend-getter-setter get-backend/.max! use-backend/.max! nnl2.ffi:%get-maxinplace-backend)
+(define-backend-getter-setter get-backend/.abs use-backend/.abs nnl2.ffi:%get-abs-backend)
+(define-backend-getter-setter get-backend/.abs! use-backend/.abs! nnl2.ffi:%get-absinplace-backend)
+(define-backend-getter-setter get-backend/hstack use-backend/hstack nnl2.ffi:%get-hstack-backend)
+(define-backend-getter-setter get-backend/vstack use-backend/vstack nnl2.ffi:%get-vstack-backend)
+(define-backend-getter-setter get-backend/concat use-backend/concat nnl2.ffi:%get-concat-backend)
+(define-backend-getter-setter get-backend/.relu use-backend/.relu nnl2.ffi:%get-relu-backend)
+(define-backend-getter-setter get-backend/.relu! use-backend/.relu! nnl2.ffi:%get-reluinplace-backend)
+(define-backend-getter-setter get-backend/.leaky-relu use-backend/.leaky-relu nnl2.ffi:%get-leakyrelu-backend)
+(define-backend-getter-setter get-backend/.leaky-relu! use-backend/.leaky-relu! nnl2.ffi:%get-leakyreluinplace-backend)
+(define-backend-getter-setter get-backend/.sigmoid use-backend/.sigmoid nnl2.ffi:%get-sigmoid-backend)
+(define-backend-getter-setter get-backend/.sigmoid! use-backend/.sigmoid! nnl2.ffi:%get-sigmoidinplace-backend)
+(define-backend-getter-setter get-backend/.tanh use-backend/.tanh nnl2.ffi:%get-tanh-backend)
+(define-backend-getter-setter get-backend/.tanh! use-backend/.tanh! nnl2.ffi:%get-tanhinplace-backend)
+(define-backend-getter-setter get-backend/randn use-backend/randn nnl2.ffi:%get-randn-backend)
+(define-backend-getter-setter get-backend/randn-like use-backend/randn-like nil :like get-backend/randn)
+(define-backend-getter-setter get-backend/xavier use-backend/xavier nnl2.ffi:%get-xavier-backend)
+(define-backend-getter-setter get-backend/transpose use-backend/transpose nnl2.ffi:%get-transpose-backend)
+(define-backend-getter-setter get-backend/transpose! use-backend/transpose! nnl2.ffi:%get-transposeinplace-backend)
+(define-backend-getter-setter get-backend/reshape use-backend/reshape nnl2.ffi:%get-reshape-backend)
+(define-backend-getter-setter get-backend/reinterpret use-backend/reinterpret nnl2.ffi:%get-reinterpret-backend)
+(define-backend-getter-setter get-backend/sum use-backend/sum nnl2.ffi:%get-sum-without-axis-backend)
 
-(defun (setf get-backend/.+) (name)
-  (use-backend/.+ name))
- 
-(defun get-backend/.- ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-sub-backend)))  
-
-(defun (setf get-backend/.-) (name)
-  (use-backend/.- name))  
- 
-(defun get-backend/*= ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-mulinplace-backend)))       
-
-(defun (setf get-backend/*=) (name)
-  (use-backend/*= name))
-
-(defun get-backend//! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-divinplace-backend)))  
-
-(defun (setf get-backend//!) (name)
-  (use-backend//! name))
-
-(defun get-backend/.* ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-mul-backend)))    
-
-(defun (setf get-backend/.*) (name)
-  (use-backend/.* name))
-
-(defun get-backend/./ ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-div-backend)))      
-  
-(defun (setf get-backend/./) (name)
-  (use-backend/./ name))  
-  
-(defun get-backend/^= ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-powinplace-backend)))      
-
-(defun (setf get-backend/^=) (name)
-  (use-backend/^= name))
-  
-(defun get-backend/.^ ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-pow-backend)))      
-  
-(defun (setf get-backend/.^) (name)
-  (use-backend/.^ name))  
-  
-(defun get-backend/.exp! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-expinplace-backend)))   
-  
-(defun (setf get-backend/.exp!) (name)
-  (use-backend/.exp! name))  
-  
-(defun get-backend/.exp ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-exp-backend)))   
-
-(defun (setf get-backend/.exp) (name)
-  (use-backend/.exp name))
-
-(defun get-backend/.log! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-loginplace-backend)))      
-
-(defun (setf get-backend/.log!) (name)
-  (use-backend/.log! name))
-	
-(defun get-backend/.log ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-log-backend)))    	
-	
-(defun (setf get-backend/.log) (name)
-  (use-backend/.log name))	ы
-	
-(defun get-backend/scale! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-scaleinplace-backend)))    		
-
-(defun (setf get-backend/scale!) (name)
-  (use-backend/scale! name))
-
-(defun get-backend/scale ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-scale-backend)))    		
-	
-(defun (setf get-backend/scale) (name)
-  (use-backend/scale name))
-	
-(defun get-backend/.max! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-maxinplace-backend)))    		
-
-(defun (setf get-backend/.max!) (name)
-  (use-backend/.max! name))
-
-(defun get-backend/.min! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-mininplace-backend)))  
-
-(defun (setf get-backend/.min!) (name)
-  (use-backend/.min! name))
-
-(defun get-backend/.max ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-max-backend)))    		
-
-(defun (setf get-backend/.max) (name)
-  (use-backend/.max name))
-
-(defun get-backend/.min ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-min-backend))) 
-
-(defun (setf get-backend/.min) (name)
-  (use-backend/.min name))
-
-(defun get-backend/.abs! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-absinplace-backend)))   
-  
-(defun (setf get-backend/.abs!) (name)
-  (use-backend/.abs! name))  
-  
-(defun get-backend/.abs ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-abs-backend)))  
-  
-(defun (setf get-backend/.abs) (name)
-  (use-backend/.abs name))  
-  
-(defun get-backend/hstack ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-hstack-backend)))   
-  
-(defun (setf get-backend/hstack) (name)
-  (use-backend/hstack name))  
-  
-(defun get-backend/vstack ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-vstack-backend)))    
-  
-(defun (setf get-backend/vstack) (name)
-  (use-backend/vstack name))  
-  
-(defun get-backend/.relu! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-reluinplace-backend)))     
-  
-(defun (setf get-backend/.relu!) (name)
-  (use-backend/.relu! name))  
-  
-(defun get-backend/.relu ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-relu-backend)))       
-  
-(defun (setf get-backend/.relu) (name)
-  (use-backend/.relu name))  
-  
-(defun get-backend/.leaky-relu! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-leakyreluinplace-backend)))     
-  
-(defun (setf get-backend/.leaky-relu!) (name)
-  (use-backend/.leaky-relu name))  
-  
-(defun get-backend/.leaky-relu ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-leakyrelu-backend)))   
- 
-(defun (setf get-backend/.leaky-relu) (name)
-  (use-backend/.leaky-relu name))
- 
-(defun get-backend/.sigmoid! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-sigmoidinplace-backend)))     
- 
-(defun (setf get-backend/.sigmoid!) (name)
-  (use-backend/.sigmoid! name))
- 
-(defun get-backend/.sigmoid ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-sigmoid-backend)))     
-  
-(defun (setf get-backend/.sigmoid) (name)
-  (use-backend/.sigmoid name))  
-  
-(defun get-backend/.tanh! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-tanhinplace-backend)))     
-  
-(defun (setf get-backend/.tanh!) (name)
-  (use-backend/.tanh! name))  
-  
-(defun get-backend/.tanh ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-tanh-backend)))    
-  
-(defun (setf get-backend/.tanh) (name)
-  (use-backend/.tanh name))  
-  
-(defun get-backend/concat ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-concat-backend)))   
-  
-(defun (setf get-backend/concat) (name)
-  (use-backend/concat name))  
-  
-(defun get-backend/randn ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-randn-backend)))  
- 
-(defun (setf get-backend/randn) (name)
-  (use-backend/randn name)) 
- 
-(defun get-backend/randn-like () 
-  (get-backend/randn))
-
-(defun (setf get-backend/randn-like) (name)
-  (use-backend/randn-like name))  
- 
-(defun get-backend/xavier ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-xavier-backend)))
-
-(defun (setf get-backend/xavier) (name)
-  (use-backend/xavier name))  
-  
-(defun get-backend/transpose! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-transposeinplace-backend))) 
-    
-(defun (setf get-backend/transpose!) (name)
-  (use-backend/transpose! name))	
-	
-(defun get-backend/transpose ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-transpose-backend))) 
-    
-(defun (setf get-backend/transpose) (name)
-  (use-backend/transpose name))
-	
-(defun get-backend/sum ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-sum-without-axis-backend)))	
-  
-(defun (setf get-backend/sum) (name)
-  (use-backend/sum name))  
-  
-(defun get-backend/reshape ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-reshape-backend)))	
-  
-(defun (setf get-backend/reshape) (name)
-  (use-backend/reshape name))
-  
-(defun get-backend/reinterpret ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-reinterpret-backend)))	  
-  
-(defun (setf get-backend/reinterpret) (name)
-  (use-backend/reinterpret name))
-  
 (defun get-backend/norm (&key (p :l2))
+  "Gets current backend for norm operation. P: Norm type (:l2 supported)"
   (case p
     (:l2 (uppercase-string-to-symbol (nnl2.ffi:%get-l2norm-backend)))
-	(otherwise (error "Incorrect :p key in norm~%"))))
+    (otherwise (error "Unsupported norm type: ~A" p))))
 
 (defun (setf get-backend/norm) (name &key (p :l2))
-  (use-backend/norm name :p p))
-	
-(defun get-backend/copy ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-copy-backend)))
-
-(defun (setf get-backend/copy) (name)
-  (use-backend/copy name))  
+  "Sets backend for norm operation to NAME. P: Norm type (:l2 supported)"
+  (case p
+    (:l2 (use-backend/l2norm name))
+    (otherwise (error "Unsupported norm type: ~A" p))))
   
-(defun get-backend/axpy! ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-inplace-backend)))
-  
-(defun (setf get-backend/axpy!) (name)
-  (use-backend/axpy! name))  
-  
-(defun get-backend/axpy ()
-  (uppercase-string-to-symbol (nnl2.ffi:%get-axpy-backend)))
+(defmacro define-backends-getter (getter-name num-backends-fn backends-fn &key (like nil))
+  "Creates a function to get available backends for an operation.
+   getter-name: Name of the getter function
+   num-backends-fn: CFFI function that returns number of available backends
+   backends-fn: CFFI function that returns array of backend names
+   like: If specified, creates alias to another getter function"
+   
+  (if like
+    `(defun ,getter-name ()
+       ,(format nil "Returns list of available backends for ~A as keyword symbols.    (Documentation was generated automatically)" getter-name)
+       (,like))
+	   
+    `(defun ,getter-name ()
+       ,(format nil "Returns list of available backends for ~A as keyword symbols.    (Documentation was generated automatically)" getter-name)
+        (let ((num-backends (,num-backends-fn))
+              (backends (,backends-fn)))
+          (loop for i from 0 below num-backends
+                collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))))
 
-(defun (setf get-backend/axpy) (name)
-  (use-backend/axpy name))
-  
-(defun get-backends/tref ()
-  (let ((num-backends (nnl2.ffi:%get-tref-getter-num-backends))
-	    (backends (nnl2.ffi:%get-tref-getter-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+(define-backends-getter get-backends/tref 
+  nnl2.ffi:%get-tref-getter-num-backends 
+  nnl2.ffi:%get-tref-getter-backends)
 
-(defun get-backends/view ()
-  (let ((num-backends (nnl2.ffi:%get-view-num-backends))
-	    (backends (nnl2.ffi:%get-view-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  
-(defun get-backends/empty ()
-  (let ((num-backends (nnl2.ffi:%get-empty-num-backends))
-	    (backends (nnl2.ffi:%get-empty-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-  
-(defun get-backends/zeros ()
-  (let ((num-backends (nnl2.ffi:%get-zeros-num-backends))
-	    (backends (nnl2.ffi:%get-zeros-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
-  
-(defun get-backends/full ()
-  (let ((num-backends (nnl2.ffi:%get-inplace-fill-num-backends))
-	    (backends (nnl2.ffi:%get-inplace-fill-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
-  
-(defun get-backends/ones ()
-  (get-backends/full))
-    
-(defun get-backends/full-like () (get-backends/full))	
-(defun get-backends/empty-like () (get-backends/empty))	
-(defun get-backends/zeros-like () (get-backends/zeros))	
-(defun get-backends/ones-like () (get-backends/ones))
-	
-(defun get-backends/gemm ()
-  (let ((num-backends (nnl2.ffi:%get-gemm-num-backends))
-	    (backends (nnl2.ffi:%get-gemm-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))    
-		  
-(defun get-backends/gemm! ()
-  (let ((num-backends (nnl2.ffi:%get-gemm-num-backends))
-	    (backends (nnl2.ffi:%get-gemm-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))   
+(define-backends-getter get-backends/view 
+  nnl2.ffi:%get-view-num-backends 
+  nnl2.ffi:%get-view-backends)
 
-(defun get-backends/+= ()
-  (let ((num-backends (nnl2.ffi:%get-addinplace-num-backends))
-	    (backends (nnl2.ffi:%get-addinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))   
- 
-(defun get-backends/-= ()
-  (let ((num-backends (nnl2.ffi:%get-subinplace-num-backends))
-	    (backends (nnl2.ffi:%get-subinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))   
- 
-(defun get-backends/.+ ()
-  (let ((num-backends (nnl2.ffi:%get-add-num-backends))
-	    (backends (nnl2.ffi:%get-add-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
- 
-(defun get-backends/.- ()
-  (let ((num-backends (nnl2.ffi:%get-sub-num-backends))
-	    (backends (nnl2.ffi:%get-sub-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
-		  
-(defun get-backends/*= ()
-  (let ((num-backends (nnl2.ffi:%get-mulinplace-num-backends))
-	    (backends (nnl2.ffi:%get-mulinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
-		  		  
-(defun get-backends//! ()
-  (let ((num-backends (nnl2.ffi:%get-divinplace-num-backends))
-	    (backends (nnl2.ffi:%get-divinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
-		  		  				  
-(defun get-backends/.* ()
-  (let ((num-backends (nnl2.ffi:%get-mul-num-backends))
-	    (backends (nnl2.ffi:%get-mul-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))  
-		  								  
-(defun get-backends/./ ()
-  (let ((num-backends (nnl2.ffi:%get-div-num-backends))
-	    (backends (nnl2.ffi:%get-div-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  
-(defun get-backends/^= ()
-  (let ((num-backends (nnl2.ffi:%get-powinplace-num-backends))
-	    (backends (nnl2.ffi:%get-powinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+(define-backends-getter get-backends/copy 
+  nnl2.ffi:%get-copy-num-backends 
+  nnl2.ffi:%get-copy-backends)
 
-(defun get-backends/.^ ()
-  (let ((num-backends (nnl2.ffi:%get-pow-num-backends))
-	    (backends (nnl2.ffi:%get-pow-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  
-(defun get-backends/.exp! ()
-  (let ((num-backends (nnl2.ffi:%get-expinplace-num-backends))
-	    (backends (nnl2.ffi:%get-expinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 		  
+(define-backends-getter get-backends/empty 
+  nnl2.ffi:%get-empty-num-backends 
+  nnl2.ffi:%get-empty-backends)
 
-(defun get-backends/.exp ()
-  (let ((num-backends (nnl2.ffi:%get-exp-num-backends))
-	    (backends (nnl2.ffi:%get-exp-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
-	
-(defun get-backends/.log! ()
-  (let ((num-backends (nnl2.ffi:%get-loginplace-num-backends))
-	    (backends (nnl2.ffi:%get-loginplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 		  
+(define-backends-getter get-backends/zeros 
+  nnl2.ffi:%get-zeros-num-backends 
+  nnl2.ffi:%get-zeros-backends)
 
-(defun get-backends/.log ()
-  (let ((num-backends (nnl2.ffi:%get-log-num-backends))
-	    (backends (nnl2.ffi:%get-log-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
-		  		  
-(defun get-backends/scale! ()
-  (let ((num-backends (nnl2.ffi:%get-scaleinplace-num-backends))
-	    (backends (nnl2.ffi:%get-scaleinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/full 
+  nnl2.ffi:%get-inplace-fill-num-backends 
+  nnl2.ffi:%get-inplace-fill-backends)
 
-(defun get-backends/scale ()
-  (let ((num-backends (nnl2.ffi:%get-scale-num-backends))
-	    (backends (nnl2.ffi:%get-scale-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  
-(defun get-backends/.max! ()
-  (let ((num-backends (nnl2.ffi:%get-maxinplace-num-backends))
-	    (backends (nnl2.ffi:%get-maxinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/ones 
+  nnl2.ffi:%get-inplace-fill-num-backends 
+  nnl2.ffi:%get-inplace-fill-backends)
 
-(defun get-backends/.min! ()
-  (let ((num-backends (nnl2.ffi:%get-mininplace-num-backends))
-	    (backends (nnl2.ffi:%get-mininplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
+(define-backends-getter get-backends/full-like :like get-backends/full)
+(define-backends-getter get-backends/empty-like :like get-backends/empty)
+(define-backends-getter get-backends/zeros-like :like get-backends/zeros)
+(define-backends-getter get-backends/ones-like :like get-backends/ones)
 
-(defun get-backends/.max ()
-  (let ((num-backends (nnl2.ffi:%get-max-num-backends))
-	    (backends (nnl2.ffi:%get-max-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/gemm 
+  nnl2.ffi:%get-gemm-num-backends 
+  nnl2.ffi:%get-gemm-backends)
 
-(defun get-backends/.min ()
-  (let ((num-backends (nnl2.ffi:%get-min-num-backends))
-	    (backends (nnl2.ffi:%get-min-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-	
-(defun get-backends/.abs! ()
-  (let ((num-backends (nnl2.ffi:%get-absinplace-num-backends))
-	    (backends (nnl2.ffi:%get-absinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/gemm! 
+  nnl2.ffi:%get-gemm-num-backends 
+  nnl2.ffi:%get-gemm-backends)
 
-(defun get-backends/.abs ()
-  (let ((num-backends (nnl2.ffi:%get-abs-num-backends))
-	    (backends (nnl2.ffi:%get-abs-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-	
-(defun get-backends/hstack ()
-  (let ((num-backends (nnl2.ffi:%get-hstack-num-backends))
-	    (backends (nnl2.ffi:%get-hstack-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/axpy 
+  nnl2.ffi:%get-axpy-num-backends 
+  nnl2.ffi:%get-axpy-backends)
 
-(defun get-backends/vstack ()
-  (let ((num-backends (nnl2.ffi:%get-vstack-num-backends))
-	    (backends (nnl2.ffi:%get-vstack-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		
-(defun get-backends/.relu! ()
-  (let ((num-backends (nnl2.ffi:%get-reluinplace-num-backends))
-	    (backends (nnl2.ffi:%get-reluinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/axpy! 
+  nnl2.ffi:%get-axpy-inplace-num-backends 
+  nnl2.ffi:%get-axpy-inplace-backends)
 
-(defun get-backends/.relu ()
-  (let ((num-backends (nnl2.ffi:%get-relu-num-backends))
-	    (backends (nnl2.ffi:%get-relu-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  	  
-(defun get-backends/.leaky-relu! ()
-  (let ((num-backends (nnl2.ffi:%get-leakyreluinplace-num-backends))
-	    (backends (nnl2.ffi:%get-leakyreluinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/+= 
+  nnl2.ffi:%get-addinplace-num-backends 
+  nnl2.ffi:%get-addinplace-backends)
 
-(defun get-backends/.leaky-relu ()
-  (let ((num-backends (nnl2.ffi:%get-leakyrelu-num-backends))
-	    (backends (nnl2.ffi:%get-leakyrelu-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  
-(defun get-backends/.sigmoid! ()
-  (let ((num-backends (nnl2.ffi:%get-sigmoidinplace-num-backends))
-	    (backends (nnl2.ffi:%get-sigmoidinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/-= 
+  nnl2.ffi:%get-subinplace-num-backends 
+  nnl2.ffi:%get-subinplace-backends)
 
-(defun get-backends/.sigmoid ()
-  (let ((num-backends (nnl2.ffi:%get-sigmoid-num-backends))
-	    (backends (nnl2.ffi:%get-sigmoid-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  		  
-(defun get-backends/.tanh! ()
-  (let ((num-backends (nnl2.ffi:%get-tanhinplace-num-backends))
-	    (backends (nnl2.ffi:%get-tanhinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 	
+(define-backends-getter get-backends/*= 
+  nnl2.ffi:%get-mulinplace-num-backends 
+  nnl2.ffi:%get-mulinplace-backends)
 
-(defun get-backends/.tanh ()
-  (let ((num-backends (nnl2.ffi:%get-tanh-num-backends))
-	    (backends (nnl2.ffi:%get-tanh-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i))))) 
-		  
-(defun get-backends/concat ()
-  (let ((num-backends (nnl2.ffi:%get-concat-num-backends))
-	    (backends (nnl2.ffi:%get-concat-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  
-(defun get-backends/randn ()
-  (let ((num-backends (nnl2.ffi:%get-randn-num-backends))
-	    (backends (nnl2.ffi:%get-randn-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))		  
+(define-backends-getter get-backends//! 
+  nnl2.ffi:%get-divinplace-num-backends 
+  nnl2.ffi:%get-divinplace-backends)
 
-(defun get-backends/randn-like () 
-  (get-backends/randn))
-		  
-(defun get-backends/xavier ()
-  (let ((num-backends (nnl2.ffi:%get-xavier-num-backends))
-	    (backends (nnl2.ffi:%get-xavier-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+(define-backends-getter get-backends/^= 
+  nnl2.ffi:%get-powinplace-num-backends 
+  nnl2.ffi:%get-powinplace-backends)
 
-(defun get-backends/transpose! ()
-  (let ((num-backends (nnl2.ffi:%get-transposeinplace-num-backends))
-	    (backends (nnl2.ffi:%get-transposeinplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  		  
-(defun get-backends/transpose ()
-  (let ((num-backends (nnl2.ffi:%get-transpose-num-backends))
-	    (backends (nnl2.ffi:%get-transpose-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  
-(defun get-backends/sum ()
-  (let ((num-backends (nnl2.ffi:%get-sum-without-axis-num-backends))
-	    (backends (nnl2.ffi:%get-sum-without-axis-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  
-(defun get-backends/l2norm ()
-  (let ((num-backends (nnl2.ffi:%get-l2norm-num-backends))
-	    (backends (nnl2.ffi:%get-l2norm-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
+(define-backends-getter get-backends/.+ 
+  nnl2.ffi:%get-add-num-backends 
+  nnl2.ffi:%get-add-backends)
+
+(define-backends-getter get-backends/.- 
+  nnl2.ffi:%get-sub-num-backends 
+  nnl2.ffi:%get-sub-backends)
+
+(define-backends-getter get-backends/.* 
+  nnl2.ffi:%get-mul-num-backends 
+  nnl2.ffi:%get-mul-backends)
+
+(define-backends-getter get-backends/./ 
+  nnl2.ffi:%get-div-num-backends 
+  nnl2.ffi:%get-div-backends)
+
+(define-backends-getter get-backends/.^ 
+  nnl2.ffi:%get-pow-num-backends 
+  nnl2.ffi:%get-pow-backends)
+
+(define-backends-getter get-backends/.exp 
+  nnl2.ffi:%get-exp-num-backends 
+  nnl2.ffi:%get-exp-backends)
+
+(define-backends-getter get-backends/.exp! 
+  nnl2.ffi:%get-expinplace-num-backends 
+  nnl2.ffi:%get-expinplace-backends)
+
+(define-backends-getter get-backends/.log 
+  nnl2.ffi:%get-log-num-backends 
+  nnl2.ffi:%get-log-backends)
+
+(define-backends-getter get-backends/.log! 
+  nnl2.ffi:%get-loginplace-num-backends 
+  nnl2.ffi:%get-loginplace-backends)
+
+(define-backends-getter get-backends/scale 
+  nnl2.ffi:%get-scale-num-backends 
+  nnl2.ffi:%get-scale-backends)
+
+(define-backends-getter get-backends/scale! 
+  nnl2.ffi:%get-scaleinplace-num-backends 
+  nnl2.ffi:%get-scaleinplace-backends)
+
+(define-backends-getter get-backends/.min 
+  nnl2.ffi:%get-min-num-backends 
+  nnl2.ffi:%get-min-backends)
+
+(define-backends-getter get-backends/.min! 
+  nnl2.ffi:%get-mininplace-num-backends 
+  nnl2.ffi:%get-mininplace-backends)
+
+(define-backends-getter get-backends/.max 
+  nnl2.ffi:%get-max-num-backends 
+  nnl2.ffi:%get-max-backends)
+
+(define-backends-getter get-backends/.max! 
+  nnl2.ffi:%get-maxinplace-num-backends 
+  nnl2.ffi:%get-maxinplace-backends)
+
+(define-backends-getter get-backends/.abs 
+  nnl2.ffi:%get-abs-num-backends 
+  nnl2.ffi:%get-abs-backends)
+
+(define-backends-getter get-backends/.abs! 
+  nnl2.ffi:%get-absinplace-num-backends 
+  nnl2.ffi:%get-absinplace-backends)
+
+(define-backends-getter get-backends/hstack 
+  nnl2.ffi:%get-hstack-num-backends 
+  nnl2.ffi:%get-hstack-backends)
+
+(define-backends-getter get-backends/vstack 
+  nnl2.ffi:%get-vstack-num-backends 
+  nnl2.ffi:%get-vstack-backends)
+
+(define-backends-getter get-backends/concat 
+  nnl2.ffi:%get-concat-num-backends 
+  nnl2.ffi:%get-concat-backends)
+
+(define-backends-getter get-backends/.relu 
+  nnl2.ffi:%get-relu-num-backends 
+  nnl2.ffi:%get-relu-backends)
+
+(define-backends-getter get-backends/.relu! 
+  nnl2.ffi:%get-reluinplace-num-backends 
+  nnl2.ffi:%get-reluinplace-backends)
+
+(define-backends-getter get-backends/.leaky-relu 
+  nnl2.ffi:%get-leakyrelu-num-backends 
+  nnl2.ffi:%get-leakyrelu-backends)
+
+(define-backends-getter get-backends/.leaky-relu! 
+  nnl2.ffi:%get-leakyreluinplace-num-backends 
+  nnl2.ffi:%get-leakyreluinplace-backends)
+
+(define-backends-getter get-backends/.sigmoid 
+  nnl2.ffi:%get-sigmoid-num-backends 
+  nnl2.ffi:%get-sigmoid-backends)
+
+(define-backends-getter get-backends/.sigmoid! 
+  nnl2.ffi:%get-sigmoidinplace-num-backends 
+  nnl2.ffi:%get-sigmoidinplace-backends)
+
+(define-backends-getter get-backends/.tanh 
+  nnl2.ffi:%get-tanh-num-backends 
+  nnl2.ffi:%get-tanh-backends)
+
+(define-backends-getter get-backends/.tanh! 
+  nnl2.ffi:%get-tanhinplace-num-backends 
+  nnl2.ffi:%get-tanhinplace-backends)
+
+(define-backends-getter get-backends/randn 
+  nnl2.ffi:%get-randn-num-backends 
+  nnl2.ffi:%get-randn-backends)
+
+(define-backends-getter get-backends/randn-like :like get-backends/randn)
+
+(define-backends-getter get-backends/xavier 
+  nnl2.ffi:%get-xavier-num-backends 
+  nnl2.ffi:%get-xavier-backends)
+
+(define-backends-getter get-backends/transpose 
+  nnl2.ffi:%get-transpose-num-backends 
+  nnl2.ffi:%get-transpose-backends)
+
+(define-backends-getter get-backends/transpose! 
+  nnl2.ffi:%get-transposeinplace-num-backends 
+  nnl2.ffi:%get-transposeinplace-backends)
+
+(define-backends-getter get-backends/reshape 
+  nnl2.ffi:%get-reshape-num-backends 
+  nnl2.ffi:%get-reshape-backends)
+
+(define-backends-getter get-backends/reinterpret 
+  nnl2.ffi:%get-reinterpret-num-backends 
+  nnl2.ffi:%get-reinterpret-backends)
+
+(define-backends-getter get-backends/sum 
+  nnl2.ffi:%get-sum-without-axis-num-backends 
+  nnl2.ffi:%get-sum-without-axis-backends)
+
+(define-backends-getter get-backends/l2norm 
+  nnl2.ffi:%get-l2norm-num-backends 
+  nnl2.ffi:%get-l2norm-backends)
 
 (defun get-backends/norm (&key (p :l2))
-  (case p 
+  "Returns list of available backends for norm operation. 
+   P: Norm type (:l2 supported)"
+  (case p
     (:l2 (get-backends/l2norm))
-	(otherwise (error "Incorrect :p key in norm~%"))))
+    (otherwise (error "Unsupported norm type: ~A" p))))  
 	
-(defun get-backends/copy ()
-  (let ((num-backends (nnl2.ffi:%get-copy-num-backends))
-	    (backends (nnl2.ffi:%get-copy-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-		  
-(defun get-backends/axpy! ()
-  (let ((num-backends (nnl2.ffi:%get-axpy-inplace-num-backends))
-	    (backends (nnl2.ffi:%get-axpy-inplace-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))		  
-		  
-(defun get-backends/axpy ()
-  (let ((num-backends (nnl2.ffi:%get-axpy-num-backends))
-	    (backends (nnl2.ffi:%get-axpy-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))
-	
-(defun get-backends/reshape ()
-  (let ((num-backends (nnl2.ffi:%get-reshape-num-backends))
-	    (backends (nnl2.ffi:%get-reshape-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))	
-		  
-(defun get-backends/reinterpret ()
-  (let ((num-backends (nnl2.ffi:%get-reinterpret-num-backends))
-	    (backends (nnl2.ffi:%get-reinterpret-backends)))
-		
-    (loop for i from 0 below num-backends
-		  collect (uppercase-string-to-symbol (cffi:mem-aref backends :string i)))))	
-	
-(defmacro with-backend/tref (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/tref)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/tref) ,name)
-             ,@body)
-         (setf (get-backend/tref) ,old-backend-sym)))))
+(defmacro define-with-backend (macro-name getter-name)
+  "Creates a with-backend macro that temporarily sets the backend for an operation
+   macro-name: Name of the macro to create
+   getter-name: Name of the getter function for the backend"
+   
+  (let ((old-backend-sym (gensym "OLD-BACKEND-"))
+        (name-sym (gensym "NAME-")))
+    `(defmacro ,macro-name (,name-sym &body body)
+       ,(format nil "Temporarily sets backend for ~A during &body execution    (Documentation was generated automatically)" getter-name)
+       (let ((,old-backend-sym (gensym "OLD-BACKEND-")))
+         `(let ((,,old-backend-sym (,',getter-name)))
+            (unwind-protect
+                (progn
+                  (setf (,',getter-name) ,,name-sym)
+                  ,@body)
+              (setf (,',getter-name) ,,old-backend-sym)))))))
 
-(defmacro with-backend/view (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/view)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/view) ,name)
-             ,@body)
-         (setf (get-backend/view) ,old-backend-sym)))))
-		 
-(defmacro with-backend/full (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/full)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/full) ,name)
-             ,@body)
-         (setf (get-backend/full) ,old-backend-sym)))))
-		 
-(defmacro with-backend/empty (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/empty)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/empty) ,name)
-             ,@body)
-         (setf (get-backend/empty) ,old-backend-sym)))))		 
-		 
-(defmacro with-backend/zeros (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/zeros)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/zeros) ,name)
-             ,@body)
-         (setf (get-backend/zeros) ,old-backend-sym)))))		 		 
-		 
-(defmacro with-backend/ones (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/ones)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/ones) ,name)
-             ,@body)
-         (setf (get-backend/ones) ,old-backend-sym)))))		 
-
-(defmacro with-backend/full-like (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/full-like)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/full-like) ,name)
-             ,@body)
-         (setf (get-backend/full-like) ,old-backend-sym)))))
-		 
-(defmacro with-backend/empty-like (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/empty-like)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/empty-like) ,name)
-             ,@body)
-         (setf (get-backend/empty-like) ,old-backend-sym)))))		 
-
-(defmacro with-backend/zeros-like (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/zeros-like)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/zeros-like) ,name)
-             ,@body)
-         (setf (get-backend/zeros-like) ,old-backend-sym)))))
-
-(defmacro with-backend/empty-like (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/empty-like)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/empty-like) ,name)
-             ,@body)
-         (setf (get-backend/empty-like) ,old-backend-sym)))))
-		 
-(defmacro with-backend/+= (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/+=)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/+=) ,name)
-             ,@body)
-         (setf (get-backend/+=) ,old-backend-sym)))))		 
-		 
-(defmacro with-backend/-= (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/-=)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/-=) ,name)
-             ,@body)
-         (setf (get-backend/-=) ,old-backend-sym)))))		 		 
-		 		 
-(defmacro with-backend/gemm (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/gemm)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/gemm) ,name)
-             ,@body)
-         (setf (get-backend/gemm) ,old-backend-sym)))))						 
-				 
-(defmacro with-backend/gemm! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/gemm!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/gemm!) ,name)
-             ,@body)
-         (setf (get-backend/gemm!) ,old-backend-sym)))))						 
-				 				 
-(defmacro with-backend/.+ (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.+)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.+) ,name)
-             ,@body)
-         (setf (get-backend/.+) ,old-backend-sym)))))									 
-
-(defmacro with-backend/.- (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.-)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.-) ,name)
-             ,@body)
-         (setf (get-backend/.-) ,old-backend-sym)))))
-
-(defmacro with-backend/*= (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/*=)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/*=) ,name)
-             ,@body)
-         (setf (get-backend/*=) ,old-backend-sym)))))			 
-
-(defmacro with-backend//! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend//!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend//!) ,name)
-             ,@body)
-         (setf (get-backend//!) ,old-backend-sym)))))			 
-
-(defmacro with-backend/.exp! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.exp!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.exp!) ,name)
-             ,@body)
-         (setf (get-backend/.exp!) ,old-backend-sym)))))				 
-		 
-(defmacro with-backend/.exp (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.exp)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.exp) ,name)
-             ,@body)
-         (setf (get-backend/.exp) ,old-backend-sym)))))	
-
-(defmacro with-backend/.log! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.log!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.log!) ,name)
-             ,@body)
-         (setf (get-backend/.log!) ,old-backend-sym)))))				 
-		 
-(defmacro with-backend/.log (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.log)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.log) ,name)
-             ,@body)
-         (setf (get-backend/.log) ,old-backend-sym)))))			
-	
-(defmacro with-backend/scale! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/scale!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/scale!) ,name)
-             ,@body)
-         (setf (get-backend/scale!) ,old-backend-sym)))))				 
-		 
-(defmacro with-backend/scale (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/scale)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/scale) ,name)
-             ,@body)
-         (setf (get-backend/scale) ,old-backend-sym)))))			
-		
-(defmacro with-backend/.max! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.max!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.max!) ,name)
-             ,@body)
-         (setf (get-backend/.max!) ,old-backend-sym)))))	
-
-(defmacro with-backend/.min! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.min!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.min!) ,name)
-             ,@body)
-         (setf (get-backend/.min!) ,old-backend-sym)))))	
-		 		 
-(defmacro with-backend/.max (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.max)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.max) ,name)
-             ,@body)
-         (setf (get-backend/.max) ,old-backend-sym)))))	
-
-(defmacro with-backend/.min (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.min)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.min) ,name)
-             ,@body)
-         (setf (get-backend/.min) ,old-backend-sym)))))					 
-				 
-(defmacro with-backend/.abs! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.abs!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.abs!) ,name)
-             ,@body)
-         (setf (get-backend/.abs!) ,old-backend-sym)))))
-	
-(defmacro with-backend/.abs (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.abs)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.abs) ,name)
-             ,@body)
-         (setf (get-backend/.abs) ,old-backend-sym)))))
-		 	
-(defmacro with-backend/hstack (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/hstack)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/hstack) ,name)
-             ,@body)
-         (setf (get-backend/hstack) ,old-backend-sym)))))
-	
-(defmacro with-backend/vstack (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/vstack)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/vstack) ,name)
-             ,@body)
-         (setf (get-backend/vstack) ,old-backend-sym)))))			
-
-(defmacro with-backend/.relu! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.relu!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.relu!) ,name)
-             ,@body)
-         (setf (get-backend/.relu!) ,old-backend-sym)))))			
-						
-(defmacro with-backend/.relu (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.relu)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.relu) ,name)
-             ,@body)
-         (setf (get-backend/.relu) ,old-backend-sym)))))	
-		 
-(defmacro with-backend/.leaky-relu! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.leaky-relu!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.leaky-relu!) ,name)
-             ,@body)
-         (setf (get-backend/.leaky-relu!) ,old-backend-sym)))))			
-						
-(defmacro with-backend/.leaky-relu (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.leaky-relu)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.leaky-relu) ,name)
-             ,@body)
-         (setf (get-backend/.leaky-relu) ,old-backend-sym)))))	
-		 
-(defmacro with-backend/.sigmoid! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.sigmoid!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.sigmoid!) ,name)
-             ,@body)
-         (setf (get-backend/.sigmoid!) ,old-backend-sym)))))			
-						
-(defmacro with-backend/.sigmoid (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.sigmoid)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.sigmoid) ,name)
-             ,@body)
-         (setf (get-backend/.sigmoid) ,old-backend-sym)))))	
-		 		 
-(defmacro with-backend/.tanh! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.tanh!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.tanh!) ,name)
-             ,@body)
-         (setf (get-backend/.tanh!) ,old-backend-sym)))))			
-						
-(defmacro with-backend/.tanh (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/.tanh)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/.tanh) ,name)
-             ,@body)
-         (setf (get-backend/.tanh) ,old-backend-sym)))))	
-		 
-(defmacro with-backend/concat (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/concat)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/concat) ,name)
-             ,@body)
-         (setf (get-backend/concat) ,old-backend-sym)))))			 
-	
-(defmacro with-backend/randn (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/randn)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/randn) ,name)
-             ,@body)
-         (setf (get-backend/randn) ,old-backend-sym)))))			 
-		 	
-(defmacro with-backend/xavier (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/xavier)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/xavier) ,name)
-             ,@body)
-         (setf (get-backend/xavier) ,old-backend-sym)))))
-
-(defmacro with-backend/transpose! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/transpose!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/transpose!) ,name)
-             ,@body)
-         (setf (get-backend/transpose!) ,old-backend-sym)))))		 
-		 
-(defmacro with-backend/transpose (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/transpose)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/transpose) ,name)
-             ,@body)
-         (setf (get-backend/transpose) ,old-backend-sym)))))
-
-(defmacro with-backend/sum (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/sum)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/sum) ,name)
-             ,@body)
-         (setf (get-backend/sum) ,old-backend-sym)))))
-
-(defmacro with-backend/norm (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/norm)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/norm) ,name)
-             ,@body)
-         (setf (get-backend/norm) ,old-backend-sym)))))		 
-
-(defmacro with-backend/axpy! (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/axpy!)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/axpy!) ,name)
-             ,@body)
-         (setf (get-backend/axpy!) ,old-backend-sym)))))	
-
-(defmacro with-backend/axpy (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/axpy)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/axpy) ,name)
-             ,@body)
-         (setf (get-backend/axpy) ,old-backend-sym)))))
-
-(defmacro with-backend/reshape (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/reshape)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/reshape) ,name)
-             ,@body)
-         (setf (get-backend/reshape) ,old-backend-sym)))))
-		 
-(defmacro with-backend/reinterpret (name &body body)
-  (let ((old-backend-sym (gensym "old-backend-")))
-    `(let ((,old-backend-sym (get-backend/reinterpret)))
-       (unwind-protect
-           (progn
-             (setf (get-backend/reinterpret) ,name)
-             ,@body)
-         (setf (get-backend/reinterpret) ,old-backend-sym)))))
+(define-with-backend with-backend/tref get-backend/tref)
+(define-with-backend with-backend/view get-backend/view)
+(define-with-backend with-backend/copy get-backend/copy)
+(define-with-backend with-backend/empty get-backend/empty)
+(define-with-backend with-backend/zeros get-backend/zeros)
+(define-with-backend with-backend/full get-backend/full)
+(define-with-backend with-backend/ones get-backend/ones)
+(define-with-backend with-backend/full-like get-backend/full-like)
+(define-with-backend with-backend/empty-like get-backend/empty-like)
+(define-with-backend with-backend/zeros-like get-backend/zeros-like)
+(define-with-backend with-backend/ones-like get-backend/ones-like)
+(define-with-backend with-backend/gemm get-backend/gemm)
+(define-with-backend with-backend/gemm! get-backend/gemm!)
+(define-with-backend with-backend/axpy get-backend/axpy)
+(define-with-backend with-backend/axpy! get-backend/axpy!)
+(define-with-backend with-backend/+= get-backend/+=)
+(define-with-backend with-backend/-= get-backend/-=)
+(define-with-backend with-backend/*= get-backend/*=)
+(define-with-backend with-backend//! get-backend//!)
+(define-with-backend with-backend/^= get-backend/^=)
+(define-with-backend with-backend/.+ get-backend/.+)
+(define-with-backend with-backend/.- get-backend/.-)
+(define-with-backend with-backend/.* get-backend/.*)
+(define-with-backend with-backend/./ get-backend/./)
+(define-with-backend with-backend/.^ get-backend/.^)
+(define-with-backend with-backend/.exp get-backend/.exp)
+(define-with-backend with-backend/.exp! get-backend/.exp!)
+(define-with-backend with-backend/.log get-backend/.log)
+(define-with-backend with-backend/.log! get-backend/.log!)
+(define-with-backend with-backend/scale get-backend/scale)
+(define-with-backend with-backend/scale! get-backend/scale!)
+(define-with-backend with-backend/.min get-backend/.min)
+(define-with-backend with-backend/.min! get-backend/.min!)
+(define-with-backend with-backend/.max get-backend/.max)
+(define-with-backend with-backend/.max! get-backend/.max!)
+(define-with-backend with-backend/.abs get-backend/.abs)
+(define-with-backend with-backend/.abs! get-backend/.abs!)
+(define-with-backend with-backend/hstack get-backend/hstack)
+(define-with-backend with-backend/vstack get-backend/vstack)
+(define-with-backend with-backend/concat get-backend/concat)
+(define-with-backend with-backend/.relu get-backend/.relu)
+(define-with-backend with-backend/.relu! get-backend/.relu!)
+(define-with-backend with-backend/.leaky-relu get-backend/.leaky-relu)
+(define-with-backend with-backend/.leaky-relu! get-backend/.leaky-relu!)
+(define-with-backend with-backend/.sigmoid get-backend/.sigmoid)
+(define-with-backend with-backend/.sigmoid! get-backend/.sigmoid!)
+(define-with-backend with-backend/.tanh get-backend/.tanh)
+(define-with-backend with-backend/.tanh! get-backend/.tanh!)
+(define-with-backend with-backend/randn get-backend/randn)
+(define-with-backend with-backend/xavier get-backend/xavier)
+(define-with-backend with-backend/transpose get-backend/transpose)
+(define-with-backend with-backend/transpose! get-backend/transpose!)
+(define-with-backend with-backend/reshape get-backend/reshape)
+(define-with-backend with-backend/reinterpret get-backend/reinterpret)
+(define-with-backend with-backend/sum get-backend/sum)
+(define-with-backend with-backend/norm get-backend/norm)
 		 
