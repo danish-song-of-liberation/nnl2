@@ -150,7 +150,7 @@ void nnl2_init_broadcasting_inplace();
  * Out-of-place operations that can handle tensors of different shapes via broadcasting
  */
 void nnl2_init_broadcasting();
- 
+    
 /** @brief 
  * Registers backend implementations for tensor reshaping operations
  *
@@ -169,7 +169,7 @@ void nnl2_init_reshaping();
  *
  ** @details
  * The function does:
- *
+ *  
  ** Seeds the standard random number generator
  *** Then
  ** Initializes the logging subsystem with default 
@@ -209,7 +209,7 @@ void nnl2_init_reshaping();
 void nnl2_init_system() {      
 	// Initialization of random number generator
 	srand(time(NULL));               
-	          
+	              
 	// Initialization of logger      
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
@@ -268,13 +268,14 @@ void nnl2_init_standard() {
 }
 
 void nnl2_init_standard_inplace() {
-	INIT_BACKEND(sgemminplace, sgemminplace_backends);   
+	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
+	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
 	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));    
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));    
-	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));    	
+	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));     	
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace));    
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));     
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace));   	
@@ -295,7 +296,7 @@ void nnl2_init_activations_inplace() {
 	EINIT_BACKEND(leakyreluinplace, leakyreluinplace_backends, current_backend(leakyreluinplace));
 	EINIT_BACKEND(sigmoidinplace, sigmoidinplace_backends, current_backend(sigmoidinplace)); 
 	EINIT_BACKEND(tanhinplace, tanhinplace_backends, current_backend(tanhinplace)); 
-}
+} 
 
 void nnl2_init_activations() {
 	EINIT_BACKEND(relu, relu_backends, current_backend(relu));       
@@ -307,7 +308,7 @@ void nnl2_init_activations() {
 void nnl2_init_initializers() {
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
-}
+}   
 
 void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 

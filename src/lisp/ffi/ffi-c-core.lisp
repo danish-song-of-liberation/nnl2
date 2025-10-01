@@ -456,6 +456,9 @@
 
 (cffi:defcfun ("set_dgemminplace_backend" %set-dgemminplace-backend) :void
   (backend-name :string))  
+  
+(cffi:defcfun ("set_i32gemminplace_backend" %set-i32gemminplace-backend) :void
+  (backend-name :string))    
 
 (cffi:defcfun ("set_addinplace_backend" %set-addinplace-backend) :void
   (backend-name :string))  

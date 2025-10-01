@@ -122,6 +122,7 @@
    #:%set-ones-backend
    #:%set-sgemminplace-backend
    #:%set-dgemminplace-backend
+   #:%set-i32gemminplace-backend
    #:%set-addinplace-backend
    #:%set-subinplace-backend
    #:%set-add-backend

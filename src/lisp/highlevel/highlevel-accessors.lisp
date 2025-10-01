@@ -959,7 +959,7 @@
    tensors (&rest): Input tensors"
 
   (let ((first-shape (aref (shape first-tensor :as :vector) 0))
-		(type-t (type/nnl2->cffi (dtype first-tensor))))
+		(type-t (type/nnl2->cffi (dtype first-tensor)))
 		(new-tensor (empty-like first-tensor)))
 		
 	(nnl2.threading:pdotimes (i first-shape)
@@ -967,7 +967,7 @@
         (tref new-tensor i) (apply funct (loop for it in tensors
 											       collect (tref it i)))))
 
-	new-tensor)
+	new-tensor))
 
 (defun hstack (&rest tensors) "Combines the transmitted tensors horizontally" (reduce #'nnl2.ffi:%hstack tensors))	
 (defun vstack (&rest tensors) "Combines the transmitted tensors verticallys" (reduce #'nnl2.ffi:%vstack tensors))	

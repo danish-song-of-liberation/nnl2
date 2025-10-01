@@ -101,17 +101,17 @@ void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
 		int b_cols = (transb == nnl2Trans) ? k : n;
 		
 		if (lda < a_cols) {
-			NNL2_ERROR("lda is less than number of columns of a matrix! (gemm)");
+			NNL2_ERROR("lda is less than number of columns of a matrix (gemm)");
 			return;
 		}
 		
 		if (ldb < b_cols) {  
-			NNL2_ERROR("ldb is less than number of columns of b matrix! (gemm)");
+			NNL2_ERROR("ldb is less than number of columns of b matrix (gemm)");
 			return;
 		}
 
 		if (ldc < n) {    
-			NNL2_ERROR("ldc is less than n! (gemm)");
+			NNL2_ERROR("ldc is less than n (gemm)");
 			return;
 		}
 	#endif

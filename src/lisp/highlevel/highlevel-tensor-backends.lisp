@@ -69,7 +69,8 @@
 
 (define-backend-setter use-backend/gemm
   nnl2.ffi:%set-sgemminplace-backend
-  nnl2.ffi:%set-dgemminplace-backend)
+  nnl2.ffi:%set-dgemminplace-backend
+  nnl2.ffi:%set-i32gemminplace-backend)
 
 (define-backend-setter use-backend/+=
   nnl2.ffi:%set-addinplace-backend

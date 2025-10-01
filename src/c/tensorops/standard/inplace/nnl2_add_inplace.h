@@ -731,10 +731,66 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
 #endif
 
 #ifdef OPENBLAS_AVAILABLE
+    /** @brief
+     * BLAS implementation of add in-place operation
+	 */
+	void nnl2_blas_addinplace(Tensor* summand, Tensor* addend);
+#endif
+
+/** @ingroup backend_system
+ ** @brief Backend implementations for add in-place
+ ** @details
+ * Array follows the common backend registration pattern
+ * Currently register backends:
+ *  - nnl2_naive_addinplace: Basic reference implementation
+ *  - nnl2_avx256_addinplace: AVX256 implementation 
+ *
+ ** @see nnl2_naive_addinplace
+ ** @see nnl2_avx256_addinplace
+ **/
+Implementation addinplace_backends[] = {	
+	REGISTER_BACKEND(nnl2_naive_addinplace, nnl2_naive, NAIVE_BACKEND_NAME),
+	
+	#if defined(__AVX__) && TENSOR_MEM_ALIGNMENT == 32
+		REGISTER_BACKEND(nnl2_avx256_addinplace, nnl2_avx256, AVX256_BACKEND_NAME),
+	#endif
+	
+	#ifdef OPENBLAS_AVAILABLE
+		REGISTER_BACKEND(nnl2_blas_addinplace, nnl2_blas, BLAS_BACKEND_NAME),
+	#endif	
+};
+
+#ifdef OPENBLAS_AVAILABLE
+
+/** @brief
+ * Suboptimal backend fallback for BLAS implementation
+ *
+ ** @details
+ * Used for data types not supported by BLAS (not FLOAT64/FLOAT32)
+ * Lazily initialized on first use
+ */
+addinplacefn addinplace_blas_suboptimal = NULL;
+
 void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
+	
+	if (addinplace_blas_suboptimal == NULL) {
+        addinplace_blas_suboptimal = ((Implementation*)nnl2_get_suboptimal_backend(addinplace_backends, 3, BLAS_BACKEND_NAME))->fn;
+    }
+	
+	TensorType dtype_summand = summand->dtype;
+	
+	if(dtype_summand == INT32) { 
+	    addinplace_blas_suboptimal(summand, addend);
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+		return;
+	}
+	
+    TensorType dtype_addend = addend->dtype;
 	
 	// Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
@@ -750,9 +806,6 @@ void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
 	
 	// If the tensor is empty, exit the function
     if(len_summand == 0) return;
-	
-	TensorType dtype_summand = summand->dtype;
-    TensorType dtype_addend = addend->dtype;
 	
 	if(dtype_summand == dtype_addend) {
         // Handling case when the tensors have the same type
@@ -781,38 +834,11 @@ void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
 		}
 	}
 	
-	else {
-		// No yet...
-	}
-	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();
     #endif
 }
 #endif
-
-/** @ingroup backend_system
- ** @brief Backend implementations for add in-place
- ** @details
- * Array follows the common backend registration pattern
- * Currently register backends:
- *  - nnl2_naive_addinplace: Basic reference implementation
- *  - nnl2_avx256_addinplace: AVX256 implementation 
- *
- ** @see nnl2_naive_addinplace
- ** @see nnl2_avx256_addinplace
- **/
-Implementation addinplace_backends[] = {
-	REGISTER_BACKEND(nnl2_naive_addinplace, nnl2_naive, NAIVE_BACKEND_NAME),
-	
-	#if defined(__AVX__) && TENSOR_MEM_ALIGNMENT == 32
-		REGISTER_BACKEND(nnl2_avx256_addinplace, nnl2_avx256, AVX256_BACKEND_NAME),
-	#endif
-	
-	#ifdef OPENBLAS_AVAILABLE
-		REGISTER_BACKEND(nnl2_blas_addinplace, nnl2_blas, BLAS_BACKEND_NAME),
-	#endif	
-};
 
 /**
  * @brief Function pointer for add in-place

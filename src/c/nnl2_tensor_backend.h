@@ -345,6 +345,13 @@ typedef void (*sgemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl
 typedef void (*dgemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
 							   const int, const int, const int, const double, const Tensor*, 
 							   const int, const Tensor*, const int, const double, Tensor*, const int);
+							   
+/** @ingroup GEMM_ops
+ ** @see sgemminplacefn
+ **/
+typedef void (*i32gemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+							     const int, const int, const int, const int32_t, const Tensor*, 
+							     const int, const Tensor*, const int, const int32_t, Tensor*, const int);							   
 
 /** @ingroup GEMM_ops
  ** @see sgemminplacefn
@@ -1050,6 +1057,79 @@ void eset_backend_by_name(Implementation* backends, size_t count, void** target_
             return;
         }
     }
+}
+
+/** @brief 
+ * Get the fastest backend that is slower than the current backend
+ *
+ ** @param backends 
+ * Array of available implementations
+ *
+ ** @param count 
+ * Number of implementations in the array
+ *
+ ** @param current_backend 
+ * Name of the current backend
+ *
+ ** @return 
+ * Pointer to the fastest implementation that is slower than current_backend,
+ * or NULL if no such backend exists
+ */
+Implementation* nnl2_get_suboptimal_backend(Implementation* backends, size_t count, const char* current_backend) {
+    Implementation* current_impl = NULL;
+    Implementation* suboptimal_impl = NULL;
+    
+    // Find the current backend and its speed priority
+    for (size_t i = 0; i < count; i++) {
+        if (strcmp(backends[i].name, current_backend) == 0) {
+            current_impl = &backends[i];
+            break;
+        }
+    }
+    
+    // If current backend not found, return NULL
+    if (current_impl == NULL) {
+        return NULL;
+    }
+    
+    // Find the fastest backend that is slower than current backend
+    for (size_t i = 0; i < count; i++) {
+        // Skip the current backend itself
+        if (strcmp(backends[i].name, current_backend) == 0) {
+            continue;
+        }
+        
+        // Consider only backends that are slower than current
+        if (backends[i].speed_priority < current_impl->speed_priority) {
+            // If no suboptimal candidate yet, or this one is faster than current candidate
+            if (suboptimal_impl == NULL || backends[i].speed_priority > suboptimal_impl->speed_priority) {
+                suboptimal_impl = &backends[i];
+            }
+        }
+    }
+    
+    return suboptimal_impl;
+}
+
+/** @brief 
+ * Get the name of the fastest backend that is slower than the current backend
+ *
+ ** @param backends 
+ * Array of available implementations
+ *
+ ** @param count 
+ * Number of implementations in the array
+ *
+ ** @param current_backend 
+ * Name of the current backend
+ *
+ ** @return 
+ * Name of the fastest implementation that is slower than current_backend,
+ * or NULL if no such backend exists
+ */
+const char* get_suboptimal_backend_name(Implementation* backends, size_t count, const char* current_backend) {
+    Implementation* impl = nnl2_get_suboptimal_backend(backends, count, current_backend);
+    return impl ? impl->name : NULL;
 }
 
 /** @brief 
