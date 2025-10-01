@@ -20,6 +20,7 @@
 (defparameter *default-.^/powf!-operation-shape* '(5 5))	
 (defparameter *default-.max/maxf!-operation-shape* '(5 5))	
 (defparameter *default-.min/minf!-operation-shape* '(5 5))	
+(defparameter *default-axpy/axpf!-operation-shape* '(5 5))	
 
 ;; -- `.+/incf!` tests section --
 
@@ -101,10 +102,10 @@
 ;; -- `axpy/axpf!` tests section --		
 	
 (fiveam:test nnl2.hli.ts/axpy/axpf!/float64
-  (check-nnl2.hli.ts/correspondence-operation :dtype :float64 :shape *default-.min/minf!-operation-shape* :fill -1.0d0 :val 5.0d0 :expected 4.0d0 :op #'nnl2.hli.ts:axpy! :inplace t))									
+  (check-nnl2.hli.ts/correspondence-operation :dtype :float64 :shape *default-axpy/axpf!-operation-shape* :fill -1.0d0 :val 5.0d0 :expected 4.0d0 :op #'nnl2.hli.ts:axpy! :inplace t))									
   
 (fiveam:test nnl2.hli.ts/axpy/axpf!/float32
-  (check-nnl2.hli.ts/correspondence-operation :dtype :float32 :shape *default-.min/minf!-operation-shape* :fill -1.0s0 :val 5.0s0 :expected 4.0s0 :op #'nnl2.hli.ts:axpy! :inplace t))									
+  (check-nnl2.hli.ts/correspondence-operation :dtype :float32 :shape *default-axpy/axpf!-operation-shape* :fill -1.0s0 :val 5.0s0 :expected 4.0s0 :op #'nnl2.hli.ts:axpy! :inplace t))									
     
 (fiveam:test nnl2.hli.ts/axpy/axpf!/int32
   (check-nnl2.hli.ts/correspondence-operation :dtype :int32 :shape *default-axpy/axpf!-operation-shape* :fill -1 :val 5 :expected 4 :op #'nnl2.hli.ts:axpy! :inplace t))									  		 				

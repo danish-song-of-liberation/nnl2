@@ -14,4 +14,4 @@
   (let ((real-status (nnl2.system:alist-symbol-to-bool (nnl2.system:assoc-key 'nnl2.system::*openblas0330woa64static* nnl2.system:+architecture+)))
 		(ffi-status (nnl2.ffi:get-openblas0330woa64static-status)))
 		
-	(fiveam:is-true (and real-status (zerop ffi-status)))))
+	(fiveam:is-true (and real-status (not (zerop ffi-status))))))

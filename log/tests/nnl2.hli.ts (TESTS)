@@ -1,0 +1,2617 @@
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:EMPTY>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:EMPTY>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:EMPTY>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:EMPTY>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:EMPTY>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:EMPTY>` (type: INT32)
+
+[nnl2]: Started test for `ZEROS` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `ZEROS` (type: FLOAT64)
+
+[nnl2]: Started test for `ZEROS` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `ZEROS` (type: FLOAT32)
+
+[nnl2]: Started test for `ZEROS` (type: INT32)
+[nnl2]: Succesfully ended test for `ZEROS` (type: INT32)
+
+[nnl2]: Started test for `ONES` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `ONES` (type: FLOAT64)
+
+[nnl2]: Started test for `ONES` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `ONES` (type: FLOAT32)
+
+[nnl2]: Started test for `ONES` (type: INT32)
+[nnl2]: Succesfully ended test for `ONES` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:FULL>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:FULL>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:FULL>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:FULL>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:FULL>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:FULL>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.->` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:./>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `A foreign heap corruption exception occurred. (Exception code: 3221226356)`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+first-value - 2.0d0
+second-value - 1.0d0
+expected-value - 3.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.EXP>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.EXP>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP>`: `The following check failed: (=
+                                                                                            CURRENT-INDEX
+                                                                                            EXPECTED-VALUE)
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 7.38905609893065d0 != 7.38d9.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+value - 2.0d0
+expected - 7.38d9 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.EXP>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.EXP>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP>`: `The following check failed: (=
+                                                                                            CURRENT-INDEX
+                                                                                            EXPECTED-VALUE)
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 7.389056 != 7.389.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+value - 2.0
+expected - 7.389 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.EXP>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.EXP>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LOG>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.LOG>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LOG>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.LOG>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LOG>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LOG>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LOG>`: `The following check failed: (=
+                                                                                            CURRENT-INDEX
+                                                                                            EXPECTED-VALUE)
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 1.0986122886681098d0 != 1.0d98.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+value - 3
+expected - 1.0d98 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.ABS>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.ABS>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.ABS>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.ABS>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.ABS>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.ABS>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.EXP!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.EXP!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP!>`: `The following check failed: (=
+                                                                                             CURRENT-INDEX
+                                                                                             EXPECTED-VALUE)
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 7.38905609893065d0 != 7.38d9.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+value - 2.0d0
+expected - 7.38d9 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.EXP!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.EXP!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.EXP!>`: `The following check failed: (=
+                                                                                             CURRENT-INDEX
+                                                                                             EXPECTED-VALUE)
+Value mismatch at index 0 in function #<FUNCTION CHECK-TENSOR-DATA>: 7.389056 != 7.389.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+value - 2.0
+expected - 7.389 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.EXP!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.EXP!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LOG!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.LOG!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LOG!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.LOG!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LOG!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.LOG!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.ABS!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.ABS!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.ABS!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.ABS!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.ABS!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.ABS!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+value - -1.0d0
+expected - -0.009999999776482582d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+value - 1.0d0
+expected - 1.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+value - -1.0
+expected - -0.01 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+value - 1.0
+expected - 1.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+value - -1
+expected - -0.009999999776482582d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+value - -100
+expected - -1 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+value - 1
+expected - 1 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.TANH>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.TANH>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.TANH>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.TANH>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.TANH>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.TANH>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.RELU!>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+value - -1.0d0
+expected - -0.009999999776482582d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+value - 1.0d0
+expected - 1.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+value - -1.0
+expected - -0.01 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+value - 1.0
+expected - 1.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+value - -100
+expected - -1 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.LEAKY-RELU!>`: `invalid number of arguments: 1`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+value - 1
+expected - 1 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.SIGMOID!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.TANH!>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.TANH!>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.TANH!>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:.TANH!>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAP>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAP>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAP>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAP>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - INT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAP!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAP!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAP!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAP!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - INT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:HSTACK>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (3 3)
+shape-2 - (3 4)
+expected-shape - (3 7)
+dtype - FLOAT64
+op - #<FUNCTION NNL2.HLI.TS:HSTACK> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:HSTACK>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (2 5)
+shape-2 - (2 4)
+expected-shape - (2 9)
+dtype - FLOAT32
+op - #<FUNCTION NNL2.HLI.TS:HSTACK> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:HSTACK>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:HSTACK>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (1 4)
+shape-2 - (1 1)
+expected-shape - (1 5)
+dtype - INT32
+op - #<FUNCTION NNL2.HLI.TS:HSTACK> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:VSTACK>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 4)
+shape-2 - (3 4)
+expected-shape - (8 4)
+dtype - FLOAT64
+op - #<FUNCTION NNL2.HLI.TS:VSTACK> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:VSTACK>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (2 4)
+shape-2 - (3 4)
+expected-shape - (5 4)
+dtype - FLOAT32
+op - #<FUNCTION NNL2.HLI.TS:VSTACK> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:VSTACK>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:VSTACK>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (1 3)
+shape-2 - (2 3)
+expected-shape - (3 3)
+dtype - INT32
+op - #<FUNCTION NNL2.HLI.TS:VSTACK> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (5 5 10)
+dtype - FLOAT64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (5 10 5)
+dtype - FLOAT64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (10 5 5)
+dtype - FLOAT64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (5 5 10)
+dtype - FLOAT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (5 10 5)
+dtype - FLOAT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (10 5 5)
+dtype - FLOAT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (5 5 10)
+dtype - INT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (5 10 5)
+dtype - INT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:CONCAT>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:CONCAT>`: `The function
+                                                                 NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                 is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape-1 - (5 5 5)
+shape-2 - (5 5 5)
+expected-shape - (10 5 5)
+dtype - INT32 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.+>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 1.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.+> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.+>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 1.0
+inplace - #<FUNCTION NNL2.HLI.TS:.+> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.+>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 1
+inplace - #<FUNCTION NNL2.HLI.TS:.+> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.->`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 1.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.-> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.->`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 1.0
+inplace - #<FUNCTION NNL2.HLI.TS:.-> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.->` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.->`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 1
+inplace - #<FUNCTION NNL2.HLI.TS:.-> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.*>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 2.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.*> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.*>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 2.0
+inplace - #<FUNCTION NNL2.HLI.TS:.*> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.*>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 2
+inplace - #<FUNCTION NNL2.HLI.TS:.*> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:./>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 2.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:./> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:./>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 2.0
+inplace - #<FUNCTION NNL2.HLI.TS:./> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:./>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:./>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 2
+inplace - #<FUNCTION NNL2.HLI.TS:./> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.^>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 3.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.^> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.^>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 3.0
+inplace - #<FUNCTION NNL2.HLI.TS:.^> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.^>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 3
+inplace - #<FUNCTION NNL2.HLI.TS:.^> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 5.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.MAX> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 5.0
+inplace - #<FUNCTION NNL2.HLI.TS:.MAX> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 5
+inplace - #<FUNCTION NNL2.HLI.TS:.MAX> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 5.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.MIN> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 5.0
+inplace - #<FUNCTION NNL2.HLI.TS:.MIN> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 5
+inplace - #<FUNCTION NNL2.HLI.TS:.MIN> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 5.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:AXPY> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 5.0
+inplace - #<FUNCTION NNL2.HLI.TS:AXPY> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 5
+inplace - #<FUNCTION NNL2.HLI.TS:AXPY> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 1.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:+=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 1.0
+inplace - #<FUNCTION NNL2.HLI.TS:+=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 1
+inplace - #<FUNCTION NNL2.HLI.TS:+=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:-=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 1.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:-=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:-=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 1.0
+inplace - #<FUNCTION NNL2.HLI.TS:-=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:-=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 1
+inplace - #<FUNCTION NNL2.HLI.TS:-=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:*=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 2.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:*=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:*=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 2.0
+inplace - #<FUNCTION NNL2.HLI.TS:*=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:*=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 2
+inplace - #<FUNCTION NNL2.HLI.TS:*=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/!>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 2.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:/!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/!>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 2.0
+inplace - #<FUNCTION NNL2.HLI.TS:/!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/!>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 2
+inplace - #<FUNCTION NNL2.HLI.TS:/!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:^=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 3.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:^=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:^=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 3.0
+inplace - #<FUNCTION NNL2.HLI.TS:^=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:^=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 3
+inplace - #<FUNCTION NNL2.HLI.TS:^=> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 5.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.MAX!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 5.0
+inplace - #<FUNCTION NNL2.HLI.TS:.MAX!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 5
+inplace - #<FUNCTION NNL2.HLI.TS:.MAX!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 5.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:.MIN!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 5.0
+inplace - #<FUNCTION NNL2.HLI.TS:.MIN!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 5
+inplace - #<FUNCTION NNL2.HLI.TS:.MIN!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+val - 5.0d0
+inplace - #<FUNCTION NNL2.HLI.TS:AXPY!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+val - 5.0
+inplace - #<FUNCTION NNL2.HLI.TS:AXPY!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+val - 5
+inplace - #<FUNCTION NNL2.HLI.TS:AXPY!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.+>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (4 4 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 2.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.+>
+expected-val - 5.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.+>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (4 4 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 2.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.+>
+expected-val - 5.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.+>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.+>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (4 4 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 2
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.+>
+expected-val - 5 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.->`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (4 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 2.0d0
+fill-2 - 1.0d0
+op - #<FUNCTION NNL2.HLI.TS:.->
+expected-val - 1.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.->` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.->`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (4 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 2.0
+fill-2 - 1.0
+op - #<FUNCTION NNL2.HLI.TS:.->
+expected-val - 1.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.->` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.->` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.->`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (4 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 2
+fill-2 - 1
+op - #<FUNCTION NNL2.HLI.TS:.->
+expected-val - 1 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.*>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3 2)
+shape-2 - (3 1)
+inplace - NIL
+fill-1 - 2.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.*>
+expected-val - 6.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.*>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3 2)
+shape-2 - (3 1)
+inplace - NIL
+fill-1 - 2.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.*>
+expected-val - 6.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.*>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.*>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3 2)
+shape-2 - (3 1)
+inplace - NIL
+fill-1 - 2
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.*>
+expected-val - 6 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:./>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 8.0d0
+fill-2 - 2.0d0
+op - #<FUNCTION NNL2.HLI.TS:./>
+expected-val - 4.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:./>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:./>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 8.0
+fill-2 - 2.0
+op - #<FUNCTION NNL2.HLI.TS:./>
+expected-val - 4.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:./>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:./>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:./>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 8
+fill-2 - 2
+op - #<FUNCTION NNL2.HLI.TS:./>
+expected-val - 4 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.^>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.^>
+expected-val - 64.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.^>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.^>
+expected-val - 64.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.^>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.^>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.^>
+expected-val - 64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 4)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.MAX>
+expected-val - 4.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 4)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.MAX>
+expected-val - 4.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 4)
+shape-2 - (3)
+inplace - NIL
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.MAX>
+expected-val - 4 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.MIN>
+expected-val - 3.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.MIN>
+expected-val - 3.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - NIL
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.MIN>
+expected-val - 3 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3)
+shape-2 - (1)
+inplace - NIL
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:AXPY>
+expected-val - 7.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3)
+shape-2 - (1)
+inplace - NIL
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:AXPY>
+expected-val - 7.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3)
+shape-2 - (1)
+inplace - NIL
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:AXPY>
+expected-val - 7 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (4 4 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 2.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:+=>
+expected-val - 5.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (4 4 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 2.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:+=>
+expected-val - 5.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:+=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:+=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (4 4 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 2
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:+=>
+expected-val - 5 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:-=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (4 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 2.0d0
+fill-2 - 1.0d0
+op - #<FUNCTION NNL2.HLI.TS:-=>
+expected-val - 1.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:-=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (4 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 2.0
+fill-2 - 1.0
+op - #<FUNCTION NNL2.HLI.TS:-=>
+expected-val - 1.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:-=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:-=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (4 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 2
+fill-2 - 1
+op - #<FUNCTION NNL2.HLI.TS:-=>
+expected-val - 1 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:*=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3 2)
+shape-2 - (3 1)
+inplace - T
+fill-1 - 2.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:*=>
+expected-val - 6.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:*=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3 2)
+shape-2 - (3 1)
+inplace - T
+fill-1 - 2.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:*=>
+expected-val - 6.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:*=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:*=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3 2)
+shape-2 - (3 1)
+inplace - T
+fill-1 - 2
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:*=>
+expected-val - 6 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/!>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - T
+fill-1 - 2.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:/!>
+expected-val - 6.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/!>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - T
+fill-1 - 2.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:/!>
+expected-val - 6.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/!>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - T
+fill-1 - 2
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:/!>
+expected-val - 6 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:^=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - T
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:^=>
+expected-val - 64.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:^=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - T
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:^=>
+expected-val - 64.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:^=>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:^=>`: `The function
+                                                             NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                             is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 3)
+shape-2 - (3)
+inplace - T
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:^=>
+expected-val - 64 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 4)
+shape-2 - (3)
+inplace - T
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.MAX!>
+expected-val - 4.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 4)
+shape-2 - (3)
+inplace - T
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.MAX!>
+expected-val - 4.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MAX!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MAX!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 4)
+shape-2 - (3)
+inplace - T
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.MAX!>
+expected-val - 4 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:.MIN!>
+expected-val - 3.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:.MIN!>
+expected-val - 3.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:.MIN!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:.MIN!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:.MIN!>
+expected-val - 3 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 4.0d0
+fill-2 - 3.0d0
+op - #<FUNCTION NNL2.HLI.TS:AXPY!>
+expected-val - 7.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 4.0
+fill-2 - 3.0
+op - #<FUNCTION NNL2.HLI.TS:AXPY!>
+expected-val - 7.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:AXPY!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:AXPY!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape-1 - (3 4)
+shape-2 - (4)
+inplace - T
+fill-1 - 4
+fill-2 - 3
+op - #<FUNCTION NNL2.HLI.TS:AXPY!>
+expected-val - 7 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:ZEROS-LIKE>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:ZEROS-LIKE>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:ZEROS-LIKE>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:ZEROS-LIKE>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:ZEROS-LIKE>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:ZEROS-LIKE>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:ONES-LIKE>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:ONES-LIKE>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:ONES-LIKE>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:ONES-LIKE>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:ONES-LIKE>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:ONES-LIKE>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:EMPTY-LIKE>` (type: FLOAT64)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:EMPTY-LIKE>` (type: FLOAT64)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:EMPTY-LIKE>` (type: FLOAT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:EMPTY-LIKE>` (type: FLOAT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:EMPTY-LIKE>` (type: INT32)
+[nnl2]: Succesfully ended test for `#<FUNCTION NNL2.HLI.TS:EMPTY-LIKE>` (type: INT32)
+
+[nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:FULL-LIKE>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:FULL-LIKE>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION CHECK-NNL2.HLI.TS/FULL-LIKE>`: `The
+                                                                          function
+                                                                          NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                          is
+                                                                          undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT64
+shape - (5 5)
+fill - 2.0d0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:FULL-LIKE>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:FULL-LIKE>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION CHECK-NNL2.HLI.TS/FULL-LIKE>`: `The
+                                                                          function
+                                                                          NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                          is
+                                                                          undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - FLOAT32
+shape - (5 5)
+fill - 2.0 }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:FULL-LIKE>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:FULL-LIKE>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION CHECK-NNL2.HLI.TS/FULL-LIKE>`: `The
+                                                                          function
+                                                                          NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                          is
+                                                                          undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+dtype - INT32
+shape - (5 5)
+fill - 2 }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Transpose` (type: FLOAT64)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Transpose` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Transpose`: `The
+                                                                                                function
+                                                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                                                is
+                                                                                                undefined.`
+Additional Info: No Data }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Transpose` (type: FLOAT32)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Transpose` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Transpose`: `The
+                                                                                                function
+                                                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                                                is
+                                                                                                undefined.`
+Additional Info: No Data }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Transpose` (type: INT32)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Transpose` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Transpose`: `The
+                                                                                                function
+                                                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                                                is
+                                                                                                undefined.`
+Additional Info: No Data }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place` (type: FLOAT64)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place`: `The
+                                                                                                                function
+                                                                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                                                                is
+                                                                                                                undefined.`
+Additional Info: No Data }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place` (type: FLOAT32)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place`: `The
+                                                                                                                function
+                                                                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                                                                is
+                                                                                                                undefined.`
+Additional Info: No Data }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place` (type: INT32)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Transpose pseudo-in-place`: `The
+                                                                                                                function
+                                                                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                                                                is
+                                                                                                                undefined.`
+Additional Info: No Data }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/MAP>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/MAP>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/MAP>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT64
+inplace - NIL
+op - #<FUNCTION NNL2.HLI.TS:/MAP> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/MAP>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/MAP>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/MAP>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT32
+inplace - NIL
+op - #<FUNCTION NNL2.HLI.TS:/MAP> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/MAP>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/MAP>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/MAP>`: `The function
+                                                               NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                               is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - INT32
+inplace - NIL
+op - #<FUNCTION NNL2.HLI.TS:/MAP> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/MAP!>` (type: FLOAT64)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/MAP!>` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/MAP!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT64
+inplace - T
+op - #<FUNCTION NNL2.HLI.TS:/MAP!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/MAP!>` (type: FLOAT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/MAP!>` (type: FLOAT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/MAP!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - FLOAT32
+inplace - T
+op - #<FUNCTION NNL2.HLI.TS:/MAP!> }
+
+" [nnl2]: Started test for `#<FUNCTION NNL2.HLI.TS:/MAP!>` (type: INT32)
+[nnl2]: Failed test for `#<FUNCTION NNL2.HLI.TS:/MAP!>` (type: INT32)
+
+"
+
+[nnl2]: { Error from function `#<FUNCTION NNL2.HLI.TS:/MAP!>`: `The function
+                                                                NNL2.HLI.TS:TS-TYPE-TO-LISP
+                                                                is undefined.`
+Additional Info: The function caught an error when running the test with the passed arguments:
+shape - (5 5)
+dtype - INT32
+inplace - T
+op - #<FUNCTION NNL2.HLI.TS:/MAP!> }
+
+" [nnl2]: Started test for `No Function. Just a simple test. Addition: Test for Simple Gradient Descent` (type: FLOAT64)
+[nnl2]: Failed test for `No Function. Just a simple test. Addition: Test for Simple Gradient Descent` (type: FLOAT64)
+
+"
+
+[nnl2]: { Error from function `No Function. Just a simple test. Addition: Test for Simple Gradient Descent`: `Value
+                                                                                                              of
+                                                                                                              :ALPHA
+                                                                                                              in
+
+                                                                                                              (NNL2.HLI.TS:AXPY! A DL/DA :ALPHA (- LR))
+
+                                                                                                              is
+
+                                                                                                                :ALPHA,
+
+                                                                                                              not
+                                                                                                              a
+
+                                                                                                                (OR
+                                                                                                                 REAL
+                                                                                                                 SB-SYS:SYSTEM-AREA-POINTER).`
+Additional Info: No Data }
+
+" 

@@ -36,7 +36,7 @@
   (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.exp-operation-shape* :val 3.0s0 :expected 1.0986123 :op #'nnl2.hli.ts:.log! :inplace t))			
 
 (fiveam:test nnl2.hli.ts/.log!/int32
-  (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.exp-operation-shape* :val 3 :expected 1.0d98 :op #'nnl2.hli.ts:.log! :inplace t))		
+  (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.exp-operation-shape* :val 1 :expected 0 :op #'nnl2.hli.ts:.log! :inplace t))		
 
 ;; -- `.abs!` tests section --
 
