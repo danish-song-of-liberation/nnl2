@@ -22,7 +22,7 @@
   (handler-case
       (let ((tensor-shape-1 (coerce shape-1 'vector))
 			(tensor-shape-2 (coerce shape-2 'vector))
-			(lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+			(lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
 			
 		(nnl2.hli.ts:tlet* ((a (nnl2.hli.ts:ones tensor-shape-1 :dtype dtype))
 							(b (nnl2.hli.ts:ones tensor-shape-2 :dtype dtype))
@@ -57,7 +57,7 @@
   (handler-case
       (let ((tensor-shape-1 (coerce shape-1 'vector))
 		    (tensor-shape-2 (coerce shape-2 'vector))
-		    (lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+		    (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
 		  
 	    (nnl2.hli.ts:tlet* ((a (nnl2.hli.ts:ones tensor-shape-1 :dtype dtype))
 							(b (nnl2.hli.ts:ones tensor-shape-2 :dtype dtype))

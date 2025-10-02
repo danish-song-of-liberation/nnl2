@@ -22,7 +22,7 @@
 
   (handler-case
       (let ((tensor-shape (coerce shape 'vector))
-			(lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+			(lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
 			
 	    (nnl2.hli.ts:tlet* ((first-tensor (nnl2.hli.ts:full shape :dtype dtype :filler (coerce fill lisp-type)))
 							(result-tensor (funcall op first-tensor val)))

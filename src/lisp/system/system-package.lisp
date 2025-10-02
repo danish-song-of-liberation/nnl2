@@ -26,5 +26,6 @@
 	#:*avx256-available*
     #:*avx512-available* 
 	#:*avx128-available* 
-	#:alist-to-int))
+	#:alist-to-int
+	#:*leaky-relu-default-shift*))
   

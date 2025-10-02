@@ -59,7 +59,7 @@
   (handler-case
       (let* ((expected-size (apply #'* shape))
 		     (expected-shape (coerce shape 'vector))
-			 (lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype))
+			 (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype))
 			 (filler (coerce fill lisp-type)))	 
 		
 		(nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:zeros expected-shape :dtype dtype))

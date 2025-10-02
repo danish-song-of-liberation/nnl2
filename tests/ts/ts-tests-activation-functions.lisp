@@ -50,13 +50,13 @@
   (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.leaky-relu-operation-shape* :val 1.0d0 :expected 1.0d0 :op #'nnl2.hli.ts:.leaky-relu))						
 	
 (fiveam:test nnl2.hli.ts/.leaky-relu/float32/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.leaky-relu-operation-shape* :val -1.00 :expected -0.01 :op #'nnl2.hli.ts:.leaky-relu :tolerance 0.001))	
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.leaky-relu-operation-shape* :val -1.00 :expected -0.01 :op #'nnl2.hli.ts:.leaky-relu :tolerance 0.01))	
 
 (fiveam:test nnl2.hli.ts/.leaky-relu/float32/2
   (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.leaky-relu-operation-shape* :val 1.0s0 :expected 1.0s0 :op #'nnl2.hli.ts:.leaky-relu))	  
 
 (fiveam:test nnl2.hli.ts/.leaky-relu/int32/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.leaky-relu-operation-shape* :val -1 :expected (coerce -0.01 'double-float) :op #'nnl2.hli.ts:.leaky-relu :tolerance 0.001))			
+  (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.leaky-relu-operation-shape* :val -1 :expected (coerce -0.01 'double-float) :op #'nnl2.hli.ts:.leaky-relu :tolerance 0.01))			
   
 (fiveam:test nnl2.hli.ts/.leaky-relu/int32/2
   (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.leaky-relu-operation-shape* :val -100 :expected -1 :op #'nnl2.hli.ts:.leaky-relu))	

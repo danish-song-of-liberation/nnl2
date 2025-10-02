@@ -25,3 +25,5 @@
   
   "contains the full path to nnl2/log/tests/tests-log")   
 	
+(defparameter *leaky-relu-default-shift* 0.01s0)	
+	

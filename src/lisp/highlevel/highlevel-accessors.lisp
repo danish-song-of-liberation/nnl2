@@ -988,14 +988,29 @@
 (cffi:defcfun ("lisp_call_relu" .relu) :pointer
   (tensor :pointer)) 
 
-(cffi:defcfun ("lisp_call_leakyreluinplace" .leaky-relu!) :void
+(cffi:defcfun ("lisp_call_leakyreluinplace" %.leaky-relu!) :void
   (tensor :pointer)
   (alpha :float))  
   
-(cffi:defcfun ("lisp_call_leakyrelu" .leaky-relu) :pointer
+(defun .leaky-relu! (tensor &key (alpha nnl2.system:*leaky-relu-default-shift*)) 
+  "Elemently-wise applies an leaky relu to passed tensor in-place
+   tensor: Input tensor
+   alpha (&key): Leaky relu shift"
+   
+  (%.leaky-relu! tensor (coerce alpha 'single-float))) 
+  
+(cffi:defcfun ("lisp_call_leakyrelu" %.leaky-relu) :pointer
   (tensor :pointer)
   (alpha :float)
   (save-type :bool))  
+  
+(defun .leaky-relu (tensor &key (alpha nnl2.system:*leaky-relu-default-shift*) (save-type t))
+  "Elemently-wise applies an leaky relu to passed tensor
+   tensor: Input tensor
+   alpha (&key): Leaky relu shift
+   save-type (&key): Try to preserve the data type as much as possible (for example, by applying leaky relu to int32)"
+   
+  (%.leaky-relu tensor (coerce alpha 'single-float) save-type))
 
 (cffi:defcfun ("lisp_call_sigmoidinplace" .sigmoid!) :void
   (tensor :pointer))  

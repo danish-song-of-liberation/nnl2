@@ -54,25 +54,23 @@ Tensor* naive_concat(Tensor* tensora, Tensor* tensorb, int axis) {
     
     TensorType typea = tensora->dtype;
     TensorType typeb = tensorb->dtype;
-    
-    int ranka = tensora->rank;
-    int rankb = tensorb->rank;
-    
+	
+    int rank = tensora->rank;
+	
     TensorType winner_type = MAX(typea, typeb);
     
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-        if (ranka != rankb) {
-            NNL2_ERROR("Ranks are different (%d != %d) in concat", ranka, rankb);
+        if (tensora->rank != tensorb->rank) {
+            NNL2_ERROR("Ranks are different (%d != %d) in concat", tensora->rank, tensorb->rank);
             return NULL;
         }
-
-        if (axis < 0 || axis >= ranka) {
-            NNL2_ERROR("Invalid axis %d (must be 0-%d) in concat", axis, ranka - 1);
+		
+        if (axis < 0 || axis >= rank) {
+            NNL2_ERROR("Invalid axis %d (must be 0-%d) in concat", axis, rank - 1);
             return NULL;
         }
-
-        // Check compatible shapes using strides for efficiency
-        for (int i = 0; i < ranka; i++) {
+		
+        for (int i = 0; i < rank; i++) {
             if (i != axis && tensora->shape[i] != tensorb->shape[i]) {
                 NNL2_ERROR("Incompatible shapes along axis %d (%d != %d) in concat", i, tensora->shape[i], tensorb->shape[i]);
                 return NULL;
@@ -81,190 +79,236 @@ Tensor* naive_concat(Tensor* tensora, Tensor* tensorb, int axis) {
     #endif
     
     // Calculate result shape
-    int* shapec = malloc(ranka * sizeof(int));
-    if (shapec == NULL) {
+    int* shape_result = malloc(rank * sizeof(int));
+    if (shape_result == NULL) {
         NNL2_ERROR("Memory allocation failed for shape in concat");
         return NULL;
     }
     
-    for (int i = 0; i < ranka; i++) {
-        shapec[i] = (i == axis) ? (tensora->shape[i] + tensorb->shape[i]) : tensora->shape[i];
-    }    
+    for (int i = 0; i < rank; i++) {
+        shape_result[i] = (i == axis) ? (tensora->shape[i] + tensorb->shape[i]) : tensora->shape[i];
+    }
     
-    Tensor* result = nnl2_empty(shapec, ranka, winner_type);
-    free(shapec);
+    Tensor* result = nnl2_empty(shape_result, rank, winner_type);
+    free(shape_result);
     
     if (result == NULL) {
         return NULL;
     }
     
     size_t item_size = get_dtype_size(winner_type);
-    
-    // Use precomputed strides for efficient memory access
-    size_t outer_elements = 1;
-    for (int i = 0; i < axis; i++) {
-        outer_elements *= tensora->shape[i];
+    size_t a_axis_size = tensora->shape[axis];
+   
+    size_t total_elements = 1;
+    for (int i = 0; i < rank; i++) {
+        total_elements *= result->shape[i];
     }
     
-    size_t inner_elements = 1;
-    for (int i = axis + 1; i < ranka; i++) {
-        inner_elements *= tensora->shape[i];
+    // Create index array
+    size_t* indices = malloc(rank * sizeof(size_t));
+    if (indices == NULL) {
+        NNL2_ERROR("Memory allocation failed for indices in concat");
+        nnl2_free_tensor(result);
+        return NULL;
     }
-    
-    size_t a_axis_elements = tensora->shape[axis];
-    size_t b_axis_elements = tensorb->shape[axis];
-    
-    char* a_data = (char*)tensora->data;
-    char* b_data = (char*)tensorb->data;
-    char* c_data = (char*)result->data;
     
     if (typea == typeb && typea == winner_type) {
-        // Handling case with same types, use memcpy with strides
-        size_t a_slice_size = a_axis_elements * inner_elements * item_size;
-        size_t b_slice_size = b_axis_elements * inner_elements * item_size;
-
-        for (size_t outer = 0; outer < outer_elements; outer++) {
-            size_t a_offset = outer * tensora->strides[axis] * a_axis_elements;
-            size_t b_offset = outer * tensorb->strides[axis] * b_axis_elements;
-            size_t c_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements);
+        // Fast path: same types
+        char* c_data = (char*)result->data;
+        
+        for (size_t linear_idx = 0; linear_idx < total_elements; linear_idx++) {
+            // Convert linear index to multi-dimensional indices
+            size_t temp = linear_idx;
+            for (int i = rank - 1; i >= 0; i--) {
+                indices[i] = temp % result->shape[i];
+                temp /= result->shape[i];
+            }
             
-            memcpy(c_data + c_offset, a_data + a_offset, a_slice_size);
-            memcpy(c_data + c_offset + a_slice_size, b_data + b_offset, b_slice_size);
+            // Calculate source tensor and adjusted indices
+            Tensor* source_tensor;
+            size_t* source_indices = malloc(rank * sizeof(size_t));
+            memcpy(source_indices, indices, rank * sizeof(size_t));
+            
+            if (indices[axis] < a_axis_size) {
+                source_tensor = tensora;
+                // Use original indices for tensor A
+            } else {
+                source_tensor = tensorb;
+                source_indices[axis] = indices[axis] - a_axis_size; // Adjust index for tensor B
+            }
+            
+            // Calculate source offset
+            size_t source_offset = 0;
+            for (int i = 0; i < rank; i++) {
+                source_offset += source_indices[i] * source_tensor->strides[i];
+            }
+            
+            // Calculate destination offset
+            size_t dest_offset = 0;
+            for (int i = 0; i < rank; i++) {
+                dest_offset += indices[i] * result->strides[i];
+            }
+            
+            // Copy data
+            char* source_ptr = (char*)source_tensor->data + source_offset * item_size;
+            char* dest_ptr = c_data + dest_offset * item_size;
+            memcpy(dest_ptr, source_ptr, item_size);
+            
+            free(source_indices);
         }
     } else {
-		// Now we handle the case when the variable names 
-		// indicate that the code was written with AI support
-		
-        // Type conversion needed - process using strides
-        switch(winner_type) { 
+        // Type conversion path
+        switch(winner_type) {
             case FLOAT64: {
-				// Cast result data pointer 
                 double* dst = (double*)result->data;
                 
-                for (size_t outer = 0; outer < outer_elements; outer++) {
-					// Copy elements from first tensor (tensora)
-                    for (size_t a_pos = 0; a_pos < a_axis_elements; a_pos++) {
-						// Process all elements after the concatenation axis
-                        for (size_t inner = 0; inner < inner_elements; inner++) {
-                            // Calculate source offset in tensor A
-							
-							// outer * tensora->strides[axis] * a_axis_elements --- offset for outer dimensions
-							// a_pos * tensora->strides[axis] --- offset along concatenation axis
-							// inner * (axis < ranka - 1 ? tensora->strides[axis + 1] : 1) --- offset for inner dimensions
-					
-                            size_t a_src_offset = outer * tensora->strides[axis] * a_axis_elements + a_pos * tensora->strides[axis] + inner * (axis < ranka - 1 ? tensora->strides[axis + 1] : 1);
-							
-							// Calculate destination offset in result tensor
-							// Similar calculation but with total axis size (a_axis_elements + b_axis_elements)
-							
-                            size_t dst_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements) + a_pos * result->strides[axis] + inner * (axis < ranka - 1 ? result->strides[axis + 1] : 1);
-                            
-							// Get pointer to source element in tensor A
-                            void* elem = a_data + a_src_offset * get_dtype_size(typea);
-							
-							// Convert element to double and store in result
-                            dst[dst_offset] = nnl2_convert_to_float64(elem, typea);
-                        }
+                for (size_t linear_idx = 0; linear_idx < total_elements; linear_idx++) {
+                    // Convert linear index to multi-dimensional indices
+                    size_t temp = linear_idx;
+                    for (int i = rank - 1; i >= 0; i--) {
+                        indices[i] = temp % result->shape[i];
+                        temp /= result->shape[i];
                     }
                     
-					// Copy elements from second tensor (tensorb)
-                    for (size_t b_pos = 0; b_pos < b_axis_elements; b_pos++) {
-                        for (size_t inner = 0; inner < inner_elements; inner++) {
-                            // Calculate source offset in tensor B
-                            size_t b_src_offset = outer * tensorb->strides[axis] * b_axis_elements + b_pos * tensorb->strides[axis] + inner * (axis < rankb - 1 ? tensorb->strides[axis + 1] : 1);
-							
-							// Calculate destination offset in result tensor
-							// Position along concatenation axis is offset by a_axis_elements
-							
-                            size_t dst_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements) + (a_axis_elements + b_pos) * result->strides[axis] + inner * (axis < ranka - 1 ? result->strides[axis + 1] : 1);
-                            
-							// Get pointer to source element in tensor B
-                            void* elem = b_data + b_src_offset * get_dtype_size(typeb);
-							
-							// Convert element to double and store in result
-                            dst[dst_offset] = nnl2_convert_to_float64(elem, typeb);
+                    // Determine source and convert
+                    if (indices[axis] < a_axis_size) {
+                        size_t source_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            source_offset += indices[i] * tensora->strides[i];
                         }
+						
+                        void* src = (char*)tensora->data + source_offset * get_dtype_size(typea);
+                        
+                        size_t dest_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            dest_offset += indices[i] * result->strides[i];
+                        }
+                        dst[dest_offset] = nnl2_convert_to_float64(src, typea);
+                    } else {
+                        size_t source_indices[rank];
+                        memcpy(source_indices, indices, rank * sizeof(size_t));
+                        source_indices[axis] = indices[axis] - a_axis_size;
+                        
+                        size_t source_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            source_offset += source_indices[i] * tensorb->strides[i];
+                        }
+						
+                        void* src = (char*)tensorb->data + source_offset * get_dtype_size(typeb);
+                        
+                        size_t dest_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            dest_offset += indices[i] * result->strides[i];
+                        }
+                        dst[dest_offset] = nnl2_convert_to_float64(src, typeb);
                     }
                 }
-				
                 break;
             }
             
             case FLOAT32: {
-				// Cast result data pointer
                 float* dst = (float*)result->data;
                 
-			    // Same nested loop structure as FLOAT64 case
-                for (size_t outer = 0; outer < outer_elements; outer++) {
-                    for (size_t a_pos = 0; a_pos < a_axis_elements; a_pos++) {
-                        for (size_t inner = 0; inner < inner_elements; inner++) {
-                            size_t a_src_offset = outer * tensora->strides[axis] * a_axis_elements + a_pos * tensora->strides[axis] + inner * (axis < ranka - 1 ? tensora->strides[axis + 1] : 1);
-                            size_t dst_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements) + a_pos * result->strides[axis] + inner * (axis < ranka - 1 ? result->strides[axis + 1] : 1);
-                            
-                            void* elem = a_data + a_src_offset * get_dtype_size(typea);
-							
-							// Convert element to float32 instead of float64
-                            dst[dst_offset] = nnl2_convert_to_float32(elem, typea);
-                        }
+                for (size_t linear_idx = 0; linear_idx < total_elements; linear_idx++) {
+                    size_t temp = linear_idx;
+					
+                    for (int i = rank - 1; i >= 0; i--) {
+                        indices[i] = temp % result->shape[i];
+                        temp /= result->shape[i];
                     }
                     
-                    for (size_t b_pos = 0; b_pos < b_axis_elements; b_pos++) {
-                        for (size_t inner = 0; inner < inner_elements; inner++) {
-                            size_t b_src_offset = outer * tensorb->strides[axis] * b_axis_elements + b_pos * tensorb->strides[axis] + inner * (axis < rankb - 1 ? tensorb->strides[axis + 1] : 1);
-                            size_t dst_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements) + (a_axis_elements + b_pos) * result->strides[axis] + inner * (axis < ranka - 1 ? result->strides[axis + 1] : 1);
-                            
-                            void* elem = b_data + b_src_offset * get_dtype_size(typeb);
-							
-							// Convert element to float32
-                            dst[dst_offset] = nnl2_convert_to_float32(elem, typeb);
+                    if (indices[axis] < a_axis_size) {
+                        size_t source_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            source_offset += indices[i] * tensora->strides[i];
                         }
+						
+                        void* src = (char*)tensora->data + source_offset * get_dtype_size(typea);
+                        
+                        size_t dest_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            dest_offset += indices[i] * result->strides[i];
+                        }
+						
+                        dst[dest_offset] = nnl2_convert_to_float32(src, typea);
+                    } else {
+                        size_t source_indices[rank];
+                        memcpy(source_indices, indices, rank * sizeof(size_t));
+                        source_indices[axis] = indices[axis] - a_axis_size;
+                        
+                        size_t source_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            source_offset += source_indices[i] * tensorb->strides[i];
+                        }
+						
+                        void* src = (char*)tensorb->data + source_offset * get_dtype_size(typeb);
+                        
+                        size_t dest_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            dest_offset += indices[i] * result->strides[i];
+                        }
+						
+                        dst[dest_offset] = nnl2_convert_to_float32(src, typeb);
                     }
                 }
-				
                 break;
             }
             
             case INT32: {
-				// Cast result data pointer
                 int32_t* dst = (int32_t*)result->data;
                 
-			    // Same nested loop structure for integer concatenation
-                for (size_t outer = 0; outer < outer_elements; outer++) {
-                    for (size_t a_pos = 0; a_pos < a_axis_elements; a_pos++) {
-                        for (size_t inner = 0; inner < inner_elements; inner++) {
-                            size_t a_src_offset = outer * tensora->strides[axis] * a_axis_elements + a_pos * tensora->strides[axis] + inner * (axis < ranka - 1 ? tensora->strides[axis + 1] : 1);                            
-                            size_t dst_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements) + a_pos * result->strides[axis] + inner * (axis < ranka - 1 ? result->strides[axis + 1] : 1);
-                            
-                            void* elem = a_data + a_src_offset * get_dtype_size(typea);
-							
-							// Convert element to int32
-                            dst[dst_offset] = nnl2_convert_to_int32(elem, typea);
-                        }
+                for (size_t linear_idx = 0; linear_idx < total_elements; linear_idx++) {
+                    size_t temp = linear_idx;
+                    for (int i = rank - 1; i >= 0; i--) {
+                        indices[i] = temp % result->shape[i];
+                        temp /= result->shape[i];
                     }
                     
-                    for (size_t b_pos = 0; b_pos < b_axis_elements; b_pos++) {
-                        for (size_t inner = 0; inner < inner_elements; inner++) {
-                            size_t b_src_offset = outer * tensorb->strides[axis] * b_axis_elements + b_pos * tensorb->strides[axis] + inner * (axis < rankb - 1 ? tensorb->strides[axis + 1] : 1);
-                            size_t dst_offset = outer * result->strides[axis] * (a_axis_elements + b_axis_elements) + (a_axis_elements + b_pos) * result->strides[axis] + inner * (axis < ranka - 1 ? result->strides[axis + 1] : 1);
-                            
-                            void* elem = b_data + b_src_offset * get_dtype_size(typeb);
-							
-							// Convert element to int32
-                            dst[dst_offset] = nnl2_convert_to_int32(elem, typeb);
+                    if (indices[axis] < a_axis_size) {
+                        size_t source_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            source_offset += indices[i] * tensora->strides[i];
                         }
+						
+                        void* src = (char*)tensora->data + source_offset * get_dtype_size(typea);
+                        
+                        size_t dest_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            dest_offset += indices[i] * result->strides[i];
+                        }
+                        dst[dest_offset] = nnl2_convert_to_int32(src, typea);
+                    } else {
+                        size_t source_indices[rank];
+                        memcpy(source_indices, indices, rank * sizeof(size_t));
+                        source_indices[axis] = indices[axis] - a_axis_size;
+                        
+                        size_t source_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            source_offset += source_indices[i] * tensorb->strides[i];
+                        }
+						
+                        void* src = (char*)tensorb->data + source_offset * get_dtype_size(typeb);
+                        
+                        size_t dest_offset = 0;
+                        for (int i = 0; i < rank; i++) {
+                            dest_offset += indices[i] * result->strides[i];
+                        }
+                        dst[dest_offset] = nnl2_convert_to_int32(src, typeb);
                     }
                 }
-				
                 break;
             }
             
             default: {
                 NNL2_TYPE_ERROR(winner_type);
                 nnl2_free_tensor(result);
+                free(indices);
                 return NULL;
             }
         }
     }
+    
+    free(indices);
 
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();

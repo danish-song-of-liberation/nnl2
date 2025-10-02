@@ -18,7 +18,7 @@
   (nnl2.tests.utils:make-test dtype "Transpose"
     (let* ((lst '((1 2 3) (4 5 6) (7 8 9)))
 		   (trans-lst (apply #'mapcar #'list lst))
-		   (lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+		   (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
       
 	  (nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:make-tensor lst :dtype dtype))
 						  (trans-tensor (nnl2.hli.ts:transpose tensor)))
@@ -33,7 +33,7 @@
   (nnl2.tests.utils:make-test dtype "Transpose pseudo-in-place"
     (let* ((lst '((1 2 3) (4 5 6) (7 8 9)))
 		   (trans-lst (apply #'mapcar #'list lst))
-		   (lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+		   (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
       
 	  (nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:make-tensor lst :dtype dtype)))
 	  

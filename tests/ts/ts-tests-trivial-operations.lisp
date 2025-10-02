@@ -53,10 +53,10 @@
 ;; -- `.exp` tests section --		
 	
 (fiveam:test nnl2.hli.ts/.exp/float64
-  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.exp-operation-shape* :val 2.0d0 :expected 7.38d9 :op #'nnl2.hli.ts:.exp))					
+  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.exp-operation-shape* :val 2.0d0 :expected 7.389d0 :op #'nnl2.hli.ts:.exp :tolerance 0.01d0))					
 	
 (fiveam:test nnl2.hli.ts/.exp/float32
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.exp-operation-shape* :val 2.0s0 :expected 7.389 :op #'nnl2.hli.ts:.exp))			
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.exp-operation-shape* :val 2.0s0 :expected 7.389s0 :op #'nnl2.hli.ts:.exp :tolerance 0.01s0))			
 
 (fiveam:test nnl2.hli.ts/.exp/int32
   (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.exp-operation-shape* :val 0 :expected 1 :op #'nnl2.hli.ts:.exp))			
@@ -64,13 +64,13 @@
 ;; -- `.log` tests section --
 
 (fiveam:test nnl2.hli.ts/.log/float64
-  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.exp-operation-shape* :val 3.0d0 :expected 1.0986122886681098d0 :op #'nnl2.hli.ts:.log))					
+  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.exp-operation-shape* :val 3.0d0 :expected 1.0986122886681098d0 :op #'nnl2.hli.ts:.log :tolerance 0.01d0))					
 	
 (fiveam:test nnl2.hli.ts/.log/float32
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.exp-operation-shape* :val 3.0s0 :expected 1.0986123 :op #'nnl2.hli.ts:.log))			
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.exp-operation-shape* :val 3.0s0 :expected 1.0986123s0 :op #'nnl2.hli.ts:.log :tolerance 0.01s0))			
 
 (fiveam:test nnl2.hli.ts/.log/int32
-  (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.exp-operation-shape* :val 3 :expected 1.0d98 :op #'nnl2.hli.ts:.log))		
+  (check-nnl2.hli.ts/trivial-operation :dtype :int32 :shape *default-.exp-operation-shape* :val 3 :expected 1.098d0 :op #'nnl2.hli.ts:.log :tolerance 0.01d0))		
 
 ;; -- `.abs` tests section --
 

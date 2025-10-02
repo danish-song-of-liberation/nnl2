@@ -20,7 +20,7 @@
   (handler-case
       (let ((tensor-shape-1 (coerce shape-1 'vector))
 			(tensor-shape-2 (coerce shape-2 'vector))
-			(lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+			(lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
 			
 		(nnl2.hli.ts:tlet* ((first-tensor (nnl2.hli.ts:full tensor-shape-1 :dtype dtype :filler (coerce fill-1 lisp-type)))
 							(second-tensor (nnl2.hli.ts:full tensor-shape-2 :dtype dtype :filler (coerce fill-2 lisp-type)))

@@ -19,7 +19,7 @@
 
   (handler-case
 	  (let ((tensor-shape (coerce shape 'vector))
-			(lisp-type (nnl2.hli.ts:ts-type-to-lisp dtype)))
+			(lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
 			
 	    (nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:full tensor-shape :dtype dtype :filler (coerce 1 lisp-type)))
 							(result-tensor (funcall op #'(lambda (x y) (nnl2.hli.ts:.+ x y)) tensor tensor)))

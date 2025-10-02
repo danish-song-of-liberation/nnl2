@@ -377,7 +377,7 @@ void nnl2_init_reshaping() {
 ///@} [initilizing]
 
 
-
+    
 ///@{ [lisp_wrappers]
 
 /** @brief 
@@ -386,7 +386,7 @@ void nnl2_init_reshaping() {
  * See the documentation in the declarations of the 
  * functions themselves (or in their typedef declarations)
  */
-
+ 
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_view(tensor, indices, num_indices); 
 } 
