@@ -4,14 +4,14 @@
 #ifdef __SSE__
 	#include <xmmintrin.h>
 #endif
-   
+    
 #ifdef NNL2_AVX256_AVAILABLE
 	#include <immintrin.h> 
 #endif
 
 #ifdef __SSE2__ 
-	#include <emmintrin.h>
-#endif  
+	#include <emmintrin.h> 
+#endif        
   
 #include <stdlib.h> 
 #include <time.h>        
@@ -19,7 +19,7 @@
 #include "nnl2_core.h"   
 #include "nnl2_ffi_test.h" 
 #include "nnl2_tensor_core.h"
-#include "nnl2_log.h"
+#include "nnl2_log.h"  
  
 #include "backends_status/nnl2_status.h"  
 
@@ -58,7 +58,7 @@ void nnl2_init_accessors();
  *
  ** @details 
  * Functions for allocating and initializing new tensors    
- */
+ */ 
 void nnl2_init_tensor_creating();
 
 /** @brief 
@@ -342,7 +342,7 @@ void nnl2_init_correspondence() {
 	INIT_BACKEND(pow_powf, pow_powf_backends);          
 	INIT_BACKEND(max_maxf, max_maxf_backends);      
 	INIT_BACKEND(min_minf, min_minf_backends); 
-	INIT_BACKEND(axpf, axpf_backends);     	
+	INIT_BACKEND(axpf, axpf_backends);     	    
 }
 
 void nnl2_init_broadcasting_inplace() {

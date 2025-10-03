@@ -187,13 +187,22 @@ void* nnl2_own_relu_inplace_float64(double* data, size_t total_size, size_t num_
         tasks[i].end = current_start + current_chunk;
         
         // Create thread to process the assigned chunk
-        pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_float64, &tasks[i]);
+        int status = pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_float64, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_relu_inplace_float64");
+            num_threads = i;
+            break;
+        }
+        
         current_start += current_chunk;
     }
     
     // Wait for all threads to complete their work
     for (size_t i = 0; i < num_threads; i++) {
-        pthread_join(threads[i], NULL);
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_relu_inplace_float64");
+        }
     }
     
     return NULL;
@@ -224,13 +233,22 @@ void* nnl2_own_relu_inplace_float32(float* data, size_t total_size, size_t num_t
         tasks[i].end = current_start + current_chunk;
         
         // Create thread to process the assigned chunk
-        pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_float32, &tasks[i]);
+        int status = pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_float32, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_relu_inplace_float32");
+            num_threads = i;
+            break;
+        }
+        
         current_start += current_chunk;
     }
     
     // Wait for all threads to complete their work
     for (size_t i = 0; i < num_threads; i++) {
-        pthread_join(threads[i], NULL);
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_relu_inplace_float32");
+        }
     }
     
     return NULL;
@@ -261,13 +279,22 @@ void* nnl2_own_relu_inplace_int32(int32_t* data, size_t total_size, size_t num_t
         tasks[i].end = current_start + current_chunk;
         
         // Create thread to process the assigned chunk
-        pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_int32, &tasks[i]);
+        int status = pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_int32, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_relu_inplace_int32");
+            num_threads = i;
+            break;
+        }
+        
         current_start += current_chunk;
     }
     
     // Wait for all threads to complete their work
     for (size_t i = 0; i < num_threads; i++) {
-        pthread_join(threads[i], NULL);
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_relu_inplace_int32");
+        }
     }
     
     return NULL;

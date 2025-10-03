@@ -62,16 +62,17 @@ static inline double nnl2_leaky_relu_float64(double a, float alpha) {
 }
 
 static inline void nnl2_leaky_relu_int32_inplace(int32_t* a, float alpha) {
-	if(*a < 0) {
-		float result = (*a * alpha);
-		
-		if(fmodf(result, 1.0f) != 0.0f) {
-			NNL2_FATAL("Leaky ReLU cannot be applied to the provided tensor");
-			exit(EXIT_FAILURE);
-		} else {
-			*a = (int32_t)result;
-		}
-	}
+    if(*a < 0) {
+        float result = (*a * alpha);
+        float remainder = fmodf(fabsf(result), 1.0f);
+        
+        if(remainder > 1e-5f && (1.0f - remainder) > 1e-5f) {
+            NNL2_FATAL("Leaky ReLU cannot be applied to the provided tensor");
+            exit(EXIT_FAILURE);
+        } else {
+            *a = (int32_t)result;
+        }
+    }
 }
 
 static inline void nnl2_leaky_relu_float32_inplace(float* a, float alpha) {

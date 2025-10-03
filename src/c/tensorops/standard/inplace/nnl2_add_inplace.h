@@ -285,7 +285,7 @@ void nnl2_avx256_addinplace(Tensor* summand, const Tensor* addend) {
 	bool is_aligned_addend = NNL2_IS_ALIGNED(addend->data, NNL2_TENSOR_ALIGNMENT_32);
 	
 	// Warning for unaligned memory in safety modes (performance impact)
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MINI
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if(!is_aligned_summand) {
 			NNL2_WARN("In the avx256 implementation of add in-place, summand memory is not aligned to 32 bytes. Calculations may be slightly slower");
 		}

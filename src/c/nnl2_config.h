@@ -181,6 +181,9 @@
 	#define NNL2_TYPE_FATAL(transmitted_data_type) NNL2_FATAL("An unsupported/incorrect data type was passed. Enum type numbering: %d", transmitted_data_type)
 	#define NNL2_ORDER_ERROR(transmitted_order) NNL2_ERROR("Invalid order: %d", transmitted_order)
 	#define NNL2_TRANS_ERROR(transmitted_trans) NNL2_ERROR("Invalid trans: %d", transmitted_trans)
+	#define NNL2_THREAD_CREATE_ERROR(error_code, function_name) NNL2_FATAL("Thread creation failed in %s: error code %d", function_name, error_code)
+	#define NNL2_THREAD_JOIN_ERROR(error_code, function_name) NNL2_ERROR("Thread join failed in %s: error code %d", function_name, error_code)
+	#define NNL2_THREAD_ERROR(function_name) NNL2_ERROR("Thread operation failed in %s", function_name)
 ///@} [errors_handling]
 
 /** @brief 
