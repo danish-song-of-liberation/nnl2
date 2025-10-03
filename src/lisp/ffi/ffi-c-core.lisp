@@ -61,7 +61,7 @@
   (dtype tensor-type))   
   
 (cffi:defcfun ("nnl2_ones" %ones) :pointer
-  (shape :pointer)
+  (shape (:pointer :int32))
   (rank :int)
   (dtype tensor-type))  
     

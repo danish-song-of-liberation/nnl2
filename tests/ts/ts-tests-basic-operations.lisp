@@ -178,3 +178,4 @@
 
 ;; A continuation of this file is ts-tests-basic-operations-inplace.lisp, 
 ;; which does something similar but with in-place operations
+	

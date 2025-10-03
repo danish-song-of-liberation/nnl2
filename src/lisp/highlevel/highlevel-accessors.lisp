@@ -195,6 +195,19 @@
             ,@rest)
 			
           `(-> (,form ,tensor) ,@rest)))))
+		  
+(defun stypeof (obj)
+  "Simplified version of type-of (vanilla lisp)
+  
+   Used to prevent bugs. When passing (stypeof 2), it 
+   will return not (INTEGER 0 4629328582) but INTEGER"
+  
+  (cond
+    ((integerp obj) (the symbol 'integer))
+	(t (type-of obj))))
+	
+(declaim (inline stypeof)
+		 (ftype (function (atom) symbol) stypeof))
 
 (in-package :nnl2.hli.ts)
 
@@ -253,8 +266,8 @@
 
   (nnl2.hli:fastcall
     (cond ((eql lisp-type 'double-float) :double) 
-		  ((eql lisp-type 'single-float) :double) 
-		  ((eql lisp-type 'integer)      :double))))
+		  ((eql lisp-type 'single-float) :float) 
+		  ((eql lisp-type 'integer)      :int))))
 		  
 (declaim (ftype (function (symbol) keyword) type/lisp->nnl2 type/lisp->cffi)) ;; Inline not needed		
 	
@@ -824,12 +837,14 @@
    tensor: Tensor from which to take the shape and type
    filler (&key): Value to fill new tensor"
    
-  (let* ((filler-type (type-of filler))
+  (let* ((filler-type (nnl2.hli:stypeof filler))
 		 (keyword-type (type/lisp->cffi filler-type))
-		 (filler-pntr (cffi:foreign-alloc keyword-type)))
+		 (filler-pntr (cffi:foreign-alloc keyword-type))) 
 		 
     (setf (cffi:mem-ref filler-pntr keyword-type) filler)
-	  (nnl2.ffi:%full-like tensor filler-pntr)))
+	  (let ((result (nnl2.ffi:%full-like tensor filler-pntr)))
+	    (cffi:foreign-free filler-pntr)
+		result)))
   
 (defun .abs! (tensor)
   "Applies the modulus of a number to a tensor in-place"
@@ -1014,7 +1029,7 @@
 
 (cffi:defcfun ("lisp_call_sigmoidinplace" .sigmoid!) :void
   (tensor :pointer))  
-  
+  f
 (cffi:defcfun ("lisp_call_sigmoid" .sigmoid) :pointer
   (tensor :pointer))    
   
@@ -1464,7 +1479,7 @@
          ((shapes-equal-p ,a-sym ,b-sym) ,same-shape-case)
          (t (multiple-value-bind (higher lower) (higher-rank-tensor ,a-sym ,b-sym) ,broadcast-case))))))
 
-(defun axpy (a b &key (alpha 1.0))
+(defun axpy (a b &key (alpha 1.0) &aux (alpha (coerce alpha 'single-float)))
   "Calculates A * X + Y
    a: A
    b: Y
@@ -1479,20 +1494,18 @@
 	  (nnl2.ffi:%axpy a b alpha)
 	  (axpy/broadcasting higher lower alpha))))
 			
-(defun axpy! (a b &key (alpha 1.0))
+(defun axpy! (a b &key (alpha 1.0) &aux (alpha (coerce alpha 'single-float)))
   "In-place version of A * X + Y
    a: A (modified in-place)
    b: Y
    alpha (&key): X"
-  
-  (declare (type real alpha))
   
   (nnl2.hli:fastcall   
     (with-tensor-dispatch (a b)
       (setq a (+ a (* b alpha)))
       (axpy/axpf! a b alpha)
       (nnl2.ffi:%axpy! a b alpha)
-      (axpy/broadcasting! higher lower alpha))))		
+      (axpy/broadcasting! higher lower alpha))))	
 
 (defun .+/internal (a b)
   "Element-wise addition"
@@ -1704,7 +1717,7 @@
   "Reduce tensors with in-place element-wise minimum"
   (reduce #'.min!/internal args))
   
-(declaim (ftype (function (&rest (or nnl2-tensor real)) nnl2-tensor) .+ .- .* ./ .^ .min .max axpy += -= *= /! ^= .min! .max! axpy!)
+(declaim (ftype (function (&rest (or nnl2-tensor real)) nnl2-tensor) .+ .- .* ./ .^ .min .max += -= *= /! ^= .min! .max!)
 		 (inline .+ .- .* ./ .^ .min .max += -= *= /! ^= .min! .max!))
 			
 (defun tensor-p (obj)

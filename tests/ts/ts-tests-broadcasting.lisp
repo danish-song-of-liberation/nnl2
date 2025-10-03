@@ -24,8 +24,8 @@
 			
 		(nnl2.hli.ts:tlet* ((first-tensor (nnl2.hli.ts:full tensor-shape-1 :dtype dtype :filler (coerce fill-1 lisp-type)))
 							(second-tensor (nnl2.hli.ts:full tensor-shape-2 :dtype dtype :filler (coerce fill-2 lisp-type)))
-							(result-tensor (funcall op first-tensor second-tensor)))				
-					
+							(result-tensor (funcall op first-tensor second-tensor)))
+	
 		  (nnl2.hli.ts.tests:check-tensor-data 
 		    :tensor (if inplace first-tensor result-tensor) 
 		    :shape shape-1

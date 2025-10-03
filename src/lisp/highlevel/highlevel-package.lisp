@@ -23,7 +23,8 @@
    #:reduce-list-size
    #:list-to-flat-vector-and-shape
    #:->
-   #:<-))
+   #:<-
+   #:stypeof))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

@@ -797,29 +797,26 @@ bool nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 		}
 		
 		case FLOAT64: {
-			double filler = *(double*)value; // Extract scalar fill value
-			double* data = (double*)tensor->data; // Cast tensor data to appropriate type
-			
-			// Create AVX vector with 4 copies of the fill value
+			double filler = *(double*)value;
+			double* data = (double*)tensor->data;
+    
 			__m256d avx_filler = _mm256_set1_pd(filler);
-			
-			size_t it = 0;
-			size_t avx_limit = total_elems - (NNL2_MIN_ELEMENTS_FOR_AVX256_DOUBLE - 1);
-			
+   
+			size_t avx_iters = total_elems / NNL2_FLOAT64_ELEMENTS_PER_AVX256;  // total_elems / 4
+			size_t avx_processed_elems = avx_iters * NNL2_FLOAT64_ELEMENTS_PER_AVX256;  // avx_iters * 4
+    
 			if(is_aligned) {
-				// Process aligned memory with optimized stores
-				for(; it < avx_limit; it += NNL2_FLOAT64_ELEMENTS_PER_AVX256) {
-					_mm256_store_pd(data + it, avx_filler);
-				}	
+				for (size_t i = 0; i < avx_iters; i++) {
+					_mm256_store_pd(data + i * NNL2_FLOAT64_ELEMENTS_PER_AVX256, avx_filler);
+				}
 			} else {
-				// Process unaligned memory with unaligned stores
-				for(; it < avx_limit; it += NNL2_FLOAT64_ELEMENTS_PER_AVX256) {
-					_mm256_storeu_pd(data + it, avx_filler);
+				for (size_t i = 0; i < avx_iters; i++) {
+					_mm256_storeu_pd(data + i * NNL2_FLOAT64_ELEMENTS_PER_AVX256, avx_filler);
 				}
 			}
-			
+    
 			// Process remaining elements
-			for(size_t j = it; j < total_elems; j++) {
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
 				data[j] = filler;
 			}
 			

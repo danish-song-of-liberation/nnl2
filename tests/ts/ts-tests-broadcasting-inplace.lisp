@@ -73,13 +73,13 @@
 ;; -- `.//broadcasting!` tests section --
 
 (fiveam:test nnl2.hli.ts/.//broadcasting!/float64
-  (check-nnl2.hli.ts/broadcasting-operation :dtype :float64 :shape-1 *default-.//broadcasting!/a-operation-shape* :shape-2 *default-.//broadcasting!/b-operation-shape* :fill-1 2.0d0 :fill-2 3.0d0 :op #'nnl2.hli.ts:/! :expected-val 6.0d0 :inplace t))									
+  (check-nnl2.hli.ts/broadcasting-operation :dtype :float64 :shape-1 *default-.//broadcasting!/a-operation-shape* :shape-2 *default-.//broadcasting!/b-operation-shape* :fill-1 15.0d0 :fill-2 3.0d0 :op #'nnl2.hli.ts:/! :expected-val 5.0d0 :inplace t))									
   
 (fiveam:test nnl2.hli.ts/.//broadcasting!/float32
-  (check-nnl2.hli.ts/broadcasting-operation :dtype :float32 :shape-1 *default-.//broadcasting!/a-operation-shape* :shape-2 *default-.//broadcasting!/b-operation-shape* :fill-1 2.0s0 :fill-2 3.0s0 :op #'nnl2.hli.ts:/! :expected-val 6.0s0 :inplace t))									
+  (check-nnl2.hli.ts/broadcasting-operation :dtype :float32 :shape-1 *default-.//broadcasting!/a-operation-shape* :shape-2 *default-.//broadcasting!/b-operation-shape* :fill-1 15.0s0 :fill-2 3.0s0 :op #'nnl2.hli.ts:/! :expected-val 5.0s0 :inplace t))									
     
 (fiveam:test nnl2.hli.ts/.//broadcasting!/int32
-  (check-nnl2.hli.ts/broadcasting-operation :dtype :int32 :shape-1 *default-.//broadcasting!/a-operation-shape* :shape-2 *default-.//broadcasting!/b-operation-shape* :fill-1 2 :fill-2 3 :op #'nnl2.hli.ts:/! :expected-val 6 :inplace t))													
+  (check-nnl2.hli.ts/broadcasting-operation :dtype :int32 :shape-1 *default-.//broadcasting!/a-operation-shape* :shape-2 *default-.//broadcasting!/b-operation-shape* :fill-1 15 :fill-2 3 :op #'nnl2.hli.ts:/! :expected-val 5 :inplace t))													
 								
 ;; -- `.^/broadcasting!` tests section --
 

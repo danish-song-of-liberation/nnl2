@@ -13,15 +13,15 @@
 	#include <emmintrin.h>
 #endif  
   
+#include <stdlib.h> 
+#include <time.h>        
+  
 #include "nnl2_core.h"   
 #include "nnl2_ffi_test.h" 
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"
  
 #include "backends_status/nnl2_status.h"  
-
-#include <stdlib.h> 
-#include <time.h>      
 
 /// NNL2
 
@@ -32,7 +32,7 @@
  *
  * File contains the full system initialization 
  * declaration as well as all lisp wrappers 
- * for cffi (or sb-alien)
+ * for cffi (or sb-alien) 
  *
  ** Filepath: nnl2/src/c/nnl2_core.c
  ** File: nnl2_core.c
@@ -40,10 +40,10 @@
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
  **/
-   
+    
 ///@{ [initilizing]
 
-///@{ [subinitializers_declaration]
+///@{ [subinitializers_declaration]       
 
 /** @brief
  * Registers backend implementations for tensor accessor operations
