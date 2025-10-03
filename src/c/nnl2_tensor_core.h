@@ -1,3 +1,8 @@
+#ifdef NNL2_PTHREAD_AVAILABLE
+	#include "nnl2_parallel_backend.h"
+	#include "pthread.h"
+#endif
+
 #include "nnl2_tensor_backend.h"
 #include "nnl2_config.h"
 #include "nnl2_convert.h"

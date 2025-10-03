@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -O3 -fPIC -mavx -mavx2 -msse4.1 -msse4.2 
+CFLAGS = -Wall -Wextra -Werror -O3 -fPIC -mavx -mavx2 -msse4.1 -msse4.2 -DNNL2_PTHREAD_AVAILABLE
 
 SRC = src/c/nnl2_core.c
 OBJ = $(SRC:.c=.o)
@@ -25,6 +25,7 @@ endif
 ifeq ($(openblas0330woa64static_available), 1)
 	CFLAGS += -I$(OPENBLAS0330WOA64STATIC_INCLUDE)
 	CFLAGS += -DOPENBLAS_AVAILABLE
+	CFLAGS += -DNNL2_NUM_THREADS=$(kernel_count)
     LDFLAGS += -L$(OPENBLAS0330WOA64STATIC_LIB) -l$(OPENBLAS0330WOA64STATIC_SHARED)
 endif
 

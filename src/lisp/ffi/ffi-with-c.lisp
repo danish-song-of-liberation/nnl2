@@ -21,9 +21,10 @@
 	(assert (probe-file makefile-path) nil (format nil "File ~a is missing" makefile-path))
 	
 	(multiple-value-bind (output error-output exit-code)
-	  (uiop:run-program (format nil "make openblas0330woa64static_available=~d avx256_available=~d" 
+	  (uiop:run-program (format nil "make openblas0330woa64static_available=~d avx256_available=~d kernel_count=~d" 
 						  (nnl2.system:alist-to-int nnl2.system:*openblas0330woa64static-available*)
-						  (nnl2.system:alist-to-int nnl2.system:*avx256-available*))
+						  (nnl2.system:alist-to-int nnl2.system:*avx256-available*)
+						  nnl2.intern-system:*kernel-count*)
 						  
 	    :error-output :interactive 
 		:output :string

@@ -4,7 +4,7 @@
 #ifdef __SSE__
 	#include <xmmintrin.h>
 #endif
-
+   
 #ifdef NNL2_AVX256_AVAILABLE
 	#include <immintrin.h> 
 #endif
@@ -43,13 +43,13 @@
     
 ///@{ [initilizing]
 
-///@{ [subinitializers_declaration]       
+///@{ [subinitializers_declaration]          
 
 /** @brief
  * Registers backend implementations for tensor accessor operations
  *
  ** @details 
- * Functions for viewing, getting, and setting tensor data
+ * Functions for viewing, getting, and setting tensor data   
  */
 void nnl2_init_accessors();
 
@@ -57,7 +57,7 @@ void nnl2_init_accessors();
  * Registers backend implementations for tensor creation operations
  *
  ** @details 
- * Functions for allocating and initializing new tensors
+ * Functions for allocating and initializing new tensors    
  */
 void nnl2_init_tensor_creating();
 
