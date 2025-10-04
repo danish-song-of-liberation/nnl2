@@ -230,7 +230,7 @@ void nnl2_init_system() {
 	nnl2_init_initializers();
 	nnl2_init_transposition(); 
 	nnl2_init_correspondence_inplace();
-	nnl2_init_correspondence();  
+	nnl2_init_correspondence();   
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  	
@@ -245,13 +245,13 @@ void nnl2_init_accessors() {
 	INIT_BACKEND(tref_setter, tref_setter_backends);   
 	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
 }	
-
+     
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
 	EINIT_BACKEND(nnl2_zeros, nnl2_zeros_backends, CURRENT_BACKEND(nnl2_zeros));   
 }
-
+    
 void nnl2_init_standard() {
 	EINIT_BACKEND(add, add_backends, current_backend(add));               
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub));            
@@ -263,7 +263,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
 	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));         
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
-	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));  
+	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));          
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  	
 }
 
@@ -317,7 +317,7 @@ void nnl2_init_transposition() {
 
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
-	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);
+	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);   
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));      
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);  

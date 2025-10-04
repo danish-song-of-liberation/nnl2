@@ -273,6 +273,7 @@ typedef enum {
 	nnl2_avx512,		 ///< AVX 512-bit SIMD optimized implementation
 	nnl2_own,			 ///< Custom optimized implementation
 	nnl2_blas,			 ///< BLAS library implementation
+	nnl2_own_2,			 ///< Hyper-optimized own nnl2 implementation
 	nnl2_implver_count	 ///< Count of implementation versions 
 } implver;
 

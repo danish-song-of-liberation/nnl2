@@ -106,6 +106,10 @@
 
 ///@} [tensor_mem_alignment]
 
+#define NNL2_PREFETCH_DISTANCE 64      
+#define NNL2_CACHE_LINE_SIZE 64        
+#define NNL2_CACHE_LINES_AHEAD 4      
+
 ///@{ [force_inline]
 
 /** @brief Compiler-specific force inline directives **/
@@ -150,7 +154,7 @@
 	#define AVX128_BACKEND_NAME "AVX128"
 	#define AVX256_BACKEND_NAME "AVX256"
 	#define BLAS_BACKEND_NAME "BLAS"
-	#define NNL2_OWN_NAME "NNL2 OWN IMPLEMENTATION"
+	#define NNL2_OWN_NAME "NNL2"
 ///@} [backends_names]
 
 ///@} [backend_macros]	
