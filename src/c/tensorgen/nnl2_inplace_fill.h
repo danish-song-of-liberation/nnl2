@@ -1491,13 +1491,7 @@ void* nnl2_own_pfill_int32(void* arg) {
 
 #endif
 
-
-
 // I tried to add blas but it's even slower than naive implementation
-
-
-
-#endif
 
 /** @ingroup backend_system
  ** @brief Backend implementations for inplace_fill
@@ -1540,11 +1534,7 @@ Implementation inplace_fill_backends[] = {
 	#if defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
 		REGISTER_BACKEND(nnl2_avx256_inplace_fill, nnl2_avx256, AVX256_BACKEND_NAME),
 	#endif
-	
-	#ifdef OPENBLAS_AVAILABLE
-		REGISTER_BACKEND(nnl2_blas_inplace_fill, nnl2_blas, BLAS_BACKEND_NAME),
-	#endif
-	
+
 	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
 		REGISTER_BACKEND(nnl2_own_inplace_fill, nnl2_own_2, NNL2_OWN_NAME),
 	#endif

@@ -55,7 +55,7 @@
   (rank :int)
   (dtype tensor-type))
   
-(cffi:defcfun ("lisp_call_zeros" %zeros) :pointer
+(cffi:defcfun ("nnl2_zeros" %zeros) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type))   

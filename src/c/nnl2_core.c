@@ -249,7 +249,6 @@ void nnl2_init_accessors() {
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
-	EINIT_BACKEND(nnl2_zeros, nnl2_zeros_backends, CURRENT_BACKEND(nnl2_zeros));   
 }
     
 void nnl2_init_standard() {
@@ -401,11 +400,7 @@ void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indice
      
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
-} 
-     
-Tensor* lisp_call_zeros(const int* shape, int rank, TensorType dtype) {
-	return nnl2_zeros(shape, rank, dtype);  
-}  	  	                     
+}        
          
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
