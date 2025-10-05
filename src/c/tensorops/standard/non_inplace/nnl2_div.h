@@ -214,20 +214,6 @@ Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
  */
 #define NNL2_DIV_PARALLEL_THREASHOLD 1000000
 
-/** @brief
- * Task structure for parallel division operation
- */
-typedef struct {
-    const void* dividend_data;    /**< Pointer to dividend tensor data */
-    const void* divisor_data;     /**< Pointer to divisor tensor data */
-    void* result_data;            /**< Pointer to result tensor data */
-    size_t start;                 /**< Start index for this thread */
-    size_t end;                   /**< End index for this thread */
-    TensorType dtype_dividend;    /**< Data type of dividend tensor */
-    TensorType dtype_divisor;     /**< Data type of divisor tensor */
-    TensorType result_dtype;      /**< Data type of result tensor */
-} div_ptask;
-
 /** @brief 
  * Worker function for parallel division for same data types
  * 

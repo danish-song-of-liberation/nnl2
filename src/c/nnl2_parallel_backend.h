@@ -96,6 +96,53 @@ typedef struct {
 
 
 
+///@{ [div_ptask]
+
+typedef struct {
+    const void* dividend_data;    ///< Pointer to dividend tensor data 
+    const void* divisor_data;     ///< Pointer to divisor tensor data 
+    void* result_data;            ///< Pointer to result tensor data
+    size_t start;                 ///< Start index for this thread 
+    size_t end;                   ///< End index for this thread 
+    TensorType dtype_dividend;    ///< Data type of dividend tensor 
+    TensorType dtype_divisor;     ///< Data type of divisor tensor 
+    TensorType result_dtype;      ///< Data type of result tensor 
+} div_ptask;
+
+///@} [div_ptask]
+
+
+
+///@{ [abs_ptask]
+
+typedef struct {
+    const void* input_data;      ///< Pointer to input tensor data 
+    void* result_data;           ///< Pointer to result tensor data 
+    size_t start;                ///< Start index for this thread 
+    size_t end;                  ///< End index for this thread 
+    TensorType dtype;            ///< Data type of tensor 
+} abs_ptask;
+
+///@} [abs_ptask]
+
+
+
+///@{ [abs_inplace_ptask]
+
+/** @brief
+ * Task structure for parallel in-place absolute value operation
+ */
+typedef struct {
+    void* data;                 ///< Pointer to tensor data 
+    size_t start;               ///< Start index for this thread 
+    size_t end;                 ///< End index for this thread 
+    TensorType dtype;           ///< Data type of tensor 
+} abs_inplace_ptask;
+
+///@} [abs_inplace_ptask]
+
+
+
 ///@{ [macro]
 
 /** @def

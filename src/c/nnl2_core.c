@@ -313,7 +313,7 @@ void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 }
- 
+    
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
 	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);   
@@ -329,13 +329,13 @@ void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);    
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);  
-	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);   
+	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);      
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
 }
 
 void nnl2_init_correspondence() {
 	INIT_BACKEND(add_incf, add_incf_backends);    
-	INIT_BACKEND(sub_decf, sub_decf_backends); 
+	INIT_BACKEND(sub_decf, sub_decf_backends);   
 	INIT_BACKEND(mul_mulf, mul_mulf_backends);          
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf, pow_powf_backends);          
