@@ -2,7 +2,13 @@
 #define NNL2_ZEROS_H
 
 /** @brief 
- * Creates a new tensor filled with ones
+ * Creates a new tensor filled with zeros
+ *
+ * Previously, there was a 400-line implementation 
+ * here that was outdated and was outdated by the 
+ * inplace_fill function, which I copy-pasted from 
+ * nnl2_ones and pasted here, slightly changing it 
+ * for zeros
  *
  ** @param shape
  * Pointer to integer array specifying the dimensions of the tensor
@@ -14,7 +20,7 @@
  * Data type of the tensor elements
  *
  ** @return
- * Pointer to the newly allocated tensor filled with ones, or NULL on failure
+ * Pointer to the newly allocated tensor filled with zeros, or NULL on failure
  *
  ** @note 
  * The returned tensor must be freed using nnl2_free_tensor() to avoid memory leaks
@@ -26,9 +32,9 @@
  * May conduct additional checks depending on the safety level
  *
  ** @example
- * // Create a 3x3 matrix of ones with float32 type
+ * // Create a 3x3 matrix of zeros with float32 type
  * int shape[] = {3, 3};
- * Tensor* ones_matrix = nnl2_ones(shape, 2, FLOAT32); 
+ * Tensor* ones_matrix = nnl2_zeros(shape, 2, FLOAT32); 
  *
  ** @exception NNL2Error
  * Shape is NULL or rank is invalid
@@ -51,7 +57,7 @@ Tensor* nnl2_zeros(int32_t* shape, int32_t rank, TensorType dtype) {
 	// Additional validation of input parameters in maximal safety level
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		if (shape == NULL || rank <= 0) {
-			NNL2_ERROR("Invalid shape or rank in ones");
+			NNL2_ERROR("Invalid shape or rank in zeros");
 			return NULL;
 		}
 	#endif

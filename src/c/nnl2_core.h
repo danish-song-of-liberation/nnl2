@@ -67,7 +67,7 @@ static inline void nnl2_leaky_relu_int32_inplace(int32_t* a, float alpha) {
         float remainder = fmodf(fabsf(result), 1.0f);
         
         if(remainder > 1e-5f && (1.0f - remainder) > 1e-5f) {
-            NNL2_FATAL("Leaky ReLU cannot be applied to the provided tensor");
+            NNL2_FATAL("Leaky ReLU cannot be applied to the provided tensor");     
             exit(EXIT_FAILURE);
         } else {
             *a = (int32_t)result;

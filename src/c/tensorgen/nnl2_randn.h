@@ -95,7 +95,8 @@ Tensor* naive_randn(int* shape, int rank, TensorType dtype, void* from, void* to
  * @see naive_randn
  */
 Implementation randn_backends[] = {
-	REGISTER_BACKEND(naive_randn, nnl2_naive, NAIVE_BACKEND_NAME),
+	REGISTER_BACKEND(naive_randn, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT TRY TO ADD OPTIMIZATION
+	// pthread or simd will only slow down code
 };	
 
 /**

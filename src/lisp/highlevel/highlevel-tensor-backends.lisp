@@ -65,7 +65,7 @@
   nnl2.ffi:%set-empty-backend)
 
 (define-backend-setter use-backend/zeros
-  nnl2.ffi:%set-zeros-backend)
+  nnl2.ffi:%set-inplace-fill-backend)
 
 (define-backend-setter use-backend/gemm
   nnl2.ffi:%set-sgemminplace-backend
@@ -273,7 +273,7 @@
 (define-backend-getter-setter get-backend/view use-backend/view nnl2.ffi:%get-view-backend)
 (define-backend-getter-setter get-backend/copy use-backend/copy nnl2.ffi:%get-copy-backend)
 (define-backend-getter-setter get-backend/empty use-backend/empty nnl2.ffi:%get-empty-backend)
-(define-backend-getter-setter get-backend/zeros use-backend/zeros nnl2.ffi:%get-zeros-backend)
+(define-backend-getter-setter get-backend/zeros use-backend/zeros nnl2.ffi:%get-inplace-fill-backend)
 (define-backend-getter-setter get-backend/full use-backend/full nnl2.ffi:%get-inplace-fill-backend)
 (define-backend-getter-setter get-backend/ones use-backend/ones nnl2.ffi:%get-inplace-fill-backend)
 (define-backend-getter-setter get-backend/full-like use-backend/full-like nil :like get-backend/full)
@@ -374,8 +374,8 @@
   nnl2.ffi:%get-empty-backends)
 
 (define-backends-getter get-backends/zeros 
-  nnl2.ffi:%get-zeros-num-backends 
-  nnl2.ffi:%get-zeros-backends)
+  nnl2.ffi:%get-inplace-fill-num-backends 
+  nnl2.ffi:%get-inplace-fill-backends)
 
 (define-backends-getter get-backends/full 
   nnl2.ffi:%get-inplace-fill-num-backends 

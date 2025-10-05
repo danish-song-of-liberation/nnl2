@@ -2,6 +2,12 @@
 #define NNL2_ADD_H
 
 /** @brief
+ * Threshold for enabling parallel execution of the
+ * addition operation
+ */
+#define NNL2_ADD_PARALLEL_THREASHOLD 1000000
+
+/** @brief
  * Performs element-wise addition of two tensors (naive implementation)
  *
  ** @details
@@ -156,7 +162,7 @@ Tensor* nnl2_naive_add(Tensor* summand, Tensor* addend) {
 	return amount;
 }
 
-#ifdef __AVX__
+#ifdef NNL2_AVX256_AVAILABLE
 
 /** @brief 
  * AVX256 optimized element-wise addition for int32 tensors (non-in-place)
@@ -560,25 +566,454 @@ static inline void nnl2_avx_add_non_in_place_float64_same_type(double* a, const 
 
 #endif
 
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief 
+ * Worker function for parallel addition for same data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_same_type(void* arg);
+
+/** @brief 
+ * Worker function for parallel addition for mixed data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_mixed_types(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same float64 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_float64(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same float32 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_float32(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same int32 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_int32(void* arg);
+
+#ifdef NNL2_AVX2
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same float64 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_float64(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same float32 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_float32(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same int32 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_int32(void* arg);
+
+#endif
+
+/** @brief
+ * Parallel implementation of tensor addition using pthreads
+ *
+ ** @param summand
+ * Pointer to the summand tensor
+ *
+ ** @param addend
+ * Pointer to the addend tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the addition result
+ */
+Tensor* nnl2_own_add(Tensor* summand, Tensor* addend) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Calculate the total number of elements in the tensors
+    size_t len = product(summand->shape, summand->rank);
+    
+    TensorType dtype_summand = summand->dtype;
+    TensorType dtype_addend = addend->dtype;
+    
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
+
+    // Create an output tensor with the same shape and data type
+    Tensor* amount = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+    
+    if(len == 0) return amount;
+    
+    // Use naive implementation for small tensors
+    if(len < NNL2_ADD_PARALLEL_THREASHOLD) {
+        amount = nnl2_naive_add(summand, addend);
+        if(amount == NULL) {
+			NNL2_ERROR("Failed to add");
+		}
+		
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+		
+        return amount;
+    }
+    
+    // Allocate arrays for thread handles and task descriptors
+    pthread_t threads[NNL2_NUM_THREADS];
+    add_ptask tasks[NNL2_NUM_THREADS];
+    
+    // Calculate base chunk size and remainder for balanced distribution
+    size_t chunk = len / NNL2_NUM_THREADS;
+    size_t remainder = len % NNL2_NUM_THREADS;
+    
+    bool use_simd = false;
+	
+    #ifdef NNL2_AVX256_AVAILABLE
+    if(dtype_summand == dtype_addend) {
+        bool aligned_summand = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32);
+        bool aligned_addend = NNL2_IS_ALIGNED(addend->data, NNL2_TENSOR_ALIGNMENT_32);
+        bool aligned_result = NNL2_IS_ALIGNED(amount->data, NNL2_TENSOR_ALIGNMENT_32);
+        use_simd = aligned_summand && aligned_addend && aligned_result;
+    }
+    #endif
+    
+    // Distribute work among threads with load balancing
+    size_t current_start = 0;
+    for (size_t i = 0; i < NNL2_NUM_THREADS; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].summand_data = summand->data;
+        tasks[i].addend_data = addend->data;
+        tasks[i].result_data = amount->data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].dtype_summand = dtype_summand;
+        tasks[i].dtype_addend = dtype_addend;
+        tasks[i].result_dtype = winner_in_the_type_hierarchy;
+        
+        // Create thread to process the assigned chunk
+        int status;
+        
+        #ifdef NNL2_AVX256_AVAILABLE
+			if(use_simd && dtype_summand == dtype_addend) {
+				switch(dtype_summand) {
+					case FLOAT64: status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_float64, &tasks[i]); break;
+					case FLOAT32: status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_float32, &tasks[i]); break;
+					case INT32:   status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_int32, &tasks[i]);   break;
+					
+					default: {
+						status = pthread_create(&threads[i], NULL, nnl2_own_padd_same_type, &tasks[i]);
+						break;
+					}
+				}
+			} else 
+        #endif
+        {
+            if(dtype_summand == dtype_addend) {
+                status = pthread_create(&threads[i], NULL, nnl2_own_padd_same_type, &tasks[i]);
+            } else {
+                status = pthread_create(&threads[i], NULL, nnl2_own_padd_mixed_types, &tasks[i]);
+            }
+        }
+        
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_add");
+            // Clean up already created threads
+            for(size_t j = 0; j < i; j++) {
+                pthread_join(threads[j], NULL);
+            }
+			
+            nnl2_free_tensor(amount);
+            return NULL;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete their work
+    for (size_t i = 0; i < NNL2_NUM_THREADS; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_add");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return amount;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_padd_same_type
+ **/
+void* nnl2_own_padd_same_type(void* arg) {
+    add_ptask* task = (add_ptask*)arg;
+    
+    switch(task->dtype_summand) {
+        case FLOAT64: {
+            volatile double* data_summand = (double*)task->summand_data;
+            volatile double* data_addend = (double*)task->addend_data;
+            volatile double* data_amount = (double*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_amount[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_summand = (float*)task->summand_data;
+            volatile float* data_addend = (float*)task->addend_data;
+            volatile float* data_amount = (float*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_amount[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_summand = (int32_t*)task->summand_data;
+            volatile int32_t* data_addend = (int32_t*)task->addend_data;
+            volatile int32_t* data_amount = (int32_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_amount[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+        
+        default: {
+            // Type error should be handled in main function
+            break;
+        }
+    }
+    
+    return NULL;
+}
+
+#ifdef NNL2_AVX256_AVAILABLE
+
+/** @brief
+ * SIMD-optimized worker function for float64 addition
+ *
+ ** @see nnl2_own_padd_simd_float64
+ **/
+void* nnl2_own_padd_simd_float64(void* arg) {
+    add_ptask* task = (add_ptask*)arg;
+    
+    double* data_summand = (double*)task->summand_data;
+    double* data_addend = (double*)task->addend_data;
+    double* data_amount = (double*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 4 elements at a time using AVX
+    for(; i + 3 < task->end; i += 4) {
+        __m256d v_summand = _mm256_load_pd(&data_summand[i]);        // Load 4 doubles
+        __m256d v_addend = _mm256_load_pd(&data_addend[i]);          // Load 4 doubles
+        __m256d v_result = _mm256_add_pd(v_summand, v_addend);       // Vector addition
+        _mm256_store_pd(&data_amount[i], v_result);                  // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_amount[i] = data_summand[i] + data_addend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * SIMD-optimized worker function for float32 addition
+ *
+ ** @see nnl2_own_padd_simd_float32
+ **/
+void* nnl2_own_padd_simd_float32(void* arg) {
+    add_ptask* task = (add_ptask*)arg;
+    
+    float* data_summand = (float*)task->summand_data;
+    float* data_addend = (float*)task->addend_data;
+    float* data_amount = (float*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 8 elements at a time using AVX
+    for(; i + 7 < task->end; i += 8) {
+        __m256 v_summand = _mm256_load_ps(&data_summand[i]);        // Load 8 floats
+        __m256 v_addend = _mm256_load_ps(&data_addend[i]);          // Load 8 floats
+        __m256 v_result = _mm256_add_ps(v_summand, v_addend);       // Vector addition
+        _mm256_store_ps(&data_amount[i], v_result);                 // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_amount[i] = data_summand[i] + data_addend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * SIMD-optimized worker function for int32 addition
+ *
+ ** @see nnl2_own_padd_simd_int32
+ **/
+void* nnl2_own_padd_simd_int32(void* arg) {
+    add_ptask* task = (add_ptask*)arg;
+    
+    int32_t* data_summand = (int32_t*)task->summand_data;
+    int32_t* data_addend = (int32_t*)task->addend_data;
+    int32_t* data_amount = (int32_t*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 8 elements at a time using AVX
+    for(; i + 7 < task->end; i += 8) {
+        __m256i v_summand = _mm256_load_si256((__m256i*)&data_summand[i]);  // Load 8 int32
+        __m256i v_addend = _mm256_load_si256((__m256i*)&data_addend[i]);    // Load 8 int32
+        __m256i v_result = _mm256_add_epi32(v_summand, v_addend);           // Vector addition
+        _mm256_store_si256((__m256i*)&data_amount[i], v_result);            // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_amount[i] = data_summand[i] + data_addend[i];
+    }
+    
+    return NULL;
+}
+
+#endif
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_padd_mixed_types
+ **/
+void* nnl2_own_padd_mixed_types(void* arg) {
+    add_ptask* task = (add_ptask*)arg;
+    
+    switch(task->result_dtype) {
+        case FLOAT64: {
+            volatile double* data_amount = (double*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_summand = (char*)task->summand_data + i * get_dtype_size(task->dtype_summand);
+                void* elem_addend = (char*)task->addend_data + i * get_dtype_size(task->dtype_addend);
+                
+                data_amount[i] = nnl2_convert_to_float64(elem_summand, task->dtype_summand) + nnl2_convert_to_float64(elem_addend, task->dtype_addend);
+            }
+			
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_amount = (float*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_summand = (char*)task->summand_data + i * get_dtype_size(task->dtype_summand);
+                void* elem_addend = (char*)task->addend_data + i * get_dtype_size(task->dtype_addend);
+                
+                data_amount[i] = nnl2_convert_to_float32(elem_summand, task->dtype_summand) + nnl2_convert_to_float32(elem_addend, task->dtype_addend);
+            }
+			
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_amount = (int32_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_summand = (char*)task->summand_data + i * get_dtype_size(task->dtype_summand);
+                void* elem_addend = (char*)task->addend_data + i * get_dtype_size(task->dtype_addend);
+                
+                data_amount[i] = nnl2_convert_to_int32(elem_summand, task->dtype_summand) + nnl2_convert_to_int32(elem_addend, task->dtype_addend);
+            }
+			
+            break;
+        }
+        
+        default: {
+            // Type error should be handled in main function
+            break;
+        }
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /** 
  * @ingroup backend_system
  * @brief Backend implementations for addition operation
  * @details
  * Array follows the common backend registration pattern.
  * Currently registered backends:
- *  - naive_add: Basic reference implementation
- *  - nnl2_avx256_add: AVX256 implementation (if available)
+ *  - nnl2_naive: Basic reference implementation
+ *  - nnl2_own: Parallel pthread implementation
+ *  - nnl2_avx256: AVX256 implementation (if available)
  * 
- * @see naive_add
+ * @see nnl2_naive_add
  * @see nnl2_avx256_add
  */
 Implementation add_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_add, nnl2_naive, NAIVE_BACKEND_NAME),
 	
-	#ifdef __AVX__
-		#if TENSOR_MEM_ALIGNMENT == 32
-			REGISTER_BACKEND(nnl2_avx256_add, nnl2_avx256, AVX256_BACKEND_NAME),
-		#endif
+	#if defined(__AVX__) && TENSOR_MEM_ALIGNMENT == 32
+		REGISTER_BACKEND(nnl2_avx256_add, nnl2_avx256, AVX256_BACKEND_NAME),
+	#endif
+	
+	#ifdef NNL2_PTHREAD_AVAILABLE
+		REGISTER_BACKEND(nnl2_own_add, nnl2_own_2, NNL2_OWN_NAME),
 	#endif
 };
 
@@ -613,7 +1048,7 @@ void set_add_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_add_backend() {
-	return current_backend(add);
+	return CURRENT_BACKEND(add);
 }
 
 /** 

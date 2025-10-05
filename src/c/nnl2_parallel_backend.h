@@ -1,6 +1,10 @@
 #ifndef NNL2_PARALLEL_BACKEND_H
 #define NNL2_PARALLEL_BACKEND_H
 
+/** @file nnl2_parallel_backend.h
+ ** @brief I tried adding a pool, but it was slower
+ **/
+
 ///@{ [single_arr_ptask]
 
 typedef struct {
@@ -38,6 +42,23 @@ typedef struct {
 } fill_ptask;
 
 ///@} [fill_ptask]
+
+
+
+///@{ [add_ptask]
+
+typedef struct {
+    const void* summand_data;  ///< Pointer to summand tensor data 
+    const void* addend_data;   ///< Pointer to addend tensor data 
+    void* result_data;         ///< Pointer to result tensor data
+    size_t start;              ///< Start index for this thread 
+    size_t end;                ///< End index for this thread 
+    TensorType dtype_summand;  ///< Data type of summand tensor 
+    TensorType dtype_addend;   ///< Data type of addend tensor 
+    TensorType result_dtype;   ///< Data type of result tensor 
+} add_ptask;
+
+///@} [add_ptask]
 
 
 

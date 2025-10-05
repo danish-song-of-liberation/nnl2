@@ -400,7 +400,7 @@ void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indice
      
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
-}        
+}                       
          
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
