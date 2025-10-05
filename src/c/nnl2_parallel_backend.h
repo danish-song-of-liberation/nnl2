@@ -62,6 +62,40 @@ typedef struct {
 
 
 
+///@{ [sub_ptask]
+
+typedef struct {
+    const void* minuend_data;     ///< Pointer to minuend tensor data 
+    const void* subtrahend_data;  ///< Pointer to subtrahend tensor data 
+    void* result_data;            ///< Pointer to result tensor data 
+    size_t start;                 ///< Start index for this thread 
+    size_t end;                   ///< End index for this thread 
+    TensorType dtype_minuend;     ///< Data type of minuend tensor 
+    TensorType dtype_subtrahend;  ///< Data type of subtrahend tensor 
+    TensorType result_dtype;      ///< Data type of result tensor 
+} sub_ptask;
+
+///@} [sub_ptask]
+
+
+
+///@{ [mul_ptask]
+
+typedef struct {
+    const void* multiplicand_data; ///< Pointer to multiplicand tensor data 
+    const void* multiplier_data;   ///< Pointer to multiplier tensor data 
+    void* result_data;             ///< Pointer to result tensor data 
+    size_t start;                  ///< Start index for this thread 
+    size_t end;                    ///< End index for this thread 
+    TensorType dtype_multiplicand; ///< Data type of multiplicand tensor 
+    TensorType dtype_multiplier;   ///< Data type of multiplier tensor 
+    TensorType result_dtype;       ///< Data type of result tensor 
+} mul_ptask;
+
+///@} [mul_ptask]
+
+
+
 ///@{ [macro]
 
 /** @def

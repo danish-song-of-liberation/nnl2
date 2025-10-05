@@ -171,6 +171,414 @@ Tensor* nnl2_naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
     return product;
 }
 
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief
+ * Threshold for enabling parallel execution of the
+ * multiplication operation
+ */
+#define NNL2_MUL_PARALLEL_THREASHOLD 1000000
+
+/** @brief 
+ * Worker function for parallel multiplication for same data types
+ * 
+ * @param arg 
+ * Pointer to mul_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pmul_same_type(void* arg);
+
+/** @brief 
+ * Worker function for parallel multiplication for mixed data types
+ * 
+ * @param arg 
+ * Pointer to mul_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pmul_mixed_types(void* arg);
+
+#ifdef NNL2_AVX256_AVAILABLE
+
+/** @brief 
+ * SIMD-optimized worker function for parallel multiplication for same float64 data types
+ * 
+ * @param arg 
+ * Pointer to mul_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pmul_simd_float64(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel multiplication for same float32 data types
+ * 
+ * @param arg 
+ * Pointer to mul_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pmul_simd_float32(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel multiplication for same int32 data types
+ * 
+ * @param arg 
+ * Pointer to mul_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pmul_simd_int32(void* arg);
+
+#endif
+
+/** @brief
+ * Parallel implementation of tensor multiplication using pthreads
+ *
+ ** @param multiplicand
+ * Pointer to the multiplicand tensor
+ *
+ ** @param multiplier
+ * Pointer to the multiplier tensor
+ *
+ ** @return 
+ * Pointer to a new tensor with the multiplication result
+ */
+Tensor* nnl2_own_mul(const Tensor* multiplicand, const Tensor* multiplier) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Calculate the total number of elements in the tensors
+    size_t len = product(multiplicand->shape, multiplicand->rank);
+    
+    TensorType dtype_multiplicand = multiplicand->dtype;
+    TensorType dtype_multiplier = multiplier->dtype;
+    
+    // Selecting the winning type (higher in the hierarchy)
+    TensorType winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
+
+    // Create an output tensor with the same shape and data type
+    Tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
+    
+    if(len == 0) return product;
+    
+    // Use naive implementation for small tensors
+    if(len < NNL2_MUL_PARALLEL_THREASHOLD) {
+        product = nnl2_naive_mul(multiplicand, multiplier);
+        if(product == NULL) {
+            NNL2_ERROR("Failed to multiply");
+        }
+        
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        
+        return product;
+    }
+    
+    // Allocate arrays for thread handles and task descriptors
+    pthread_t threads[NNL2_NUM_THREADS];
+    mul_ptask tasks[NNL2_NUM_THREADS];
+    
+    // Calculate base chunk size and remainder for balanced distribution
+    size_t chunk = len / NNL2_NUM_THREADS;
+    size_t remainder = len % NNL2_NUM_THREADS;
+    
+    bool use_simd = false;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+    if(dtype_multiplicand == dtype_multiplier) {
+        bool aligned_multiplicand = NNL2_IS_ALIGNED(multiplicand->data, NNL2_TENSOR_ALIGNMENT_32);
+        bool aligned_multiplier = NNL2_IS_ALIGNED(multiplier->data, NNL2_TENSOR_ALIGNMENT_32);
+        bool aligned_result = NNL2_IS_ALIGNED(product->data, NNL2_TENSOR_ALIGNMENT_32);
+        use_simd = aligned_multiplicand && aligned_multiplier && aligned_result;
+    }
+    #endif
+    
+    // Distribute work among threads with load balancing
+    size_t current_start = 0;
+    for (size_t i = 0; i < NNL2_NUM_THREADS; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].multiplicand_data = multiplicand->data;
+        tasks[i].multiplier_data = multiplier->data;
+        tasks[i].result_data = product->data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].dtype_multiplicand = dtype_multiplicand;
+        tasks[i].dtype_multiplier = dtype_multiplier;
+        tasks[i].result_dtype = winner_in_the_type_hierarchy;
+        
+        // Create thread to process the assigned chunk
+        int status;
+        
+        #ifdef NNL2_AVX256_AVAILABLE
+            if(use_simd && dtype_multiplicand == dtype_multiplier) {
+                switch(dtype_multiplicand) {
+                    case FLOAT64: status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_float64, &tasks[i]); break;
+                    case FLOAT32: status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_float32, &tasks[i]); break;
+                    case INT32:   status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_int32, &tasks[i]);   break;
+                    
+                    default: {
+                        status = pthread_create(&threads[i], NULL, nnl2_own_pmul_same_type, &tasks[i]);
+                        break;
+                    }
+                }
+            } else 
+        #endif
+        {
+            if(dtype_multiplicand == dtype_multiplier) {
+                status = pthread_create(&threads[i], NULL, nnl2_own_pmul_same_type, &tasks[i]);
+            } else {
+                status = pthread_create(&threads[i], NULL, nnl2_own_pmul_mixed_types, &tasks[i]);
+            }
+        }
+        
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_mul");
+            // Clean up already created threads
+            for(size_t j = 0; j < i; j++) {
+                pthread_join(threads[j], NULL);
+            }
+            
+            nnl2_free_tensor(product);
+            return NULL;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete their work
+    for (size_t i = 0; i < NNL2_NUM_THREADS; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_mul");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return product;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pmul_same_type
+ **/
+void* nnl2_own_pmul_same_type(void* arg) {
+    mul_ptask* task = (mul_ptask*)arg;
+    
+    switch(task->dtype_multiplicand) {
+        case FLOAT64: {
+            volatile double* data_multiplicand = (double*)task->multiplicand_data;
+            volatile double* data_multiplier = (double*)task->multiplier_data;
+            volatile double* data_result = (double*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_result[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_multiplicand = (float*)task->multiplicand_data;
+            volatile float* data_multiplier = (float*)task->multiplier_data;
+            volatile float* data_result = (float*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_result[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_multiplicand = (int32_t*)task->multiplicand_data;
+            volatile int32_t* data_multiplier = (int32_t*)task->multiplier_data;
+            volatile int32_t* data_result = (int32_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_result[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+        
+        default: {
+            // Type error should be handled in main function
+            break;
+        }
+    }
+    
+    return NULL;
+}
+
+#ifdef NNL2_AVX256_AVAILABLE
+
+/** @brief
+ * SIMD-optimized worker function for float64 multiplication
+ *
+ ** @see nnl2_own_pmul_simd_float64
+ **/
+void* nnl2_own_pmul_simd_float64(void* arg) {
+    mul_ptask* task = (mul_ptask*)arg;
+    
+    double* data_multiplicand = (double*)task->multiplicand_data;
+    double* data_multiplier = (double*)task->multiplier_data;
+    double* data_result = (double*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 4 elements at a time using AVX
+    for(; i + 3 < task->end; i += 4) {
+        __m256d v_multiplicand = _mm256_load_pd(&data_multiplicand[i]);        // Load 4 doubles
+        __m256d v_multiplier = _mm256_load_pd(&data_multiplier[i]);            // Load 4 doubles
+        __m256d v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);        // Vector multiplication
+        _mm256_store_pd(&data_result[i], v_result);                            // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_result[i] = data_multiplicand[i] * data_multiplier[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * SIMD-optimized worker function for float32 multiplication
+ *
+ ** @see nnl2_own_pmul_simd_float32
+ **/
+void* nnl2_own_pmul_simd_float32(void* arg) {
+    mul_ptask* task = (mul_ptask*)arg;
+    
+    float* data_multiplicand = (float*)task->multiplicand_data;
+    float* data_multiplier = (float*)task->multiplier_data;
+    float* data_result = (float*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 8 elements at a time using AVX
+    for(; i + 7 < task->end; i += 8) {
+        __m256 v_multiplicand = _mm256_load_ps(&data_multiplicand[i]);        // Load 8 floats
+        __m256 v_multiplier = _mm256_load_ps(&data_multiplier[i]);            // Load 8 floats
+        __m256 v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);        // Vector multiplication
+        _mm256_store_ps(&data_result[i], v_result);                           // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_result[i] = data_multiplicand[i] * data_multiplier[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * SIMD-optimized worker function for int32 multiplication
+ *
+ ** @see nnl2_own_pmul_simd_int32
+ **/
+void* nnl2_own_pmul_simd_int32(void* arg) {
+    mul_ptask* task = (mul_ptask*)arg;
+    
+    int32_t* data_multiplicand = (int32_t*)task->multiplicand_data;
+    int32_t* data_multiplier = (int32_t*)task->multiplier_data;
+    int32_t* data_result = (int32_t*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 8 elements at a time using AVX
+    for(; i + 7 < task->end; i += 8) {
+        __m256i v_multiplicand = _mm256_load_si256((__m256i*)&data_multiplicand[i]);  // Load 8 int32
+        __m256i v_multiplier = _mm256_load_si256((__m256i*)&data_multiplier[i]);      // Load 8 int32
+        
+        __m256i v_mul_lo = _mm256_mullo_epi16(v_multiplicand, v_multiplier);          // Multiply low 16 bits
+        __m256i v_mul_hi = _mm256_mulhi_epi16(v_multiplicand, v_multiplier);          // Multiply high 16 bits
+        
+        // Combine results 
+        __m256i v_result = _mm256_or_si256(v_mul_lo, _mm256_slli_epi32(v_mul_hi, 16));
+        
+        _mm256_store_si256((__m256i*)&data_result[i], v_result);                      // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_result[i] = data_multiplicand[i] * data_multiplier[i];
+    }
+    
+    return NULL;
+}
+
+#endif
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pmul_mixed_types
+ **/
+void* nnl2_own_pmul_mixed_types(void* arg) {
+    mul_ptask* task = (mul_ptask*)arg;
+    
+    switch(task->result_dtype) {
+        case FLOAT64: {
+            volatile double* data_result = (double*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_multiplicand = (char*)task->multiplicand_data + i * get_dtype_size(task->dtype_multiplicand);
+                void* elem_multiplier = (char*)task->multiplier_data + i * get_dtype_size(task->dtype_multiplier);
+                
+                data_result[i] = nnl2_convert_to_float64(elem_multiplicand, task->dtype_multiplicand) * nnl2_convert_to_float64(elem_multiplier, task->dtype_multiplier);
+            }
+            
+            break;
+        }
+        
+        case FLOAT32: {
+            volatile float* data_result = (float*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_multiplicand = (char*)task->multiplicand_data + i * get_dtype_size(task->dtype_multiplicand);
+                void* elem_multiplier = (char*)task->multiplier_data + i * get_dtype_size(task->dtype_multiplier);
+                
+                data_result[i] = nnl2_convert_to_float32(elem_multiplicand, task->dtype_multiplicand) * nnl2_convert_to_float32(elem_multiplier, task->dtype_multiplier);
+            }
+            
+            break;
+        }
+        
+        case INT32: {
+            volatile int32_t* data_result = (int32_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_multiplicand = (char*)task->multiplicand_data + i * get_dtype_size(task->dtype_multiplicand);
+                void* elem_multiplier = (char*)task->multiplier_data + i * get_dtype_size(task->dtype_multiplier);
+                
+                data_result[i] = nnl2_convert_to_int32(elem_multiplicand, task->dtype_multiplicand) * nnl2_convert_to_int32(elem_multiplier, task->dtype_multiplier);
+            }
+            
+            break;
+        }
+        
+        default: {
+            // Type error should be handled in main function
+            break;
+        }
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /** 
  * @ingroup backend_system
  * @brief Backend implementations for multiplication operation
@@ -178,11 +586,17 @@ Tensor* nnl2_naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
  * Array follows the common backend registration pattern.
  * Currently registered backends:
  *  - nnl2_naive_mul: Basic reference implementation
+ *  - nnl2_own_mul: nnl2 Own hyper-optimized implementation
  * 
  * @see nnl2_naive_mul
+ * @see nnl2_own_mul
  */
 Implementation mul_backends[] = {
-	REGISTER_BACKEND(nnl2_naive_mul, nnl2_naive, NAIVE_BACKEND_NAME),
+    REGISTER_BACKEND(nnl2_naive_mul, nnl2_naive, NAIVE_BACKEND_NAME),
+    
+    #ifdef NNL2_PTHREAD_AVAILABLE
+        REGISTER_BACKEND(nnl2_own_mul, nnl2_own, NNL2_OWN_NAME),
+    #endif
 };
 
 /**
@@ -216,7 +630,7 @@ void set_mul_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_mul_backend() {
-	return CURRENT_BACKEND(mul);
+    return CURRENT_BACKEND(mul);
 }
 
 /** 

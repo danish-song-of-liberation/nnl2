@@ -282,13 +282,13 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));  
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
-}	
+}	 
 
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
 	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));           
-}
+} 
 
 void nnl2_init_activations_inplace() {
 	EINIT_BACKEND(reluinplace, reluinplace_backends, current_backend(reluinplace));  
@@ -313,7 +313,7 @@ void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 }
-
+ 
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
 	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);   
@@ -400,7 +400,7 @@ void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indice
      
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
-}                       
+}                          
          
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
