@@ -249,7 +249,7 @@ void nnl2_init_accessors() {
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
-}
+}   
     
 void nnl2_init_standard() {
 	EINIT_BACKEND(add, add_backends, current_backend(add));               
@@ -283,7 +283,8 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
 }	 
-                          
+                                   
+                               
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
@@ -342,7 +343,7 @@ void nnl2_init_correspondence() {
 	INIT_BACKEND(max_maxf, max_maxf_backends);      
 	INIT_BACKEND(min_minf, min_minf_backends); 
 	INIT_BACKEND(axpf, axpf_backends);     	    
-}
+}      
 
 void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
@@ -366,7 +367,7 @@ void nnl2_init_broadcasting() {
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
 }
 
-void nnl2_init_reshaping() {
+void nnl2_init_reshaping() {  
 	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));  
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
 }

@@ -38,7 +38,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void naive_maxinplace(Tensor* tensora, Tensor* tensorb) {
+void naive_maxinplace(Tensor* tensora, const Tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -157,6 +157,330 @@ void naive_maxinplace(Tensor* tensora, Tensor* tensorb) {
     #endif
 }
 
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief
+ * Threshold for enabling parallel execution of in-place maximum operation
+ */
+#define NNL2_MAX_INPLACE_PARALLEL_THRESHOLD 1000000
+
+/** @brief
+ * Worker function for parallel double precision in-place maximum operation
+ * 
+ ** @param arg 
+ * Pointer to maxinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Processes FLOAT64 data using AVX256 instructions with cache prefetching
+ * for optimal memory access patterns in in-place operation
+ */
+void* nnl2_own_pmaxinplace_float64(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision in-place maximum operation
+ * 
+ ** @param arg 
+ * Pointer to maxinplace_ptask structure containing thread parameters  
+ * 
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmaxinplace_float64
+ **/
+void* nnl2_own_pmaxinplace_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel integer in-place maximum operation
+ * 
+ ** @param arg 
+ * Pointer to maxinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmaxinplace_float64
+ **/
+void* nnl2_own_pmaxinplace_int32(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of in-place element-wise maximum operation
+ * 
+ ** @param tensora 
+ * Pointer to the first input tensor (will be modified in-place)
+ *
+ ** @param tensorb 
+ * Pointer to the second input tensor
+ * 
+ ** @details
+ * Combines AVX256 vectorization, multi-threading with pthread, and cache
+ * prefetching for maximum performance on modern CPU architectures.
+ * Automatically selects optimal thread count and chunk sizes.
+ * 
+ ** @note
+ * Uses NNL2_NUM_THREADS for parallelization configuration
+ * Falls back to naive implementation for small tensors or mixed types
+ * 
+ ** @warning
+ * Requires pthread support and AVX256 capable CPU
+ * Modifies the first tensor directly
+ */
+void nnl2_own_maxinplace(Tensor* tensora, const Tensor* tensorb) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora, "First tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensora->data, "First tensor data is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb, "Second tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor data is NULL");
+    #endif
+    
+    size_t total_elems = product(tensora->shape, tensora->rank);
+    if(total_elems == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return;
+    }
+    
+    TensorType dtype_a = tensora->dtype;
+    TensorType dtype_b = tensorb->dtype;
+    
+    // Fallback to naive implementation for small tensors or mixed types
+    if(total_elems < NNL2_MAX_INPLACE_PARALLEL_THRESHOLD || dtype_a != dtype_b) {
+        naive_maxinplace(tensora, tensorb);
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return;
+    }
+    
+    bool is_aligned = NNL2_IS_ALIGNED(tensora->data, NNL2_TENSOR_ALIGNMENT_32) &&
+                      NNL2_IS_ALIGNED(tensorb->data, NNL2_TENSOR_ALIGNMENT_32);
+    
+    // Warning for unaligned memory in safety modes
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned) {
+            NNL2_WARN("In nnl2_own_maxinplace, tensor memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_threads = NNL2_NUM_THREADS;
+    pthread_t threads[num_threads];
+    maxinplace_ptask tasks[num_threads];
+    
+    // Calculate optimal chunk sizes with load balancing
+    size_t chunk = total_elems / num_threads;
+    size_t remainder = total_elems % num_threads;
+    
+    // Configure common task parameters
+    for (size_t i = 0; i < num_threads; i++) {
+        tasks[i].tensora = tensora;
+        tasks[i].tensorb = tensorb;
+        tasks[i].dtype_a = dtype_a;
+        tasks[i].dtype_b = dtype_b;
+        tasks[i].aligned = is_aligned;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        
+        // Select appropriate worker function based on data type
+        void* (*worker_func)(void*) = NULL;
+        switch(dtype_a) {
+            case FLOAT64: worker_func = nnl2_own_pmaxinplace_float64; break;
+            case FLOAT32: worker_func = nnl2_own_pmaxinplace_float32; break;
+            case INT32:   worker_func = nnl2_own_pmaxinplace_int32;   break;
+            default: {
+                NNL2_TYPE_ERROR(dtype_a);
+                #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                    NNL2_FUNC_EXIT();
+                #endif
+                return;
+            }
+        }
+        
+        // Create thread to process the assigned chunk
+        int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_maxinplace");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_maxinplace");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+// Worker function implementations with AVX256 and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmaxinplace_float64
+ **/
+void* nnl2_own_pmaxinplace_float64(void* arg) {
+    maxinplace_ptask* task = (maxinplace_ptask*)arg;
+    double* data_a = (double*)task->tensora->data;
+    const double* data_b = (const double*)task->tensorb->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            // Prefetch next cache lines
+            _mm_prefetch((char*)&data_a[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 16], _MM_HINT_T0);
+            
+            __m256d v_data_a = _mm256_load_pd(&data_a[i]);
+            __m256d v_data_b = _mm256_load_pd(&data_b[i]);
+            __m256d v_result = _mm256_max_pd(v_data_a, v_data_b);
+            _mm256_store_pd(&data_a[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data_a[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 16], _MM_HINT_T0);
+            
+            __m256d v_data_a = _mm256_loadu_pd(&data_a[i]);
+            __m256d v_data_b = _mm256_loadu_pd(&data_b[i]);
+            __m256d v_result = _mm256_max_pd(v_data_a, v_data_b);
+            _mm256_storeu_pd(&data_a[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        data_a[i] = MAX(data_a[i], data_b[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmaxinplace_float32
+ **/
+void* nnl2_own_pmaxinplace_float32(void* arg) {
+    maxinplace_ptask* task = (maxinplace_ptask*)arg;
+    float* data_a = (float*)task->tensora->data;
+    const float* data_b = (const float*)task->tensorb->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&data_a[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 32], _MM_HINT_T0);
+            
+            __m256 v_data_a = _mm256_load_ps(&data_a[i]);
+            __m256 v_data_b = _mm256_load_ps(&data_b[i]);
+            __m256 v_result = _mm256_max_ps(v_data_a, v_data_b);
+            _mm256_store_ps(&data_a[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&data_a[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 32], _MM_HINT_T0);
+            
+            __m256 v_data_a = _mm256_loadu_ps(&data_a[i]);
+            __m256 v_data_b = _mm256_loadu_ps(&data_b[i]);
+            __m256 v_result = _mm256_max_ps(v_data_a, v_data_b);
+            _mm256_storeu_ps(&data_a[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        data_a[i] = MAX(data_a[i], data_b[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmaxinplace_int32
+ **/
+void* nnl2_own_pmaxinplace_int32(void* arg) {
+    maxinplace_ptask* task = (maxinplace_ptask*)arg;
+    int32_t* data_a = (int32_t*)task->tensora->data;
+    const int32_t* data_b = (const int32_t*)task->tensorb->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&data_a[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 32], _MM_HINT_T0);
+            
+            __m256i v_data_a = _mm256_load_si256((__m256i*)&data_a[i]);
+            __m256i v_data_b = _mm256_load_si256((__m256i*)&data_b[i]);
+            
+            // For integers, we need to compare and select maximum
+            __m256i v_compare = _mm256_cmpgt_epi32(v_data_a, v_data_b);
+            __m256i v_result = _mm256_blendv_epi8(v_data_b, v_data_a, v_compare);
+            
+            _mm256_store_si256((__m256i*)&data_a[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&data_a[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 32], _MM_HINT_T0);
+            
+            __m256i v_data_a = _mm256_loadu_si256((__m256i*)&data_a[i]);
+            __m256i v_data_b = _mm256_loadu_si256((__m256i*)&data_b[i]);
+            
+            __m256i v_compare = _mm256_cmpgt_epi32(v_data_a, v_data_b);
+            __m256i v_result = _mm256_blendv_epi8(v_data_b, v_data_a, v_compare);
+            
+            _mm256_storeu_si256((__m256i*)&data_a[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        data_a[i] = MAX(data_a[i], data_b[i]);
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /**
  * @ingroup backend_system
  * @brief Backend implementations for maxinplace operation
@@ -169,6 +493,10 @@ void naive_maxinplace(Tensor* tensora, Tensor* tensorb) {
  */
 Implementation maxinplace_backends[] = {
 	REGISTER_BACKEND(naive_maxinplace, nnl2_naive, NAIVE_BACKEND_NAME),
+	
+	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
+		REGISTER_BACKEND(nnl2_own_maxinplace, nnl2_own, NNL2_OWN_NAME),
+	#endif
 };
 
 /**

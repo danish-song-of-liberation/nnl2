@@ -183,12 +183,394 @@ Tensor* naive_max_broadcasting(Tensor* x, Tensor* y) {
     }
 }
 
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief
+ * Threshold for enabling parallel execution of broadcasting maximum operation
+ */
+#define NNL2_MAX_BROADCASTING_PARALLEL_THRESHOLD 100000
+
+/** @brief
+ * Worker function for parallel double precision broadcasting maximum operation
+ * 
+ ** @param arg 
+ * Pointer to max_broadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Processes FLOAT64 data using AVX256 instructions with cache prefetching
+ * for optimal memory access patterns in broadcasting operation
+ */
+void* nnl2_own_pmax_broadcasting_float64(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision broadcasting maximum operation
+ * 
+ ** @param arg 
+ * Pointer to max_broadcasting_ptask structure containing thread parameters  
+ * 
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmax_broadcasting_float64
+ **/
+void* nnl2_own_pmax_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel integer broadcasting maximum operation
+ * 
+ ** @param arg 
+ * Pointer to max_broadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmax_broadcasting_float64
+ **/
+void* nnl2_own_pmax_broadcasting_int32(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of broadcasting element-wise maximum operation
+ * 
+ ** @param x 
+ * Pointer to the first input tensor
+ *
+ ** @param y 
+ * Pointer to the second input tensor (broadcasted)
+ * 
+ ** @return
+ * Pointer to new tensor containing element-wise maximum values with broadcasting
+ *
+ ** @details
+ * Combines AVX256 vectorization, multi-threading with pthread, and cache
+ * prefetching for maximum performance on modern CPU architectures.
+ * Optimized for broadcasting patterns with efficient memory access.
+ * 
+ ** @note
+ * Uses NNL2_NUM_THREADS for parallelization configuration
+ * Falls back to naive implementation for small tensors, mixed types, or complex broadcasting
+ * 
+ ** @warning
+ * Requires pthread support and AVX256 capable CPU
+ * Only supports simple broadcasting patterns where numel_x % numel_y == 0
+ */
+Tensor* nnl2_own_max_broadcasting(const Tensor* x, const Tensor* y) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks for max safety level 
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x, "X tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y, "Y tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x->shape, "X shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", NULL);
+    #endif
+ 
+    size_t numel_x = product(x->shape, x->rank);
+    size_t numel_y = product(y->shape, y->rank);
+    
+    // Check broadcasting compatibility
+    if((numel_x % numel_y) != 0) {
+        NNL2_ERROR("Cannot broadcast y tensor");
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return NULL;
+    }
+    
+    TensorType x_dtype = x->dtype;
+    TensorType y_dtype = y->dtype;
+    TensorType result_dtype = MAX(x_dtype, y_dtype);
+    
+    // Create output tensor
+    Tensor* result = nnl2_empty(x->shape, x->rank, result_dtype);
+    if (result == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return NULL;
+    }
+    
+    // Fallback to naive implementation for small tensors, mixed types, or complex cases
+    if(numel_x < NNL2_MAX_BROADCASTING_PARALLEL_THRESHOLD || 
+       x_dtype != y_dtype || 
+       numel_y == 0) {
+        Tensor* naive_result = naive_max_broadcasting((Tensor*)x, (Tensor*)y);
+        if (naive_result != NULL) {
+            // Copy data from naive result to our result tensor
+            memcpy(result->data, naive_result->data, numel_x * get_dtype_size(result_dtype));
+            nnl2_free_tensor(naive_result);
+        }
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
+    
+    bool is_aligned = NNL2_IS_ALIGNED(x->data, NNL2_TENSOR_ALIGNMENT_32) &&
+                      NNL2_IS_ALIGNED(y->data, NNL2_TENSOR_ALIGNMENT_32) &&
+                      NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
+    
+    // Warning for unaligned memory in safety modes
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned) {
+            NNL2_WARN("In nnl2_own_max_broadcasting, tensor memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_blocks = numel_x / numel_y;
+    size_t num_threads = NNL2_NUM_THREADS;
+    
+    // Limit threads based on number of blocks
+    num_threads = MIN(num_threads, num_blocks);
+    
+    pthread_t threads[num_threads];
+    max_broadcasting_ptask tasks[num_threads];
+    
+    // Calculate optimal block distribution with load balancing
+    size_t blocks_per_thread = num_blocks / num_threads;
+    size_t remainder_blocks = num_blocks % num_threads;
+    
+    // Configure common task parameters
+    for (size_t i = 0; i < num_threads; i++) {
+        tasks[i].x = x;
+        tasks[i].y = y;
+        tasks[i].result = result;
+        tasks[i].x_dtype = x_dtype;
+        tasks[i].y_dtype = y_dtype;
+        tasks[i].result_dtype = result_dtype;
+        tasks[i].block_size = numel_y;
+        tasks[i].aligned = is_aligned;
+    }
+    
+    size_t current_block_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_blocks = blocks_per_thread + (i < remainder_blocks ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].start_block = current_block_start;
+        tasks[i].end_block = current_block_start + current_blocks;
+        
+        // Select appropriate worker function based on data type
+        void* (*worker_func)(void*) = NULL;
+        switch(x_dtype) {
+            case FLOAT64: worker_func = nnl2_own_pmax_broadcasting_float64; break;
+            case FLOAT32: worker_func = nnl2_own_pmax_broadcasting_float32; break;
+            case INT32:   worker_func = nnl2_own_pmax_broadcasting_int32;   break;
+            default: {
+                NNL2_TYPE_ERROR(x_dtype);
+                nnl2_free_tensor(result);
+                #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                    NNL2_FUNC_EXIT();
+                #endif
+                return NULL;
+            }
+        }
+        
+        // Create thread to process the assigned blocks
+        int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_max_broadcasting");
+            num_threads = i;
+            break;
+        }
+        
+        current_block_start += current_blocks;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_max_broadcasting");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
+// Worker function implementations with AVX256 and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmax_broadcasting_float64
+ **/
+void* nnl2_own_pmax_broadcasting_float64(void* arg) {
+    max_broadcasting_ptask* task = (max_broadcasting_ptask*)arg;
+    const double* x_data = (const double*)task->x->data;
+    const double* y_data = (const double*)task->y->data;
+    double* result_data = (double*)task->result->data;
+    size_t start_block = task->start_block;
+    size_t end_block = task->end_block;
+    size_t block_size = task->block_size;
+    
+    // Process each block assigned to this thread
+    for(size_t block = start_block; block < end_block; block++) {
+        size_t block_offset = block * block_size;
+        size_t i = 0;
+        
+        // AVX256 processing with prefetching within the block
+        if(task->aligned) {
+            for(; i + 3 < block_size; i += 4) {
+                // Prefetch next cache lines
+                _mm_prefetch((char*)&x_data[block_offset + i + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&y_data[i + 16], _MM_HINT_T0);
+                
+                __m256d v_x_data = _mm256_load_pd(&x_data[block_offset + i]);
+                __m256d v_y_data = _mm256_load_pd(&y_data[i]);
+                __m256d v_result = _mm256_max_pd(v_x_data, v_y_data);
+                _mm256_store_pd(&result_data[block_offset + i], v_result);
+            }
+        } else {
+            for(; i + 3 < block_size; i += 4) {
+                _mm_prefetch((char*)&x_data[block_offset + i + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&y_data[i + 16], _MM_HINT_T0);
+                
+                __m256d v_x_data = _mm256_loadu_pd(&x_data[block_offset + i]);
+                __m256d v_y_data = _mm256_loadu_pd(&y_data[i]);
+                __m256d v_result = _mm256_max_pd(v_x_data, v_y_data);
+                _mm256_storeu_pd(&result_data[block_offset + i], v_result);
+            }
+        }
+        
+        // Scalar processing for remainder in the block
+        for(; i < block_size; i++) {
+            result_data[block_offset + i] = MAX(x_data[block_offset + i], y_data[i]);
+        }
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmax_broadcasting_float32
+ **/
+void* nnl2_own_pmax_broadcasting_float32(void* arg) {
+    max_broadcasting_ptask* task = (max_broadcasting_ptask*)arg;
+    const float* x_data = (const float*)task->x->data;
+    const float* y_data = (const float*)task->y->data;
+    float* result_data = (float*)task->result->data;
+    size_t start_block = task->start_block;
+    size_t end_block = task->end_block;
+    size_t block_size = task->block_size;
+    
+    // Process each block assigned to this thread
+    for(size_t block = start_block; block < end_block; block++) {
+        size_t block_offset = block * block_size;
+        size_t i = 0;
+        
+        // AVX256 processing with prefetching (8 elements per iteration)
+        if(task->aligned) {
+            for(; i + 7 < block_size; i += 8) {
+                _mm_prefetch((char*)&x_data[block_offset + i + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&y_data[i + 32], _MM_HINT_T0);
+                
+                __m256 v_x_data = _mm256_load_ps(&x_data[block_offset + i]);
+                __m256 v_y_data = _mm256_load_ps(&y_data[i]);
+                __m256 v_result = _mm256_max_ps(v_x_data, v_y_data);
+                _mm256_store_ps(&result_data[block_offset + i], v_result);
+            }
+        } else {
+            for(; i + 7 < block_size; i += 8) {
+                _mm_prefetch((char*)&x_data[block_offset + i + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&y_data[i + 32], _MM_HINT_T0);
+                
+                __m256 v_x_data = _mm256_loadu_ps(&x_data[block_offset + i]);
+                __m256 v_y_data = _mm256_loadu_ps(&y_data[i]);
+                __m256 v_result = _mm256_max_ps(v_x_data, v_y_data);
+                _mm256_storeu_ps(&result_data[block_offset + i], v_result);
+            }
+        }
+        
+        // Scalar processing for remainder in the block
+        for(; i < block_size; i++) {
+            result_data[block_offset + i] = MAX(x_data[block_offset + i], y_data[i]);
+        }
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmax_broadcasting_int32
+ **/
+void* nnl2_own_pmax_broadcasting_int32(void* arg) {
+    max_broadcasting_ptask* task = (max_broadcasting_ptask*)arg;
+    const int32_t* x_data = (const int32_t*)task->x->data;
+    const int32_t* y_data = (const int32_t*)task->y->data;
+    int32_t* result_data = (int32_t*)task->result->data;
+    size_t start_block = task->start_block;
+    size_t end_block = task->end_block;
+    size_t block_size = task->block_size;
+    
+    // Process each block assigned to this thread
+    for(size_t block = start_block; block < end_block; block++) {
+        size_t block_offset = block * block_size;
+        size_t i = 0;
+        
+        // AVX256 processing with prefetching (8 elements per iteration)
+        if(task->aligned) {
+            for(; i + 7 < block_size; i += 8) {
+                _mm_prefetch((char*)&x_data[block_offset + i + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&y_data[i + 32], _MM_HINT_T0);
+                
+                __m256i v_x_data = _mm256_load_si256((__m256i*)&x_data[block_offset + i]);
+                __m256i v_y_data = _mm256_load_si256((__m256i*)&y_data[i]);
+                
+                // For integers, we need to compare and select maximum
+                __m256i v_compare = _mm256_cmpgt_epi32(v_x_data, v_y_data);
+                __m256i v_result = _mm256_blendv_epi8(v_y_data, v_x_data, v_compare);
+                
+                _mm256_store_si256((__m256i*)&result_data[block_offset + i], v_result);
+            }
+        } else {
+            for(; i + 7 < block_size; i += 8) {
+                _mm_prefetch((char*)&x_data[block_offset + i + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&y_data[i + 32], _MM_HINT_T0);
+                
+                __m256i v_x_data = _mm256_loadu_si256((__m256i*)&x_data[block_offset + i]);
+                __m256i v_y_data = _mm256_loadu_si256((__m256i*)&y_data[i]);
+                
+                __m256i v_compare = _mm256_cmpgt_epi32(v_x_data, v_y_data);
+                __m256i v_result = _mm256_blendv_epi8(v_y_data, v_x_data, v_compare);
+                
+                _mm256_storeu_si256((__m256i*)&result_data[block_offset + i], v_result);
+            }
+        }
+        
+        // Scalar processing for remainder in the block
+        for(; i < block_size; i++) {
+            result_data[block_offset + i] = MAX(x_data[block_offset + i], y_data[i]);
+        }
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /**
  * @ingroup backend_system
  * @brief Backend implementations for maximum operation with broadcasting
  */
 Implementation max_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_max_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
+    
+    #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
+        REGISTER_BACKEND(nnl2_own_max_broadcasting, nnl2_own, NNL2_OWN_NAME),
+    #endif
 };  
 
 /**

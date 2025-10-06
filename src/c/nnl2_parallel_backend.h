@@ -507,6 +507,231 @@ typedef struct {
 
 
 
+///@{ [max_ptask]
+
+typedef struct {
+    const Tensor* tensora;      ///< Pointer to first input tensor 
+    const Tensor* tensorb;      ///< Pointer to second input tensor 
+    Tensor* result;             ///< Pointer to output tensor 
+    size_t start;               ///< Start index for this thread's chunk 
+    size_t end;                 ///< End index for this thread's chunk 
+    TensorType dtype_a;         ///< Data type of first tensor 
+    TensorType dtype_b;         ///< Data type of second tensor 
+    TensorType result_dtype;    ///< Data type of result tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+} max_ptask;
+
+///@} [max_ptask]
+
+
+
+///@{ [min_ptask]
+
+typedef struct {
+    const Tensor* tensora;      ///< Pointer to first input tensor 
+    const Tensor* tensorb;      ///< Pointer to second input tensor 
+    Tensor* result;             ///< Pointer to output tensor 
+    size_t start;               ///< Start index for this thread's chunk 
+    size_t end;                 ///< End index for this thread's chunk 
+    TensorType dtype_a;         ///< Data type of first tensor 
+    TensorType dtype_b;         ///< Data type of second tensor 
+    TensorType result_dtype;    ///< Data type of result tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+} min_ptask;
+
+///@} [min_ptask]
+
+
+
+///@{ [maxinplace_ptask]
+
+typedef struct {
+    Tensor* tensora;            ///< Pointer to first input tensor (modified in-place)
+    const Tensor* tensorb;      ///< Pointer to second input tensor 
+    size_t start;               ///< Start index for this thread's chunk 
+    size_t end;                 ///< End index for this thread's chunk 
+    TensorType dtype_a;         ///< Data type of first tensor 
+    TensorType dtype_b;         ///< Data type of second tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+} maxinplace_ptask;
+
+///@} [maxinplace_ptask]
+
+
+
+///@{ [mininplace_ptask]
+
+typedef struct {
+    Tensor* tensora;            ///< Pointer to first input tensor (modified in-place)
+    const Tensor* tensorb;      ///< Pointer to second input tensor 
+    size_t start;               ///< Start index for this thread's chunk 
+    size_t end;                 ///< End index for this thread's chunk 
+    TensorType dtype_a;         ///< Data type of first tensor 
+    TensorType dtype_b;         ///< Data type of second tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+} mininplace_ptask;
+
+///@} [mininplace_ptask]
+
+
+
+///@{ [max_broadcasting_inplace_ptask]
+
+typedef struct {
+    Tensor* x;                  ///< Pointer to first input tensor (modified in-place)
+    const Tensor* y;            ///< Pointer to second input tensor 
+    size_t start_block;         ///< Start block index for this thread's chunk
+    size_t end_block;           ///< End block index for this thread's chunk
+    size_t block_size;          ///< Size of each broadcast block (numel_y)
+    TensorType x_dtype;         ///< Data type of first tensor 
+    TensorType y_dtype;         ///< Data type of second tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+} max_broadcasting_inplace_ptask;
+
+///@} [max_broadcasting_inplace_ptask]
+
+
+
+///@{ [min_broadcasting_inplace_ptask]
+
+typedef struct {
+    Tensor* x;                  ///< Pointer to first input tensor (modified in-place)
+    const Tensor* y;            ///< Pointer to second input tensor 
+    size_t start_block;         ///< Start block index for this thread's chunk
+    size_t end_block;           ///< End block index for this thread's chunk
+    size_t block_size;          ///< Size of each broadcast block (numel_y)
+    TensorType x_dtype;         ///< Data type of first tensor 
+    TensorType y_dtype;         ///< Data type of second tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+} min_broadcasting_inplace_ptask;
+
+///@} [min_broadcasting_inplace_ptask]
+
+
+
+///@{ [max_broadcasting_ptask]
+
+typedef struct {
+    const Tensor* x;            ///< Pointer to first input tensor
+    const Tensor* y;            ///< Pointer to second input tensor 
+    Tensor* result;             ///< Pointer to output tensor
+    size_t start_block;         ///< Start block index for this thread's chunk
+    size_t end_block;           ///< End block index for this thread's chunk
+    size_t block_size;          ///< Size of each broadcast block (numel_y)
+    TensorType x_dtype;         ///< Data type of first tensor 
+    TensorType y_dtype;         ///< Data type of second tensor 
+    TensorType result_dtype;    ///< Data type of result tensor
+    bool aligned;               ///< Whether memory is properly aligned 
+} max_broadcasting_ptask;
+
+///@} [max_broadcasting_ptask]
+
+
+
+///@{ [min_broadcasting_ptask]
+
+typedef struct {
+    const Tensor* x;            ///< Pointer to first input tensor
+    const Tensor* y;            ///< Pointer to second input tensor 
+    Tensor* result;             ///< Pointer to output tensor
+    size_t start_block;         ///< Start block index for this thread's chunk
+    size_t end_block;           ///< End block index for this thread's chunk
+    size_t block_size;          ///< Size of each broadcast block (numel_y)
+    TensorType x_dtype;         ///< Data type of first tensor 
+    TensorType y_dtype;         ///< Data type of second tensor 
+    TensorType result_dtype;    ///< Data type of result tensor
+    bool aligned;               ///< Whether memory is properly aligned 
+} min_broadcasting_ptask;
+
+///@} [min_broadcasting_ptask]
+
+
+
+///@{ [min_minf_ptask]
+
+typedef struct {
+    const Tensor* tensor;       ///< Pointer to input tensor
+    Tensor* result;             ///< Pointer to output tensor
+    size_t start;               ///< Start index for this thread's chunk
+    size_t end;                 ///< End index for this thread's chunk
+    TensorType dtype;           ///< Data type of tensor
+    bool aligned;               ///< Whether memory is properly aligned
+    union {
+        double float64_threshold;   ///< Threshold value for FLOAT64
+        float float32_threshold;    ///< Threshold value for FLOAT32
+        int32_t int32_threshold;    ///< Threshold value for INT32
+    } threshold;
+} min_minf_ptask;
+
+///@} [min_minf_ptask]
+
+
+
+///@{ [max_maxf_ptask]
+
+/** @brief
+ * Task structure for parallel element-wise maximum operation
+ * 
+ ** @details
+ * Contains all necessary parameters for worker threads to compute
+ * element-wise maximum between tensor elements and scalar value
+ */
+typedef struct {
+    const Tensor* tensor;       ///< Pointer to input tensor
+    Tensor* result;             ///< Pointer to output tensor
+    size_t start;               ///< Start index for this thread's chunk
+    size_t end;                 ///< End index for this thread's chunk
+    TensorType dtype;           ///< Data type of tensor
+    bool aligned;               ///< Whether memory is properly aligned
+    union {
+        double float64_threshold;   ///< Threshold value for FLOAT64
+        float float32_threshold;    ///< Threshold value for FLOAT32
+        int32_t int32_threshold;    ///< Threshold value for INT32
+    } threshold;
+} max_maxf_ptask;
+
+///@} [max_maxf_ptask]
+
+
+
+///@{ [max_maxf_inplace_ptask]
+
+typedef struct {
+    Tensor* tensor;             ///< Pointer to input tensor (modified in-place)
+    size_t start;               ///< Start index for this thread's chunk
+    size_t end;                 ///< End index for this thread's chunk
+    TensorType dtype;           ///< Data type of tensor
+    bool aligned;               ///< Whether memory is properly aligned
+    union {
+        double float64_threshold;   ///< Threshold value for FLOAT64
+        float float32_threshold;    ///< Threshold value for FLOAT32
+        int32_t int32_threshold;    ///< Threshold value for INT32
+    } threshold;
+} max_maxf_inplace_ptask;
+
+///@} [max_maxf_inplace_ptask]
+
+
+
+///@{ [min_minf_inplace_ptask]
+
+typedef struct {
+    Tensor* tensor;             ///< Pointer to input tensor (modified in-place)
+    size_t start;               ///< Start index for this thread's chunk
+    size_t end;                 ///< End index for this thread's chunk
+    TensorType dtype;           ///< Data type of tensor
+    bool aligned;               ///< Whether memory is properly aligned
+    union {
+        double float64_threshold;   ///< Threshold value for FLOAT64
+        float float32_threshold;    ///< Threshold value for FLOAT32
+        int32_t int32_threshold;    ///< Threshold value for INT32
+    } threshold;
+} min_minf_inplace_ptask;
+
+///@} [min_minf_inplace_ptask]
+
+
+
 ///@{ [macro]
 
 /** @def
