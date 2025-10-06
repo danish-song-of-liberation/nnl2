@@ -177,12 +177,455 @@ Tensor* naive_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) {
     }
 }
 
+#if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
+
+/** @brief
+ * Threshold for enabling parallel execution of the
+ * broadcasting multiplication operation
+ */
+#define NNL2_MUL_BROADCASTING_PARALLEL_THRESHOLD 500000
+
+/** @brief 
+ * Worker function for parallel double precision broadcasting multiplication
+ * 
+ ** @param arg 
+ * Pointer to mulbroadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pmul_broadcasting_float64(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision broadcasting multiplication
+ * 
+ ** @param arg 
+ * Pointer to mulbroadcasting_ptask structure containing thread parameters  
+ * 
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pmul_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel integer broadcasting multiplication
+ * 
+ ** @param arg 
+ * Pointer to mulbroadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pmul_broadcasting_int32(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of broadcasting multiplication
+ * 
+ ** @param multiplicand
+ * Pointer to multiplicand tensor
+ *
+ ** @param multiplier
+ * Pointer to multiplier tensor (broadcasted)
+ *
+ ** @return
+ * Pointer to a new tensor containing the result of the multiplication operation
+ */
+Tensor* nnl2_own_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand, "Multiplicand tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier, "Multiplier tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand->shape, "Multiplicand shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->shape, "Multiplier shape is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand->data, "Multiplicand data is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->data, "Multiplier data is NULL", NULL);
+    #endif
+    
+    size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
+    size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
+    
+    // Check broadcasting compatibility
+    if((numel_multiplicand % numel_multiplier) != 0) {
+        NNL2_ERROR("Cannot broadcast multiplier tensor");
+        return NULL;
+    }
+    
+    // Determine result data type
+    TensorType result_dtype = MAX(multiplicand->dtype, multiplier->dtype);
+    
+    // Create result tensor
+    Tensor* result = nnl2_empty(multiplicand->shape, multiplicand->rank, result_dtype);
+    if(result == NULL) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            NNL2_ERROR("Failed to allocate result tensor");
+        #endif
+        return NULL;
+    }
+    
+    if(numel_multiplicand == 0 || numel_multiplier == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
+    
+    // Fall back to naive implementation for small tensors or different dtypes
+    if(numel_multiplicand < NNL2_MUL_BROADCASTING_PARALLEL_THRESHOLD || 
+       multiplicand->dtype != multiplier->dtype) {
+        Tensor* naive_result = naive_mul_broadcasting(multiplicand, multiplier);
+        if(naive_result == NULL) {
+            nnl2_free_tensor(result);
+            return NULL;
+        }
+        nnl2_free_tensor(result);
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return naive_result;
+    }
+    
+    size_t broadcast_ratio = numel_multiplicand / numel_multiplier;
+    
+    bool is_aligned_multiplicand = NNL2_IS_ALIGNED(multiplicand->data, NNL2_TENSOR_ALIGNMENT_32);
+    bool is_aligned_multiplier = NNL2_IS_ALIGNED(multiplier->data, NNL2_TENSOR_ALIGNMENT_32);
+    bool is_aligned_result = NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned_multiplicand) {
+            NNL2_WARN("In nnl2_own mul broadcasting, multiplicand memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+        
+        if(!is_aligned_multiplier) {
+            NNL2_WARN("In nnl2_own mul broadcasting, multiplier memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+        
+        if(!is_aligned_result) {
+            NNL2_WARN("In nnl2_own mul broadcasting, result memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_threads = NNL2_NUM_THREADS;
+    pthread_t threads[num_threads];
+    mulbroadcasting_ptask tasks[num_threads];
+    
+    // Calculate chunk size per thread for the outer loop
+    size_t chunk = broadcast_ratio / num_threads;
+    size_t remainder = broadcast_ratio % num_threads;
+    
+    // Initialize common task parameters
+    for(size_t i = 0; i < num_threads; i++) {
+        tasks[i].dtype = result_dtype;
+        tasks[i].aligned_multiplicand = is_aligned_multiplicand;
+        tasks[i].aligned_multiplier = is_aligned_multiplier;
+        tasks[i].aligned_result = is_aligned_result;
+        tasks[i].multiplicand_data = multiplicand->data;
+        tasks[i].multiplier_data = multiplier->data;
+        tasks[i].result_data = result->data;
+        tasks[i].numel_multiplier = numel_multiplier;
+        tasks[i].broadcast_ratio = broadcast_ratio;
+    }
+    
+    size_t current_start = 0;
+    for(size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        
+        void* (*worker_func)(void*) = NULL;
+        switch(result_dtype) {
+            case FLOAT64: worker_func = nnl2_own_pmul_broadcasting_float64; break;
+            case FLOAT32: worker_func = nnl2_own_pmul_broadcasting_float32; break;
+            case INT32:   worker_func = nnl2_own_pmul_broadcasting_int32;   break;
+            
+            default: {
+                NNL2_TYPE_ERROR(result_dtype);
+                nnl2_free_tensor(result);
+                return NULL;
+            }
+        }
+        
+        int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_mul_broadcasting");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    for(size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_mul_broadcasting");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
+void* nnl2_own_pmul_broadcasting_float64(void* arg) {
+    mulbroadcasting_ptask* task = (mulbroadcasting_ptask*)arg;
+    const double* multiplicand_data = (const double*)task->multiplicand_data;
+    const double* multiplier_data = (const double*)task->multiplier_data;
+    double* result_data = (double*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_multiplier = task->numel_multiplier;
+    
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_multiplier;
+        
+        __m256d v_multiplier, v_multiplicand, v_result;
+        size_t j = 0;
+        
+        if(task->aligned_multiplicand && task->aligned_multiplier && task->aligned_result) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_store_pd(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplicand && task->aligned_multiplier) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_storeu_pd(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplicand && task->aligned_result) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_store_pd(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplier && task->aligned_result) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_store_pd(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplicand) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_storeu_pd(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplier) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_storeu_pd(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_result) {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_store_pd(&result_data[base_idx + j], v_result);
+            }
+        } else {
+            for(; j + 3 < numel_multiplier; j += 4) {
+                _mm_prefetch((char*)&multiplier_data[j + 16], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 16], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_pd(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_pd(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_pd(v_multiplicand, v_multiplier);
+                _mm256_storeu_pd(&result_data[base_idx + j], v_result);
+            }
+        }
+        
+        // Handle remaining elements
+        for(; j < numel_multiplier; j++) {
+            result_data[base_idx + j] = multiplicand_data[base_idx + j] * multiplier_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_pmul_broadcasting_float32(void* arg) {
+    mulbroadcasting_ptask* task = (mulbroadcasting_ptask*)arg;
+    const float* multiplicand_data = (const float*)task->multiplicand_data;
+    const float* multiplier_data = (const float*)task->multiplier_data;
+    float* result_data = (float*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_multiplier = task->numel_multiplier;
+    
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_multiplier;
+        
+        __m256 v_multiplier, v_multiplicand, v_result;
+        size_t j = 0;
+        
+        if(task->aligned_multiplicand && task->aligned_multiplier && task->aligned_result) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_store_ps(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplicand && task->aligned_multiplier) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_storeu_ps(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplicand && task->aligned_result) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_store_ps(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplier && task->aligned_result) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_store_ps(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplicand) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_load_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_storeu_ps(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_multiplier) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_load_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_storeu_ps(&result_data[base_idx + j], v_result);
+            }
+        } else if(task->aligned_result) {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_store_ps(&result_data[base_idx + j], v_result);
+            }
+        } else {
+            for(; j + 7 < numel_multiplier; j += 8) {
+                _mm_prefetch((char*)&multiplier_data[j + 32], _MM_HINT_T0);
+                _mm_prefetch((char*)&multiplicand_data[base_idx + j + 32], _MM_HINT_T0);
+                
+                v_multiplier = _mm256_loadu_ps(&multiplier_data[j]);
+                v_multiplicand = _mm256_loadu_ps(&multiplicand_data[base_idx + j]);
+                v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
+                _mm256_storeu_ps(&result_data[base_idx + j], v_result);
+            }
+        }
+        
+        // Handle remaining elements
+        for(; j < numel_multiplier; j++) {
+            result_data[base_idx + j] = multiplicand_data[base_idx + j] * multiplier_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_pmul_broadcasting_int32(void* arg) {
+    mulbroadcasting_ptask* task = (mulbroadcasting_ptask*)arg;
+    const int32_t* multiplicand_data = (const int32_t*)task->multiplicand_data;
+    const int32_t* multiplier_data = (const int32_t*)task->multiplier_data;
+    int32_t* result_data = (int32_t*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_multiplier = task->numel_multiplier;
+    
+    // Integer multiplication uses scalar operations for precise arithmetic semantics
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_multiplier;
+        
+        for(size_t j = 0; j < numel_multiplier; j++) {
+            result_data[base_idx + j] = multiplicand_data[base_idx + j] * multiplier_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /**
  * @ingroup backend_system
  * @brief Backend implementations for multiplication with broadcasting
+ * @details
+ * Array follows the common backend registration pattern for multiplication
+ * with broadcasting operations. Currently registered backends:
+ *  - nnl2_naive: Basic reference implementation for multiplication with broadcasting
+ *  - nnl2_own: High-performance implementation with AVX256, pthread and prefetching
+ * 
+ * @see nnl2_naive
+ * @see naive_mul_broadcasting
+ * @see nnl2_own_mul_broadcasting
  */
 Implementation mul_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_mul_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
+    
+    #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
+        REGISTER_BACKEND(nnl2_own_mul_broadcasting, nnl2_own, NNL2_OWN_NAME),
+    #endif
 };  
 
 /**

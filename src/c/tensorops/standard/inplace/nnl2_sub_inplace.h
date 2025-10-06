@@ -732,6 +732,625 @@ static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const Tensor* 
 
 #endif
 
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief
+ * Threshold for enabling parallel execution of the
+ * subtraction operation during in-place calculations
+ */
+#define NNL2_SUB_INPLACE_PARALLEL_THRESHOLD 1000000
+
+/** @brief 
+ * Worker function for parallel double precision subtraction with same data types
+ * 
+ ** @param arg 
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Processes FLOAT64 data using AVX256 instructions with cache prefetching
+ * for optimal memory access patterns
+ */
+void* nnl2_own_psub_float64_same_type(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision subtraction with same data types
+ * 
+ ** @param arg 
+ * Pointer to subinplace_ptask structure containing thread parameters  
+ * 
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_float64_same_type
+ **/
+void* nnl2_own_psub_float32_same_type(void* arg);
+
+/** @brief
+ * Worker function for parallel integer subtraction with same data types
+ * 
+ ** @param arg 
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_float64_same_type
+ **/
+void* nnl2_own_psub_int32_same_type(void* arg);
+
+/** @brief
+ * Worker function for parallel double precision subtraction with type conversion
+ * 
+ ** @param arg 
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Handles type conversion from subtrahend to minuend data type with AVX256
+ * optimizations and prefetching
+ */
+void* nnl2_own_psub_float64_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision subtraction with type conversion
+ * 
+ ** @param arg 
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_float64_diff_type
+ **/
+void* nnl2_own_psub_float32_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel integer subtraction with type conversion
+ * 
+ ** @param arg
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_float64_diff_type
+ **/
+void* nnl2_own_psub_int32_diff_type(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of in-place subtraction
+ * 
+ ** @param minuend 
+ * Pointer to tensor that will be modified in-place
+ *
+ ** @param subtrahend 
+ * Pointer to tensor whose values will be subtracted from minuend
+ * 
+ ** @details
+ * Combines AVX256 vectorization, multi-threading with pthread, and cache
+ * prefetching for maximum performance on modern CPU architectures.
+ * Automatically selects optimal thread count and chunk sizes.
+ * 
+ ** @note
+ * Uses NNL2_NUM_THREADS for parallelization configuration
+ * Falls back to naive implementation for small tensors
+ */
+void nnl2_own_sub_inplace(Tensor* minuend, const Tensor* subtrahend) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend, "Minuend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(minuend->data, "Minuend tensor's data is NULL");
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend, "Subtrahend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(subtrahend->data, "Subtrahend tensor's data is NULL");
+    #endif
+    
+    // Calculating the total number of elements in the minuend tensor
+    size_t len_minuend = product(minuend->shape, minuend->rank);
+    
+    // Fallback to naive implementation for small tensors
+    if(len_minuend < NNL2_SUB_INPLACE_PARALLEL_THRESHOLD) {
+        nnl2_naive_subinplace(minuend, subtrahend);
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return;
+    }
+    
+    TensorType dtype_minuend = minuend->dtype;
+    TensorType dtype_subtrahend = subtrahend->dtype;
+    
+    bool is_aligned_minuend = NNL2_IS_ALIGNED(minuend->data, NNL2_TENSOR_ALIGNMENT_32);
+    bool is_aligned_subtrahend = NNL2_IS_ALIGNED(subtrahend->data, NNL2_TENSOR_ALIGNMENT_32);
+    
+    // Warning for unaligned memory in safety modes
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned_minuend) {
+            NNL2_WARN("In nnl2_own_2 sub in-place, minuend memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+        
+        if(!is_aligned_subtrahend && dtype_minuend == dtype_subtrahend) {
+            NNL2_WARN("In nnl2_own_2 sub in-place, subtrahend memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_threads = NNL2_NUM_THREADS;
+    pthread_t threads[num_threads];
+    subinplace_ptask tasks[num_threads];
+    
+    // Calculate optimal chunk sizes with load balancing
+    size_t chunk = len_minuend / num_threads;
+    size_t remainder = len_minuend % num_threads;
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].minuend_data = minuend->data;
+        tasks[i].subtrahend_data = subtrahend->data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].dtype_minuend = dtype_minuend;
+        tasks[i].dtype_subtrahend = dtype_subtrahend;
+        tasks[i].aligned_minuend = is_aligned_minuend;
+        tasks[i].aligned_subtrahend = is_aligned_subtrahend;
+        tasks[i].subtrahend_step = (dtype_minuend == dtype_subtrahend) ? get_dtype_size(dtype_subtrahend) : 0;
+        
+        // Select appropriate worker function based on data types
+        void* (*worker_func)(void*) = NULL;
+        
+        if(dtype_minuend == dtype_subtrahend) {
+            switch(dtype_minuend) {
+                case FLOAT64: worker_func = nnl2_own_psub_float64_same_type; break;
+                case FLOAT32: worker_func = nnl2_own_psub_float32_same_type; break;
+                case INT32:   worker_func = nnl2_own_psub_int32_same_type;   break;
+                default: {
+                    NNL2_TYPE_ERROR(dtype_minuend);
+                    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                        NNL2_FUNC_EXIT();
+                    #endif
+                    return;
+                }
+            }
+        } else {
+            tasks[i].subtrahend_step = get_dtype_size(dtype_subtrahend);
+            switch(dtype_minuend) {
+                case FLOAT64: worker_func = nnl2_own_psub_float64_diff_type; break;
+                case FLOAT32: worker_func = nnl2_own_psub_float32_diff_type; break;
+                case INT32:   worker_func = nnl2_own_psub_int32_diff_type;   break;
+                default: {
+                    NNL2_TYPE_ERROR(dtype_minuend);
+                    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                        NNL2_FUNC_EXIT();
+                    #endif
+                    return;
+                }
+            }
+        }
+        
+        // Create thread to process the assigned chunk
+        int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_2_subinplace");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_2_subinplace");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+// Worker function implementations with AVX256 and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_float64_same_type
+ **/
+void* nnl2_own_psub_float64_same_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    double* minuend = (double*)task->minuend_data;
+    double* subtrahend = (double*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching
+    if(task->aligned_minuend && task->aligned_subtrahend) {
+        for(; i + 3 < end; i += 4) {
+            // Prefetch next cache lines
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_minuend = _mm256_load_pd(&minuend[i]);
+            __m256d v_subtrahend = _mm256_load_pd(&subtrahend[i]);
+            __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+            _mm256_store_pd(&minuend[i], v_result);
+        }
+    } else if(task->aligned_minuend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_minuend = _mm256_load_pd(&minuend[i]);
+            __m256d v_subtrahend = _mm256_loadu_pd(&subtrahend[i]);
+            __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+            _mm256_store_pd(&minuend[i], v_result);
+        }
+    } else if(task->aligned_subtrahend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_minuend = _mm256_loadu_pd(&minuend[i]);
+            __m256d v_subtrahend = _mm256_load_pd(&subtrahend[i]);
+            __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+            _mm256_storeu_pd(&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_minuend = _mm256_loadu_pd(&minuend[i]);
+            __m256d v_subtrahend = _mm256_loadu_pd(&subtrahend[i]);
+            __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+            _mm256_storeu_pd(&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        minuend[i] -= subtrahend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_float32_same_type
+ **/
+void* nnl2_own_psub_float32_same_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    float* minuend = (float*)task->minuend_data;
+    float* subtrahend = (float*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned_minuend && task->aligned_subtrahend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_minuend = _mm256_load_ps(&minuend[i]);
+            __m256 v_subtrahend = _mm256_load_ps(&subtrahend[i]);
+            __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+            _mm256_store_ps(&minuend[i], v_result);
+        }
+    } else if(task->aligned_minuend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_minuend = _mm256_load_ps(&minuend[i]);
+            __m256 v_subtrahend = _mm256_loadu_ps(&subtrahend[i]);
+            __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+            _mm256_store_ps(&minuend[i], v_result);
+        }
+    } else if(task->aligned_subtrahend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_minuend = _mm256_loadu_ps(&minuend[i]);
+            __m256 v_subtrahend = _mm256_load_ps(&subtrahend[i]);
+            __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+            _mm256_storeu_ps(&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_minuend = _mm256_loadu_ps(&minuend[i]);
+            __m256 v_subtrahend = _mm256_loadu_ps(&subtrahend[i]);
+            __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+            _mm256_storeu_ps(&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        minuend[i] -= subtrahend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_int32_same_type
+ **/
+void* nnl2_own_psub_int32_same_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    int32_t* minuend = (int32_t*)task->minuend_data;
+    int32_t* subtrahend = (int32_t*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned_minuend && task->aligned_subtrahend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_load_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else if(task->aligned_minuend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else if(task->aligned_subtrahend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_load_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        minuend[i] -= subtrahend[i];
+    }
+    
+    return NULL;
+}
+
+// Different type worker functions with conversion and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_float64_diff_type
+ **/
+void* nnl2_own_psub_float64_diff_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    double* minuend = (double*)task->minuend_data;
+    char* subtrahend_data = (char*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t subtrahend_step = task->subtrahend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching
+    if(task->aligned_minuend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_minuend = _mm256_load_pd(&minuend[i]);
+            __m256d v_subtrahend = _mm256_set_pd(
+                nnl2_convert_to_float64(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float64(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float64(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float64(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+            _mm256_store_pd(&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_minuend = _mm256_loadu_pd(&minuend[i]);
+            __m256d v_subtrahend = _mm256_set_pd(
+                nnl2_convert_to_float64(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float64(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float64(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float64(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256d v_result = _mm256_sub_pd(v_minuend, v_subtrahend);
+            _mm256_storeu_pd(&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* subtrahend_elem = subtrahend_data + i * subtrahend_step;
+        minuend[i] -= nnl2_convert_to_float64(subtrahend_elem, task->dtype_subtrahend);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_float32_diff_type
+ **/
+void* nnl2_own_psub_float32_diff_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    float* minuend = (float*)task->minuend_data;
+    char* subtrahend_data = (char*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t subtrahend_step = task->subtrahend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching
+    if(task->aligned_minuend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_minuend = _mm256_load_ps(&minuend[i]);
+            __m256 v_subtrahend = _mm256_set_ps(
+                nnl2_convert_to_float32(subtrahend_data + (i + 7) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 6) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 5) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 4) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+            _mm256_store_ps(&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_minuend = _mm256_loadu_ps(&minuend[i]);
+            __m256 v_subtrahend = _mm256_set_ps(
+                nnl2_convert_to_float32(subtrahend_data + (i + 7) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 6) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 5) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 4) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_float32(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
+            _mm256_storeu_ps(&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* subtrahend_elem = subtrahend_data + i * subtrahend_step;
+        minuend[i] -= nnl2_convert_to_float32(subtrahend_elem, task->dtype_subtrahend);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_int32_diff_type
+ **/
+void* nnl2_own_psub_int32_diff_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    int32_t* minuend = (int32_t*)task->minuend_data;
+    char* subtrahend_data = (char*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t subtrahend_step = task->subtrahend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching
+    if(task->aligned_minuend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_set_epi32(
+                nnl2_convert_to_int32(subtrahend_data + (i + 7) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 6) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 5) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 4) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&minuend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_set_epi32(
+                nnl2_convert_to_int32(subtrahend_data + (i + 7) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 6) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 5) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 4) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int32(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256i v_result = _mm256_sub_epi32(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* subtrahend_elem = subtrahend_data + i * subtrahend_step;
+        minuend[i] -= nnl2_convert_to_int32(subtrahend_elem, task->dtype_subtrahend);
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /** @ingroup backend_system
  ** @brief Backend implementations for subtract in-place
  ** @details
@@ -748,6 +1367,10 @@ Implementation subinplace_backends[] = {
 	
 	#if defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
 		REGISTER_BACKEND(nnl2_avx256_subinplace, nnl2_avx256, AVX256_BACKEND_NAME),
+	#endif
+	
+	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
+		REGISTER_BACKEND(nnl2_own_sub_inplace, nnl2_own_2, NNL2_OWN_NAME),
 	#endif
 };
 

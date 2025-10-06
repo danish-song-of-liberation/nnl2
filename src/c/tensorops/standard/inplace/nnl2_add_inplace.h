@@ -737,6 +737,10 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
 	void nnl2_blas_addinplace(Tensor* summand, Tensor* addend);
 #endif
 
+#if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE)
+	void nnl2_own_add_inplace(Tensor* summand, const Tensor* addend);
+#endif
+
 /** @ingroup backend_system
  ** @brief Backend implementations for add in-place
  ** @details
@@ -758,6 +762,10 @@ Implementation addinplace_backends[] = {
 	#ifdef OPENBLAS_AVAILABLE
 		REGISTER_BACKEND(nnl2_blas_addinplace, nnl2_blas, BLAS_BACKEND_NAME),
 	#endif	
+	
+	#if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE)
+		REGISTER_BACKEND(nnl2_own_add_inplace, nnl2_own_2, NNL2_OWN_NAME),
+	#endif
 };
 
 #ifdef OPENBLAS_AVAILABLE
@@ -777,7 +785,7 @@ void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
     #endif
 	
 	if (addinplace_blas_suboptimal == NULL) {
-        addinplace_blas_suboptimal = ((Implementation*)nnl2_get_suboptimal_backend(addinplace_backends, 3, BLAS_BACKEND_NAME))->fn;
+        addinplace_blas_suboptimal = ((Implementation*)nnl2_get_suboptimal_backend(addinplace_backends, sizeof(addinplace_backends) / sizeof(addinplace_backends[0]), BLAS_BACKEND_NAME))->fn;
     }
 	
 	TensorType dtype_summand = summand->dtype;
@@ -838,6 +846,626 @@ void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
         NNL2_FUNC_EXIT();
     #endif
 }
+
+#endif
+ 
+#if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE)
+
+/** @brief
+ * Threshold for enabling parallel execution of the
+ * addition operation during in-place calculations
+ */
+#define NNL2_ADD_INPLACE_PARALLEL_THRESHOLD 1000000
+
+/** @brief
+ * Worker function for parallel double precision addition with same data types
+ * 
+ ** @param arg 
+ * Pointer to addinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Processes FLOAT64 data using AVX256 instructions with cache prefetching
+ * for optimal memory access patterns
+ */
+void* nnl2_own_padd_float64_same_type(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision addition with same data types
+ * 
+ ** @param arg 
+ * Pointer to addinplace_ptask structure containing thread parameters  
+ * 
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_padd_float64_same_type
+ **/
+void* nnl2_own_padd_float32_same_type(void* arg);
+
+/** @brief
+ * Worker function for parallel integer addition with same data types
+ * 
+ ** @param arg 
+ * Pointer to addinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_padd_float64_same_type
+ **/
+void* nnl2_own_padd_int32_same_type(void* arg);
+
+/** @brief
+ * Worker function for parallel double precision addition with type conversion
+ * 
+ ** @param arg 
+ * Pointer to addinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Handles type conversion from addend to summand data type with AVX256
+ * optimizations and prefetching
+ */
+void* nnl2_own_padd_float64_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision addition with type conversion
+ * 
+ ** @param arg 
+ * Pointer to addinplace_ptask structure containing thread parameters
+ *
+ ** @return
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_padd_float64_diff_type
+ **/
+void* nnl2_own_padd_float32_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel integer addition with type conversion
+ * 
+ ** @param arg
+ * Pointer to addinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_padd_float64_diff_type
+ **/
+void* nnl2_own_padd_int32_diff_type(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of in-place addition
+ * 
+ ** @param summand 
+ * Pointer to tensor that will be modified in-place
+ *
+ ** @param addend 
+ * Pointer to tensor whose values will be added to summand
+ * 
+ ** @details
+ * Combines AVX256 vectorization, multi-threading with pthread, and cache
+ * prefetching for maximum performance on modern CPU architectures.
+ * Automatically selects optimal thread count and chunk sizes
+ * 
+ ** @note
+ * Uses NNL2_NUM_THREADS for parallelization configuration
+ * Falls back to naive implementation for small tensors
+ */
+void nnl2_own_add_inplace(Tensor* summand, const Tensor* addend) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand, "Summand tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(summand->data, "Summand tensor's data is NULL");
+        
+        NNL2_CHECK_NULL_IF_ERR_RETURN(addend, "Addend tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(addend->data, "Addend tensor's data is NULL");
+    #endif
+    
+    // Calculating the total number of elements in the summand tensor
+    size_t len_summand = product(summand->shape, summand->rank);
+    
+    // Fallback to naive implementation for small tensors
+    if(len_summand < NNL2_ADD_INPLACE_PARALLEL_THRESHOLD) {
+        nnl2_naive_addinplace(summand, addend);
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return;
+    }
+    
+    TensorType dtype_summand = summand->dtype;
+    TensorType dtype_addend = addend->dtype;
+    
+    bool is_aligned_summand = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32);
+    bool is_aligned_addend = NNL2_IS_ALIGNED(addend->data, NNL2_TENSOR_ALIGNMENT_32);
+    
+    // Warning for unaligned memory in safety modes
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned_summand) {
+            NNL2_WARN("In nnl2_own_2 add in-place, summand memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+        
+        if(!is_aligned_addend && dtype_summand == dtype_addend) {
+            NNL2_WARN("In nnl2_own_2 add in-place, addend memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_threads = NNL2_NUM_THREADS;
+    pthread_t threads[num_threads];
+    addinplace_ptask tasks[num_threads];
+    
+    // Calculate optimal chunk sizes with load balancing
+    size_t chunk = len_summand / num_threads;
+    size_t remainder = len_summand % num_threads;
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].summand_data = summand->data;
+        tasks[i].addend_data = addend->data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].dtype_summand = dtype_summand;
+        tasks[i].dtype_addend = dtype_addend;
+        tasks[i].aligned_summand = is_aligned_summand;
+        tasks[i].aligned_addend = is_aligned_addend;
+        tasks[i].addend_step = (dtype_summand == dtype_addend) ? get_dtype_size(dtype_addend) : 0;
+        
+        // Select appropriate worker function based on data types
+        void* (*worker_func)(void*) = NULL;
+        
+        if(dtype_summand == dtype_addend) {
+            switch(dtype_summand) {
+                case FLOAT64: worker_func = nnl2_own_padd_float64_same_type; break;
+                case FLOAT32: worker_func = nnl2_own_padd_float32_same_type; break;
+                case INT32:   worker_func = nnl2_own_padd_int32_same_type;   break;
+                default: {
+                    NNL2_TYPE_ERROR(dtype_summand);
+                    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                        NNL2_FUNC_EXIT();
+                    #endif
+                    return;
+                }
+            }
+        } else {
+            tasks[i].addend_step = get_dtype_size(dtype_addend);
+            switch(dtype_summand) {
+                case FLOAT64: worker_func = nnl2_own_padd_float64_diff_type; break;
+                case FLOAT32: worker_func = nnl2_own_padd_float32_diff_type; break;
+                case INT32:   worker_func = nnl2_own_padd_int32_diff_type;   break;
+                default: {
+                    NNL2_TYPE_ERROR(dtype_summand);
+                    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                        NNL2_FUNC_EXIT();
+                    #endif
+                    return;
+                }
+            }
+        }
+        
+        // Create thread to process the assigned chunk
+        int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_2_addinplace");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_2_addinplace");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+// Worker function implementations with AVX256 and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ * @see nnl2_own_padd_float64_same_type
+ */
+void* nnl2_own_padd_float64_same_type(void* arg) {
+    addinplace_ptask* task = (addinplace_ptask*)arg;
+    double* summand = (double*)task->summand_data;
+    double* addend = (double*)task->addend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching
+    if(task->aligned_summand && task->aligned_addend) {
+        for(; i + 3 < end; i += 4) {
+            // Prefetch next cache lines
+            _mm_prefetch((char*)&summand[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_load_pd(&summand[i]);
+            __m256d v_addend = _mm256_load_pd(&addend[i]);
+            __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+            _mm256_store_pd(&summand[i], v_result);
+        }
+    } else if(task->aligned_summand) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_load_pd(&summand[i]);
+            __m256d v_addend = _mm256_loadu_pd(&addend[i]);
+            __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+            _mm256_store_pd(&summand[i], v_result);
+        }
+    } else if(task->aligned_addend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_loadu_pd(&summand[i]);
+            __m256d v_addend = _mm256_load_pd(&addend[i]);
+            __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+            _mm256_storeu_pd(&summand[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_loadu_pd(&summand[i]);
+            __m256d v_addend = _mm256_loadu_pd(&addend[i]);
+            __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+            _mm256_storeu_pd(&summand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        summand[i] += addend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ * @see nnl2_own_padd_float32_same_type
+ */
+void* nnl2_own_padd_float32_same_type(void* arg) {
+    addinplace_ptask* task = (addinplace_ptask*)arg;
+    float* summand = (float*)task->summand_data;
+    float* addend = (float*)task->addend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned_summand && task->aligned_addend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_load_ps(&summand[i]);
+            __m256 v_addend = _mm256_load_ps(&addend[i]);
+            __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+            _mm256_store_ps(&summand[i], v_result);
+        }
+    } else if(task->aligned_summand) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_load_ps(&summand[i]);
+            __m256 v_addend = _mm256_loadu_ps(&addend[i]);
+            __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+            _mm256_store_ps(&summand[i], v_result);
+        }
+    } else if(task->aligned_addend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_loadu_ps(&summand[i]);
+            __m256 v_addend = _mm256_load_ps(&addend[i]);
+            __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+            _mm256_storeu_ps(&summand[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_loadu_ps(&summand[i]);
+            __m256 v_addend = _mm256_loadu_ps(&addend[i]);
+            __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+            _mm256_storeu_ps(&summand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        summand[i] += addend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ * @see nnl2_own_padd_int32_same_type
+ */
+void* nnl2_own_padd_int32_same_type(void* arg) {
+    addinplace_ptask* task = (addinplace_ptask*)arg;
+    int32_t* summand = (int32_t*)task->summand_data;
+    int32_t* addend = (int32_t*)task->addend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned_summand && task->aligned_addend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_load_si256((__m256i*)&summand[i]);
+            __m256i v_addend = _mm256_load_si256((__m256i*)&addend[i]);
+            __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+            _mm256_store_si256((__m256i*)&summand[i], v_result);
+        }
+    } else if(task->aligned_summand) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_load_si256((__m256i*)&summand[i]);
+            __m256i v_addend = _mm256_loadu_si256((__m256i*)&addend[i]);
+            __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+            _mm256_store_si256((__m256i*)&summand[i], v_result);
+        }
+    } else if(task->aligned_addend) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_loadu_si256((__m256i*)&summand[i]);
+            __m256i v_addend = _mm256_load_si256((__m256i*)&addend[i]);
+            __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+            _mm256_storeu_si256((__m256i*)&summand[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&addend[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_loadu_si256((__m256i*)&summand[i]);
+            __m256i v_addend = _mm256_loadu_si256((__m256i*)&addend[i]);
+            __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+            _mm256_storeu_si256((__m256i*)&summand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        summand[i] += addend[i];
+    }
+    
+    return NULL;
+}
+
+// Different type worker functions with conversion and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ * @see nnl2_own_padd_float64_diff_type
+ */
+void* nnl2_own_padd_float64_diff_type(void* arg) {
+    addinplace_ptask* task = (addinplace_ptask*)arg;
+    double* summand = (double*)task->summand_data;
+    char* addend_data = (char*)task->addend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t addend_step = task->addend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching
+    if(task->aligned_summand) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_load_pd(&summand[i]);
+            __m256d v_addend = _mm256_set_pd(
+                nnl2_convert_to_float64(addend_data + (i + 3) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float64(addend_data + (i + 2) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float64(addend_data + (i + 1) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float64(addend_data + (i + 0) * addend_step, task->dtype_addend)
+            );
+            
+            __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+            _mm256_store_pd(&summand[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_loadu_pd(&summand[i]);
+            __m256d v_addend = _mm256_set_pd(
+                nnl2_convert_to_float64(addend_data + (i + 3) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float64(addend_data + (i + 2) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float64(addend_data + (i + 1) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float64(addend_data + (i + 0) * addend_step, task->dtype_addend)
+            );
+            
+            __m256d v_result = _mm256_add_pd(v_summand, v_addend);
+            _mm256_storeu_pd(&summand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* addend_elem = addend_data + i * addend_step;
+        summand[i] += nnl2_convert_to_float64(addend_elem, task->dtype_addend);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ * @see nnl2_own_padd_float32_diff_type
+ */
+void* nnl2_own_padd_float32_diff_type(void* arg) {
+    addinplace_ptask* task = (addinplace_ptask*)arg;
+    float* summand = (float*)task->summand_data;
+    char* addend_data = (char*)task->addend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t addend_step = task->addend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching
+    if(task->aligned_summand) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_load_ps(&summand[i]);
+            __m256 v_addend = _mm256_set_ps(
+                nnl2_convert_to_float32(addend_data + (i + 7) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 6) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 5) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 4) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 3) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 2) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 1) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 0) * addend_step, task->dtype_addend)
+            );
+            
+            __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+            _mm256_store_ps(&summand[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_loadu_ps(&summand[i]);
+            __m256 v_addend = _mm256_set_ps(
+                nnl2_convert_to_float32(addend_data + (i + 7) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 6) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 5) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 4) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 3) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 2) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 1) * addend_step, task->dtype_addend),
+                nnl2_convert_to_float32(addend_data + (i + 0) * addend_step, task->dtype_addend)
+            );
+            
+            __m256 v_result = _mm256_add_ps(v_summand, v_addend);
+            _mm256_storeu_ps(&summand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* addend_elem = addend_data + i * addend_step;
+        summand[i] += nnl2_convert_to_float32(addend_elem, task->dtype_addend);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ * @see nnl2_own_padd_int32_diff_type
+ */
+void* nnl2_own_padd_int32_diff_type(void* arg) {
+    addinplace_ptask* task = (addinplace_ptask*)arg;
+    int32_t* summand = (int32_t*)task->summand_data;
+    char* addend_data = (char*)task->addend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t addend_step = task->addend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching
+    if(task->aligned_summand) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_load_si256((__m256i*)&summand[i]);
+            __m256i v_addend = _mm256_set_epi32(
+                nnl2_convert_to_int32(addend_data + (i + 7) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 6) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 5) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 4) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 3) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 2) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 1) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 0) * addend_step, task->dtype_addend)
+            );
+            
+            __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+            _mm256_store_si256((__m256i*)&summand[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_loadu_si256((__m256i*)&summand[i]);
+            __m256i v_addend = _mm256_set_epi32(
+                nnl2_convert_to_int32(addend_data + (i + 7) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 6) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 5) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 4) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 3) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 2) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 1) * addend_step, task->dtype_addend),
+                nnl2_convert_to_int32(addend_data + (i + 0) * addend_step, task->dtype_addend)
+            );
+            
+            __m256i v_result = _mm256_add_epi32(v_summand, v_addend);
+            _mm256_storeu_si256((__m256i*)&summand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* addend_elem = addend_data + i * addend_step;
+        summand[i] += nnl2_convert_to_int32(addend_elem, task->dtype_addend);
+    }
+    
+    return NULL;
+}
+
 #endif
 
 /**

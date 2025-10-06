@@ -256,7 +256,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub));            
 	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	       
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));     
-	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));            
+	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));             
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log));   
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
@@ -266,7 +266,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  	
 }
 
-void nnl2_init_standard_inplace() {
+void nnl2_init_standard_inplace() {          
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
 	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);   
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
@@ -283,7 +283,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
 }	 
-
+                          
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
 	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
@@ -330,12 +330,12 @@ void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);  
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);      
-	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);
+	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);  
 }
 
 void nnl2_init_correspondence() {
 	INIT_BACKEND(add_incf, add_incf_backends);    
-	INIT_BACKEND(sub_decf, sub_decf_backends);   
+	INIT_BACKEND(sub_decf, sub_decf_backends);     
 	INIT_BACKEND(mul_mulf, mul_mulf_backends);          
 	INIT_BACKEND(div_divf, div_divf_backends);  
 	INIT_BACKEND(pow_powf, pow_powf_backends);          
