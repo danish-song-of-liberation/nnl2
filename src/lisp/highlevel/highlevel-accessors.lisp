@@ -460,7 +460,7 @@
                       (setf (cffi:mem-aref data-pntr :double i)
                             (the double-float (coerce (aref flatten-data i) 'double-float)))))
 							 
-                  (t
+                  (t	
                     (nnl2.threading:pdotimes (i total-elems)
                       (setf (cffi:mem-aref data-pntr cffi-type i)
                             (coerce (aref flatten-data i) lisp-type)))))))))

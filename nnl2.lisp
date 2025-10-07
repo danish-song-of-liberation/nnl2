@@ -72,7 +72,14 @@
 										   (:module "lowlevel"
 											:serial t
 											:components ((:file "lowlevel-package" :type "lisp")
-														 (:file "lowlevel-accessors" :type "lisp")))))))
+														 (:file "lowlevel-accessors" :type "lisp")))
+														 
+										   (:module "convert"
+										    :serial t
+											:components ((:file "convert-package" :type "lisp")
+														 (:file "convert-nnl2-array" :type "lisp")
+														 (:file "convert-nnl2-list" :type "lisp")
+														 (:file "convert-nnl2-magicl" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t
