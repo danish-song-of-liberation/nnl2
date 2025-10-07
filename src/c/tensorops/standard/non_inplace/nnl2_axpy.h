@@ -175,12 +175,397 @@ Tensor* naive_axpy(Tensor* summand, Tensor* sumend, float alpha) {
     
     return result;
 }
+
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief
+ * Threshold for enabling parallel execution of AXPY operation
+ */
+#define NNL2_AXPY_PARALLEL_THRESHOLD 1000000
+
+/** @brief
+ * Worker function for parallel double precision AXPY operation
+ * 
+ ** @param arg 
+ * Pointer to axpy_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @details
+ * Processes FLOAT64 data using AVX256 instructions with cache prefetching
+ * for optimal memory access patterns in AXPY operation
+ */
+void* nnl2_own_paxpy_float64(void* arg);
+
+/** @brief
+ * Worker function for parallel single precision AXPY operation
+ * 
+ ** @param arg 
+ * Pointer to axpy_ptask structure containing thread parameters  
+ * 
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_paxpy_float64
+ **/
+void* nnl2_own_paxpy_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel integer AXPY operation
+ * 
+ ** @param arg 
+ * Pointer to axpy_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_paxpy_float64
+ **/
+void* nnl2_own_paxpy_int32(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of AXPY operation
+ * 
+ ** @param summand 
+ * Pointer to the summand tensor
+ *
+ ** @param sumend 
+ * Pointer to the sumend tensor
+ *
+ ** @param alpha
+ * Scalar multiplier for the sumend tensor values
+ * 
+ ** @return
+ * Pointer to new tensor containing AXPY operation result
+ *
+ ** @details
+ * Combines AVX256 vectorization, multi-threading with pthread, and cache
+ * prefetching for maximum performance on modern CPU architectures.
+ * Automatically selects optimal thread count and chunk sizes.
+ * 
+ ** @note
+ * Uses NNL2_NUM_THREADS for parallelization configuration
+ * Falls back to naive implementation for small tensors or mixed types
+ * 
+ ** @warning
+ * Requires pthread support and AVX256 capable CPU
+ * Creates a new tensor for the result
+ */
+Tensor* nnl2_own_axpy(const Tensor* summand, const Tensor* sumend, float alpha) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Additional checks at the maximum safety level
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand, "Summand tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(summand->data, "Summand tensor data is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->data, "Sumend tensor data is NULL", NULL);
+    #endif
+    
+    size_t total_elems = product(summand->shape, summand->rank);
+    
+    TensorType dtype_summand = summand->dtype;
+    TensorType dtype_sumend = sumend->dtype;
+    TensorType result_dtype = MAX(dtype_summand, dtype_sumend);
+    
+    // Create output tensor
+    Tensor* result = nnl2_empty(summand->shape, summand->rank, result_dtype);
+    if (result == NULL) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return NULL;
+    }
+    
+    if(total_elems == 0) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
+    
+    // Fallback to naive implementation for small tensors or mixed types
+    if(total_elems < NNL2_AXPY_PARALLEL_THRESHOLD || dtype_summand != dtype_sumend) {
+        Tensor* naive_result = naive_axpy((Tensor*)summand, (Tensor*)sumend, alpha);
+        if (naive_result != NULL) {
+            // Copy data from naive result to our result tensor
+            memcpy(result->data, naive_result->data, total_elems * get_dtype_size(result_dtype));
+            nnl2_free_tensor(naive_result);
+        }
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        return result;
+    }
+    
+    bool is_aligned = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32) &&
+                      NNL2_IS_ALIGNED(sumend->data, NNL2_TENSOR_ALIGNMENT_32) &&
+                      NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
+    
+    // Warning for unaligned memory in safety modes
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned) {
+            NNL2_WARN("In nnl2_own_axpy, tensor memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_threads = NNL2_NUM_THREADS;
+    pthread_t threads[num_threads];
+    axpy_ptask tasks[num_threads];
+    
+    // Calculate optimal chunk sizes with load balancing
+    size_t chunk = total_elems / num_threads;
+    size_t remainder = total_elems % num_threads;
+    
+    // Configure alpha value based on data type
+    for (size_t i = 0; i < num_threads; i++) {
+        tasks[i].summand = summand;
+        tasks[i].sumend = sumend;
+        tasks[i].result = result;
+        tasks[i].dtype_summand = dtype_summand;
+        tasks[i].dtype_sumend = dtype_sumend;
+        tasks[i].result_dtype = result_dtype;
+        tasks[i].aligned = is_aligned;
+        
+        switch(dtype_summand) {
+            case FLOAT64: tasks[i].alpha.float64_alpha = (double)alpha; break;
+            case FLOAT32: tasks[i].alpha.float32_alpha = alpha; break;
+            case INT32:   tasks[i].alpha.int32_alpha = (int32_t)alpha; break;
+            default: {
+                NNL2_TYPE_ERROR(dtype_summand);
+                nnl2_free_tensor(result);
+                #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                    NNL2_FUNC_EXIT();
+                #endif
+                return NULL;
+            }
+        }
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        
+        // Select appropriate worker function based on data type
+        void* (*worker_func)(void*) = NULL;
+        switch(dtype_summand) {
+            case FLOAT64: worker_func = nnl2_own_paxpy_float64; break;
+            case FLOAT32: worker_func = nnl2_own_paxpy_float32; break;
+            case INT32:   worker_func = nnl2_own_paxpy_int32;   break;
+            default: {
+                NNL2_TYPE_ERROR(dtype_summand);
+                nnl2_free_tensor(result);
+                #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                    NNL2_FUNC_EXIT();
+                #endif
+                return NULL;
+            }
+        }
+        
+        // Create thread to process the assigned chunk
+        int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_axpy");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_axpy");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
+// Worker function implementations with AVX256 and prefetching
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_paxpy_float64
+ **/
+void* nnl2_own_paxpy_float64(void* arg) {
+    axpy_ptask* task = (axpy_ptask*)arg;
+    const double* summand_data = (const double*)task->summand->data;
+    const double* sumend_data = (const double*)task->sumend->data;
+    double* result_data = (double*)task->result->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    double alpha = task->alpha.float64_alpha;
+    
+    // Create AVX256 vector with alpha value repeated
+    __m256d v_alpha = _mm256_set1_pd(alpha);
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            // Prefetch next cache lines
+            _mm_prefetch((char*)&summand_data[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_load_pd(&summand_data[i]);
+            __m256d v_sumend = _mm256_load_pd(&sumend_data[i]);
+            __m256d v_scaled_sumend = _mm256_mul_pd(v_sumend, v_alpha);
+            __m256d v_result = _mm256_add_pd(v_summand, v_scaled_sumend);
+            _mm256_store_pd(&result_data[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand_data[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 16], _MM_HINT_T0);
+            
+            __m256d v_summand = _mm256_loadu_pd(&summand_data[i]);
+            __m256d v_sumend = _mm256_loadu_pd(&sumend_data[i]);
+            __m256d v_scaled_sumend = _mm256_mul_pd(v_sumend, v_alpha);
+            __m256d v_result = _mm256_add_pd(v_summand, v_scaled_sumend);
+            _mm256_storeu_pd(&result_data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        result_data[i] = summand_data[i] + (sumend_data[i] * alpha);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_paxpy_float32
+ **/
+void* nnl2_own_paxpy_float32(void* arg) {
+    axpy_ptask* task = (axpy_ptask*)arg;
+    const float* summand_data = (const float*)task->summand->data;
+    const float* sumend_data = (const float*)task->sumend->data;
+    float* result_data = (float*)task->result->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    float alpha = task->alpha.float32_alpha;
+    
+    // Create AVX256 vector with alpha value repeated
+    __m256 v_alpha = _mm256_set1_ps(alpha);
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand_data[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_load_ps(&summand_data[i]);
+            __m256 v_sumend = _mm256_load_ps(&sumend_data[i]);
+            __m256 v_scaled_sumend = _mm256_mul_ps(v_sumend, v_alpha);
+            __m256 v_result = _mm256_add_ps(v_summand, v_scaled_sumend);
+            _mm256_store_ps(&result_data[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand_data[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 32], _MM_HINT_T0);
+            
+            __m256 v_summand = _mm256_loadu_ps(&summand_data[i]);
+            __m256 v_sumend = _mm256_loadu_ps(&sumend_data[i]);
+            __m256 v_scaled_sumend = _mm256_mul_ps(v_sumend, v_alpha);
+            __m256 v_result = _mm256_add_ps(v_summand, v_scaled_sumend);
+            _mm256_storeu_ps(&result_data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        result_data[i] = summand_data[i] + (sumend_data[i] * alpha);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_paxpy_int32
+ **/
+void* nnl2_own_paxpy_int32(void* arg) {
+    axpy_ptask* task = (axpy_ptask*)arg;
+    const int32_t* summand_data = (const int32_t*)task->summand->data;
+    const int32_t* sumend_data = (const int32_t*)task->sumend->data;
+    int32_t* result_data = (int32_t*)task->result->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int32_t alpha = task->alpha.int32_alpha;
+    
+    // Create AVX256 vector with alpha value repeated
+    __m256i v_alpha = _mm256_set1_epi32(alpha);
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (8 elements per iteration)
+    if(task->aligned) {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand_data[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_load_si256((__m256i*)&summand_data[i]);
+            __m256i v_sumend = _mm256_load_si256((__m256i*)&sumend_data[i]);
+            __m256i v_scaled_sumend = _mm256_mullo_epi32(v_sumend, v_alpha);
+            __m256i v_result = _mm256_add_epi32(v_summand, v_scaled_sumend);
+            _mm256_store_si256((__m256i*)&result_data[i], v_result);
+        }
+    } else {
+        for(; i + 7 < end; i += 8) {
+            _mm_prefetch((char*)&summand_data[i + 32], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 32], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_loadu_si256((__m256i*)&summand_data[i]);
+            __m256i v_sumend = _mm256_loadu_si256((__m256i*)&sumend_data[i]);
+            __m256i v_scaled_sumend = _mm256_mullo_epi32(v_sumend, v_alpha);
+            __m256i v_result = _mm256_add_epi32(v_summand, v_scaled_sumend);
+            _mm256_storeu_si256((__m256i*)&result_data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        result_data[i] = summand_data[i] + (sumend_data[i] * alpha);
+    }
+    
+    return NULL;
+}
+
+#endif
+
 /**
  * @ingroup backend_system
  * @brief Backend implementations for AXPY operation
  */
 Implementation axpy_backends[] = {
     REGISTER_BACKEND(naive_axpy, nnl2_naive, NAIVE_BACKEND_NAME),
+    
+    #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
+        REGISTER_BACKEND(nnl2_own_axpy, nnl2_own, NNL2_OWN_NAME),
+    #endif
 };  
 
 /**

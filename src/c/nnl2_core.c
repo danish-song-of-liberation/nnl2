@@ -355,7 +355,7 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 }
-
+      
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
 	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);
@@ -367,7 +367,7 @@ void nnl2_init_broadcasting() {
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
 }
 
-void nnl2_init_reshaping() {  
+void nnl2_init_reshaping() {      
 	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));  
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
 }

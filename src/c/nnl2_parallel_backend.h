@@ -732,6 +732,152 @@ typedef struct {
 
 
 
+///@{ [axpy_inplace_ptask]
+
+typedef struct {
+    Tensor* summand;            ///< Pointer to summand tensor (modified in-place)
+    const Tensor* sumend;       ///< Pointer to sumend tensor 
+    size_t start;               ///< Start index for this thread's chunk
+    size_t end;                 ///< End index for this thread's chunk
+    TensorType dtype_summand;   ///< Data type of summand tensor 
+    TensorType dtype_sumend;    ///< Data type of sumend tensor 
+    bool aligned;               ///< Whether memory is properly aligned 
+    union {
+        double float64_alpha;   ///< Alpha value for FLOAT64
+        float float32_alpha;    ///< Alpha value for FLOAT32
+        int32_t int32_alpha;    ///< Alpha value for INT32
+    } alpha;
+} axpy_inplace_ptask;
+
+///@} [axpy_inplace_ptask]
+
+
+
+///@{ [axpy_ptask]
+
+typedef struct {
+    const Tensor* summand;          ///< Pointer to summand tensor
+    const Tensor* sumend;           ///< Pointer to sumend tensor 
+    Tensor* result;                 ///< Pointer to output tensor
+    size_t start;                   ///< Start index for this thread's chunk
+    size_t end;                     ///< End index for this thread's chunk
+    TensorType dtype_summand;       ///< Data type of summand tensor 
+    TensorType dtype_sumend;        ///< Data type of sumend tensor 
+    TensorType result_dtype;        ///< Data type of result tensor
+    bool aligned;                   ///< Whether memory is properly aligned 
+    union {
+        double float64_alpha;       ///< Alpha value for FLOAT64
+        float float32_alpha;        ///< Alpha value for FLOAT32
+        int32_t int32_alpha;        ///< Alpha value for INT32
+    } alpha;
+} axpy_ptask;
+
+///@} [axpy_ptask]
+
+
+
+///@{ [axpf_ptask]
+
+typedef struct {
+    const Tensor* summand;          ///< Pointer to summand tensor
+    Tensor* result;                 ///< Pointer to output tensor
+    size_t start;                   ///< Start index for this thread's chunk
+    size_t end;                     ///< End index for this thread's chunk
+    TensorType dtype;               ///< Data type of tensor
+    bool aligned;                   ///< Whether memory is properly aligned 
+    union {
+        double float64_sumend;      ///< Sumend value for FLOAT64
+        float float32_sumend;       ///< Sumend value for FLOAT32
+        int32_t int32_sumend;       ///< Sumend value for INT32
+    } sumend;
+    union {
+        double float64_alpha;       ///< Alpha value for FLOAT64
+        float float32_alpha;        ///< Alpha value for FLOAT32
+        int32_t int32_alpha;        ///< Alpha value for INT32
+    } alpha;
+} axpf_ptask;
+
+///@} [axpf_ptask]
+
+
+
+///@{ [axpy_broadcasting_inplace_ptask]
+
+typedef struct {
+    Tensor* summand;                ///< Pointer to summand tensor (modified in-place)
+    const Tensor* sumend;           ///< Pointer to sumend tensor 
+    size_t start_block;             ///< Start block index for this thread's chunk
+    size_t end_block;               ///< End block index for this thread's chunk
+    size_t block_size;              ///< Size of each broadcast block (numel_sumend)
+    TensorType summand_dtype;       ///< Data type of summand tensor 
+    TensorType sumend_dtype;        ///< Data type of sumend tensor 
+    bool aligned;                   ///< Whether memory is properly aligned 
+    union {
+        double float64_alpha;       ///< Alpha value for FLOAT64
+        float float32_alpha;        ///< Alpha value for FLOAT32
+        int32_t int32_alpha;        ///< Alpha value for INT32
+    } alpha;
+} axpy_broadcasting_inplace_ptask;
+
+///@} [axpy_broadcasting_inplace_ptask]
+
+
+
+///@{ [axpy_broadcasting_ptask]
+
+/** @brief
+ * Parallel task structure for AXPY broadcasting operation
+ */
+typedef struct {
+    Tensor* summand;                ///< Pointer to summand tensor 
+    Tensor* sumend;                 ///< Pointer to sumend tensor 
+    Tensor* result;                 ///< Pointer to result tensor 
+    size_t start_block;             ///< Start block index for this thread's chunk
+    size_t end_block;               ///< End block index for this thread's chunk
+    size_t block_size;              ///< Size of each broadcast block (numel_sumend)
+    TensorType summand_dtype;       ///< Data type of summand tensor 
+    TensorType sumend_dtype;        ///< Data type of sumend tensor 
+    TensorType result_dtype;        ///< Data type of result tensor 
+    bool aligned;                   ///< Whether memory is properly aligned 
+    union {
+        double float64_alpha;       ///< Alpha value for FLOAT64
+        float float32_alpha;        ///< Alpha value for FLOAT32
+        int32_t int32_alpha;        ///< Alpha value for INT32
+    } alpha;
+} axpy_broadcasting_ptask;
+
+///@} [axpy_broadcasting_ptask]
+
+
+
+///@{ [axpf_inplace_ptask]
+
+/** @brief
+ * Parallel task structure for AXPF in-place operation
+ */
+typedef struct {
+    Tensor* summand;                ///< Pointer to summand tensor (modified in-place)
+    void* sumend;                   ///< Pointer to scalar sumend value
+    size_t start_index;             ///< Start index for this thread's chunk
+    size_t end_index;               ///< End index for this thread's chunk
+    TensorType summand_dtype;       ///< Data type of summand tensor
+    bool aligned;                   ///< Whether memory is properly aligned
+    union {
+        double float64_alpha;       ///< Alpha value for FLOAT64
+        float float32_alpha;        ///< Alpha value for FLOAT32
+        int32_t int32_alpha;        ///< Alpha value for INT32
+    } alpha;
+    union {
+        double float64_sumend;      ///< Sumend value for FLOAT64
+        float float32_sumend;       ///< Sumend value for FLOAT32
+        int32_t int32_sumend;       ///< Sumend value for INT32
+    } sumend_val;
+} axpf_inplace_ptask;
+
+
+
+///@} [axpf_inplace_ptask]
+
 ///@{ [macro]
 
 /** @def

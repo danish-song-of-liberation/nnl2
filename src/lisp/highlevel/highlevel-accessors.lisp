@@ -1491,7 +1491,14 @@
     (with-tensor-dispatch (a b)
 	  (+ a (* b alpha))
 	  (axpy/axpf a b alpha)
-	  (nnl2.ffi:%axpy a b alpha)
+	  
+	  (cond
+	    ((= alpha 1.0) (nnl2.ffi:%+ a b))
+		((= alpha -1.0) (nnl2.ffi:%- a b))
+		((= alpha 0.0) a)
+		(t
+		  (nnl2.ffi:%axpy a b alpha)))
+	  
 	  (axpy/broadcasting higher lower alpha))))
 			
 (defun axpy! (a b &key (alpha 1.0) &aux (alpha (coerce alpha 'single-float)))
@@ -1504,7 +1511,14 @@
     (with-tensor-dispatch (a b)
       (setq a (+ a (* b alpha)))
       (axpy/axpf! a b alpha)
-      (nnl2.ffi:%axpy! a b alpha)
+	  
+      (cond 
+	    ((= alpha 1.0)  (nnl2.ffi:%+= a b) a)
+		((= alpha -1.0) (nnl2.ffi:%-= a b) a)
+		((= alpha 0.0) a)
+		(t  
+		  (nnl2.ffi:%axpy! a b alpha) a))
+		  
       (axpy/broadcasting! higher lower alpha))))	
 
 (defun .+/internal (a b)

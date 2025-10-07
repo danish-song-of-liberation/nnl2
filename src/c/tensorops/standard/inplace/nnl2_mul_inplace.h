@@ -814,7 +814,7 @@ make_current_backend(mulinplace);
  * @see SET_BACKEND_BY_NAME
  * @see ESET_BACKEND_BY_NAME
  */
-void set_mulinplace_backend(const char* backend_name) {
+void set_mul_inplace_backend(const char* backend_name) {
     ESET_BACKEND_BY_NAME(mulinplace_backends, mulinplace, backend_name, CURRENT_BACKEND(mulinplace));
 }
 
