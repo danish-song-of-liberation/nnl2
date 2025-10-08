@@ -14,13 +14,20 @@
   "Converts nnl2 tensor to MAGICL tensor
    
    Args:
-      nnl2-tensor: Input nnl2 tensor
+      nnl2-tensor: Input nnl2 tensor	  
 	  
    Example:
-	  todo
-		
-  "
+	  (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:zeros #(5 5))))
+	    (let ((b (nnl2.convert:nnl2->magicl a)))
+		  ...
+		  ))"
   
-  (if (cl:find-package :magicl)
-    nil ;; todo
-    (error "MAGICL was not found. Did you happen to forget ```(ql:quickload :magicl)``` ?")))
+  (let ((magicl-package (find-package :magicl)))
+    (if magicl-package
+      (let ((dims (nnl2.hli.ts:shape nnl2-tensor :as :list))
+			(list-to-magicl-from-list-tensor (nnl2->list nnl2-tensor :flatten t)))
+			
+        (funcall (find-symbol "FROM-LIST" magicl-package) list-to-magicl-from-list-tensor dims))
+		
+      (if (nnl2.convert:auto-install-magicl-choice)
+	    (nnl2->magicl nnl2-tensor)))))

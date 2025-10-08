@@ -79,7 +79,8 @@
 											:components ((:file "convert-package" :type "lisp")
 														 (:file "convert-nnl2-array" :type "lisp")
 														 (:file "convert-nnl2-list" :type "lisp")
-														 (:file "convert-nnl2-magicl" :type "lisp")))))))
+														 (:file "convert-nnl2-magicl" :type "lisp")
+														 (:file "convert-magicl-nnl2" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t
