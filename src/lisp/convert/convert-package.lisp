@@ -15,7 +15,10 @@
     #:nnl2->magicl
 	#:nnl2->array
 	#:nnl2->list
-	#:magicl->nnl2))
+	#:magicl->nnl2
+	#:magicl->array
+	#:magicl->list
+	#:array->list))
   
 (in-package :nnl2.convert)  
 
@@ -23,7 +26,8 @@
   "Default choice in function ```auto-install-magicl```")
   
 (defun auto-install-magicl ()
-  (ql:quickload :magicl))  
+  (let ((quickload (find-symbol "QUICKLOAD" (find-package :ql))))
+    (when quickload (funcall quickload :magicl)))) 
   
 (defun check-status (awanser)
   (or (char= awanser #\Y) (char= awanser #\y)
@@ -37,10 +41,23 @@
     (if *nnl2-default-magicl-install-status* "yes" "no"))
 	
   (let ((awanser #\?))
-    (loop while (not (check-status)) 
+    (loop while (not (check-status awanser)) 
 		  do (setq awanser (read-char)))
 		  
 	(cond
 	  ((y-pressed awanser) (auto-install-magicl) t)
 	  ((n-pressed awanser) nil))))
-  
+	  
+(defun array->list (array)
+  "Convert multidimensional array to nested list structure"
+  (labels ((build-list (current-dims)
+             (if (null current-dims)
+               (error "Invalid dimensions")
+               (let ((dim (first current-dims))
+                     (rest-dims (rest current-dims)))
+                 (if (null rest-dims)
+                   (loop for i from 0 below dim collect (row-major-aref array i))
+                   (loop for i from 0 below dim collect (build-list rest-dims)))))))
+					   
+    (build-list (array-dimensions array))))	  
+			
