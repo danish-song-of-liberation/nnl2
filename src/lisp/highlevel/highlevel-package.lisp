@@ -197,6 +197,7 @@
    #:use-backend/transpose!
    #:use-backend/reshape
    #:use-backend/reinterpret
+   #:use-backend/slice
    #:get-backend/view
    #:get-backend/tref
    #:get-backend/empty
@@ -254,6 +255,7 @@
    #:get-backend/axpy
    #:get-backend/reshape
    #:get-backend/reinterpret
+   #:get-backend/slice
    #:get-backends/tref
    #:get-backends/view
    #:get-backends/empty
@@ -311,6 +313,7 @@
    #:get-backends/axpy
    #:get-backends/reshape
    #:get-backends/reinterpret
+   #:get-backends/slice
    #:with-backend/view
    #:with-backend/tref
    #:with-backend/full
@@ -364,11 +367,13 @@
    #:with-backend/axpy
    #:with-backend/reshape
    #:with-backend/reinterpret
+   #:with-backend/slice
    #:tensor-p
    #:type/nnl2->lisp
    #:type/lisp->nnl2
    #:type/nnl2->cffi
    #:type/lisp->cffi
    #:free
-   #:empty-with-shape-pntr))
+   #:empty-with-shape-pntr
+   #:slice))
    

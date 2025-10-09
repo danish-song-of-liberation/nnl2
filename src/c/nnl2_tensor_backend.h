@@ -921,6 +921,14 @@ typedef Tensor* (*reshapefn)(Tensor* a, int32_t* new_shape, int32_t new_rank, bo
  **/
 typedef Tensor* (*reinterpretfn)(Tensor* a, int32_t* new_shape, int32_t new_rank, bool copy);
 
+/** @brief Returns a truncated copy of the tensor
+ ** @param tensor Input tensor
+ ** @param slice_from List of indices to start truncating the tensor
+ ** @param slice_to List of indices for the end of the tensor truncation
+ ** @return Sliced tensor (copy)
+ **/
+typedef Tensor* (*slicefn)(Tensor* tensor, int32_t* slice_from, int32_t* slice_t);
+
 /// @} [typedef]
 
 

@@ -1123,14 +1123,16 @@
    tensor: Input tensor
    axes (&key): Axes to apply the norm. DOES NOT WORK YET"
    
-  (let* ((type-t (type/nn2->cffi dtype))
-		 (axes-pntr (make-shape-pntr axes))
+  (let* ((type-t (type/nnl2->cffi dtype))
+		 (axes-pntr (nnl2.hli:make-shape-pntr axes))
 		 (axes-len (length axes))
 		 (out (cffi:foreign-alloc type-t)))
 					
 	(nnl2.ffi:%l2norm tensor axes-pntr axes-len out)
 				
-	(cffi:mem-ref out type-t)))
+	(let ((result (cffi:mem-ref out type-t)))
+	  (cffi:foreign-free out)
+	  result)))
 	
 (defun norm (tensor &key (axes #(0)) (p :l2))
   "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
@@ -1750,7 +1752,7 @@
    new-shape: Input new shape
    force (&key): Should the incompatibility of the form be ignored (5x5) -> (1x24)"
    
-  (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%reshape tensor shape rank force)))
 	
 (defun reinterpret (tensor new-shape &key force)
@@ -1759,6 +1761,13 @@
    new-shape: Input new shape
    force (&key): Should the incompatibility of the form be ignored (5x5) -> (1x24)"
    
-  (multiple-value-bind (shape rank) (make-shape-pntr new-shape)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%reinterpret tensor shape rank force)))																			 
+																			 
+(defun slice (tensor &key from to)
+  (let* ((pntr-from (nnl2.hli:make-shape-pntr from))
+		 (pntr-to (nnl2.hli:make-shape-pntr to)))
+		
+	(nnl2.ffi:%slice tensor pntr-from pntr-to)))
+  																			 
 																			 

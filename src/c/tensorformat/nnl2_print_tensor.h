@@ -38,6 +38,13 @@ void nnl2_print_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int32_
         NNL2_FUNC_ENTER();
     #endif
 	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(tensor == NULL) {
+			NNL2_ERROR("NULL was passed to tensor output (print_tensor)");
+			return;
+		}
+	#endif
+	
 	int32_t rank = tensor->rank;
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX

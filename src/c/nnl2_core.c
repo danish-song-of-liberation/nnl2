@@ -320,7 +320,8 @@ void nnl2_init_auxiliary() {
 	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);   
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));      
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
-	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);  
+	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
+	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
 }
 
 void nnl2_init_correspondence_inplace() {
@@ -355,7 +356,7 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends);
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 }
-      
+         
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
 	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);
@@ -389,7 +390,7 @@ void nnl2_init_reshaping() {
  
 void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_view(tensor, indices, num_indices); 
-} 
+}  
 
 void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
 	tref_setter(tensor, shape, rank, change_with, tensor_p); 
@@ -416,7 +417,7 @@ Tensor* lisp_call_sgemm(const nnl2_order order, const nnl2_transpose transa,
 						const int k, const float alpha, const Tensor* a, const int lda,
 						const Tensor* b, const int ldb, const float beta) {
 							   
-	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
+	return sgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);      	  
 }                  
     
 void lisp_call_addinplace(Tensor* summand, Tensor* addend) { 
@@ -716,7 +717,7 @@ void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float 
 }       
 
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
-	return axpy_broadcasting(summand, sumend, alpha); 
+	return axpy_broadcasting(summand, sumend, alpha);  
 } 
 
 Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
@@ -725,6 +726,10 @@ Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_
 
 Tensor* lisp_call_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
 	return nnl2_reinterpret(tensor, new_shape, new_shape_len, force); 
+}
+
+Tensor* lisp_call_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to) {
+	return nnl2_slice(tensor, slice_from, slice_to);          
 }
 
 ///@} [lisp_wrappers]      

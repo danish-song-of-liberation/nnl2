@@ -189,6 +189,7 @@
    #:%set-max-broadcasting-inplace-backend
    #:%set-min-broadcasting-inplace-backend
    #:%set-max-broadcasting-backend
+   #:%set-slice-backend
    #:%get-max-backend
    #:%set-fill-tensor-with-data-backend
    #:%set-axpy-inplace-backend
@@ -250,6 +251,7 @@
    #:%get-axpy-backend
    #:%get-reshape-backend
    #:%get-reinterpret-backend
+   #:%get-slice-backend
    #:%get-view-backends
    #:%get-view-num-backends
    #:%get-tref-setter-num-backends
@@ -354,11 +356,14 @@
    #:%get-reshape-num-backends
    #:%get-reinterpret-backends
    #:%get-reinterpret-num-backends
+   #:%get-slice-backends
+   #:%get-slice-num-backends
    #:shape-at
    #:mem-aref-getter-float64
    #:mem-aref-getter-float32
    #:mem-aref-getter-int32
    #:mem-aref-setter-float64
    #:mem-aref-setter-float32
-   #:mem-aref-setter-int32))
+   #:mem-aref-setter-int32
+   #:%slice))
    

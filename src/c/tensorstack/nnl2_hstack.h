@@ -28,47 +28,56 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
         NNL2_FUNC_ENTER();
     #endif
     
+    if (tensora == NULL || tensorb == NULL) {
+        return NULL;
+    }
+    
     TensorType typea = tensora->dtype;
     TensorType typeb = tensorb->dtype;
-    
     int ranka = tensora->rank;
     int rankb = tensorb->rank;
 
-	// Safety checks for tensor compatibility
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		if(ranka != rankb) {
-			NNL2_ERROR("Tensors dimensions are different");
-			return NULL;
-		}
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(ranka != rankb) {
+            NNL2_ERROR("Tensors dimensions are different");
+            return NULL;
+        }
 
-		// Check if all dimensions except axis=1 are equal
-		for(int i = 0; i < ranka; i++) {
-			if(i != 1 && tensora->shape[i] != tensorb->shape[i]) {
-				NNL2_ERROR("Tensors shapes are incompatible for hstack");
-				return NULL;
-			}
-		}
-	#endif
+        // Check if all dimensions except the stacking axis are equal
+        int stacking_axis = (ranka == 1) ? 0 : 1;
+        for(int i = 0; i < ranka; i++) {
+            if(i != stacking_axis && tensora->shape[i] != tensorb->shape[i]) {
+                NNL2_ERROR("Tensors shapes are incompatible for hstack");
+                return NULL;
+            }
+        }
+    #endif
 
     TensorType winner_type = MAX(typea, typeb);
 
-	// Allocate memory for result shape
+    // Allocate memory for result shape
     int* shapec = malloc(ranka * sizeof(int));
     if (shapec == NULL) {
         NNL2_ERROR("Memory allocation failed");
         return NULL; 
     }
     
-	// Calculate result shape
-    for(int i = 0; i < ranka; i++) {
-        if(i == 1) {
-            shapec[i] = tensora->shape[i] + tensorb->shape[i];
-        } else {
-            shapec[i] = tensora->shape[i];
+    // Calculate result shape
+    if (ranka == 1) {
+        // For 1D tensors stack along axis 0
+        shapec[0] = tensora->shape[0] + tensorb->shape[0];
+    } else {
+        // For multi-dimensional tensors stack along axis 1
+        for(int i = 0; i < ranka; i++) {
+            if(i == 1) {
+                shapec[i] = tensora->shape[i] + tensorb->shape[i];
+            } else {
+                shapec[i] = tensora->shape[i];
+            }
         }
     }
     
-	// Create empty result tensor with calculated shape and winning type
     Tensor* result = nnl2_empty(shapec, ranka, winner_type);
     free(shapec);
     
@@ -77,38 +86,34 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
         return NULL;
     }
     
-	// Handle empty tensors case
     size_t total_elements = product(result->shape, result->rank);
     if(total_elements == 0) {
         return result;
     }
-    
-    size_t shapea_0 = (size_t)tensora->shape[0];
-    size_t shapeb_0 = (size_t)tensorb->shape[0];
-    
-	// Handle 1D tensors
+
+    // Handle 1D tensors
     if(ranka == 1) {
         if(typea == typeb && typea == winner_type) {
-			// Same types, use memcpy
             size_t item_size = get_dtype_size(winner_type);
-            memcpy(result->data, tensora->data, shapea_0 * item_size);
-            memcpy((char*)result->data + shapea_0 * item_size, tensorb->data, shapeb_0 * item_size);
+            memcpy(result->data, tensora->data, tensora->shape[0] * item_size);
+            memcpy((char*)result->data + tensora->shape[0] * item_size, 
+                   tensorb->data, tensorb->shape[0] * item_size);
         } else {
-		    // Type conversion needed
+            // Type conversion needed
             switch(winner_type) {
                 case FLOAT64: {
                     volatile double* dst = (double*)result->data;
 
-					// Convert and copy first tensor
-                    for(size_t i = 0; i < shapea_0; i++) {
+                    // Convert and copy first tensor
+                    for(size_t i = 0; i < (size_t)tensora->shape[0]; i++) {
                         void* elem = (char*)tensora->data + i * get_dtype_size(typea);
                         dst[i] = nnl2_convert_to_float64(elem, typea);
                     }
                 
-					// Convert and copy second tensor
-                    for(size_t i = 0; i < shapeb_0; i++) {
+                    // Convert and copy second tensor
+                    for(size_t i = 0; i < (size_t)tensorb->shape[0]; i++) {
                         void* elem = (char*)tensorb->data + i * get_dtype_size(typeb);
-                        dst[shapea_0 + i] = nnl2_convert_to_float64(elem, typeb);
+                        dst[tensora->shape[0] + i] = nnl2_convert_to_float64(elem, typeb);
                     }
                     break;
                 }
@@ -116,16 +121,16 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
                 case FLOAT32: {
                     volatile float* dst = (float*)result->data;
                     
-					// Convert and copy first tensor
-                    for(size_t i = 0; i < shapea_0; i++) {
+                    // Convert and copy first tensor
+                    for(size_t i = 0; i < (size_t)tensora->shape[0]; i++) {
                         void* elem = (char*)tensora->data + i * get_dtype_size(typea);
                         dst[i] = nnl2_convert_to_float32(elem, typea);
                     }
                     
-					// Convert and copy second tensor
-                    for(size_t i = 0; i < shapeb_0; i++) {
+                    // Convert and copy second tensor
+                    for(size_t i = 0; i < (size_t)tensorb->shape[0]; i++) {
                         void* elem = (char*)tensorb->data + i * get_dtype_size(typeb);
-                        dst[shapea_0 + i] = nnl2_convert_to_float32(elem, typeb);
+                        dst[tensora->shape[0] + i] = nnl2_convert_to_float32(elem, typeb);
                     }
                     break;
                 }
@@ -133,142 +138,154 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
                 case INT32: {
                     volatile int32_t* dst = (int32_t*)result->data;
                     
-					// Convert and copy first tensor
-                    for(size_t i = 0; i < shapea_0; i++) {
+                    // Convert and copy first tensor
+                    for(size_t i = 0; i < (size_t)tensora->shape[0]; i++) {
                         void* elem = (char*)tensora->data + i * get_dtype_size(typea);
                         dst[i] = nnl2_convert_to_int32(elem, typea);
                     }
                     
-					// Convert and copy second tensor
-                    for(size_t i = 0; i < shapeb_0; i++) {
+                    // Convert and copy second tensor
+                    for(size_t i = 0; i < (size_t)tensorb->shape[0]; i++) {
                         void* elem = (char*)tensorb->data + i * get_dtype_size(typeb);
-                        dst[shapea_0 + i] = nnl2_convert_to_int32(elem, typeb);
+                        dst[tensora->shape[0] + i] = nnl2_convert_to_int32(elem, typeb);
                     }
                     break;
                 }
                 
                 default: {
                     NNL2_TYPE_ERROR(winner_type);
-                    free(result);
+                    nnl2_free_tensor(result);
                     return NULL;
                 }
             }
         }
     } else {
-		// Handle multi-dimensional tensors
+        // Handle multi-dimensional tensors
         size_t outer_dim = (size_t)tensora->shape[0];
-        size_t inner_elements_a = product(tensora->shape + 1, ranka - 1);
-        size_t inner_elements_b = product(tensorb->shape + 1, rankb - 1);
+        size_t inner_dim_a = (size_t)tensora->shape[1];
+        size_t inner_dim_b = (size_t)tensorb->shape[1];
+        size_t inner_elements_rest = 1;
+        
+        // Calculate remaining elements (for dimensions > 2)
+        if(ranka > 2) {
+            inner_elements_rest = product(tensora->shape + 2, ranka - 2);
+        }
+        
+        size_t elements_per_row_a = inner_dim_a * inner_elements_rest;
+        size_t elements_per_row_b = inner_dim_b * inner_elements_rest;
+        size_t elements_per_row_result = elements_per_row_a + elements_per_row_b;
         
         if(typea == typeb && typea == winner_type) {
-			// Same types, use memcpy 
             size_t item_size = get_dtype_size(winner_type);
-            size_t row_size_a = inner_elements_a * item_size;
-            size_t row_size_b = inner_elements_b * item_size;
+            size_t row_size_a = elements_per_row_a * item_size;
+            size_t row_size_b = elements_per_row_b * item_size;
             
             char* src_a = tensora->data;
             char* src_b = tensorb->data;
             char* dst = result->data;
             
-			// Process each outer dimension (e.g., each matrix in a 3D tensor)
+            // Process each outer dimension
             for(size_t i = 0; i < outer_dim; i++) {
-				// Copy slice from first tensor
+                // Copy slice from first tensor
                 memcpy(dst, src_a, row_size_a);
                 dst += row_size_a;
                 src_a += row_size_a;
                 
-				// Copy slice from second tensor
+                // Copy slice from second tensor
                 memcpy(dst, src_b, row_size_b);
                 dst += row_size_b;
                 src_b += row_size_b;
             }
         } else {
-			// Type conversion needed for multi-dimensional case
+            // Type conversion needed for multi-dimensional case
             switch(winner_type) {
                 case FLOAT64: {
                     volatile double* dst = (double*)result->data;
                     
-					// Process each outer dimension
+                    // Process each outer dimension
                     for(size_t i = 0; i < outer_dim; i++) {
-						// Convert and copy slice from first tensor
-                        for(size_t j = 0; j < inner_elements_a; j++) {
-                            size_t src_idx = i * inner_elements_a + j;
-                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + j;
+                        size_t base_idx = i * elements_per_row_result;
+                        
+                        // Convert and copy slice from first tensor
+                        for(size_t j = 0; j < elements_per_row_a; j++) {
+                            size_t src_idx = i * elements_per_row_a + j;
+                            size_t dst_idx = base_idx + j;
                             
                             void* elem = (char*)tensora->data + src_idx * get_dtype_size(typea);
                             dst[dst_idx] = nnl2_convert_to_float64(elem, typea);
                         }
-						
+                        
                         // Convert and copy slice from second tensor
-                        for(size_t j = 0; j < inner_elements_b; j++) {
-                            size_t src_idx = i * inner_elements_b + j;
-                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + inner_elements_a + j;
+                        for(size_t j = 0; j < elements_per_row_b; j++) {
+                            size_t src_idx = i * elements_per_row_b + j;
+                            size_t dst_idx = base_idx + elements_per_row_a + j;
                             
                             void* elem = (char*)tensorb->data + src_idx * get_dtype_size(typeb);
                             dst[dst_idx] = nnl2_convert_to_float64(elem, typeb);
                         }
                     }
-					
                     break;
                 }
                 
                 case FLOAT32: {
                     volatile float* dst = (float*)result->data;
                     
-					// Process each outer dimension
+                    // Process each outer dimension
                     for(size_t i = 0; i < outer_dim; i++) {
-						// Convert and copy slice from first tensor
-                        for(size_t j = 0; j < inner_elements_a; j++) {
-                            size_t src_idx = i * inner_elements_a + j;
-                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + j;
+                        size_t base_idx = i * elements_per_row_result;
+                        
+                        // Convert and copy slice from first tensor
+                        for(size_t j = 0; j < elements_per_row_a; j++) {
+                            size_t src_idx = i * elements_per_row_a + j;
+                            size_t dst_idx = base_idx + j;
                             
                             void* elem = (char*)tensora->data + src_idx * get_dtype_size(typea);
                             dst[dst_idx] = nnl2_convert_to_float32(elem, typea);
                         }
                         
-						// Convert and copy slice from second tensor
-                        for(size_t j = 0; j < inner_elements_b; j++) {
-                            size_t src_idx = i * inner_elements_b + j;
-                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + inner_elements_a + j;
+                        // Convert and copy slice from second tensor
+                        for(size_t j = 0; j < elements_per_row_b; j++) {
+                            size_t src_idx = i * elements_per_row_b + j;
+                            size_t dst_idx = base_idx + elements_per_row_a + j;
                             
                             void* elem = (char*)tensorb->data + src_idx * get_dtype_size(typeb);
                             dst[dst_idx] = nnl2_convert_to_float32(elem, typeb);
                         }
                     }
-					
                     break;
                 }
                 
                 case INT32: {
                     volatile int32_t* dst = (int32_t*)result->data;
                     
-					// Process each outer dimension
+                    // Process each outer dimension
                     for(size_t i = 0; i < outer_dim; i++) {
-						// Convert and copy slice from first tensor
-                        for(size_t j = 0; j < inner_elements_a; j++) {
-                            size_t src_idx = i * inner_elements_a + j;
-                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + j;
+                        size_t base_idx = i * elements_per_row_result;
+                        
+                        // Convert and copy slice from first tensor
+                        for(size_t j = 0; j < elements_per_row_a; j++) {
+                            size_t src_idx = i * elements_per_row_a + j;
+                            size_t dst_idx = base_idx + j;
                             
                             void* elem = (char*)tensora->data + src_idx * get_dtype_size(typea);
                             dst[dst_idx] = nnl2_convert_to_int32(elem, typea);
                         }
                         
-						// Convert and copy slice from second tensor
-                        for(size_t j = 0; j < inner_elements_b; j++) {
-                            size_t src_idx = i * inner_elements_b + j;
-                            size_t dst_idx = i * (inner_elements_a + inner_elements_b) + inner_elements_a + j;
+                        // Convert and copy slice from second tensor
+                        for(size_t j = 0; j < elements_per_row_b; j++) {
+                            size_t src_idx = i * elements_per_row_b + j;
+                            size_t dst_idx = base_idx + elements_per_row_a + j;
                             
                             void* elem = (char*)tensorb->data + src_idx * get_dtype_size(typeb);
                             dst[dst_idx] = nnl2_convert_to_int32(elem, typeb);
                         }
                     }
-					
                     break;
                 }
                 
                 default: {
                     NNL2_TYPE_ERROR(winner_type);
-                    free(result);
+                    nnl2_free_tensor(result);
                     return NULL;
                 }
             }
@@ -294,8 +311,8 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
  * @see naive_hstack
  */
 Implementation hstack_backends[] = {
-	REGISTER_BACKEND(naive_hstack, nnl2_naive, NAIVE_BACKEND_NAME),
-};	
+    REGISTER_BACKEND(naive_hstack, nnl2_naive, NAIVE_BACKEND_NAME),
+};    
 
 /**
  * @brief Function pointer for hstack operation
@@ -326,7 +343,7 @@ void set_hstack_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_hstack_backend() {
-	return current_backend(hstack);
+    return current_backend(hstack);
 }
 
 /** 
