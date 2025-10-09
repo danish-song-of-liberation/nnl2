@@ -1792,7 +1792,7 @@
 		 (to (if to to tensor-shape)) ;; If to is not provided, use the full tensor shape
 										 
          (processed-to (loop for i from 0 below (length to)
-                             for t-val = (aref to i)
+                             for t-val = (elt to i)
                              collect (if (= t-val -1) (aref tensor-shape i) t-val))) ;; Replace -1 with actual size
 									   
 		 (pntr-from (nnl2.hli:make-shape-pntr from))
@@ -1805,4 +1805,19 @@
 
 (cffi:defcfun ("nnl2_ncols" ncols) :int
   (tensor :pointer)) 
+  
+(defun cut (tensor &key from to)  
+  (let* ((tensor-shape (shape tensor :as :vector))
+  
+		 (from (if from from (make-array (list (length tensor-shape)) :initial-element 0))) ;; If from is not provided, create a zero vector of the same rank as tensor
+		 (to (if to to tensor-shape)) ;; If to is not provided, use the full tensor shape
+										 
+         (processed-to (loop for i from 0 below (length to)
+                             for t-val = (elt to i)
+                             collect (if (= t-val -1) (aref tensor-shape i) t-val))) ;; Replace -1 with actual size
+									   
+		 (pntr-from (nnl2.hli:make-shape-pntr from))
+		 (pntr-to (nnl2.hli:make-shape-pntr processed-to)))
+		
+	(nnl2.ffi:%cut tensor pntr-from pntr-to)))
 																				

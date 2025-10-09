@@ -217,6 +217,9 @@
   
 (define-backend-setter use-backend/slice
   nnl2.ffi:%set-slice-backend)  
+  
+(define-backend-setter use-backend/cut
+  nnl2.ffi:%set-cut-backend)    
 
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  
@@ -242,7 +245,8 @@
                               use-backend/.relu use-backend/.relu! use-backend/.leaky-relu
                               use-backend/.leaky-relu! use-backend/.sigmoid use-backend/.sigmoid!
                               use-backend/.tanh use-backend/.tanh! use-backend/transpose
-                              use-backend/transpose! use-backend/reshape use-backend/reinterpret))
+                              use-backend/transpose! use-backend/reshape use-backend/reinterpret
+							  use-backend/slice use-backend/cut))
 							  
       (funcall backend-function name)))
 	  
@@ -329,6 +333,7 @@
 (define-backend-getter-setter get-backend/reinterpret use-backend/reinterpret nnl2.ffi:%get-reinterpret-backend)
 (define-backend-getter-setter get-backend/sum use-backend/sum nnl2.ffi:%get-sum-without-axis-backend)
 (define-backend-getter-setter get-backend/slice use-backend/slice nnl2.ffi:%get-slice-backend)
+(define-backend-getter-setter get-backend/cut use-backend/cut nnl2.ffi:%get-cut-backend)
 
 (defun get-backend/norm (&key (p :l2))
   "Gets current backend for norm operation. P: Norm type (:l2 supported)"
@@ -579,6 +584,10 @@
 (define-backends-getter get-backends/slice
   nnl2.ffi:%get-slice-num-backends
   nnl2.ffi:%get-slice-backends)
+  
+(define-backends-getter get-backends/cut
+  nnl2.ffi:%get-cut-num-backends
+  nnl2.ffi:%get-cut-backends)  
 
 (defun get-backends/norm (&key (p :l2))
   "Returns list of available backends for norm operation. 
@@ -661,4 +670,5 @@
 (define-with-backend with-backend/sum get-backend/sum)
 (define-with-backend with-backend/norm get-backend/norm)
 (define-with-backend with-backend/slice get-backend/slice)
+(define-with-backend with-backend/cut get-backend/cut)
 		 

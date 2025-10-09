@@ -322,6 +322,7 @@ void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
+	EINIT_BACKEND(nnl2_cut, cut_backends, CURRENT_BACKEND(cut));
 }
 
 void nnl2_init_correspondence_inplace() {
@@ -717,7 +718,7 @@ void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float 
 }       
 
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
-	return axpy_broadcasting(summand, sumend, alpha);     
+	return axpy_broadcasting(summand, sumend, alpha);      
 } 
 
 Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
@@ -732,7 +733,11 @@ Tensor* lisp_call_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to) 
 	return nnl2_slice(tensor, slice_from, slice_to);          
 }
 
-///@} [lisp_wrappers]      
+Tensor* lisp_call_cut(Tensor* tensor, int32_t* cut_from, int32_t* cut_to) {
+	return nnl2_cut(tensor, cut_from, cut_to);          
+}
+
+///@} [lisp_wrappers]          
 		             
 #endif /** NNL2_CORE_C **/					 
 					 

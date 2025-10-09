@@ -201,6 +201,7 @@
    #:%set-axpy-broadcasting-backend
    #:%set-reshape-backend
    #:%set-reinterpret-backend
+   #:%set-cut-backend
    #:%get-tref-getter-backend
    #:%get-view-backend
    #:%get-empty-backend
@@ -252,6 +253,7 @@
    #:%get-reshape-backend
    #:%get-reinterpret-backend
    #:%get-slice-backend
+   #:%get-cut-backend
    #:%get-view-backends
    #:%get-view-num-backends
    #:%get-tref-setter-num-backends
@@ -358,6 +360,8 @@
    #:%get-reinterpret-num-backends
    #:%get-slice-backends
    #:%get-slice-num-backends
+   #:%get-cut-backends
+   #:%get-cut-num-backends
    #:shape-at
    #:mem-aref-getter-float64
    #:mem-aref-getter-float32
@@ -365,5 +369,6 @@
    #:mem-aref-setter-float64
    #:mem-aref-setter-float32
    #:mem-aref-setter-int32
-   #:%slice))
+   #:%slice
+   #:%cut))
    

@@ -2,7 +2,7 @@
 #define NNL2_SLICE_H
 
 /** @brief
- * Returns a slice of the tensor using the specified indices (copy)
+ * Returns a slice of the tensor using the specified indices (copy with proper allocation)
  *
  ** @param tensor
  * Input tensor to slice
@@ -67,102 +67,66 @@ Tensor* nnl2_naive_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to)
         }
     #endif
     
-	// Allocate memory for the result tensor structure
-    Tensor* result = (Tensor*)malloc(sizeof(Tensor));
-    if (!result) return NULL;
-    
-	// Copy basic metadata from input tensor
-    result->dtype = tensor->dtype;
-    result->rank = tensor->rank;
-    result->is_view = false;  // This is a copy, not a view
-    
-	// Allocate memory for shape and strides arrays
-    result->shape = (int32_t*)malloc(result->rank * sizeof(int32_t));
-    result->strides = (int32_t*)malloc(result->rank * sizeof(int32_t));
-    
-	// Check if shape/strides allocation succeeded
-    if (!result->shape || !result->strides) {
-        if (result->shape) free(result->shape);
-        if (result->strides) free(result->strides);
-        free(result);
+    // Calculate new shape
+    int32_t* new_shape = (int32_t*)malloc(tensor->rank * sizeof(int32_t));
+    if (!new_shape) {
+        NNL2_ERROR("Failed to allocate memory for new shape");
         return NULL;
     }
     
-	// Element size calculation
+    for (int i = 0; i < tensor->rank; i++) {
+        new_shape[i] = slice_to[i] - slice_from[i];
+    }
+    
+    // Create properly allocated tensor using nnl2_naive_empty
+    Tensor* result = nnl2_naive_empty(new_shape, tensor->rank, tensor->dtype);
+    free(new_shape);
+    
+    if (!result) {
+        NNL2_ERROR("Failed to create empty tensor for slice");
+        return NULL;
+    }
+    
+    // Element size calculation
     size_t elem_size;
     switch (tensor->dtype) {
-        case INT32: elem_size = sizeof(int32_t); break;
-        case FLOAT32: elem_size = sizeof(float); break;
-        case FLOAT64: elem_size = sizeof(double); break;
-        default: 
-            free(result->shape);
-            free(result->strides);
-            free(result);
-            return NULL;
-    }
-	
-	// Calculate result tensor shape and total elements
-    int32_t total_elements = 1;
-    for (int i = 0; i < tensor->rank; i++) {
-		// Additional safety checks 
-        if (slice_from[i] < 0 || slice_to[i] > tensor->shape[i] || 
-            slice_from[i] >= slice_to[i]) {
-            free(result->shape);
-            free(result->strides);
-            free(result);
-            return NULL;
-        }
-        
-		// Calculate new dimension size: to - from
-        result->shape[i] = slice_to[i] - slice_from[i];
+	    case FLOAT64: elem_size = sizeof(double); break;
+		case FLOAT32: elem_size = sizeof(float); break;
+        case INT32:   elem_size = sizeof(int32_t); break;
 		
-		// Accumulate total number of elements in result tensor
-        total_elements *= result->shape[i];
+        default: {
+            nnl2_free_tensor(result);
+            return NULL;
+		}
     }
     
-	// Data buffer allocation
-    result->data = malloc(total_elements * elem_size);
-    if (!result->data) {
-        free(result->shape);
-        free(result->strides);
-        free(result);
-        return NULL;
-    }
-	
-	// Strides calculation for result tensor
-	
-    result->strides[result->rank - 1] = 1;
-    for (int i = result->rank - 2; i >= 0; i--) {
-        result->strides[i] = result->strides[i + 1] * result->shape[i + 1];
-    }
-    
-    for (int i = 0; i < result->rank; i++) {
-        result->strides[i] *= elem_size;
-    }
-    
+    // Copy data from original tensor to the sliced region
     char* dest_ptr = (char*)result->data;
     
 	// Allocate and initialize indices array for tracking current position
     int32_t* indices = (int32_t*)calloc(tensor->rank, sizeof(int32_t));
     if (!indices) {
-        free(result->data);
-        free(result->shape);
-        free(result->strides);
-        free(result);
+        nnl2_free_tensor(result);
         return NULL;
     }
     
+    // Calculate total elements in result tensor
+    size_t total_elements = 1;
+    for (int i = 0; i < tensor->rank; i++) {
+        total_elements *= result->shape[i];
+    }
+    
 	// Iterate through all elements in the result tensor
-    for (int i = 0; i < total_elements; i++) {
-		// Calculate source offset in original tensor
-        int32_t src_offset = 0;
+    for (size_t i = 0; i < total_elements; i++) {
+        size_t src_offset_elems = 0;
         for (int dim = 0; dim < tensor->rank; dim++) {
 			// Convert result indices to original tensor indices
-            src_offset += (slice_from[dim] + indices[dim]) * (tensor->strides[dim] / elem_size);
+            src_offset_elems += (slice_from[dim] + indices[dim]) * tensor->strides[dim];
         }
         
-		// Copy single element from source to destination
-        memcpy(dest_ptr, (char*)tensor->data + src_offset * elem_size, elem_size);
+        // Convert element offset to byte offset and copy
+        size_t src_offset_bytes = src_offset_elems * elem_size;
+		memcpy(dest_ptr, (char*)tensor->data + src_offset_bytes, elem_size);
         
 		// Move destination pointer to next element
         dest_ptr += elem_size;
@@ -179,8 +143,8 @@ Tensor* nnl2_naive_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to)
     }
     
     free(indices);
-	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();
     #endif
 	

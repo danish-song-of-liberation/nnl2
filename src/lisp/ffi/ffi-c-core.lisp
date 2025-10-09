@@ -436,6 +436,11 @@
   (slice-from :pointer)
   (slice-to :pointer))  
   
+(cffi:defcfun ("lisp_call_cut" %cut) :pointer
+  (tensor :pointer)
+  (slice-from :pointer)
+  (slice-to :pointer))    
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
@@ -700,7 +705,10 @@
   (backend-name :string))
   
 (cffi:defcfun ("set_slice_backend" %set-slice-backend) :void
-  (backend-name :string))  
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_cut_backend" %set-cut-backend) :void
+  (backend-name :string))    
   
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
@@ -753,6 +761,7 @@
 (cffi:defcfun ("get_reshape_backend" %get-reshape-backend) :string) 
 (cffi:defcfun ("get_reinterpret_backend" %get-reinterpret-backend) :string) 
 (cffi:defcfun ("get_slice_backend" %get-slice-backend) :string)
+(cffi:defcfun ("get_cut_backend" %get-cut-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -856,6 +865,8 @@
 (cffi:defcfun ("get_reinterpret_backends" %get-reinterpret-backends) :pointer)
 (cffi:defcfun ("get_slice_num_backends" %get-slice-num-backends) :int)
 (cffi:defcfun ("get_slice_backends" %get-slice-backends) :pointer)
+(cffi:defcfun ("get_cut_num_backends" %get-cut-num-backends) :int)
+(cffi:defcfun ("get_cut_backends" %get-cut-backends) :pointer)
 
 ;; -- mem-aref setters/getters --
 
