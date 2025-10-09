@@ -1800,4 +1800,9 @@
 		
 	(nnl2.ffi:%slice tensor pntr-from pntr-to)))
   																			 
-																			 
+(cffi:defcfun ("nnl2_nrows" nrows) :int
+  (tensor :pointer))
+
+(cffi:defcfun ("nnl2_ncols" ncols) :int
+  (tensor :pointer)) 
+																				

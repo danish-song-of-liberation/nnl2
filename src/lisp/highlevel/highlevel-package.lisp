@@ -375,5 +375,7 @@
    #:type/lisp->cffi
    #:free
    #:empty-with-shape-pntr
-   #:slice))
+   #:slice
+   #:nrows
+   #:ncols))
    

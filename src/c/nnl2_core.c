@@ -717,7 +717,7 @@ void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float 
 }       
 
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
-	return axpy_broadcasting(summand, sumend, alpha);  
+	return axpy_broadcasting(summand, sumend, alpha);     
 } 
 
 Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
