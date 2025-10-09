@@ -1765,8 +1765,38 @@
     (nnl2.ffi:%reinterpret tensor shape rank force)))																			 
 																			 
 (defun slice (tensor &key from to)
-  (let* ((pntr-from (nnl2.hli:make-shape-pntr from))
-		 (pntr-to (nnl2.hli:make-shape-pntr to)))
+  "Return a sliced copy of the tensor with the specified range
+    
+   Args:
+       tensor: The input tensor to slice
+	   
+	   from: Starting indices for each dimension (vector/list)
+			  If not provided, defaults to zeros for all dimensions
+			  
+       to: Ending indices for each dimension (vector/list)
+	        If not provided, defaults to the tensor's shape (full tensor)
+			Use -1 to automatically use the full dimension size
+			
+   Examples:
+       (slice tensor :from #(0 0) :to #(3 3))    ;; Slice from (0,0) to (3,3)
+	   (slice tensor :from #(1 1) :to #(-1 -1))  ;; Slice from (1,1) to end
+	   (slice tensor :to #(2 2))                 ;; Slice from start to (2,2)
+	   (slice tensor :from #(0 1))                ; Slice from (0,1) to end
+
+   Returns:
+       A new tensor containing the sliced data as a copy"
+
+  (let* ((tensor-shape (shape tensor :as :vector))
+  
+		 (from (if from from (make-array (list (length tensor-shape)) :initial-element 0))) ;; If from is not provided, create a zero vector of the same rank as tensor
+		 (to (if to to tensor-shape)) ;; If to is not provided, use the full tensor shape
+										 
+         (processed-to (loop for i from 0 below (length to)
+                             for t-val = (aref to i)
+                             collect (if (= t-val -1) (aref tensor-shape i) t-val))) ;; Replace -1 with actual size
+									   
+		 (pntr-from (nnl2.hli:make-shape-pntr from))
+		 (pntr-to (nnl2.hli:make-shape-pntr processed-to)))
 		
 	(nnl2.ffi:%slice tensor pntr-from pntr-to)))
   																			 
