@@ -395,7 +395,7 @@ void* lisp_call_view(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 
 void lisp_call_tref_setter(Tensor* tensor, int* shape, int rank, void* change_with, bool tensor_p) {
 	tref_setter(tensor, shape, rank, change_with, tensor_p); 
-}
+} 	
 
 void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indices) {
 	return nnl2_tref_getter(tensor, indices, num_indices);
@@ -737,7 +737,15 @@ Tensor* lisp_call_cut(Tensor* tensor, int32_t* cut_from, int32_t* cut_to) {
 	return nnl2_cut(tensor, cut_from, cut_to);          
 }
 
-///@} [lisp_wrappers]          
+Tensor* lisp_call_transposition(const Tensor* tensor) {
+	return nnl2_transposition(tensor);
+}
+
+void lisp_call_transposition_inplace(Tensor* tensor) {
+	nnl2_transposition_inplace(tensor);
+}
+
+///@} [lisp_wrappers]             
 		             
 #endif /** NNL2_CORE_C **/					 
-					 
+					  

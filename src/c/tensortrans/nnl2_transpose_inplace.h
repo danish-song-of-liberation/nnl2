@@ -1,5 +1,5 @@
-#ifndef NNL2_TRANS_INPLACE_H
-#define NNL2_TRANS_INPLACE_H
+#ifndef NNL2_TRANSPOSE_INPLACE_H
+#define NNL2_TRANSPOSE_INPLACE_H
 
 /** @brief
  * Transposes a matrix in place (naive implementation)
@@ -194,4 +194,4 @@ DEFINE_GET_BACKENDS_FUNCTION(transposeinplace);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(transposeinplace);
 
-#endif /** NNL2_TRANS_INPLACE_H **/
+#endif /** NNL2_TRANSPOSE_INPLACE_H **/

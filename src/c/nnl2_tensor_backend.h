@@ -468,6 +468,17 @@ typedef void (*transposeinplacefn)(Tensor* a);
  **/
 typedef Tensor* (*transposefn)(const Tensor* a);
 
+/** @brief In-place matrix transposition function pointer (view)
+ ** @param a Input tensor (transposed in-place)
+ **/
+typedef void (*transpositioninplacefn)(Tensor* a);
+
+/** @brief Matrix transposition function pointer (creates new tensor) (view)
+ ** @param a Input tensor
+ ** @return New tensor containing transposed matrix
+ **/
+typedef Tensor* (*transpositionfn)(const Tensor* a);
+
 /** @brief In-place scaling function pointer
  ** @param a Input tensor (scaled in-place)
  ** @param scale Scaling factor

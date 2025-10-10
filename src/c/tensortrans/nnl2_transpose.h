@@ -1,5 +1,5 @@
-#ifndef NNL2_TRANS_H
-#define NNL2_TRANS_H
+#ifndef NNL2_TRANSPOSE_H
+#define NNL2_TRANSPOSE_H
 
 /** @brief 
  * Performs 2D tensor transposition using a naive method
@@ -162,4 +162,4 @@ DEFINE_GET_BACKENDS_FUNCTION(transpose);
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(transpose);
 
-#endif /** NNL2_TRANS_H **/
+#endif /** NNL2_TRANSPOSE_H **/

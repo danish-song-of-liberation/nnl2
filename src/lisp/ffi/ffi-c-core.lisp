@@ -441,6 +441,12 @@
   (slice-from :pointer)
   (slice-to :pointer))    
   
+(cffi:defcfun ("lisp_call_transposition" %transposition) :pointer
+  (tensor :pointer))
+  
+(cffi:defcfun ("lisp_call_transposition_inplace" %transposition!) :void
+  (tensor :pointer))
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void

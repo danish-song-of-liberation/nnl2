@@ -370,5 +370,7 @@
    #:mem-aref-setter-float32
    #:mem-aref-setter-int32
    #:%slice
-   #:%cut))
+   #:%cut
+   #:%transposition
+   #:%transposition!))
    
