@@ -220,6 +220,12 @@
   
 (define-backend-setter use-backend/cut
   nnl2.ffi:%set-cut-backend)    
+  
+(define-backend-setter use-backend/transposition
+  nnl2.ffi:%set-transposition-backend)  
+
+(define-backend-setter use-backend/transposition!
+  nnl2.ffi:%set-transposition-inplace-backend)      
 
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  
@@ -246,7 +252,8 @@
                               use-backend/.leaky-relu! use-backend/.sigmoid use-backend/.sigmoid!
                               use-backend/.tanh use-backend/.tanh! use-backend/transpose
                               use-backend/transpose! use-backend/reshape use-backend/reinterpret
-							  use-backend/slice use-backend/cut))
+							  use-backend/slice use-backend/cut use-backend/transposition
+							  use-backend/transposition!))
 							  
       (funcall backend-function name)))
 	  
@@ -334,6 +341,8 @@
 (define-backend-getter-setter get-backend/sum use-backend/sum nnl2.ffi:%get-sum-without-axis-backend)
 (define-backend-getter-setter get-backend/slice use-backend/slice nnl2.ffi:%get-slice-backend)
 (define-backend-getter-setter get-backend/cut use-backend/cut nnl2.ffi:%get-cut-backend)
+(define-backend-getter-setter get-backend/transposition use-backend/transposition nnl2.ffi:%get-transposition-backend)
+(define-backend-getter-setter get-backend/transposition! use-backend/transposition! nnl2.ffi:%get-transposition-inplace-backend)
 
 (defun get-backend/norm (&key (p :l2))
   "Gets current backend for norm operation. P: Norm type (:l2 supported)"
@@ -588,6 +597,14 @@
 (define-backends-getter get-backends/cut
   nnl2.ffi:%get-cut-num-backends
   nnl2.ffi:%get-cut-backends)  
+  
+(define-backends-getter get-backends/transposition
+  nnl2.ffi:%get-transposition-num-backends
+  nnl2.ffi:%get-transposition-backends)  
+  
+(define-backends-getter get-backends/transposition!
+  nnl2.ffi:%get-transposition-inplace-num-backends
+  nnl2.ffi:%get-transposition-inplace-backends)    
 
 (defun get-backends/norm (&key (p :l2))
   "Returns list of available backends for norm operation. 
@@ -671,4 +688,6 @@
 (define-with-backend with-backend/norm get-backend/norm)
 (define-with-backend with-backend/slice get-backend/slice)
 (define-with-backend with-backend/cut get-backend/cut)
+(define-with-backend with-backend/transposition get-backend/transposition)
+(define-with-backend with-backend/transposition! get-backend/transposition!)
 		 

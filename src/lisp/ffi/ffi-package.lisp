@@ -202,6 +202,8 @@
    #:%set-reshape-backend
    #:%set-reinterpret-backend
    #:%set-cut-backend
+   #:%set-transposition-backend
+   #:%set-transposition-inplace-backend
    #:%get-tref-getter-backend
    #:%get-view-backend
    #:%get-empty-backend
@@ -254,6 +256,8 @@
    #:%get-reinterpret-backend
    #:%get-slice-backend
    #:%get-cut-backend
+   #:%get-transposition-backend
+   #:%get-transposition-inplace-backend
    #:%get-view-backends
    #:%get-view-num-backends
    #:%get-tref-setter-num-backends
@@ -362,6 +366,10 @@
    #:%get-slice-num-backends
    #:%get-cut-backends
    #:%get-cut-num-backends
+   #:%get-transposition-num-backends
+   #:%get-transposition-inplace-num-backends
+   #:%get-transposition-backends
+   #:%get-transposition-inplace-backends
    #:shape-at
    #:mem-aref-getter-float64
    #:mem-aref-getter-float32
@@ -370,7 +378,5 @@
    #:mem-aref-setter-float32
    #:mem-aref-setter-int32
    #:%slice
-   #:%cut
-   #:%transposition
-   #:%transposition!))
+   #:%cut))
    

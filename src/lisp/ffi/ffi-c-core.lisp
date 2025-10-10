@@ -441,12 +441,6 @@
   (slice-from :pointer)
   (slice-to :pointer))    
   
-(cffi:defcfun ("lisp_call_transposition" %transposition) :pointer
-  (tensor :pointer))
-  
-(cffi:defcfun ("lisp_call_transposition_inplace" %transposition!) :void
-  (tensor :pointer))
-  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
@@ -714,7 +708,13 @@
   (backend-name :string)) 
 
 (cffi:defcfun ("set_cut_backend" %set-cut-backend) :void
-  (backend-name :string))    
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_transposition_backend" %set-transposition-backend) :void
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_transposition_inplace_backend" %set-transposition-inplace-backend) :void
+  (backend-name :string))   
   
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
@@ -768,6 +768,8 @@
 (cffi:defcfun ("get_reinterpret_backend" %get-reinterpret-backend) :string) 
 (cffi:defcfun ("get_slice_backend" %get-slice-backend) :string)
 (cffi:defcfun ("get_cut_backend" %get-cut-backend) :string)
+(cffi:defcfun ("get_transposition_backend" %get-transposition-backend) :string)
+(cffi:defcfun ("get_transposition_inplace_backend" %get-transposition-inplace-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -873,6 +875,10 @@
 (cffi:defcfun ("get_slice_backends" %get-slice-backends) :pointer)
 (cffi:defcfun ("get_cut_num_backends" %get-cut-num-backends) :int)
 (cffi:defcfun ("get_cut_backends" %get-cut-backends) :pointer)
+(cffi:defcfun ("get_transposition_num_backends" %get-transposition-num-backends) :int)
+(cffi:defcfun ("get_transposition_inplace_num_backends" %get-transposition-inplace-num-backends) :int)
+(cffi:defcfun ("get_transposition_backends" %get-transposition-backends) :pointer)
+(cffi:defcfun ("get_transposition_inplace_backends" %get-transposition-inplace-backends) :pointer)
 
 ;; -- mem-aref setters/getters --
 

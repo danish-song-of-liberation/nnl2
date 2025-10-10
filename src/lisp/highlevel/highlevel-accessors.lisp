@@ -1838,3 +1838,9 @@
 
 (cffi:defcfun ("nnl2_ncols" ncols) :int
   (tensor :pointer)) 
+  
+(cffi:defcfun ("lisp_call_transposition" transposition) :pointer
+  (tensor :pointer))
+  
+(cffi:defcfun ("lisp_call_transposition_inplace" transposition!) :void
+  (tensor :pointer))  
