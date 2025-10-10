@@ -10,125 +10,137 @@
  ** @param tensor
  * Pointer to a tensor for transposition
  *
+ ** @param force
+ * If true - performs full transposition with data reordering
+ * If false - only swaps dimensions without reordering data
+ *
  ** @see product
  ** @see https://en.wikipedia.org/wiki/Dont_repeat_yourself 
  **/
-void naive_transposeinplace(Tensor* tensor) {
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+void naive_transposeinplace(Tensor* tensor, bool force) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
-	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		int32_t tensor_rank = tensor->rank;
-		if(tensor_rank < 2 || tensor_rank > 2) {
-			NNL2_FATAL("Tensor have an incorrect rank: %d (expected 2)", tensor_rank);
-			return;
-		}
-	#endif
-	
-	// Calculating the total number of elements in a tensor
-	size_t total_elems = product(tensor->shape, tensor->rank);
-	
-	int* shape = tensor->shape;
-	
-	int rows = shape[0];
-	int cols = shape[1];
-	
-	switch(tensor->dtype) {
-		case FLOAT64: {
-			size_t total_bytes = total_elems * sizeof(double);
-			
-			// Allocating memory for temporary storage of the transposed matrix
-			double* trans_data = (double*)malloc(total_bytes);
-			double* cast_data = (double*)tensor->data;
-			
-			if (trans_data == NULL) {
-				NNL2_ERROR("Memory allocation failed");
-				return;
-			}
-			
-			// Matrix transposition: element [i][j] -> [j][i]
-			for(int i = 0; i < rows; i++) {
-				for(int j = 0; j < cols; j++) {
-					int orig_index = i * cols + j;   // Index in the original matrix
-					int trans_index = j * rows + i;  // Index in the transposed matrix
-					
-					trans_data[trans_index] = cast_data[orig_index];
-				}
-			}
-			
-			// Copying the result back to the original tensor
-			memcpy(cast_data, trans_data, total_bytes);
-			free(trans_data);
-			
-			break;
-		}
-		
-		case FLOAT32: {
-			size_t total_bytes = total_elems * sizeof(float);
-			
-			// Allocating memory for temporary storage of the transposed matrix
-			float* trans_data = (float*)malloc(total_bytes);
-			float* cast_data = (float*)tensor->data;
-			
-			if (trans_data == NULL) {
-				NNL2_ERROR("Memory allocation failed");
-				return;
-			}
-			
-			// Matrix transposition: element [i][j] -> [j][i]
-			for(int i = 0; i < rows; i++) {
-				for(int j = 0; j < cols; j++) { 
-					int orig_index = i * cols + j;   // Index in the original matrix
-					int trans_index = j * rows + i;  // Index in the transposed matrix
-					
-					trans_data[trans_index] = cast_data[orig_index];
-				}
-			}
-			
-			// Copying the result back to the original tensor
-			memcpy(cast_data, trans_data, total_bytes);
-			free(trans_data);
-			
-			break;
-		}
-		
-		case INT32: {
-			size_t total_bytes = total_elems * sizeof(int32_t);
-			
-			// Allocating memory for temporary storage of the transposed matrix
-			int32_t* trans_data = (int32_t*)malloc(total_bytes);
-			int32_t* cast_data = (int32_t*)tensor->data;
-			
-			if (trans_data == NULL) {
-				NNL2_ERROR("Memory allocation failed");
-				return;
-			}
-			
-			// Matrix transposition: element [i][j] -> [j][i]
-			for(int i = 0; i < rows; i++) {
-				for(int j = 0; j < cols; j++) { 
-					int orig_index = i * cols + j;   // Index in the original matrix
-					int trans_index = j * rows + i;  // Index in the transposed matrix
-					
-					trans_data[trans_index] = cast_data[orig_index];
-				}
-			}
-			
-			// Copying the result back to the original tensor
-			memcpy(cast_data, trans_data, total_bytes);
-			free(trans_data);
-			
-			break;
-		}
-		
-		default: {
-			NNL2_TYPE_ERROR(tensor->dtype);
-			return;
-		}
-	}
-	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        int32_t tensor_rank = tensor->rank;
+        if(tensor_rank < 2 || tensor_rank > 2) {
+            NNL2_FATAL("Tensor have an incorrect rank: %d (expected 2)", tensor_rank);
+            return;
+        }
+    #endif
+    
+    if (force) {
+        // Full transposition with data reordering
+        // Calculating the total number of elements in a tensor
+        size_t total_elems = product(tensor->shape, tensor->rank);
+        
+        int* shape = tensor->shape;
+        
+        int rows = shape[0];
+        int cols = shape[1];
+        
+        switch(tensor->dtype) {
+            case FLOAT64: {
+                size_t total_bytes = total_elems * sizeof(double);
+                
+                // Allocating memory for temporary storage of the transposed matrix
+                double* trans_data = (double*)malloc(total_bytes);
+                double* cast_data = (double*)tensor->data;
+                
+                if (trans_data == NULL) {
+                    NNL2_ERROR("Memory allocation failed");
+                    return;
+                }
+                
+                // Matrix transposition: element [i][j] -> [j][i]
+                for(int i = 0; i < rows; i++) {
+                    for(int j = 0; j < cols; j++) {
+                        int orig_index = i * cols + j;   // Index in the original matrix
+                        int trans_index = j * rows + i;  // Index in the transposed matrix
+                        
+                        trans_data[trans_index] = cast_data[orig_index];
+                    }
+                }
+                
+                // Copying the result back to the original tensor
+                memcpy(cast_data, trans_data, total_bytes);
+                free(trans_data);
+                
+                break;
+            }
+            
+            case FLOAT32: {
+                size_t total_bytes = total_elems * sizeof(float);
+                
+                // Allocating memory for temporary storage of the transposed matrix
+                float* trans_data = (float*)malloc(total_bytes);
+                float* cast_data = (float*)tensor->data;
+                
+                if (trans_data == NULL) {
+                    NNL2_ERROR("Memory allocation failed");
+                    return;
+                }
+                
+                // Matrix transposition: element [i][j] -> [j][i]
+                for(int i = 0; i < rows; i++) {
+                    for(int j = 0; j < cols; j++) { 
+                        int orig_index = i * cols + j;   // Index in the original matrix
+                        int trans_index = j * rows + i;  // Index in the transposed matrix
+                        
+                        trans_data[trans_index] = cast_data[orig_index];
+                    }
+                }
+                
+                // Copying the result back to the original tensor
+                memcpy(cast_data, trans_data, total_bytes);
+                free(trans_data);
+                
+                break;
+            }
+            
+            case INT32: {
+                size_t total_bytes = total_elems * sizeof(int32_t);
+                
+                // Allocating memory for temporary storage of the transposed matrix
+                int32_t* trans_data = (int32_t*)malloc(total_bytes);
+                int32_t* cast_data = (int32_t*)tensor->data;
+                
+                if (trans_data == NULL) {
+                    NNL2_ERROR("Memory allocation failed");
+                    return;
+                }
+                
+                // Matrix transposition: element [i][j] -> [j][i]
+                for(int i = 0; i < rows; i++) {
+                    for(int j = 0; j < cols; j++) { 
+                        int orig_index = i * cols + j;   // Index in the original matrix
+                        int trans_index = j * rows + i;  // Index in the transposed matrix
+                        
+                        trans_data[trans_index] = cast_data[orig_index];
+                    }
+                }
+                
+                // Copying the result back to the original tensor
+                memcpy(cast_data, trans_data, total_bytes);
+                free(trans_data);
+                
+                break;
+            }
+            
+            default: {
+                NNL2_TYPE_ERROR(tensor->dtype);
+                return;
+            }
+        }
+    }
+    
+    // For both force=true and force=false we need to swap the shape dimensions
+    int temp = tensor->shape[0];
+    tensor->shape[0] = tensor->shape[1];
+    tensor->shape[1] = temp;
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();
     #endif
 }

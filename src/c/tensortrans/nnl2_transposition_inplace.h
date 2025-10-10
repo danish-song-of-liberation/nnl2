@@ -1,8 +1,61 @@
 #ifndef NNL2_TRANSPOSITION_INPLACE_H
 #define NNL2_TRANSPOSITION_INPLACE_H
 
+/** @brief 
+ * Performs pseudo-inplace transposition of a 2D tensor (matrix) in O(1) time
+ *
+ ** @param tensor
+ * Pointer to the 2D tensor to be transposed in-place
+ *
+ ** @warning
+ * MATHEMATICALLY INCORRECT FOR MOST OPERATIONS!
+ * This function modifies the tensor's shape and strides to represent
+ * a transposed view, but the underlying data remains unchanged in
+ * row-major order. Most tensor operations will produce mathematically
+ * incorrect results
+ *
+ ** @warning  
+ * This is a DESTRUCTIVE operation that modifies the input tensor.
+ * The original shape and strides are lost after this call
+ *
+ ** @example
+ * // Transposes tensor in-place without data copying
+ * Tensor* matrix = nnl2_empty((int[]){3, 2}, 2, FLOAT64);
+ * nnl2_naive_transposition_inplace(matrix);  // Now shape [2, 3]
+ *
+ ** @see nnl2_naive_transposition
+ **/
 void nnl2_naive_transposition_inplace(Tensor* tensor) {
-	(void)tensor;
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "Passed tensor in inplace transposition is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->shape, "Passed tensor shape in inplace transposition is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->strides, "Passed tensor stride in inplace transposition is NULL");
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(tensor->rank != 2) {
+            NNL2_ERROR("Tensor has incorrect rank: %d (expected 2)", tensor->rank);
+            return;
+        }
+    #endif
+    
+    // Swap shape dimensions in-place
+    int32_t temp_shape = tensor->shape[0];
+    tensor->shape[0] = tensor->shape[1];
+    tensor->shape[1] = temp_shape;
+    
+    // Swap strides in-place  
+    int32_t temp_stride = tensor->strides[0];
+    tensor->strides[0] = tensor->strides[1];
+    tensor->strides[1] = temp_stride;
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
 }
 
 /**

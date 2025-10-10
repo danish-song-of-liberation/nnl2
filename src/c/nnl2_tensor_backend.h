@@ -460,13 +460,14 @@ typedef Tensor* (*logfn)(const Tensor* a, bool inplace);
 /** @brief In-place matrix transpose function pointer
  ** @param a Input tensor (transposed in-place)
  **/
-typedef void (*transposeinplacefn)(Tensor* a);
+typedef void (*transposeinplacefn)(Tensor* a, bool force);
 
 /** @brief Matrix transpose function pointer (creates new tensor)
  ** @param a Input tensor
+ ** @param force If true return mathematically correct result
  ** @return New tensor containing transposed matrix
  **/
-typedef Tensor* (*transposefn)(const Tensor* a);
+typedef Tensor* (*transposefn)(const Tensor* a, bool force);
 
 /** @brief In-place matrix transposition function pointer (view)
  ** @param a Input tensor (transposed in-place)

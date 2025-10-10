@@ -1090,12 +1090,12 @@
 	    (:normal   (nnl2.ffi:%xavier shape rank dtype in out gain 2.0s0))
 	    (:uniform  (nnl2.ffi:%xavier shape rank dtype in out gain 6.0s0))
 	    (otherwise (error "Unknown xavier distribution: ~a%" distribution))))))
-		
-(cffi:defcfun ("lisp_call_transposeinplace" transpose!) :void
-  (tensor :pointer))
   
-(cffi:defcfun ("lisp_call_transpose" transpose) :pointer
-  (tensor :pointer))    
+(defun transpose (tensor &key force)
+  (nnl2.ffi:%transpose tensor force))
+  
+(defun transpose! (tensor &key force)
+  (nnl2.ffi:%transpose! tensor force))
   
 (defun sum (tensor &key axis &aux (dtype (dtype tensor)))
   "WARNING: YET NOT SUPPORT MULTIPLE AXES

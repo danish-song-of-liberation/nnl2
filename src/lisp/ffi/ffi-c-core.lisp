@@ -439,7 +439,15 @@
 (cffi:defcfun ("lisp_call_cut" %cut) :pointer
   (tensor :pointer)
   (slice-from :pointer)
-  (slice-to :pointer))    
+  (slice-to :pointer)) 
+
+(cffi:defcfun ("lisp_call_transpose" %transpose) :pointer
+  (tensor :pointer)
+  (force :bool))  
+  
+(cffi:defcfun ("lisp_call_transposeinplace" %transpose!) :void
+  (tensor :pointer)
+  (force :bool))  
   
 ;; -- Backends --  
  

@@ -158,7 +158,7 @@ void nnl2_init_broadcasting();
  * Functions to change the shape or interpretation of a tensor's dimensions without copying data
  */
 void nnl2_init_reshaping();
-        
+         
 ///@} [subinitializers_declaration]		
 		
 /** @brief
@@ -304,7 +304,7 @@ void nnl2_init_activations() {
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
 }
-
+     
 void nnl2_init_initializers() {
 	EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
 	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
@@ -313,6 +313,8 @@ void nnl2_init_initializers() {
 void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
+	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, current_backend(transposition_inplace)); 
+	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));  
 }
     
 void nnl2_init_auxiliary() {
@@ -561,12 +563,12 @@ Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
 }  
  
-void lisp_call_transposeinplace(Tensor* tensor) {
-	transposeinplace(tensor);  
+void lisp_call_transposeinplace(Tensor* tensor, bool force) {
+	transposeinplace(tensor, force);  
 }  
 
-Tensor* lisp_call_transpose(Tensor* tensor) {
-	return transpose(tensor);    
+Tensor* lisp_call_transpose(Tensor* tensor, bool force) {
+	return transpose(tensor, force);    
 }
 
 void lisp_call_sum_without_axis(Tensor* tensor, void* filler) {
