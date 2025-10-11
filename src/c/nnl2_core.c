@@ -630,7 +630,7 @@ Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
 void lisp_call_max_maxf_inplace(Tensor* tensor, void* maxf) {
 	max_maxf_inplace(tensor, maxf);
 }
-       
+         
 Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
 	return max_maxf(tensor, maxf);
 }

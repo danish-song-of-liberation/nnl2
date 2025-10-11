@@ -194,7 +194,229 @@ Tensor* nnl2_naive_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape
     
     return new_tensor;
 }
- 
+
+#ifdef NNL2_PTHREAD_AVAILABLE
+
+/** @brief
+ * Threshold for enabling parallel execution of reshape operation
+ */
+#define NNL2_RESHAPE_PARALLEL_THRESHOLD 1000000
+
+/** @brief
+ * Worker function for parallel reshape copy
+ * 
+ ** @param arg 
+ * Pointer to reshape_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_preshape_copy(void* arg);
+
+/** @brief
+ * High-performance parallel implementation of tensor reshape
+ * 
+ ** @param tensor 
+ * Pointer to source tensor
+ *
+ ** @param new_shape
+ * Target shape dimensions
+ *
+ ** @param new_shape_len
+ * Number of dimensions in new shape
+ *
+ ** @param force
+ * If true, bypasses element count validation
+ * 
+ ** @return
+ * Pointer to new reshaped tensor
+ * 
+ ** @warning
+ * Requires pthread support
+ */
+Tensor* nnl2_own_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", NULL);
+    #endif
+    
+    // Early return if shapes are identical
+    if (tensor->rank == new_shape_len && memcmp(tensor->shape, new_shape, new_shape_len * sizeof(int32_t)) == 0) {
+        return nnl2_copy(tensor, tensor->dtype); 
+    }
+    
+    // Calculate total elements from original tensor
+    size_t total_elems = product(tensor->shape, tensor->rank);
+    
+    // Allocate temporary buffer for shape processing (including wildcard resolution)
+    int32_t* wildcard_shape = malloc(new_shape_len * sizeof(int32_t));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!wildcard_shape) {
+            NNL2_ERROR("Memory allocation failed");
+            return NULL;
+        }
+    #endif
+    
+    int32_t wildcard_index = NNL2_WILDCARD_DIM;
+    size_t wildcard_count = 0;
+    size_t wildcard_shape_product = 1;
+    
+    for(int32_t i = 0; i < new_shape_len; i++) {
+        wildcard_shape[i] = new_shape[i];
+        if(new_shape[i] == NNL2_WILDCARD_DIM) {
+            wildcard_index = i;
+            wildcard_count++;
+        } else if (new_shape[i] < NNL2_WILDCARD_DIM) {
+            NNL2_ERROR("Invalid shape dimension: %d", new_shape[i]);
+            free(wildcard_shape);
+            return NULL;
+        } else {
+            #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+                if (new_shape[i] > 0) {
+                    if (wildcard_shape_product > SIZE_MAX / new_shape[i]) {
+                        NNL2_ERROR("Shape product overflow at dimension %d: %d * %d would exceed maximum size", i, wildcard_shape_product, new_shape[i]);
+                        free(wildcard_shape);
+                        return NULL;
+                    }
+                }
+            #endif
+            
+            wildcard_shape_product *= new_shape[i];
+        }
+    }
+    
+    // Validate wildcard count (0 or 1 allowed)
+    if(wildcard_count > 1) {
+        NNL2_ERROR("Must have at most one wildcard (-1), found %d", wildcard_count);
+        free(wildcard_shape);
+        return NULL;
+    }
+    
+    if(wildcard_count == 1) {
+        if(wildcard_shape_product == 0 || total_elems % wildcard_shape_product != 0) {
+            NNL2_ERROR("Cannot compute wildcard: %d %% %d != 0", total_elems, wildcard_shape_product);
+            free(wildcard_shape);
+            return NULL;
+        }
+        
+        int32_t wildcard_value = total_elems / wildcard_shape_product;
+        wildcard_shape[wildcard_index] = wildcard_value;
+    } else {
+        if(total_elems != wildcard_shape_product && !force) {
+            NNL2_ERROR("Number of elements for reshape does not match: expected %d, got %d", total_elems, wildcard_shape_product);
+            free(wildcard_shape);
+            return NULL;
+        }
+    }
+    
+    // Create new tensor with the resolved shape
+    Tensor* new_tensor = nnl2_empty(wildcard_shape, new_shape_len, tensor->dtype);
+    free(wildcard_shape);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(new_tensor == NULL) {
+            NNL2_ERROR("Tensor allocation failed");
+            return NULL;
+        }
+    #endif
+    
+    // Fallback to naive implementation for small tensors
+    if (total_elems < NNL2_RESHAPE_PARALLEL_THRESHOLD) {
+        // Use optimized memcpy for same data type
+        size_t item_size = get_dtype_size(tensor->dtype);
+        memcpy(new_tensor->data, tensor->data, total_elems * item_size);
+        
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+		
+        return new_tensor;
+    }
+    
+    bool src_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
+    bool dst_aligned = NNL2_IS_ALIGNED(new_tensor->data, NNL2_TENSOR_ALIGNMENT_32);
+    bool is_aligned = src_aligned && dst_aligned;
+    
+    // Warning for unaligned memory in safety modes
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!is_aligned) {
+            NNL2_WARN("In nnl2_own_reshape, tensor memory is not aligned to 32 bytes. Performance may be suboptimal");
+        }
+    #endif
+    
+    size_t num_threads = NNL2_NUM_THREADS;
+    pthread_t threads[num_threads];
+    reshape_ptask tasks[num_threads];
+    
+    size_t item_size = get_dtype_size(tensor->dtype);
+    
+    // Calculate optimal chunk sizes with load balancing
+    size_t chunk = total_elems / num_threads;
+    size_t remainder = total_elems % num_threads;
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        tasks[i].src_data = tensor->data;
+        tasks[i].dst_data = new_tensor->data;
+        tasks[i].start_idx = current_start;
+        tasks[i].end_idx = current_start + current_chunk;
+        tasks[i].item_size = item_size;
+        tasks[i].aligned = is_aligned;
+        
+        // Create thread to process the assigned chunk
+        int status = pthread_create(&threads[i], NULL, nnl2_own_preshape_copy, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_reshape");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_reshape");
+        }
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return new_tensor;
+}
+
+/** @brief
+ * Parallel reshape copy worker
+ * 
+ ** @see nnl2_own_preshape_copy
+ **/
+void* nnl2_own_preshape_copy(void* arg) {
+    reshape_ptask* task = (reshape_ptask*)arg;
+    char* src_data = (char*)task->src_data;
+    char* dst_data = (char*)task->dst_data;
+    
+    size_t start_byte = task->start_idx * task->item_size;
+    size_t end_byte = task->end_idx * task->item_size;
+    size_t chunk_size = end_byte - start_byte;
+    
+    // Use memcpy for the chunk
+    memcpy(dst_data + start_byte, src_data + start_byte, chunk_size);
+    
+    return NULL;
+}
+
+#endif
+
 /** 
  * @ingroup backend_system
  * @brief Backend implementations for reshape operation
@@ -207,6 +429,10 @@ Tensor* nnl2_naive_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape
  */
 Implementation reshape_backends[] = {
     REGISTER_BACKEND(nnl2_naive_reshape, nnl2_naive, NAIVE_BACKEND_NAME),
+    
+    #ifdef NNL2_PTHREAD_AVAILABLE
+        REGISTER_BACKEND(nnl2_own_reshape, nnl2_own, NNL2_OWN_NAME),
+    #endif
 };  
 
 /**

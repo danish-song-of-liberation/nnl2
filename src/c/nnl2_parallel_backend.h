@@ -964,6 +964,21 @@ typedef struct {
 
 
 
+///@{ [reshape_ptask]
+
+typedef struct {
+    void* src_data;           ///< Pointer to source data 
+    void* dst_data;           ///< Pointer to destination data
+    size_t start_idx;         ///< Start index for this thread 
+    size_t end_idx;           ///< End index for this thread 
+    size_t item_size;         ///< Size of each element in bytes 
+    bool aligned;             ///< Whether memory is aligned 
+} reshape_ptask;
+
+///@} [reshape_ptask]
+
+
+
 ///@{ [macro]
 
 /** @def
