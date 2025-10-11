@@ -375,7 +375,7 @@
    #:mem-aref-getter-float32
    #:mem-aref-getter-int32
    #:mem-aref-setter-float64
-   #:mem-aref-setter-float32
+   #:mem-aref-setter-float32 
    #:mem-aref-setter-int32
    #:%slice
    #:%cut

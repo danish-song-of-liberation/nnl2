@@ -825,9 +825,6 @@ typedef struct {
 
 ///@{ [axpy_broadcasting_ptask]
 
-/** @brief
- * Parallel task structure for AXPY broadcasting operation
- */
 typedef struct {
     Tensor* summand;                ///< Pointer to summand tensor 
     Tensor* sumend;                 ///< Pointer to sumend tensor 
@@ -852,9 +849,6 @@ typedef struct {
 
 ///@{ [axpf_inplace_ptask]
 
-/** @brief
- * Parallel task structure for AXPF in-place operation
- */
 typedef struct {
     Tensor* summand;                ///< Pointer to summand tensor (modified in-place)
     void* sumend;                   ///< Pointer to scalar sumend value
@@ -877,6 +871,98 @@ typedef struct {
 
 
 ///@} [axpf_inplace_ptask]
+
+
+
+///@{ [copy_ptask]
+
+typedef struct {
+    void* src_data;           ///< Pointer to source data 
+    void* dst_data;           ///< Pointer to destination data 
+    size_t start;             ///< Start index for this thread 
+    size_t end;               ///< End index for this thread 
+    TensorType dtype;         ///< Data type of the tensor 
+    bool aligned;             ///< Whether memory is aligned 
+    TensorType target_dtype;  ///< Target data type for conversion 
+} copy_ptask;
+
+///@} [copy_ptask]
+
+
+
+///@{ [hstack_ptask]
+
+typedef struct {
+    void* src_a;            		  ///< Pointer to first source tensor data 
+    void* src_b;             		  ///< Pointer to second source tensor data 
+    void* dst;               		  ///< Pointer to destination data 
+    size_t start_idx;        		  ///< Start index for this thread 
+    size_t end_idx;          		  ///< End index for this thread 
+    size_t elements_per_row_a;		  ///< Elements per row in tensor A 
+    size_t elements_per_row_b;        ///< Elements per row in tensor B 
+    size_t elements_per_row_result;   ///< Elements per row in result 
+    TensorType type_a;      		  ///< Data type of first tensor 
+    TensorType type_b;       		  ///< Data type of second tensor 
+    TensorType result_type;  		  ///< Result data type 
+    bool aligned;             		  ///< Whether memory is aligned 
+    bool same_type;           		  ///< Whether both tensors have same type 
+} hstack_ptask;
+
+///@} [hstack_ptask]
+
+
+
+///@{ [vstack_ptask]
+
+typedef struct {
+    void* src_a;              ///< Pointer to first source tensor data 
+    void* src_b;              ///< Pointer to second source tensor data 
+    void* dst;                ///< Pointer to destination data 
+    size_t start_idx;         ///< Start index for this thread 
+    size_t end_idx;           ///< End index for this thread 
+    size_t size_a;            ///< Total elements in tensor A 
+    size_t size_b;            ///< Total elements in tensor B 
+    size_t row_size_a;        ///< Row size in bytes for tensor A 
+    size_t row_size_b;        ///< Row size in bytes for tensor B 
+    TensorType type_a;        ///< Data type of first tensor 
+    TensorType type_b;        ///< Data type of second tensor 
+    TensorType result_type;   ///< Result data type 
+    bool aligned;             ///< Whether memory is aligned 
+    bool same_type;           ///< Whether both tensors have same type 
+    int case_type;            ///< VStack case type: 0=1D-1D, 1=2D-1D, 2=1D-2D, 3=ND-ND 
+} vstack_ptask;
+
+///@} [vstack_ptask]
+
+
+
+///@{ [concat_ptask]
+
+typedef struct {
+    void* src_a;              ///< Pointer to first source tensor data 
+    void* src_b;              ///< Pointer to second source tensor data 
+    void* dst;                ///< Pointer to destination data 
+    size_t start_idx;         ///< Start index for this thread 
+    size_t end_idx;           ///< End index for this thread 
+    size_t total_elements;    ///< Total elements in result 
+    size_t a_axis_size;       ///< Size of concatenation axis in tensor A 
+    size_t item_size;         ///< Size of each element in bytes 
+    int rank;                 ///< Rank of tensors 
+    int axis;                 ///< Concatenation axis 
+    int* result_shape;        ///< Shape of result tensor 
+    int32_t* result_strides;  ///< Strides of result tensor (in elements) 
+    int32_t* a_strides;       ///< Strides of tensor A (in elements) 
+    int32_t* b_strides;       ///< Strides of tensor B (in elements) 
+    TensorType type_a;        ///< Data type of first tensor 
+    TensorType type_b;        ///< Data type of second tensor 
+    TensorType result_type;   ///< Result data type 
+    bool aligned;             ///< Whether memory is aligned 
+    bool same_type;           ///< Whether both tensors have same type 
+} concat_ptask;
+
+///@} [concat_ptask]
+
+
 
 ///@{ [macro]
 

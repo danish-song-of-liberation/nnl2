@@ -561,7 +561,7 @@ Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
-}  
+}       
  
 void lisp_call_transposeinplace(Tensor* tensor, bool force) {
 	transposeinplace(tensor, force);  
@@ -622,7 +622,7 @@ Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) {
 void lisp_call_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
 	pow_powf_inplace(tensor, powf_arg);
 }
- 
+   
 Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
 	return pow_powf(tensor, powf);
 }
@@ -630,7 +630,7 @@ Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
 void lisp_call_max_maxf_inplace(Tensor* tensor, void* maxf) {
 	max_maxf_inplace(tensor, maxf);
 }
-
+       
 Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
 	return max_maxf(tensor, maxf);
 }
