@@ -979,6 +979,25 @@ typedef struct {
 
 
 
+///@{ [sum_axis_ptask]
+
+typedef struct {
+    void* src_data;           ///< Pointer to source data 
+    void* dst_data;           ///< Pointer to destination data 
+    size_t start_idx;         ///< Start result index for this thread 
+    size_t end_idx;           ///< End result index for this thread 
+    size_t result_numel;      ///< Total elements in result 
+    int axis;                 ///< Summation axis 
+    int elements_along_axis;  ///< Elements along summation axis 
+    TensorType dtype;         ///< Data type 
+    Tensor* tensor;           ///< Source tensor 
+    Tensor* result;           ///< Result tensor 
+} sum_axis_ptask;
+
+///@} [sum_axis_ptask]
+
+
+
 ///@{ [macro]
 
 /** @def

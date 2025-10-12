@@ -34,7 +34,7 @@
 	#define ALLOC_ALIGNED(ptr, alignment, size) \
 		do { \
 			ptr = _aligned_malloc(size, alignment); \
-			if (ptr == NULL) { fprintf(stderr, "Error (Hello from C!): Failed to allocate memory\n"); } \
+			if (ptr == NULL) { NNL2_ERROR("Failed to allocate memory"); } \
 		} while(0)
 			
     /** @brief 
@@ -94,11 +94,11 @@
 ///@{ [tensor_mem_alignment]
 
 /** @brief Determines optimal memory alignment based on available CPU features **/
-#if defined(__AVX512F__)
+#if defined(__AVX512F__) && defined(NNL2_AVX512_AVAILABLE)
 	#define TENSOR_MEM_ALIGNMENT 64
-#elif defined(__AVX2__)
+#elif defined(__AVX2__) && defined(NNL2_AVX256_AVAILABLE)
 	#define TENSOR_MEM_ALIGNMENT 32
-#elif defined(__AVX__)
+#elif defined(__AVX__) && defined(NNL2_AVX128_AVAILABLE)
 	#define TENSOR_MEM_ALIGNMENT 32
 #else 
 	#define TENSOR_MEM_ALIGNMENT 16

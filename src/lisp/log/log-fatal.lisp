@@ -27,5 +27,5 @@
   
   (let ((text (apply #'format nil msg args)))
     (%fatal text)
-    text)) ;; lol its like KeBugCheckEx(...); return SUCCESS;
+    text)) ;; KeBugCheckEx(...); return SUCCESS;
 	

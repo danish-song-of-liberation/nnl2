@@ -16,7 +16,7 @@
 #include <stdlib.h> 
 #include <time.h>        
   
-#include "nnl2_core.h"      
+#include "nnl2_core.h"       
 #include "nnl2_ffi_test.h" 
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"  
@@ -41,7 +41,7 @@
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
  **/
-    
+       
 ///@{ [initilizing]
 
 ///@{ [subinitializers_declaration]          
