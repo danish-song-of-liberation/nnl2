@@ -82,7 +82,17 @@
 														 (:file "convert-nnl2-magicl" :type "lisp")
 														 (:file "convert-magicl-nnl2" :type "lisp")
 														 (:file "convert-magicl-array" :type "lisp")
-														 (:file "convert-magicl-list" :type "lisp")))))))
+														 (:file "convert-magicl-list" :type "lisp")))
+														 
+										   (:module "log"
+										    :serial t
+											:components ((:file "log-package" :type "lisp")
+														 (:file "log-ffi" :type "lisp")
+														 (:file "log-error" :type "lisp")
+														 (:file "log-warning" :type "lisp")
+														 (:file "log-fatal" :type "lisp")
+														 (:file "log-debug" :type "lisp")
+														 (:file "log-info" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

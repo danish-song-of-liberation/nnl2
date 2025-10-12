@@ -1106,7 +1106,7 @@
    tensor: Input tensor
    axis (&key): Axis to sum"
    
-  (let* ((type-t (type/nn2->cffi dtype))
+  (let* ((type-t (type/nnl2->cffi dtype))
 		 (out (cffi:foreign-alloc type-t)))
 					
 	(if axis				

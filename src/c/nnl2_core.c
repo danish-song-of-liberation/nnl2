@@ -16,10 +16,11 @@
 #include <stdlib.h> 
 #include <time.h>        
   
-#include "nnl2_core.h"   
+#include "nnl2_core.h"      
 #include "nnl2_ffi_test.h" 
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"  
+#include "nnl2_foreign_log.h"  
  
 #include "backends_status/nnl2_status.h"  
 
