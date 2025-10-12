@@ -1102,7 +1102,7 @@
   
    Summarizes all tensor elements 
    along the selected axis
-   
+    
    tensor: Input tensor
    axis (&key): Axis to sum"
    
