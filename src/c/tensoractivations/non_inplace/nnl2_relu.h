@@ -166,10 +166,6 @@ Tensor* nnl2_own_relu(Tensor* tensor) {
     #endif
     
     size_t num_threads = NNL2_NUM_THREADS;
-    // For very large tensors, use more threads
-    if(total_elems > 10000000) {
-        num_threads = NNL2_NUM_THREADS * 2; // Use hyper-threading
-    }
     
     pthread_t threads[num_threads];
     relu_ptask tasks[num_threads];

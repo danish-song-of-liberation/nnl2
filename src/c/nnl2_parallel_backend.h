@@ -1020,16 +1020,32 @@ typedef struct {
 ///@{ [relu_ptask]
 
 typedef struct {
-    void* src_data;           /**< Pointer to source data */
-    void* dst_data;           /**< Pointer to destination data */
-    size_t start_idx;         /**< Start index for this thread */
-    size_t end_idx;           /**< End index for this thread */
-    TensorType dtype;         /**< Data type of the tensor */
-    bool aligned;             /**< Whether memory is aligned */
-    bool inplace;             /**< Whether operation is in-place */
+    void* src_data;           ///< Pointer to source data */
+    void* dst_data;           ///< Pointer to destination data */
+    size_t start_idx;         ///< Start index for this thread */
+    size_t end_idx;           ///< End index for this thread */
+    TensorType dtype;         ///< Data type of the tensor */
+    bool aligned;             ///< Whether memory is aligned */
+    bool inplace;             ///< Whether operation is in-place */
 } relu_ptask;
 
 ///@} [relu_ptask]
+
+
+
+///@{ [leakyrelu_ptask]
+
+typedef struct {
+    void* src_data;           ///< Pointer to source data 
+    void* dst_data;           ///< Pointer to destination data 
+    size_t start_idx;         ///< Start index for this thread 
+    size_t end_idx;           ///< End index for this thread 
+    TensorType dtype;         ///< Data type of the tensor
+    float alpha;              ///< Negative slope coefficient
+    bool inplace;             ///< Whether operation is in-place
+} leakyrelu_ptask;
+
+///@} [leakyrelu_ptask]
 
 
 

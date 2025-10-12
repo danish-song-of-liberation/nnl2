@@ -82,7 +82,7 @@ void nnl2_init_standard_inplace();
  * Registers backend implementations for tensor stacking and concatenation
  */
 void nnl2_init_stack();
-  
+    
 /** @brief 
  * Registers in-place activation function operations
  *
