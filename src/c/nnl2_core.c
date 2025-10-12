@@ -82,7 +82,7 @@ void nnl2_init_standard_inplace();
  * Registers backend implementations for tensor stacking and concatenation
  */
 void nnl2_init_stack();
-
+  
 /** @brief 
  * Registers in-place activation function operations
  *
@@ -126,7 +126,7 @@ void nnl2_init_auxiliary();
  ** @details 
  * In-place operations that correspond to a standard function (e.g., `add_incf_inplace` for `add`)
  */
-void nnl2_init_correspondence_inplace();
+void nnl2_init_correspondence_inplace();      
 
 /** @brief 
  * Registers out-of-place correspondence operations
