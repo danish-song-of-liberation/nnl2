@@ -572,25 +572,29 @@ typedef Tensor* (*leakyrelufn)(const Tensor* a, float alpha, bool inplace);
 
 /** @brief In-place sigmoid activation function pointer
  ** @param a Input tensor (modified in-place with 1/(1 + exp(-a)))
+ ** @param approx If true, use approximation for faster computation
  **/
-typedef void (*sigmoidinplacefn)(Tensor* a);
+typedef void (*sigmoidinplacefn)(Tensor* a, bool approx);
 
 /** @brief Sigmoid activation function pointer (creates new tensor)
  ** @param a Input tensor
+ ** @param approx If true, use approximation for faster computation
  ** @return New tensor containing sigmoid activation 1/(1 + exp(-a))
  **/
-typedef Tensor* (*sigmoidfn)(const Tensor* a);
+typedef Tensor* (*sigmoidfn)(const Tensor* a, bool approx);
 
 /** @brief In-place hyperbolic tangent function pointer
  ** @param a Input tensor (modified in-place with tanh(a))
+ ** @param approx If true, use approximation for faster computation
  **/
-typedef void (*tanhinplacefn)(Tensor* a);
+typedef void (*tanhinplacefn)(Tensor* a, bool approx);
 
 /** @brief Hyperbolic tangent function pointer (creates new tensor)
  ** @param a Input tensor
+ ** @param approx If true, use approximation for faster computation
  ** @return New tensor containing element-wise tanh(a)
  **/
-typedef Tensor* (*tanhfn)(const Tensor* a);
+typedef Tensor* (*tanhfn)(const Tensor* a, bool approx);
 
 /** @brief Concatenation function pointer (creates new tensor)
  ** @param a First tensor

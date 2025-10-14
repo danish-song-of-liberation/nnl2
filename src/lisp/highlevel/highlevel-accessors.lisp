@@ -1027,17 +1027,33 @@
    
   (%.leaky-relu tensor (coerce alpha 'single-float) save-type))
 
-(cffi:defcfun ("lisp_call_sigmoidinplace" .sigmoid!) :void
-  (tensor :pointer))  
-  f
-(cffi:defcfun ("lisp_call_sigmoid" .sigmoid) :pointer
-  (tensor :pointer))    
+(cffi:defcfun ("lisp_call_sigmoidinplace" %.sigmoid!) :void
+  (tensor :pointer)
+  (approx :bool))
   
-(cffi:defcfun ("lisp_call_tanhinplace" .tanh!) :void
-  (tensor :pointer))
+(defun .sigmoid! (tensor &key (approx t))
+  (%.sigmoid! tensor approx))
   
-(cffi:defcfun ("lisp_call_tanh" .tanh) :pointer
-  (tensor :pointer))  
+(cffi:defcfun ("lisp_call_sigmoid" %.sigmoid) :pointer
+  (tensor :pointer)
+  (approx :bool))
+  
+(defun .sigmoid (tensor &key (approx t))
+  (%.sigmoid tensor approx))  
+  
+(cffi:defcfun ("lisp_call_tanhinplace" %.tanh!) :void
+  (tensor :pointer)
+  (approx :bool))
+  
+(defun .tanh! (tensor &key (approx t))
+  (%.tanh! tensor approx))  
+  
+(cffi:defcfun ("lisp_call_tanh" %.tanh) :pointer
+  (tensor :pointer)
+  (approx :bool))
+
+(defun .tanh (tensor &key (approx t))
+  (%.tanh tensor approx))  
   
 (defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
   "Creates a tensor of the specified shape from random numbers

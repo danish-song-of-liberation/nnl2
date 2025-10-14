@@ -244,10 +244,10 @@
 ///@} [tensor_alignment_macros]
 
 ///@{ [avx_macros]
-	#define NNL2_INT32_ELEMENTS_PER_AVX256 8       ///< 256 bits / 32 bits per int32
-	#define NNL2_FLOAT32_ELEMENTS_PER_AVX256 8     ///< 256 bits / 32 bits per float
-	#define NNL2_FLOAT64_ELEMENTS_PER_AVX256 4     ///< 256 bits / 64 bits per double
-	#define NNL2_MIN_ELEMENTS_FOR_AVX256_DOUBLE 4  ///< Minimum elements for AVX256 double processing
+	#define NNL2_INT32_ELEMENTS_PER_AVX256 8       ///< 256 bits / 32 bits per nnl2_int32
+	#define NNL2_FLOAT32_ELEMENTS_PER_AVX256 8     ///< 256 bits / 32 bits per nnl2_float32
+	#define NNL2_FLOAT64_ELEMENTS_PER_AVX256 4     ///< 256 bits / 64 bits per nnl2_float64
+	#define NNL2_MIN_ELEMENTS_FOR_AVX256_DOUBLE 4  ///< Minimum elements for AVX256 nnl2_float64 processing
 ///@} [avx_macros]
 
 ///@{ [format_parameters]
@@ -258,7 +258,7 @@
 												    **  macros that I later removed in format function **/
 	#define NNL2_LARGE_TENSOR_SAMPLE_SIZE 10	   ///< Same
 	#define NNL2_1D_TENSOR_SHOW_ELEMENTS 5		   ///< Show items BEFORE and AFTER skipping
-	#define NNL2_FLOAT64_FORMAT "%.6f"			   ///< Format string for double precision floating point 
+	#define NNL2_FLOAT64_FORMAT "%.6f"			   ///< Format string for nnl2_float64 precision floating point 
 	#define NNL2_FLOAT32_FORMAT "%.4f"			   ///< Format string for single precision floating point
 ///@} [format_parameters] 
 
@@ -278,7 +278,7 @@
     }
 
 /** @brief Invalid tensor type return pointer (for error handling) **/
-#define NNL2_TENSOR_TYPE_INVALID_RET_PNTR ((int32_t*)-1)
+#define NNL2_TENSOR_TYPE_INVALID_RET_PNTR ((nnl2_int32*)-1)
 
 /** @brief Invalid tensor type value **/
 #define NNL2_TENSOR_TYPE_INVALID -1
@@ -291,13 +291,15 @@
  */
 #define NNL2_TENSORTYPE_TO_C_TYPE(type) \
     _Generic((type), \
-        INT32: int32_t, \
-        FLOAT32: float, \
-        FLOAT64: double \
+        INT32: nnl2_int32, \
+        FLOAT32: nnl2_float32, \
+        FLOAT64: nnl2_float64 \
     )
 	
 /** @brief Wildcard dimension value for reinterpret (reshape as a world and representation (view)) **/	
 #define NNL2_WILDCARD_DIM -1
+
+#define NNL2_OWN_GEMM_AVAILABLE (NNL2_PTHREAD_AVAILABLE && (NNL2_AVX128_AVAILABLE || NNL2_AVX256_AVAILABLE || NNL2_AVX512_AVAILABLE))
 
 ///@} [tensor_macros]
 
@@ -344,7 +346,7 @@ NNL2_FORCE_INLINE static size_t get_dtype_size(TensorType dtype) {
 		#define NNL2_SUPPRESS_ARRAY_BOUNDS
     #endif
 	
-	return (const size_t[]){sizeof(int), sizeof(float), sizeof(double)}[dtype]; 
+	return (const size_t[]){sizeof(nnl2_int32), sizeof(nnl2_float32), sizeof(nnl2_float64)}[dtype]; 
 	
 	#ifdef __GNUC__
 		#pragma GCC diagnostic pop

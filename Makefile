@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -O3 -fPIC -mavx -mavx2 -msse4.1 -msse4.2 -DNNL2_PTHREAD_AVAILABLE
+CFLAGS = -Wall -Wextra -Werror -O3 -fPIC -mavx -mavx2 -msse4.1 -msse4.2 -mfma -DNNL2_PTHREAD_AVAILABLE -fopenmp
 
 SRC = src/c/nnl2_core.c
 OBJ = $(SRC:.c=.o)

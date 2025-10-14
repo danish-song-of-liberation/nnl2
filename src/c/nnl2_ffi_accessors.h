@@ -15,7 +15,7 @@
  ** @return 
  * Value at specified index
  */
-float nnl2_fast_float32_get(float* data, size_t index) {
+nnl2_float32 nnl2_fast_float32_get(nnl2_float32* data, size_t index) {
     return data[index];
 }
 
@@ -31,7 +31,7 @@ float nnl2_fast_float32_get(float* data, size_t index) {
  ** @param value 
  * Value to assign
  */
-void nnl2_fast_float32_set(float* data, size_t index, float value) {
+void nnl2_fast_float32_set(nnl2_float32* data, size_t index, float value) {
     data[index] = value;
 }
 
@@ -47,7 +47,7 @@ void nnl2_fast_float32_set(float* data, size_t index, float value) {
  ** @return 
  * Value at specified index
  */
-double nnl2_fast_float64_get(double* data, size_t index) {
+nnl2_float64 nnl2_fast_float64_get(nnl2_float64* data, size_t index) {
     return data[index];
 }
 
@@ -63,7 +63,7 @@ double nnl2_fast_float64_get(double* data, size_t index) {
  ** @param value 
  * Value to assign
  */
-void nnl2_fast_float64_set(double* data, size_t index, double value) {
+void nnl2_fast_float64_set(nnl2_float64* data, size_t index, double value) {
     data[index] = value;
 }
 
@@ -79,7 +79,7 @@ void nnl2_fast_float64_set(double* data, size_t index, double value) {
  ** @return 
  * Value at specified index
  */
-int nnl2_fast_int32_get(int* data, size_t index) {
+nnl2_int32 nnl2_fast_int32_get(nnl2_int32* data, size_t index) {
     return data[index];
 }
 
@@ -95,7 +95,7 @@ int nnl2_fast_int32_get(int* data, size_t index) {
  ** @param value 
  * Value to assign
  */
-void nnl2_fast_int32_set(int* data, size_t index, int value) {
+void nnl2_fast_int32_set(nnl2_int32* data, size_t index, int value) {
     data[index] = value;
 }
 

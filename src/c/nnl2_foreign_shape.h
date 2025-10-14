@@ -10,7 +10,7 @@
  ** @return int32_t
  * Number of rows in a tensor
  */
-int32_t nnl2_nrows (Tensor* tensor) { 
+nnl2_int32 nnl2_nrows (Tensor* tensor) { 
 	return tensor->shape[0];
 }
 
@@ -23,7 +23,7 @@ int32_t nnl2_nrows (Tensor* tensor) {
  ** @return int32_t
  * Number of cols in a tensor
  */
-int32_t nnl2_ncols (Tensor* tensor) {
+nnl2_int32 nnl2_ncols (Tensor* tensor) {
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if(tensor->rank < 2) {
 			NNL2_ERROR("Can't extract number of cols in passed tensor (tensor rank is less than 2)");

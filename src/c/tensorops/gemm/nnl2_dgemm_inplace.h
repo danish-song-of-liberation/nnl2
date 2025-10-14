@@ -332,7 +332,7 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 	
 	// Call the actual BLAS DGEMM function for double-precision matrices
     // This is the highly optimized matrix multiplication routine from OpenBLAS
-    // Performs: C = alpha * op(A) * op(B) + beta * Cы					   
+    // Performs: C = alpha * op(A) * op(B) + beta * C					   
 	cblas_dgemm(cblas_order,     // Memory ordering (RowMajor/ColMajor)
                 cblas_transa,    // Transpose flag for matrix A
                 cblas_transb,    // Transpose flag for matrix B
@@ -352,6 +352,7 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 		NNL2_FUNC_EXIT();
 	#endif	
 }
+
 #endif
 
 /** @ingroup backend_system
@@ -369,7 +370,7 @@ Implementation dgemminplace_backends[] = {
 	REGISTER_BACKEND(naive_dgemminplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef OPENBLAS_AVAILABLE
-	REGISTER_BACKEND(blas_dgemminplace, nnl2_blas, BLAS_BACKEND_NAME),
+		REGISTER_BACKEND(blas_dgemminplace, nnl2_blas, BLAS_BACKEND_NAME),
 	#endif
 };
 

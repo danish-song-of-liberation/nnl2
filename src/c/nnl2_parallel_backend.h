@@ -224,9 +224,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor 
     bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned 
     union {
-        double float64_inc;     ///< Scalar increment for FLOAT64 
-        float float32_inc;      ///< Scalar increment for FLOAT32 
-        int32_t int32_inc;      ///< Scalar increment for INT32 
+        nnl2_float64 float64_inc;    ///< Scalar increment for FLOAT64 
+        nnl2_float32 float32_inc;    ///< Scalar increment for FLOAT32 
+        nnl2_int32   int32_inc;      ///< Scalar increment for INT32 
     } increment;                ///< Scalar increment value 
 } addincfinplace_ptask;
 
@@ -243,9 +243,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor 
     bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned 
     union {
-        double float64_dec;     ///< Scalar decrement for FLOAT64 
-        float float32_dec;      ///< Scalar decrement for FLOAT32 
-        int32_t int32_dec;      ///< Scalar decrement for INT32 
+        nnl2_float64 float64_dec;     ///< Scalar decrement for FLOAT64 
+        nnl2_float32 float32_dec;     ///< Scalar decrement for FLOAT32 
+        nnl2_int32   int32_dec;       ///< Scalar decrement for INT32 
     } decrement;                ///< Scalar decrement value 
 } subdecfinplace_ptask;
 	
@@ -262,9 +262,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor 
     bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned 
     union {
-        double float64_mult;    ///< Scalar multiplier for FLOAT64 
-        float float32_mult;     ///< Scalar multiplier for FLOAT32 
-        int32_t int32_mult;     ///< Scalar multiplier for INT32 
+        nnl2_float64 float64_mult;    ///< Scalar multiplier for FLOAT64 
+        nnl2_float32 float32_mult;    ///< Scalar multiplier for FLOAT32 
+        nnl2_int32   int32_mult;      ///< Scalar multiplier for INT32 
     } multiplier;               ///< Scalar multiplier value 
 } mulmulfinplace_ptask;
 
@@ -281,9 +281,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor
     bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned
     union {
-        double float64_div;     ///< Scalar divisor for FLOAT64
-        float float32_div;      ///< Scalar divisor for FLOAT32
-        int32_t int32_div;      ///< Scalar divisor for INT32
+        nnl2_float64 float64_div;     ///< Scalar divisor for FLOAT64
+        nnl2_float32 float32_div;     ///< Scalar divisor for FLOAT32
+        nnl2_int32   int32_div;       ///< Scalar divisor for INT32
     } divisor;                  ///< Scalar divisor value
 } divdivfinplace_ptask;
 
@@ -302,9 +302,9 @@ typedef struct {
     bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
-        double float64_inc;     ///< Scalar increment for FLOAT64
-        float float32_inc;      ///< Scalar increment for FLOAT32
-        int32_t int32_inc;      ///< Scalar increment for INT32
+        nnl2_float64 float64_inc;     ///< Scalar increment for FLOAT64
+        nnl2_float32 float32_inc;     ///< Scalar increment for FLOAT32
+        nnl2_int32   int32_inc;       ///< Scalar increment for INT32
     } increment;                ///< Scalar increment value
 } addincf_non_inplace_ptask;
 
@@ -323,9 +323,9 @@ typedef struct {
     bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
-        double float64_dec;     ///< Scalar decrement for FLOAT64
-        float float32_dec;      ///< Scalar decrement for FLOAT32
-        int32_t int32_dec;      ///< Scalar decrement for INT32
+        nnl2_float64 float64_dec;     ///< Scalar decrement for FLOAT64
+        nnl2_float32 float32_dec;     ///< Scalar decrement for FLOAT32
+        nnl2_int32 int32_dec;         ///< Scalar decrement for INT32
     } decrement;                ///< Scalar decrement value
 } subdecf_non_inplace_ptask;
 
@@ -344,9 +344,9 @@ typedef struct {
     bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
-        double float64_mult;    ///< Scalar multiplier for FLOAT64
-        float float32_mult;     ///< Scalar multiplier for FLOAT32
-        int32_t int32_mult;     ///< Scalar multiplier for INT32
+        nnl2_float64 float64_mult;    ///< Scalar multiplier for FLOAT64
+        nnl2_float32 float32_mult;    ///< Scalar multiplier for FLOAT32
+        nnl2_int32 int32_mult;        ///< Scalar multiplier for INT32
     } multiplier;               ///< Scalar multiplier value
 } mulmulf_non_inplace_ptask;
 
@@ -365,9 +365,9 @@ typedef struct {
     bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
-        double float64_div;     ///< Scalar divisor for FLOAT64
-        float float32_div;      ///< Scalar divisor for FLOAT32
-        int32_t int32_div;      ///< Scalar divisor for INT32
+        nnl2_float64 float64_div;     ///< Scalar divisor for FLOAT64
+        nnl2_float32 float32_div;     ///< Scalar divisor for FLOAT32
+        nnl2_int32 int32_div;         ///< Scalar divisor for INT32
     } divisor;                  ///< Scalar divisor value
 } divdivf_non_inplace_ptask;
 
@@ -657,9 +657,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
-        double float64_threshold;   ///< Threshold value for FLOAT64
-        float float32_threshold;    ///< Threshold value for FLOAT32
-        int32_t int32_threshold;    ///< Threshold value for INT32
+        nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
+        nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
+        nnl2_int32   int32_threshold;     ///< Threshold value for INT32
     } threshold;
 } min_minf_ptask;
 
@@ -684,9 +684,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
-        double float64_threshold;   ///< Threshold value for FLOAT64
-        float float32_threshold;    ///< Threshold value for FLOAT32
-        int32_t int32_threshold;    ///< Threshold value for INT32
+        nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
+        nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
+        nnl2_int32   int32_threshold;     ///< Threshold value for INT32
     } threshold;
 } max_maxf_ptask;
 
@@ -703,9 +703,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
-        double float64_threshold;   ///< Threshold value for FLOAT64
-        float float32_threshold;    ///< Threshold value for FLOAT32
-        int32_t int32_threshold;    ///< Threshold value for INT32
+        nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
+        nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
+        nnl2_int32   int32_threshold;     ///< Threshold value for INT32
     } threshold;
 } max_maxf_inplace_ptask;
 
@@ -722,9 +722,9 @@ typedef struct {
     TensorType dtype;           ///< Data type of tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
-        double float64_threshold;   ///< Threshold value for FLOAT64
-        float float32_threshold;    ///< Threshold value for FLOAT32
-        int32_t int32_threshold;    ///< Threshold value for INT32
+        nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
+        nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
+        nnl2_int32   int32_threshold;     ///< Threshold value for INT32
     } threshold;
 } min_minf_inplace_ptask;
 
@@ -743,9 +743,9 @@ typedef struct {
     TensorType dtype_sumend;    ///< Data type of sumend tensor 
     bool aligned;               ///< Whether memory is properly aligned 
     union {
-        double float64_alpha;   ///< Alpha value for FLOAT64
-        float float32_alpha;    ///< Alpha value for FLOAT32
-        int32_t int32_alpha;    ///< Alpha value for INT32
+        nnl2_float64 float64_alpha;   ///< Alpha value for FLOAT64
+        nnl2_float32 float32_alpha;   ///< Alpha value for FLOAT32
+        nnl2_int32   int32_alpha;     ///< Alpha value for INT32
     } alpha;
 } axpy_inplace_ptask;
 
@@ -766,9 +766,9 @@ typedef struct {
     TensorType result_dtype;        ///< Data type of result tensor
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
-        double float64_alpha;       ///< Alpha value for FLOAT64
-        float float32_alpha;        ///< Alpha value for FLOAT32
-        int32_t int32_alpha;        ///< Alpha value for INT32
+        nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
+        nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
+        nnl2_int32   int32_alpha;         ///< Alpha value for INT32
     } alpha;
 } axpy_ptask;
 
@@ -786,14 +786,14 @@ typedef struct {
     TensorType dtype;               ///< Data type of tensor
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
-        double float64_sumend;      ///< Sumend value for FLOAT64
-        float float32_sumend;       ///< Sumend value for FLOAT32
-        int32_t int32_sumend;       ///< Sumend value for INT32
+        nnl2_float64 float64_sumend;      ///< Sumend value for FLOAT64
+        nnl2_float32 float32_sumend;      ///< Sumend value for FLOAT32
+        nnl2_int32   int32_sumend;        ///< Sumend value for INT32
     } sumend;
     union {
-        double float64_alpha;       ///< Alpha value for FLOAT64
-        float float32_alpha;        ///< Alpha value for FLOAT32
-        int32_t int32_alpha;        ///< Alpha value for INT32
+        nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
+        nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
+        nnl2_int32   int32_alpha;         ///< Alpha value for INT32
     } alpha;
 } axpf_ptask;
 
@@ -813,9 +813,9 @@ typedef struct {
     TensorType sumend_dtype;        ///< Data type of sumend tensor 
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
-        double float64_alpha;       ///< Alpha value for FLOAT64
-        float float32_alpha;        ///< Alpha value for FLOAT32
-        int32_t int32_alpha;        ///< Alpha value for INT32
+        nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
+        nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
+        nnl2_int32   int32_alpha;         ///< Alpha value for INT32
     } alpha;
 } axpy_broadcasting_inplace_ptask;
 
@@ -837,9 +837,9 @@ typedef struct {
     TensorType result_dtype;        ///< Data type of result tensor 
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
-        double float64_alpha;       ///< Alpha value for FLOAT64
-        float float32_alpha;        ///< Alpha value for FLOAT32
-        int32_t int32_alpha;        ///< Alpha value for INT32
+        nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
+        nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
+        nnl2_int32 int32_alpha;           ///< Alpha value for INT32
     } alpha;
 } axpy_broadcasting_ptask;
 
@@ -857,14 +857,14 @@ typedef struct {
     TensorType summand_dtype;       ///< Data type of summand tensor
     bool aligned;                   ///< Whether memory is properly aligned
     union {
-        double float64_alpha;       ///< Alpha value for FLOAT64
-        float float32_alpha;        ///< Alpha value for FLOAT32
-        int32_t int32_alpha;        ///< Alpha value for INT32
+        nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
+        nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
+        nnl2_int32 int32_alpha;           ///< Alpha value for INT32
     } alpha;
     union {
-        double float64_sumend;      ///< Sumend value for FLOAT64
-        float float32_sumend;       ///< Sumend value for FLOAT32
-        int32_t int32_sumend;       ///< Sumend value for INT32
+        nnl2_float64 float64_sumend;      ///< Sumend value for FLOAT64
+        nnl2_float32 float32_sumend;      ///< Sumend value for FLOAT32
+        nnl2_int32 int32_sumend;          ///< Sumend value for INT32
     } sumend_val;
 } axpf_inplace_ptask;
 
@@ -939,25 +939,25 @@ typedef struct {
 ///@{ [concat_ptask]
 
 typedef struct {
-    void* src_a;              ///< Pointer to first source tensor data 
-    void* src_b;              ///< Pointer to second source tensor data 
-    void* dst;                ///< Pointer to destination data 
-    size_t start_idx;         ///< Start index for this thread 
-    size_t end_idx;           ///< End index for this thread 
-    size_t total_elements;    ///< Total elements in result 
-    size_t a_axis_size;       ///< Size of concatenation axis in tensor A 
-    size_t item_size;         ///< Size of each element in bytes 
-    int rank;                 ///< Rank of tensors 
-    int axis;                 ///< Concatenation axis 
-    int* result_shape;        ///< Shape of result tensor 
-    int32_t* result_strides;  ///< Strides of result tensor (in elements) 
-    int32_t* a_strides;       ///< Strides of tensor A (in elements) 
-    int32_t* b_strides;       ///< Strides of tensor B (in elements) 
-    TensorType type_a;        ///< Data type of first tensor 
-    TensorType type_b;        ///< Data type of second tensor 
-    TensorType result_type;   ///< Result data type 
-    bool aligned;             ///< Whether memory is aligned 
-    bool same_type;           ///< Whether both tensors have same type 
+    void* src_a;                 ///< Pointer to first source tensor data 
+    void* src_b;                 ///< Pointer to second source tensor data 
+    void* dst;                   ///< Pointer to destination data 
+    size_t start_idx;            ///< Start index for this thread 
+    size_t end_idx;              ///< End index for this thread 
+    size_t total_elements;       ///< Total elements in result 
+    size_t a_axis_size;          ///< Size of concatenation axis in tensor A 
+    size_t item_size;            ///< Size of each element in bytes 
+    int rank;                    ///< Rank of tensors 
+    int axis;                    ///< Concatenation axis 
+    int* result_shape;           ///< Shape of result tensor 
+    nnl2_int32* result_strides;  ///< Strides of result tensor (in elements) 
+    nnl2_int32* a_strides;       ///< Strides of tensor A (in elements) 
+    nnl2_int32* b_strides;       ///< Strides of tensor B (in elements) 
+    TensorType type_a;           ///< Data type of first tensor 
+    TensorType type_b;           ///< Data type of second tensor 
+    TensorType result_type;      ///< Result data type 
+    bool aligned;                ///< Whether memory is aligned 
+    bool same_type;              ///< Whether both tensors have same type 
 } concat_ptask;
 
 ///@} [concat_ptask]
@@ -1007,9 +1007,9 @@ typedef struct {
     TensorType dtype;         ///< Data type of the tensor 
     bool aligned;             ///< Whether memory is aligned 
     union {
-        double float64_acc;
-        float float32_acc;
-        int32_t int32_acc;
+        nnl2_float64 float64_acc;
+        nnl2_float32 float32_acc;
+        nnl2_int32   int32_acc;
     } accumulator;            ///< Thread-local accumulator for squared values 
 } l2norm_ptask;
 
@@ -1020,13 +1020,13 @@ typedef struct {
 ///@{ [relu_ptask]
 
 typedef struct {
-    void* src_data;           ///< Pointer to source data */
-    void* dst_data;           ///< Pointer to destination data */
-    size_t start_idx;         ///< Start index for this thread */
-    size_t end_idx;           ///< End index for this thread */
-    TensorType dtype;         ///< Data type of the tensor */
-    bool aligned;             ///< Whether memory is aligned */
-    bool inplace;             ///< Whether operation is in-place */
+    void* src_data;           ///< Pointer to source data 
+    void* dst_data;           ///< Pointer to destination data 
+    size_t start_idx;         ///< Start index for this thread 
+    size_t end_idx;           ///< End index for this thread 
+    TensorType dtype;         ///< Data type of the tensor 
+    bool aligned;             ///< Whether memory is aligned 
+    bool inplace;             ///< Whether operation is in-place 
 } relu_ptask;
 
 ///@} [relu_ptask]
@@ -1046,6 +1046,35 @@ typedef struct {
 } leakyrelu_ptask;
 
 ///@} [leakyrelu_ptask]
+
+
+
+///@{ [tanh_ptask]
+
+typedef struct {
+    TensorType dtype;         ///< Data type of the tensor
+    bool approx;              ///< Whether to use approximation
+    size_t start_idx;         ///< Start index for this thread
+    size_t end_idx;           ///< End index for this thread
+    void* src_data;           ///< Pointer to source data
+    void* dst_data;           ///< Pointer to destination data
+} tanh_ptask;
+
+///@} [tanh_ptask]
+
+
+
+///@{ [tanhinplace_ptask]
+
+typedef struct {
+    TensorType dtype;         ///< Data type of the tensor
+    bool approx;              ///< Whether to use approximation
+    size_t start_idx;         ///< Start index for this thread
+    size_t end_idx;           ///< End index for this thread
+    void* data;               ///< Pointer to tensor data (modified in-place)
+} tanhinplace_ptask;
+
+///@} [tanhinplace_ptask]
 
 
 

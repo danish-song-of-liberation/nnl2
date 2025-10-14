@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include "nnl2_log.h"
+#include "nnl2_type_backend.h"
 
 #ifndef NNL2_CORE_H
 #define NNL2_CORE_H
@@ -13,47 +14,47 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-static inline int32_t nnl2_relu_int32(int32_t a) {
+static inline nnl2_int32 nnl2_relu_int32(nnl2_int32 a) {
 	return MAX(a, 0);
 }
 
-static inline float nnl2_relu_float32(float a) {
+static inline nnl2_float32 nnl2_relu_float32(nnl2_float32 a) {
 	return MAX(a, 0.0f);
 }
 
-static inline double nnl2_relu_float64(double a) {
+static inline nnl2_float64 nnl2_relu_float64(nnl2_float64 a) {
 	return MAX(a, 0.0);
 }
 
-static inline void nnl2_relu_int32_inplace(int32_t* a) {
+static inline void nnl2_relu_int32_inplace(nnl2_int32* a) {
 	if(*a < 0) *a = 0;
 }
 
-static inline void nnl2_relu_float32_inplace(float* a) {
+static inline void nnl2_relu_float32_inplace(nnl2_float32* a) {
 	if(*a < 0.0f) *a = 0.0f;
 }
 
-static inline void nnl2_relu_float64_inplace(double* a) {
+static inline void nnl2_relu_float64_inplace(nnl2_float64* a) {
 	if(*a < 0.0) *a = 0.0;
 }
 
-static inline int32_t nnl2_leaky_relu_int32(int32_t a, float alpha) {
+static inline nnl2_int32 nnl2_leaky_relu_int32(nnl2_int32 a, float alpha) {
     if (a > 0) {
         return a;
     } else {
-        return (int32_t)(a * alpha);
+        return (nnl2_int32)(a * alpha);
     }
 }
 
-static inline float nnl2_leaky_relu_float32(float a, float alpha) {
+static inline nnl2_float32 nnl2_leaky_relu_float32(nnl2_float32 a, float alpha) {
     if (a > 0.0f) {
         return a;
     } else {
-        return a * alpha;
+        return a * alpha; 
     }
 }
 
-static inline double nnl2_leaky_relu_float64(double a, float alpha) {
+static inline nnl2_float64 nnl2_leaky_relu_float64(nnl2_float64 a, float alpha) {
     if (a > 0.0) {
         return a;
     } else {
@@ -61,7 +62,7 @@ static inline double nnl2_leaky_relu_float64(double a, float alpha) {
     }
 }
 
-static inline void nnl2_leaky_relu_int32_inplace(int32_t* a, float alpha) {
+static inline void nnl2_leaky_relu_int32_inplace(nnl2_int32* a, float alpha) {
     if(*a < 0) {
         float result = (*a * alpha);
         float remainder = fmodf(fabsf(result), 1.0f);
@@ -70,32 +71,32 @@ static inline void nnl2_leaky_relu_int32_inplace(int32_t* a, float alpha) {
             NNL2_FATAL("Leaky ReLU cannot be applied to the provided tensor");     
             exit(EXIT_FAILURE);
         } else {
-            *a = (int32_t)result;
+            *a = (nnl2_int32)result;
         }
     }
 }
 
-static inline void nnl2_leaky_relu_float32_inplace(float* a, float alpha) {
+static inline void nnl2_leaky_relu_float32_inplace(nnl2_float32* a, float alpha) {
 	if(*a < 0.0f) *a = (*a * alpha);
 }
 
-static inline void nnl2_leaky_relu_float64_inplace(double* a, float alpha) {
+static inline void nnl2_leaky_relu_float64_inplace(nnl2_float64* a, float alpha) {
 	if(*a < 0.0f) *a = (*a * alpha);
 }
 
-static inline float nnl2_sigmoid_float32(float x) {
+static inline nnl2_float32 nnl2_sigmoid_float32(nnl2_float32 x) {
 	return 1.0f / (1.0f + expf(-x));
 }
 
-static inline double nnl2_sigmoid_float64(double x) {
+static inline nnl2_float64 nnl2_sigmoid_float64(nnl2_float64 x) {
 	return 1.0 / (1.0 + exp(-x));
 }
 
-static inline void nnl2_sigmoid_float32_inplace(float* x) {
+static inline void nnl2_sigmoid_float32_inplace(nnl2_float32* x) {
 	*x = 1.0f / (1.0f + expf(-(*x)));
 }
 
-static inline void nnl2_sigmoid_float64_inplace(double* x) {
+static inline void nnl2_sigmoid_float64_inplace(nnl2_float64* x) {
 	*x = 1.0 / (1.0 + exp(-(*x)));
 }
 

@@ -1,13 +1,13 @@
 #ifndef NNL2_CORE_C
 #define NNL2_CORE_C
 
-#ifdef __SSE__
+#ifdef __SSE__ 
 	#include <xmmintrin.h>
 #endif
     
 #ifdef NNL2_AVX256_AVAILABLE
 	#include <immintrin.h> 
-#endif
+#endif  	
 
 #ifdef __SSE2__ 
 	#include <emmintrin.h> 
@@ -16,20 +16,20 @@
 #include <stdlib.h> 
 #include <time.h>        
   
-#include "nnl2_core.h"       
-#include "nnl2_ffi_test.h" 
+#include "nnl2_core.h"          	 
+#include "nnl2_ffi_test.h"  
 #include "nnl2_tensor_core.h"
-#include "nnl2_log.h"  
+#include "nnl2_log.h"    
 #include "nnl2_foreign_log.h"  
  
 #include "backends_status/nnl2_status.h"  
 
 /// NNL2
-
+     
 /** @file nnl2_core.c
  ** @brief Contains a function with system initialization and lisp-wrappers
- ** @copyright MIT License
- ** @date 2025
+ ** @copyright MIT License 
+ ** @date 2025    
  *
  * File contains the full system initialization 
  * declaration as well as all lisp wrappers 
@@ -37,14 +37,14 @@
  *
  ** Filepath: nnl2/src/c/nnl2_core.c
  ** File: nnl2_core.c
- ** 
+ **      
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
- **/
+ **/     
        
-///@{ [initilizing]
+///@{ [initilizing]  
 
-///@{ [subinitializers_declaration]          
+///@{ [subinitializers_declaration]            
 
 /** @brief
  * Registers backend implementations for tensor accessor operations
@@ -82,22 +82,22 @@ void nnl2_init_standard_inplace();
  * Registers backend implementations for tensor stacking and concatenation
  */
 void nnl2_init_stack();
-    
+       
 /** @brief 
  * Registers in-place activation function operations
  *
  ** @details 
  * These functions (e.g., ReLU, Sigmoid) modify the target tensor directly
- */
+ */ 
 void nnl2_init_activations_inplace();
-
+ 
 /** @brief 
  * Registers out-of-place activation function operations
  *
  ** @details 
  * These functions (e.g., ReLU, Sigmoid) return a new result tensor
  */
-void nnl2_init_activations();
+void nnl2_init_activations(); 
 
 /** @brief 
  * Registers backend implementations for tensor weight initializers
@@ -105,7 +105,7 @@ void nnl2_init_activations();
  ** @details 
  * Functions like Xavier and random normal distribution initializers
  */
-void nnl2_init_initializers();
+void nnl2_init_initializers();     
 
 /** @brief 
  * Registers backend implementations for tensor transposition operations
@@ -116,17 +116,17 @@ void nnl2_init_transposition();
  * Registers backend implementations for auxiliary/utility operations
  *   
  ** @details
- * Includes summation, normalization, copying, and data filling 
+ * Includes summation, normalization, copying, and data filling  
  */
-void nnl2_init_auxiliary();
+void nnl2_init_auxiliary();     
 
 /** @brief 
  * Registers in-place correspondence operations
  *
  ** @details 
  * In-place operations that correspond to a standard function (e.g., `add_incf_inplace` for `add`)
- */
-void nnl2_init_correspondence_inplace();      
+ */ 
+void nnl2_init_correspondence_inplace();       
 
 /** @brief 
  * Registers out-of-place correspondence operations
@@ -136,11 +136,11 @@ void nnl2_init_correspondence_inplace();
  */
 void nnl2_init_correspondence();
 
-/** @brief 
+/** @brief  
  * Registers in-place operations with broadcasting support
  *
  ** @details 
- * In-place operations that can handle tensors of different shapes via broadcasting
+ * In-place operations that can handle tensors of different shapes via broadcasting  
  */
 void nnl2_init_broadcasting_inplace();
  
@@ -150,7 +150,7 @@ void nnl2_init_broadcasting_inplace();
  ** @details 
  * Out-of-place operations that can handle tensors of different shapes via broadcasting
  */
-void nnl2_init_broadcasting();
+void nnl2_init_broadcasting();    
     
 /** @brief 
  * Registers backend implementations for tensor reshaping operations
@@ -159,7 +159,7 @@ void nnl2_init_broadcasting();
  * Functions to change the shape or interpretation of a tensor's dimensions without copying data
  */
 void nnl2_init_reshaping();
-         
+           
 ///@} [subinitializers_declaration]		
 		
 /** @brief
@@ -487,7 +487,7 @@ void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 Tensor* lisp_call_scale(Tensor* tensor, float multiplier, bool save_type) {   
 	return scale(tensor, multiplier, save_type); 
 }   
-    
+      
 void lisp_call_maxinplace(Tensor* tensora, Tensor* tensorb) {
 	maxinplace(tensora, tensorb);
 } 
@@ -498,13 +498,13 @@ void lisp_call_mininplace(Tensor* tensora, Tensor* tensorb) {
   
 Tensor* lisp_call_max(Tensor* tensora, Tensor* tensorb) {
 	return nnl2_max(tensora, tensorb);  
-} 
-  
+}  	
+		 
 Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) { 
 	return nnl2_min(tensora, tensorb);    
-}  
-  
-void lisp_call_absinplace(Tensor* tensor) {
+}   
+		
+void lisp_call_absinplace(Tensor* tensor) {  
 	absinplace(tensor);     
 }
   
@@ -526,30 +526,30 @@ void lisp_call_reluinplace(Tensor* tensor) {
   
 Tensor* lisp_call_relu(Tensor* tensor) {
 	return relu(tensor);
-}         
+}          
  
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
-	leakyreluinplace(tensor, alpha); 
+	leakyreluinplace(tensor, alpha);    
 }
- 
+   
 Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
 	return leakyrelu(tensor, alpha, save_type);  
 }
 
-void lisp_call_sigmoidinplace(Tensor* tensor) {
-	sigmoidinplace(tensor);
-}
+void lisp_call_sigmoidinplace(Tensor* tensor, bool approx) {        
+	sigmoidinplace(tensor, approx);
+}      
 
-Tensor* lisp_call_sigmoid(Tensor* tensor) {
-	return sigmoid(tensor); 
-}
- 
-void lisp_call_tanhinplace(Tensor* tensor) { 
-	tanhinplace(tensor);
+Tensor* lisp_call_sigmoid(Tensor* tensor, bool approx) {  
+	return sigmoid(tensor, approx); 
+}  
+  
+void lisp_call_tanhinplace(Tensor* tensor, bool approx) { 
+	tanhinplace(tensor, approx);
 }    
 
-Tensor* lisp_call_tanh(Tensor* tensor) {
-	return nnl2_tanh(tensor); 
+Tensor* lisp_call_tanh(Tensor* tensor, bool approx) {
+	return nnl2_tanh(tensor, approx); 
 }   
 
 Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
