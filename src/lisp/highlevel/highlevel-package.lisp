@@ -392,5 +392,7 @@
    #:nrows
    #:ncols
    #:transposition
-   #:transposition!))
+   #:transposition!
+   #:rand
+   #:rand-like))
    

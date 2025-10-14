@@ -64,10 +64,12 @@
    tensor: Input tensor 
    at: Linear index of the element"
    
-  (let* ((cffi-type (nnl2.hli.ts:type/nnl2->cffi (nnl2.hli.ts:dtype tensor)))				   
+  (let* ((dtype (nnl2.hli.ts:dtype tensor))
+         (cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype))    
+	     (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype))
 		 (filler-pntr (cffi:foreign-alloc cffi-type)))
 
-   (setf (cffi:mem-ref filler-pntr cffi-type) with)
+   (setf (cffi:mem-ref filler-pntr cffi-type) (coerce with lisp-type))
    
    (nnl2.ffi:%lowlevel-tref-setter tensor at filler-pntr)))
   
@@ -91,10 +93,12 @@
    at: Variable number of coordinate indices"
    
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr at)
-    (let* ((cffi-type (nnl2.hli.ts:type/nnl2->cffi (nnl2.hli.ts:dtype tensor)))		
+    (let* ((dtype (nnl2.hli.ts:dtype tensor))
+		   (cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype))
+		   (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype))
 		   (filler-pntr (cffi:foreign-alloc cffi-type)))
 
-     (setf (cffi:mem-ref filler-pntr cffi-type) with)
+     (setf (cffi:mem-ref filler-pntr cffi-type) (coerce with lisp-type))
 	 
 	 (nnl2.ffi:%lowlevel-tref-with-coords-setter tensor shape rank filler-pntr))))
 		

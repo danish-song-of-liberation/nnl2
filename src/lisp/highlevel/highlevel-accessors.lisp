@@ -406,11 +406,12 @@
   (nnl2.hli:fastcall
     (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
       (let* ((cffi-type (the keyword (type/nnl2->cffi dtype)))
+		     (lisp-type (the symbol (type/nnl2->lisp dtype)))
 	    	 (filler-pntr (cffi:foreign-alloc cffi-type)))
 			 
 		(declare (type keyword cffi-type))	 
 		  
-	    (setf (cffi:mem-ref filler-pntr cffi-type) filler)
+	    (setf (cffi:mem-ref filler-pntr cffi-type) (coerce filler lisp-type))
 	  
         (let ((tensor (nnl2.ffi:%full shape rank dtype filler-pntr)))
 	      (cffi:foreign-free filler-pntr)		  
@@ -802,9 +803,10 @@
 	  (if is-tensor-p 
 	    (nnl2.ffi:%tref-setter tensor shape shape-rank change-to t)
 		(let* ((cffi-type (type/nnl2->cffi tensor-dtype))
+			   (lisp-type (type/nnl2->lisp tensor-dtype))
 			   (changer (cffi:foreign-alloc cffi-type)))
 			   
-		  (setf (cffi:mem-ref changer cffi-type) change-to)
+		  (setf (cffi:mem-ref changer cffi-type) (coerce change-to lisp-type))
 		  (nnl2.ffi:%tref-setter tensor shape shape-rank changer nil))))))
 		  
 (defmacro scale! (tensor multiplier)
@@ -1055,38 +1057,80 @@
 (defun .tanh (tensor &key (approx t))
   (%.tanh tensor approx))  
   
-(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
+(defun %internal-rand (indices dtype from to)
   "Creates a tensor of the specified shape from random numbers
+   indices: Input shape
+   dtype: Type of tensor
+   from: Value to fill from
+   to: Value to fill to"
+   
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (let* ((cffi-type (type/nnl2->cffi dtype))
+		   (lisp-type (type/nnl2->lisp dtype))
+		   (coerced-from (coerce from lisp-type))
+		   (coerced-to   (coerce to lisp-type))
+	       (from-pntr (cffi:foreign-alloc cffi-type))
+		   (to-pntr   (cffi:foreign-alloc cffi-type)))
+		  
+	  (setf (cffi:mem-ref from-pntr cffi-type) coerced-from
+			(cffi:mem-ref to-pntr 	cffi-type) coerced-to)
+			
+	  (nnl2.ffi:%randn shape rank dtype from-pntr to-pntr))))
+	  
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from -1.0d0) (to 1.0d0))
+  "Creates a tensor of the specified shape filled with random numbers from -1 to 1
+   indices: Input shape
+   dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
+   from (&key) (default: -1.0d0): Value to fill from
+   to (&key) (default: 1.0d0): Value to fill to"
+   
+   (%internal-rand indices dtype from to))
+   
+(defun rand (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
+  "Creates a tensor of the specified shape filled with random numbers from 0 to 1
    indices: Input shape
    dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
    from (&key) (default: 0.0d0): Value to fill from
    to (&key) (default: 1.0d0): Value to fill to"
    
-  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-    (let* ((cffi-type (type/nnl2->cffi dtype))
-	       (from-pntr (cffi:foreign-alloc cffi-type))
-		   (to-pntr   (cffi:foreign-alloc cffi-type)))
-		  
-	  (setf (cffi:mem-ref from-pntr cffi-type) from
-			(cffi:mem-ref to-pntr 	cffi-type)  to)
-			
-	  (nnl2.ffi:%randn shape rank dtype from-pntr to-pntr))))
+   (%internal-rand indices dtype from to))   
 
-(defun randn-like (tensor &key (from 0.0d0) (to 1.0d0) (dtype (dtype tensor)))
+(defun %internal-randn-like (tensor from to dtype)
   "Сreates a tensor filled with random numbers of the same shape as the passed tensor
    tensor: Input tensor
-   dtype (&key): Type of new tensor
-   from (&key): Value to fill from
-   to (&key): Value to fill to"
+   dtype: Type of new tensor
+   from: Value to fill from
+   to: Value to fill to"
    
   (let* ((cffi-type (type/nnl2->cffi dtype))
+         (lisp-type (type/nnl2->lisp dtype))
+		 (coerced-from (coerce from lisp-type))
+		 (coerced-to (coerce to lisp-type))
          (from-pntr (cffi:foreign-alloc cffi-type))
 		 (to-pntr (cffi:foreign-alloc cffi-type)))
 					   
-	(setf (cffi:mem-ref from-pntr cffi-type) from
-		  (cffi:mem-ref to-pntr cffi-type) to)
+	(setf (cffi:mem-ref from-pntr cffi-type) coerced-from
+		  (cffi:mem-ref to-pntr cffi-type) coerced-to)
 						 
 	(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
+	
+(defun randn-like (tensor &key (from -1.0d0) (to 1.0d0) (dtype (dtype tensor)))
+  "Сreates a tensor filled with random numbers from -1 to 1 of the same shape as the passed tensor
+   tensor: Input tensor
+   dtype (&key) (default: (nnl2.hli.ts:dtype tensor)): Type of new tensor
+   from (&key) (default: -1.0d0): Value to fill from
+   to (&key) (default: 1.0d0): Value to fill to"
+   
+  (%internal-randn-like tensor from to dtype))
+  
+(defun rand-like (tensor &key (from 0.0d0) (to 1.0d0) (dtype (dtype tensor)))
+  "Сreates a tensor filled with random numbers from 0 to 1 of the same shape as the passed tensor
+   tensor: Input tensor
+   dtype (&key) (default: (nnl2.hli.ts:dtype tensor)): Type of new tensor
+   from (&key) (default: 0.0d0): Value to fill from
+   to (&key) (default: 1.0d0): Value to fill to"
+   
+  (%internal-randn-like tensor from to dtype))  
 				 
 (defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   "Makes a tensor with the xavier distribution in the specified shape
