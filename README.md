@@ -18,9 +18,9 @@
 ```
 
 # nnl2
-Common Lisp (CL) neural network framework
+Common Lisp (CL) neural network library
 
-*About the Author:* This framework is being developed by a 14-year-old (already 15) as a personal solo project. All code, all bugs, all mine!
+*About the Author:* This framework is being developed by a 15-year-old as a personal solo project. All code, all bugs, all mine!
 
 I write the framework mainly for myself because writing on torch or tensorflow develops into eternal procrastination and unwillingness to write code on it.
 
@@ -34,7 +34,7 @@ to be more specific, due to problems with BPTT, recurrent graphs, and poor libra
 
 The framework is divided into three main components:
 
-1. Tensor System (99% complete) (it remains to redo the interface)
+1. Tensor System (100% complete)
 2. Autodiff System (with 5 different modes)
 3. Neural Networks Implementations
 
@@ -42,9 +42,7 @@ I'm sorry, but I have VERY, VERY little time right now, so the code is writing s
 
 # Documentation
 
-Full documentation: https://azinelibrary.org/trash/Land_N_-_The_Thirst_for_Annihilation_-_George_Bataille_and_Virulent_Nihilism.pdf
-<br>
-You also can see docs at /nnl2/src
+You can see docs at /nnl2/src
 
 # Benchmarks 
 
