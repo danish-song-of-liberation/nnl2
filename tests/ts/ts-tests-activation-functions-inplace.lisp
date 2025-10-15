@@ -66,27 +66,27 @@
 ;; -- `.sigmoid!` tests section --
 
 (fiveam:test nnl2.hli.ts/.sigmoid!/float64/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.sigmoid!-operation-shape* :val 0.7d0 :expected 0.6681877721681662d0 :op #'nnl2.hli.ts:.sigmoid! :tolerance 0.00001 :inplace t))					 
+  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.sigmoid!-operation-shape* :val 0.7d0 :expected 0.6681877721681662d0 :op #'(lambda (x) (nnl2.hli.ts:.sigmoid! x :approx nil)) :tolerance 0.00001 :inplace t))					 
  
 (fiveam:test nnl2.hli.ts/.sigmoid!/float64/2
-  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.sigmoid!-operation-shape* :val 0.0d0 :expected 0.50d0 :op #'nnl2.hli.ts:.sigmoid! :tolerance 0.0001 :inplace t)) 
+  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.sigmoid!-operation-shape* :val 0.0d0 :expected 0.50d0 :op #'(lambda (x) (nnl2.hli.ts:.sigmoid! x :approx nil)) :tolerance 0.0001 :inplace t)) 
  
 (fiveam:test nnl2.hli.ts/.sigmoid!/float32/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.sigmoid!-operation-shape* :val 0.7s0 :expected 0.66818774s0 :op #'nnl2.hli.ts:.sigmoid! :tolerance 0.001 :inplace t))					 
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.sigmoid!-operation-shape* :val 0.7s0 :expected 0.66818774s0 :op #'(lambda (x) (nnl2.hli.ts:.sigmoid! x :approx nil)) :tolerance 0.001 :inplace t))					 
  
 (fiveam:test nnl2.hli.ts/.sigmoid!/float32/2
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.sigmoid!-operation-shape* :val 0.0s0 :expected 0.50s0 :op #'nnl2.hli.ts:.sigmoid! :tolerance 0.01 :inplace t)) 	  
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.sigmoid!-operation-shape* :val 0.0s0 :expected 0.50s0 :op #'(lambda (x) (nnl2.hli.ts:.sigmoid! x :approx nil)) :tolerance 0.01 :inplace t)) 	  
 
 ;; -- `.tanh!` tests section --
 
 (fiveam:test nnl2.hli.ts/.tanh!/float32/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.tanh!-operation-shape* :val 0.3s0 :expected 0.29131s0 :op #'nnl2.hli.ts:.tanh! :tolerance 0.01 :inplace t))				 
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.tanh!-operation-shape* :val 0.3s0 :expected 0.29131s0 :op #'(lambda (x) (nnl2.hli.ts:.tanh! x :approx nil)) :tolerance 0.01 :inplace t))				 
  
 (fiveam:test nnl2.hli.ts/.tanh!/float64/2
-  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.tanh!-operation-shape* :val 0.0d0 :expected 0.0d0 :op #'nnl2.hli.ts:.tanh! :inplace t))					 
+  (check-nnl2.hli.ts/trivial-operation :dtype :float64 :shape *default-.tanh!-operation-shape* :val 0.0d0 :expected 0.0d0 :op #'(lambda (x) (nnl2.hli.ts:.tanh! x :approx nil)) :inplace t))					 
   
 (fiveam:test nnl2.hli.ts/.tanh!/float32/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.tanh!-operation-shape* :val 0.3s0 :expected 0.29131s0 :op #'nnl2.hli.ts:.tanh! :tolerance 0.01 :inplace t))
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.tanh!-operation-shape* :val 0.3s0 :expected 0.29131s0 :op #'(lambda (x) (nnl2.hli.ts:.tanh! x :approx nil)) :tolerance 0.01 :inplace t))
 
 (fiveam:test nnl2.hli.ts/.tanh!/float32/1
-  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.tanh!-operation-shape* :val 0.0s0 :expected 0.0s0 :op #'nnl2.hli.ts:.tanh! :inplace t))  
+  (check-nnl2.hli.ts/trivial-operation :dtype :float32 :shape *default-.tanh!-operation-shape* :val 0.0s0 :expected 0.0s0 :op #'(lambda (x) (nnl2.hli.ts:.tanh! x :approx nil)) :inplace t))  

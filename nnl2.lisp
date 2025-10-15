@@ -138,6 +138,16 @@
 										   (:file "ts-tests-subtensor-map" :type "lisp")
 										   (:file "ts-tests-subtensor-map-inplace" :type "lisp")
 										   (:file "ts-tests-real" :type "lisp")))
+										   
+							 (:module "llits"
+							  :serial t 
+							  :components ((:file "llits-tests-package" :type "lisp")
+										   (:file "llits-tests" :type "lisp")))
+										   
+							 (:module "convert"
+							  :serial t
+							  :components ((:file "convert-tests-package" :type "lisp")
+										   (:file "convert-tests" :type "lisp")))
 							 
 							 (:file "tests" :type "lisp"))))
 							 

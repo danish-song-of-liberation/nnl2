@@ -148,11 +148,10 @@ Tensor* nnl2_own_relu(Tensor* tensor) {
     
     // Fallback to naive implementation for small tensors
     if(total_elems < NNL2_RELU_PARALLEL_THRESHOLD) {
-        naive_relu(tensor);
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
         #endif
-        return result;
+        return naive_relu(tensor);
     }
     
     bool src_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);

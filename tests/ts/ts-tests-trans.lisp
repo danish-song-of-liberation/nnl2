@@ -21,7 +21,7 @@
 		   (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype)))
       
 	  (nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:make-tensor lst :dtype dtype))
-						  (trans-tensor (nnl2.hli.ts:transpose tensor)))
+						  (trans-tensor (nnl2.hli.ts:transpose tensor :force t)))
 						  
 	    (dotimes (i (length lst))
 		  (dotimes (j (length (first lst)))
@@ -37,7 +37,7 @@
       
 	  (nnl2.hli.ts:tlet* ((tensor (nnl2.hli.ts:make-tensor lst :dtype dtype)))
 	  
-		(nnl2.hli.ts:transpose! tensor)
+		(nnl2.hli.ts:transpose! tensor :force t)
 						  
 	    (dotimes (i (length lst))
 		  (dotimes (j (length (first lst)))

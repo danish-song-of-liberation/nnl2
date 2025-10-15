@@ -4,10 +4,12 @@
 #include <stdbool.h>
 
 ///@{
+	
 /** @brief
  * Threshold for enabling parallel execution of Sigmoid operation
  */
 #define NNL2_SIGMOID_PARALLEL_THRESHOLD 1000000
+
 ///@}
 
 /** @brief
@@ -18,8 +20,8 @@
  *
  ** @param approx
  * Whether to use approximation for faster computation
- * - true: uses fast approximation sigmoid(x) ≈ 0.5 + 0.5 * x / (1 + |x|)
- * - false: uses exact calculation sigmoid(x) = 1 / (1 + exp(-x))
+ * true: uses fast approximation sigmoid(x) ~= 0.5 + 0.5 * x / (1 + |x|)
+ * false: uses exact calculation sigmoid(x) = 1 / (1 + exp(-x))
  *
  ** @return
  * Pointer to a new tensor containing the sigmoid-activated values
@@ -27,8 +29,8 @@
  *
  ** @details
  * The sigmoid function maps input values to the range (0, 1).
- * For integer tensors (INT32), this function will trigger a fatal error.
- * Creates a new tensor with the same shape and dtype as input.
+ * For integer tensors (INT32), the result tensor will have FLOAT64 dtype.
+ * Creates a new tensor with the same shape as input, but may change dtype.
  *
  ** @see nnl2_product
  ** @see nnl2_sigmoid_float64
@@ -48,7 +50,14 @@ Tensor* naive_sigmoid(Tensor* tensor, bool approx) {
     #endif
 
     size_t total_elems = product(tensor->shape, tensor->rank);    
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    Tensor* result = NULL;
+    
+    // For INT32 input, create FLOAT64 output tensor
+    if (tensor->dtype == INT32) {
+        result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+    } else {
+        result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    }
     
     if(total_elems == 0) return result;
     
@@ -95,7 +104,21 @@ Tensor* naive_sigmoid(Tensor* tensor, bool approx) {
         }
         
         case INT32: {
-            NNL2_FATAL("Sigmoid cannot be applied to the provided tensor");
+            // Convert INT32 to FLOAT64 and apply sigmoid
+            int32_t* cast_data_t = (int32_t*)data_t;    
+            double* cast_data_r = (double*)data_r;
+            if (approx) {
+                for(size_t i = 0; i < total_elems; i++) {
+                    double x = (double)cast_data_t[i];
+                    double abs_x = fabs(x);
+                    cast_data_r[i] = 0.5 + 0.5 * x / (1.0 + abs_x);
+                }
+            } else {
+                for(size_t i = 0; i < total_elems; i++) {
+                    double x = (double)cast_data_t[i];
+                    cast_data_r[i] = nnl2_sigmoid_float64(x);
+                }
+            }
             break;
         }
         
@@ -385,17 +408,82 @@ static inline void nnl2_sigmoid_vector_float32_full_out(float* src_data, float* 
 }
 
 /** @brief
- * Task structure for parallel sigmoid operations (out-of-place)
+ * Optimized vectorized implementation of sigmoid for INT32 to FLOAT64 conversion (out-of-place)
+ *
+ ** @param src_data
+ * Pointer to the source int32 data array
+ *
+ ** @param dst_data
+ * Pointer to the destination double-precision floating point data array
+ *
+ ** @param size
+ * Number of elements in the data arrays
+ *
+ ** @param approx
+ * Whether to use approximation for faster computation
+ *
+ ** @details
+ * Converts INT32 values to FLOAT64 and applies sigmoid function.
+ * Uses AVX256 for efficient conversion and computation.
  */
-typedef struct {
-    TensorType dtype;
-    bool aligned;
-    bool approx;
-    size_t start_idx;
-    size_t end_idx;
-    void* src_data;
-    void* dst_data;
-} sigmoid_ptask;
+static inline void nnl2_sigmoid_vector_int32_to_float64_out(int32_t* src_data, double* dst_data, size_t size, bool approx) {
+    size_t i = 0;
+    
+    if (approx) {
+        // Process with approximation using SIMD where possible
+        for (; i + 4 <= size; i += 4) {
+            // Load 4 int32 values
+            __m128i x_int = _mm_loadu_si128((__m128i*)(src_data + i));
+            
+            // Convert to double (4 values)
+            __m256d x = _mm256_cvtepi32_pd(x_int);
+            
+            // Compute absolute value
+            __m256d abs_x = _mm256_andnot_pd(_mm256_set1_pd(-0.0), x);
+            
+            // Compute sigmoid approximation: 0.5 + 0.5 * x / (1 + |x|)
+            __m256d denom = _mm256_add_pd(_mm256_set1_pd(1.0), abs_x);
+            __m256d ratio = _mm256_div_pd(x, denom);
+            __m256d result = _mm256_add_pd(_mm256_set1_pd(0.5), _mm256_mul_pd(_mm256_set1_pd(0.5), ratio));
+            
+            _mm256_storeu_pd(dst_data + i, result);
+        }
+    } else {
+        // Process with exact sigmoid using SIMD where possible
+        for (; i + 4 <= size; i += 4) {
+            // Load 4 int32 values
+            __m128i x_int = _mm_loadu_si128((__m128i*)(src_data + i));
+            
+            // Convert to double (4 values)
+            __m256d x = _mm256_cvtepi32_pd(x_int);
+            
+            // Compute -x
+            __m256d neg_x = _mm256_sub_pd(_mm256_setzero_pd(), x);
+            
+            // Store to temporary array and compute exp
+            double temp[4];
+            _mm256_storeu_pd(temp, neg_x);
+            
+            double result[4];
+            for (int j = 0; j < 4; j++) {
+                result[j] = 1.0 / (1.0 + exp(temp[j]));
+            }
+            
+            _mm256_storeu_pd(dst_data + i, _mm256_loadu_pd(result));
+        }
+    }
+    
+    // Process remaining elements
+    for (; i < size; i++) {
+        double x = (double)src_data[i];
+        if (approx) {
+            double abs_x = fabs(x);
+            dst_data[i] = 0.5 + 0.5 * x / (1.0 + abs_x);
+        } else {
+            dst_data[i] = 1.0 / (1.0 + exp(-x));
+        }
+    }
+}
 
 /** @brief
  * Worker function for parallel approximate sigmoid on float64 data (out-of-place)
@@ -510,6 +598,31 @@ void* nnl2_own_psigmoid_float32_full(void* arg) {
 }
 
 /** @brief
+ * Worker function for parallel sigmoid on INT32 data with FLOAT64 output
+ *
+ ** @param arg
+ * Pointer to sigmoid_ptask structure containing work parameters
+ *
+ ** @return
+ * Always returns NULL (required by pthread interface)
+ *
+ ** @details
+ * Processes a chunk of INT32 data, converts to FLOAT64 and applies sigmoid.
+ * Supports both approximate and exact sigmoid calculations.
+ */
+void* nnl2_own_psigmoid_int32_to_float64(void* arg) {
+    sigmoid_ptask* task = (sigmoid_ptask*)arg;
+    int32_t* src_data = (int32_t*)task->src_data;
+    double* dst_data = (double*)task->dst_data;
+    size_t start = task->start_idx;
+    size_t end = task->end_idx;
+    size_t size = end - start;
+    
+    nnl2_sigmoid_vector_int32_to_float64_out(src_data + start, dst_data + start, size, task->approx);
+    return NULL;
+}
+
+/** @brief
  * High-performance parallel implementation of sigmoid activation function
  *
  ** @param tensor
@@ -526,6 +639,7 @@ void* nnl2_own_psigmoid_float32_full(void* arg) {
  * Uses multi-threading and SIMD vectorization for optimal performance on large tensors.
  * Automatically selects between naive and optimized implementations based on tensor size.
  * Supports both float32 and float64 data types with proper error handling.
+ * For INT32 input, returns FLOAT64 output tensor.
  * For very large tensors, uses extreme optimizations with non-temporal stores.
  *
  ** @see naive_sigmoid
@@ -546,7 +660,14 @@ Tensor* nnl2_own_sigmoid(Tensor* tensor, bool approx) {
     #endif
 
     size_t total_elems = product(tensor->shape, tensor->rank);    
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    Tensor* result = NULL;
+    
+    // For INT32 input, create FLOAT64 output tensor
+    if (tensor->dtype == INT32) {
+        result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+    } else {
+        result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    }
     
     if(total_elems == 0) return result;
 
@@ -555,7 +676,7 @@ Tensor* nnl2_own_sigmoid(Tensor* tensor, bool approx) {
         Tensor* naive_result = naive_sigmoid(tensor, approx);
         if (naive_result) {
             // Copy data from naive_result to result
-            size_t data_size = total_elems * get_dtype_size(tensor->dtype);
+            size_t data_size = total_elems * get_dtype_size(result->dtype);
             memcpy(result->data, naive_result->data, data_size);
             nnl2_free_tensor(naive_result);
         }
@@ -565,7 +686,52 @@ Tensor* nnl2_own_sigmoid(Tensor* tensor, bool approx) {
         return result;
     }
     
-    // Check memory alignment for optimization
+    // For INT32 input with parallel processing, handle specially
+    if (tensor->dtype == INT32) {
+        size_t num_threads = NNL2_NUM_THREADS;
+        pthread_t threads[num_threads];
+        sigmoid_ptask tasks[num_threads];
+        
+        // Calculate optimal chunk sizes with load balancing
+        size_t chunk = total_elems / num_threads;
+        size_t remainder = total_elems % num_threads;
+        
+        // Configure tasks for INT32 to FLOAT64 conversion
+        size_t current_start = 0;
+        for (size_t i = 0; i < num_threads; i++) {
+            size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+            
+            tasks[i].dtype = tensor->dtype;
+            tasks[i].aligned = false; // INT32 to FLOAT64 conversion doesn't benefit from alignment as much
+            tasks[i].approx = approx;
+            tasks[i].start_idx = current_start;
+            tasks[i].end_idx = current_start + current_chunk;
+            tasks[i].src_data = tensor->data;
+            tasks[i].dst_data = result->data;
+            
+            int status = pthread_create(&threads[i], NULL, nnl2_own_psigmoid_int32_to_float64, &tasks[i]);
+            if(status != 0) {
+                NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_sigmoid");
+                num_threads = i;
+                break;
+            }
+            
+            current_start += current_chunk;
+        }
+        
+        // Wait for all threads to complete
+        for (size_t i = 0; i < num_threads; i++) {
+            pthread_join(threads[i], NULL);
+        }
+        
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+            NNL2_FUNC_EXIT();
+        #endif
+        
+        return result;
+    }
+    
+    // Original parallel processing for FLOAT32 and FLOAT64
     bool src_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
     bool dst_aligned = NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned = src_aligned && dst_aligned;
@@ -577,7 +743,6 @@ Tensor* nnl2_own_sigmoid(Tensor* tensor, bool approx) {
     #endif
     
     size_t num_threads = NNL2_NUM_THREADS;
-    
     pthread_t threads[num_threads];
     sigmoid_ptask tasks[num_threads];
     
@@ -608,15 +773,18 @@ Tensor* nnl2_own_sigmoid(Tensor* tensor, bool approx) {
                 worker_func = approx ? nnl2_own_psigmoid_float64_superapprox : nnl2_own_psigmoid_float64_full;
                 break;
             }
+			
             case FLOAT32: {
                 worker_func = approx ? nnl2_own_psigmoid_float32_superapprox : nnl2_own_psigmoid_float32_full;
                 break;
             }
+			
             case INT32: {
-                NNL2_FATAL("Sigmoid cannot be applied to the provided tensor");
-                nnl2_free_tensor(result);
-                return NULL;
+                // This case should be handled above, but included for completeness
+                worker_func = nnl2_own_psigmoid_int32_to_float64;
+                break;
             }
+			
             default: {
                 NNL2_TYPE_ERROR(tensor->dtype);
                 nnl2_free_tensor(result);

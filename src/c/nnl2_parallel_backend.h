@@ -1078,6 +1078,22 @@ typedef struct {
 
 
 
+///@{ [sigmoid_ptask]
+	
+typedef struct {
+    TensorType dtype;
+    bool aligned;
+    bool approx;
+    size_t start_idx;
+    size_t end_idx;
+    void* src_data;
+    void* dst_data;
+} sigmoid_ptask;
+
+///@} [sigmoid_ptask]
+
+
+
 ///@{ [macro]
 
 /** @def

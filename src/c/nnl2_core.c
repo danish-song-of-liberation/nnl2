@@ -530,16 +530,16 @@ Tensor* lisp_call_relu(Tensor* tensor) {
  
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha);    
-}
+} 
    
 Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
 	return leakyrelu(tensor, alpha, save_type);  
-}
+}    
 
 void lisp_call_sigmoidinplace(Tensor* tensor, bool approx) {        
 	sigmoidinplace(tensor, approx);
 }      
-
+ 
 Tensor* lisp_call_sigmoid(Tensor* tensor, bool approx) {  
 	return sigmoid(tensor, approx); 
 }  
@@ -548,7 +548,7 @@ void lisp_call_tanhinplace(Tensor* tensor, bool approx) {
 	tanhinplace(tensor, approx);
 }    
 
-Tensor* lisp_call_tanh(Tensor* tensor, bool approx) {
+Tensor* lisp_call_tanh(Tensor* tensor, bool approx) { 
 	return nnl2_tanh(tensor, approx); 
 }   
 

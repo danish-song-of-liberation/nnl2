@@ -423,11 +423,10 @@ Tensor* nnl2_own_hstack(Tensor* tensora, Tensor* tensorb) {
     // Fallback to naive implementation for small tensors or 1D with type conversion
     if (total_elements < NNL2_HSTACK_PARALLEL_THRESHOLD || 
         (ranka == 1 && !same_type)) {
-        naive_hstack(tensora, tensorb);
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
         #endif
-        return result;
+        return naive_hstack(tensora, tensorb);
     }
 
     bool src_a_aligned = NNL2_IS_ALIGNED(tensora->data, NNL2_TENSOR_ALIGNMENT_32);

@@ -50,7 +50,7 @@ static inline nnl2_float32 nnl2_leaky_relu_float32(nnl2_float32 a, float alpha) 
     if (a > 0.0f) {
         return a;
     } else {
-        return a * alpha; 
+        return a * alpha;  
     }
 }
 
