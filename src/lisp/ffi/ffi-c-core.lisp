@@ -449,6 +449,11 @@
   (tensor :pointer)
   (force :bool))  
   
+(cffi:defcfun ("lisp_call_inplace_fill" %fill!) :bool
+  (tensor :pointer)
+  (value :pointer)
+  (dtype tensor-type))  
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void

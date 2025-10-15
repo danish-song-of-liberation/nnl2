@@ -394,5 +394,6 @@
    #:transposition
    #:transposition!
    #:rand
-   #:rand-like))
+   #:rand-like
+   #:fill!))
    

@@ -380,5 +380,6 @@
    #:%slice
    #:%cut
    #:%transpose
-   #:%transpose!))
+   #:%transpose!
+   #:%fill!))
    

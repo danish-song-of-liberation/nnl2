@@ -748,6 +748,10 @@ void lisp_call_transposition_inplace(Tensor* tensor) {
 	nnl2_transposition_inplace(tensor);
 }
 
+bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+	return inplace_fill(tensor, value, dtype);
+}
+
 ///@} [lisp_wrappers]             
 		             
 #endif /** NNL2_CORE_C **/					 

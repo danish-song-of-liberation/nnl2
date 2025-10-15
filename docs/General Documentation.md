@@ -1,22 +1,23 @@
 # General nnl2 documentation
 
 
-This documentation provides general information about all the components of the framework.
+This documentation provides general information about all the components of the library.
 
 In the same directory, there are the **click-me-if-you-lisp-advanced/click-me-if-you-lisp-beginner** folders. If you want more personalized and convenient documentation, you can navigate to them.
 
-The framework is divided into **3** main parts: **the tensor system**, **automatic differentiation (AD)**, **and neural network implementations**
+The library is divided into **3** main parts: **the tensor system (TS)**, **automatic differentiation (AD)**, **and neural network implementations**
 
-The documentation is not fully complete at the moment because the framework is still under active development, and the documentation will be gradually updated as the framework is completed.
+The documentation is not fully complete at the moment because the library is still under active development, and the documentation will be gradually updated as the library is completed.
 
 ## Contents:
 - [1. Getting Started] (#1-getting-started) 
 - [2. Installing] (#2-installing)
 - [3. Tensor system] (#3-tensor-system)
+- [- 3.1 Making the first tensor] (#3-1-making-the-first-tensor)
 
 ## 1. Getting Started
 
-nnl2 Is a **neural network framework** in common lisp with a C core
+nnl2 Is a **neural network library** in common lisp with a C core
 
 The framework provides **high-level**, **user-friendly**, and **high-performance** tools for working with tensors, autodiff, and neural networks.
 
@@ -58,7 +59,7 @@ So far, there are only **3** types of tensors:
 
 [Magicl Equivalents Table]: https://github.com/quil-lang/magicl/blob/master/doc/high-level.md
 
-*All nnl2 functions in the table will be from the :nnl2.hli.ts package*
+*All nnl2 functions in the table will be from the :nnl2.hli.ts package (sometimes the nnl2.lli.ts package may appear)*
 
 *I would also like to inform you that the table is very extensive.*
 
@@ -69,7 +70,14 @@ So far, there are only **3** types of tensors:
 | ```(size-in-bytes a)``` | 	| It is usually done manually (numel * sizeof(dtype)) | It is usually done manually (numel * sizeof(dtype)) | ```a.element_size() * a.numel()``` | Gets the dimensions of the tensor in bytes |
 | ```(shape a)``` | ```(shape a)```   | ```size(a)```   | ```shape(a)``` or ```a.shape``` | ```a.shape``` or ```a.size()``` | Get the shape of the array. |
 | ```(dtype a)``` | 	 | ```class(a)``` | ```a.dtype``` | ```a.dtype``` |  Gets the data type of the array. |
-| ```(tref a 1 4)```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | ```a[1, 4]``` | Get the element in the second row, fifth column of the array. |
+| ```(tref a 1 4) or (view (a 1 4) or (nnl2.lli.ts:trefw a  1 4)```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | ```a[1, 4]``` | Get the element in the second row, fifth column of the array. |
+| ```(view a 0)``` | | | ```a[0, :] or a[0]``` | ```a[0, :] or a[0]``` | Get the first subtensor from a two-dimensional tensor (view) |
+| ```(tref a 0)``` or ```(copy (view a 0))``` | | ```a(1, :)```  | ```a[0, :].copy()``` | ```a[0, :].clone()``` | Get the first subtensor from a two-dimensional tensor (copy) |
+| ```(setf (tref a '* 0) 3)``` | | ```a(:, 1) = 3``` | ```a[:, 0] = 3``` | ```a[:, 0] = 3``` | 	Set all elements in the first column to 3
+ |
+| ```(nnl2.lli.ts:flat a 0)``` | | ```a(1)``` | ```a.flat[0]``` or ```a.ravel()[0]``` | ```a.flatten()[0]``` | Get an item by linear index |
+| ```(nrows a)``` | | ```size(a, 1)``` | ```a.shape[0]``` | 	```a.size(0)``` or ```a.shape[0]``` | Get number of rows in the tensor |
+| ```(ncols a)``` | | ```size(a, 2)``` | ```a.shape[1]``` | ```a.size(1)``` or ```a.shape[1]``` | Get number of columns in the tensor |
 
 ### Constructors 
 
@@ -80,6 +88,8 @@ So far, there are only **3** types of tensors:
 | ```(zeros #(2 3 4))```| ```(zeros '(2 3 4)) or (const 0d0 '(2 3 4))``` | ```zeros(2,3,4)``` | ```zeros((2,3,4))``` | ```torch.zeros(2,3,4)``` |  Create a 2x3x4 dimensional array of zeroes of double-float element type. |
 | ```(ones #(3 4))``` | ```(ones '(3 4))``` or ```(const 1d0 '(3 4))``` |  ```ones(3,4)``` | ```ones((3,4))``` | ```torch.ones(3,4)``` | Create a 3x4 dimensional array of ones of double-float element type. |
 | ```(full #(6 9) :filler 2.0d0)``` | ```(const 2.0d0 '(6 9))``` | ```2 * ones(6,9)``` | ```full((6, 9), 2)``` | ```torch.full((6,9),2.0)``` | Create a 6x9 dimensional array of a double-float element-type filled with 2. |
+| ```(rand #(5 5))``` | ```(rand '(5 5))``` | ```rand(5, 5)``` | ```np.random.rand(5, 5)``` | ```torch.rand(5, 5)``` | ```Generate a 5x5 tensor with random values from uniform distribution [0, 1)``` |
+| ```(randn #(5 5))``` | 
 
 ###  Basic Operations 
 
@@ -139,6 +149,8 @@ So far, there are only **3** types of tensors:
 |------|--------|--------|-------|---------|-------------|
 | ```(.map #'fn a b ...)``` | ```(map #'fn a)``` | ```arrayfun(fn, a, b, ...)``` | ```np.vectorize(fn)(a, b, ...)``` | ```torch.vmap(fn)(a, b, ...)``` or ```fn(a, b, ...)``` | Applies fn elementwise to tensors a, b, ... (returns a new tensor). |
 | ```(.map! #'fn a b ...)``` | ```(map! #'fn a)``` | | | ```a.set_(fn(a, b, ...))``` | Applies fn elementwise, writing the result to the first tensor (a). |
+| ```(/map #'fn a b)``` | | | ```np.apply_along_axis(fn, axis, a, b)``` | ```torch.stack([fn(x,y) for x,y in zip(a.unbind(), b.unbind())])``` | Apply fn to corresponding subtensors of a and b along the first dimension |
+| ```(/map! #'fn a b)``` | | | | | Apply fn to corresponding subtensors of a and b, writing results in-place to a |
 
 ### Activation Functions
 
@@ -152,5 +164,37 @@ So far, there are only **3** types of tensors:
 | ```(.sigmoid! a)``` | | | ```np.reciprocal(1 + np.exp(-a), out=a)``` | ```torch.sigmoid_(a)``` or ```a.sigmoid_()``` | Wise-element In-place Sigmoid |
 | ```(.tanh a)``` | | ```tanh(a)``` | ```np.tanh(a)``` | ```torch.tanh(a)``` | Wise-element Hyperbolic Tangent |
 | ```(.tanh! a)``` | | | ```np.tanh(a, out=a)``` | ```torch.tanh_(a)``` or ```a.tanh_()``` | Wise-element In-place Hyperbolic Tangent |
+
+ ### Miscellaneous
+ 
+ | nnl2 | MAGICL | MATLAB | NumPy | PyTorch | Description |
+ |------|--------|--------|-------|---------|-------------|
+ | ```(slice a :to #(5 3)``` | | | ```[:5, :3]``` | ```a[:5, :3]``` | Obtain a tensor with shape #(5 5) as a representation with shape #(5 3) |
+ | ```(cut a :to #(5 3)``` or ```(copy (slice a :to #(5 3))``` | | ```a(1:5, 1:3)``` | ```a[:5, :3].copy()``` | ```a[:5, :3].clone()``` | Obtain a tensor with shape #(5 5) as a copy with shape #(5 3) |
+ | ```(reinterpret a #(-1))``` | | | ```a.reshape(-1)``` | ```a.reshape(-1)``` | Flatten the tensor to 1D (inferred size) (view)
+ | 
+ | ```(reshape a #(-1))``` | | ```a(:)``` | ```a.reshape(-1).copy()``` | ```a.reshape(-1).clone()``` | Flatten the tensor to 1D (inferred size) (copy) |
+ 
+ 
+ 
+ ## 3.1 Making the first tensor
+ 
+ Let's start taking the first steps.
+
+ ```(nnl2.hli.ts:tlet ((form)) ...)``` - let-form for tensor. Automatically frees memory
+ 
+ Let's make a tensor with a zero: ```(nnl2.hli.ts:tlet ((foo (nnl2.hli.ts:zeros #(1) :dtype :float64))) foo))```
+ #(1) - Shape
+ :dtype - Type of tensor (default: float64)
+ 
+ You can also free up memory manually: ```(nnl2.hli.ts:let ((a (nnl2.hli.ts:zeros #(1)))) ...
+  (nnl2.hli.ts:free a))```
+  
+  
+Make a tensor with manual data input: ```(nnl2.hli.ts:make-tensor #2A((1 2 3) (4 5 6) (7 8 9)))``` or ```(nnl2.hli.ts:from-flatten #(1 2 3 4 5 6 7 8 9) #(3 3))```
+
+See: ```#'zeros```, ```#'ones```, ```#'full```, ```#'rand```, ```#'randn```, ```#'xavier```, ```#'make-tensor```, ```#'from-flatten```
+
+I tried to comment on all the functions, so you can see most of the explanations at ```(documentation #'fn 'function)``` (or ```(describe #'fn)```)
 
  

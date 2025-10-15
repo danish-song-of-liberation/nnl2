@@ -1904,3 +1904,24 @@
   
 (cffi:defcfun ("lisp_call_transposition_inplace" transposition!) :void
   (tensor :pointer))  
+
+(defun fill! (tensor val)
+  "Fills a tensor with the specified value
+   
+   Args:
+      tensor: Input Tensor
+      val: Value to fill
+	  
+   Example:
+      (fill! foo 1) - Fill tensor with ones"
+	  
+  (let* ((dtype (dtype tensor))
+		 (cffi-type (type/nnl2->cffi dtype))
+		 (lisp-type (type/nnl2->lisp dtype))
+		 (alloc (cffi:foreign-alloc cffi-type)))
+		 
+	(setf (cffi:mem-ref alloc cffi-type) (coerce val lisp-type))
+	
+    (let ((status (nnl2.ffi:%fill! tensor alloc dtype)))
+	  (cffi:foreign-free alloc)
+	  (unless status (warn "Failed to fill passed tensor (fill!)")))))
