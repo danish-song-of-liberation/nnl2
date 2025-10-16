@@ -171,8 +171,7 @@ So far, there are only **3** types of tensors:
  |------|--------|--------|-------|---------|-------------|
  | ```(slice a :to #(5 3)``` | | | ```[:5, :3]``` | ```a[:5, :3]``` | Obtain a tensor with shape #(5 5) as a representation with shape #(5 3) |
  | ```(cut a :to #(5 3)``` or ```(copy (slice a :to #(5 3))``` | | ```a(1:5, 1:3)``` | ```a[:5, :3].copy()``` | ```a[:5, :3].clone()``` | Obtain a tensor with shape #(5 5) as a copy with shape #(5 3) |
- | ```(reinterpret a #(-1))``` | | | ```a.reshape(-1)``` | ```a.reshape(-1)``` | Flatten the tensor to 1D (inferred size) (view)
- | 
+ | ```(reinterpret a #(-1))``` | | | ```a.reshape(-1)``` | ```a.reshape(-1)``` | Flatten the tensor to 1D (inferred size) (view) | 
  | ```(reshape a #(-1))``` | | ```a(:)``` | ```a.reshape(-1).copy()``` | ```a.reshape(-1).clone()``` | Flatten the tensor to 1D (inferred size) (copy) |
  
  

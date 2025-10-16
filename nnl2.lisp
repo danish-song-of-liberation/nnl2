@@ -92,7 +92,12 @@
 														 (:file "log-warning" :type "lisp")
 														 (:file "log-fatal" :type "lisp")
 														 (:file "log-debug" :type "lisp")
-														 (:file "log-info" :type "lisp")))))))
+														 (:file "log-info" :type "lisp")))
+														 
+										   (:module "fusion"
+										    :serial t
+											:components ((:file "fusion-package" :type "lisp")
+														 (:file "fusion" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t
