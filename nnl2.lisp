@@ -97,7 +97,8 @@
 										   (:module "fusion"
 										    :serial t
 											:components ((:file "fusion-package" :type "lisp")
-														 (:file "fusion" :type "lisp")))))))
+														 (:file "fusion-core" :type "lisp")
+														 (:file "fusion-rules" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

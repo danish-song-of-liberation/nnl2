@@ -226,6 +226,12 @@
 
 (define-backend-setter use-backend/transposition!
   nnl2.ffi:%set-transposition-inplace-backend)      
+  
+(define-backend-setter use-backend/axpy!
+  nnl2.ffi:%set-axpy-inplace-backend) 
+  
+(define-backend-setter use-backend/axpy
+  nnl2.ffi:%set-axpy-backend)   
 
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  

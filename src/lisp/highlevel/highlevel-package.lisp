@@ -395,5 +395,7 @@
    #:transposition!
    #:rand
    #:rand-like
-   #:fill!))
+   #:fill!
+   #:use-backend/axpy!
+   #:use-backend/axpy))
    

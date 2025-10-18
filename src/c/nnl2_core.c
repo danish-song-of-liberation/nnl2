@@ -708,7 +708,7 @@ Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 	return axpy(summand, sumend, alpha);    
 }     
 
-void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
+void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) { 
 	axpf_inplace(summand, sumend, alpha); 
 } 
        
@@ -748,7 +748,7 @@ void lisp_call_transposition_inplace(Tensor* tensor) {
 	nnl2_transposition_inplace(tensor);
 }
 
-bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
+bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) { 
 	return inplace_fill(tensor, value, dtype);
 }
 
