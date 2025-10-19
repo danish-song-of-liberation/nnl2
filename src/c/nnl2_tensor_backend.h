@@ -281,6 +281,22 @@ typedef enum {
 
 
 
+///@{
+
+/** @typedef nnl2_tensor
+ ** @brief nnl2 Tensor
+ **/
+typedef Tensor nnl2_tensor;
+
+/** @typedef nnl2_tensor_type
+ ** @brief nnl2 Tensor Type
+ **/
+typedef TensorType nnl2_tensor_type;
+
+///@}
+
+
+
 /// @{ [typedef]
 
 /** @brief

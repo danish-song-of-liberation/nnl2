@@ -18,4 +18,8 @@
 		  
 (add-rule '(nnl2.hli.ts:tlet* ((?a (nnl2.hli.ts:.* ?b ?c)) (?d (nnl2.hli.ts:.+ ?f ?a))) &body)
           '(nnl2.hli.ts:tlet ((?d (nnl2.hli.ts:axpy ?f ?b :alpha ?c))) &body))
+
+(add-rule '(nnl2.hli.ts:tlet ((?a (nnl2.hli.ts:.* ?d ?b=real))) (nnl2.hli.ts:+= ?c ?a))
+		  '(nnl2.hli.ts:axpy! ?c ?d :alpha ?b))
+
 		  

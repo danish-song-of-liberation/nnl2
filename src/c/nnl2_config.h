@@ -188,6 +188,8 @@
 	#define NNL2_THREAD_CREATE_ERROR(error_code, function_name) NNL2_FATAL("Thread creation failed in %s: error code %d", function_name, error_code)
 	#define NNL2_THREAD_JOIN_ERROR(error_code, function_name) NNL2_ERROR("Thread join failed in %s: error code %d", function_name, error_code)
 	#define NNL2_THREAD_ERROR(function_name) NNL2_ERROR("Thread operation failed in %s", function_name)
+	#define NNL2_MALLOC_ERROR() NNL2_ERROR("Failed to allocate memory in the `%s` function using malloc", __func__)
+	#define NNL2_TENSOR_ERROR(filled_with) NNL2_ERROR("Failed to make a tensor filled with " filled_with ". Check if you have enough RAM")
 ///@} [errors_handling]
 
 /** @brief 

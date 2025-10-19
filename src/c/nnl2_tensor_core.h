@@ -1,3 +1,5 @@
+// ----- Core -----
+
 #include "nnl2_tensor_backend.h"
 #include "nnl2_config.h"
 
@@ -10,6 +12,9 @@
 #include "nnl2_product.h"
 #include "nnl2_ffi_accessors.h"
 #include "nnl2_foreign_shape.h"
+
+// ----- Tensor System (TS) -----
+
 #include "tensorgen/nnl2_inplace_fill.h"
 #include "tensorgen/nnl2_free.h"
 #include "tensorgen/nnl2_empty.h"
@@ -120,3 +125,8 @@
 #include "tensorref/nnl2_tensor_direct_accessors.h"
 #include "tensorshape/nnl2_reshape.h"
 #include "tensorshape/nnl2_reinterpret.h"
+
+// ----- Automatic Differentiation (AD) -----
+
+#include "nnl2_autodiff_backend.h"
+#include "ad/nnl2_adgens.h"

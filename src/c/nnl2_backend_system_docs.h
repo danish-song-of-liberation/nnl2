@@ -14,7 +14,7 @@
  
 /** @defgroup backend_system
  * Backend System
- *
+ * 
  ** @brief Documentation for the backend registration and selection
  **
  ** @details

@@ -25,6 +25,10 @@
    #:->
    #:<-
    #:stypeof))
+   
+(defpackage :nnl2.hli.ad
+  (:use #:cl)
+  (:export))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
