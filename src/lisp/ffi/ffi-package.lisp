@@ -381,5 +381,7 @@
    #:%cut
    #:%transpose
    #:%transpose!
-   #:%fill!))
+   #:%fill!
+   #:%ad-zeros
+   #:%ad-ones))
    

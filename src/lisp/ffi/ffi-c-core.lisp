@@ -454,6 +454,34 @@
   (value :pointer)
   (dtype tensor-type))  
   
+;; -- AD --
+
+(cffi:defcstruct ad-tensor
+  "Tensor structure with support for automatic differentiation"
+  (data tensor)
+  (grad tensor)
+  (requires-grad :bool)
+  (is-leaf :bool)
+  (backward-fn :pointer)
+  (roots :pointer)
+  (num-roots :long)
+  (grad-computed :pointer)
+  (name :string))
+
+(cffi:defcfun ("nnl2_ad_zeros" %ad-zeros) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string))
+  
+(cffi:defcfun ("nnl2_ad_zeros" %ad-ones) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string))  
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
