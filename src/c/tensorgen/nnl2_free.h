@@ -25,20 +25,25 @@ void nnl2_free_tensor(Tensor* tensor) {
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
 		if (tensor == NULL) {
-			NNL2_ERROR("Invalid data (NULL) was passed to the tensor release");
 			return;
 		}
 	#endif
 	
 	// Additional checks
 	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (tensor->rank < 0) {
-			NNL2_ERROR("Invalid tensor rank: %d", tensor->rank);
+			return;
 		}
 		
 		if (tensor->shape == NULL && tensor->rank > 0) {
-			NNL2_ERROR("NULL shape array with rank %d", tensor->rank);
+			return;
+		}
+		
+		for (int i = 0; i < tensor->rank; i++) {
+			if (tensor->shape[i] <= 1) {
+				return;
+			}
 		}
 	#endif
 	

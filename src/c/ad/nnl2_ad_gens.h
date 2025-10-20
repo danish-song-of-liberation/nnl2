@@ -1,7 +1,7 @@
-#ifndef NNL2_ADGENS_H
-#define NNL2_ADGENS_H
+#ifndef NNL2_AD_GENS_H
+#define NNL2_AD_GENS_H
 
-/** @file nnl2_adgens.h
+/** @file nnl2_ad_gens.h
  ** @copyright MIT
  ** @date 2025
  *
@@ -76,4 +76,4 @@ nnl2_ad_tensor* nnl2_ad_ones(int32_t* shape, int rank, nnl2_tensor_type dtype, b
 	return nnl2_ad_full(shape, rank, dtype, requires_grad, name, &one);
 }
  
-#endif /** NNL2_ADGENS_H **/
+#endif /** NNL2_AD_GENS_H **/

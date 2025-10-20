@@ -129,4 +129,5 @@
 // ----- Automatic Differentiation (AD) -----
 
 #include "nnl2_autodiff_backend.h"
-#include "ad/nnl2_adgens.h"
+#include "ad/nnl2_ad_gens.h"
+#include "ad/nnl2_ad_accessors.h"

@@ -711,10 +711,10 @@ Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) { 
 	axpf_inplace(summand, sumend, alpha);  
 } 
-           
+                
 Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
 	return axpf(summand, sumend, alpha);  
-} 
+}      
 
 void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 	axpy_broadcasting_inplace(summand, sumend, alpha); 

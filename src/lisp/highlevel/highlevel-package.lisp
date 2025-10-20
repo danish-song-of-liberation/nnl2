@@ -30,7 +30,11 @@
 (defpackage :nnl2.hli.ad
   (:use #:cl)
   (:export
-   #:zeros))
+   #:zeros
+   #:ones
+   #:data
+   #:is-leaf
+   #:requires-grad))
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

@@ -46,7 +46,7 @@
   (shape :pointer)			 ;; Array of dimension sizes 
   (strides :pointer)  		 ;; Array of byte strides for each dimension
   (rank :int)				 ;; Number of dimensions (ndim)
-  (is-view :bool))			 ;; Flag indicating if this is a view (not owning data)
+  (is-view :bool)) 			 ;; Flag indicating if this is a view (not owning data)
   
 ;; -- Main operations --  
   
@@ -475,7 +475,7 @@
   (requires-grad :bool)
   (name :string))
   
-(cffi:defcfun ("nnl2_ad_zeros" %ad-ones) :pointer
+(cffi:defcfun ("nnl2_ad_ones" %ad-ones) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type)

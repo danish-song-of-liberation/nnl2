@@ -99,7 +99,11 @@
 										    :serial t
 											:components ((:file "fusion-package" :type "lisp")
 														 (:file "fusion-core" :type "lisp")
-														 (:file "fusion-rules" :type "lisp")))))))
+														 (:file "fusion-rules" :type "lisp")))
+														 
+										   (:module "gc"
+										    :serial t
+											:components ((:file "gc-package" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t
