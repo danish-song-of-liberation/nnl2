@@ -45,8 +45,9 @@
   (data :pointer)			 ;; Pointer to the raw tensor data
   (shape :pointer)			 ;; Array of dimension sizes 
   (strides :pointer)  		 ;; Array of byte strides for each dimension
-  (rank :int)				 ;; Number of dimensions (ndim)
-  (is-view :bool)) 			 ;; Flag indicating if this is a view (not owning data)
+  (rank :int)				 ;; Number of dimensions (ndim)	
+  (is-view :bool)			 ;; Flag indicating if this is a view (not owning data)
+  (magic-number :bool))      ;; This is necessary to avoid memory corruption when releasing the tensor
   
 ;; -- Main operations --  
   

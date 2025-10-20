@@ -29,16 +29,16 @@ void nnl2_free_tensor(Tensor* tensor) {
 		}
 	#endif
 	
-	// Additional checks
+	if (tensor->magic_number != TENSOR_MAGIC_ALIVE) return;
+	tensor->magic_number = TENSOR_MAGIC_FREED;
 	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		if (tensor->rank < 0) {
-			return;
-		}
-		
-		if (tensor->shape == NULL && tensor->rank > 0) {
-			return;
-		}
+	// Additional checks
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+	    if (tensor->dtype < 0 || tensor->dtype >= NUM_TENSOR_TYPES)  return;
+	    if (tensor->shape == NULL && tensor->rank > 0)  			 return;
+		if (tensor->data == NULL) 									 return;
+		if (tensor->rank < 0) 										 return;
+	    if (product(tensor->shape, tensor->rank) <= 0)			     return;
 		
 		for (int i = 0; i < tensor->rank; i++) {
 			if (tensor->shape[i] <= 1) {
