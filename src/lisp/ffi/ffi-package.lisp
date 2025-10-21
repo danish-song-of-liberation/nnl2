@@ -383,5 +383,6 @@
    #:%transpose!
    #:%fill!
    #:%ad-zeros
-   #:%ad-ones))
+   #:%ad-ones
+   #:%ad-full))
    

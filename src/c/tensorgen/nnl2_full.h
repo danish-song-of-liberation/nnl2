@@ -80,7 +80,7 @@ Tensor* nnl2_full(const int* shape, int rank, TensorType dtype, void* filler) {
 			}
 		}
 	#endif
-	
+
 	// Create empty tensor with specified shape and data type
 	Tensor* tensor_t = nnl2_empty(shape, rank, dtype);
 	

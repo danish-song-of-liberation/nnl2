@@ -47,7 +47,7 @@
   (strides :pointer)  		 ;; Array of byte strides for each dimension
   (rank :int)				 ;; Number of dimensions (ndim)	
   (is-view :bool)			 ;; Flag indicating if this is a view (not owning data)
-  (magic-number :bool))      ;; This is necessary to avoid memory corruption when releasing the tensor
+  (magic-number :char))      ;; This is necessary to avoid memory corruption when releasing the tensor
   
 ;; -- Main operations --  
   
@@ -482,6 +482,14 @@
   (dtype tensor-type)
   (requires-grad :bool)
   (name :string))  
+  
+(cffi:defcfun ("nnl2_ad_full" %ad-full) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string)
+  (filler :pointer))
   
 ;; -- Backends --  
  

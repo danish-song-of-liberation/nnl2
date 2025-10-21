@@ -33,6 +33,7 @@
    #:zeros
    #:ones
    #:data
+   #:full
    #:is-leaf
    #:requires-grad))
 
