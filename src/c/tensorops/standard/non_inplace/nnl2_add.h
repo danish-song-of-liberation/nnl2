@@ -1,6 +1,8 @@
 #ifndef NNL2_ADD_H
 #define NNL2_ADD_H
 
+#define nnl2_add(addend, sumend) add(addend, sumend) // I'm too lazy to rename the function in all places
+
 /** @brief
  * Threshold for enabling parallel execution of the
  * addition operation

@@ -190,6 +190,7 @@
 	#define NNL2_THREAD_ERROR(function_name) NNL2_ERROR("Thread operation failed in %s", function_name)
 	#define NNL2_MALLOC_ERROR() NNL2_ERROR("Failed to allocate memory in the `%s` function using malloc", __func__)
 	#define NNL2_TENSOR_ERROR(filled_with) NNL2_ERROR("Failed to make a tensor filled with " filled_with ". Check if you have enough RAM")
+	#define NNL2_UNKNOWN_AD_MODE_ERROR(transmitted_ad_mode) NNL2_ERROR("An unsupported/incorrect AD mode was passed. AD mode numbering: %d", transmitted_ad_mode)
 ///@} [errors_handling]
 
 /** @brief 

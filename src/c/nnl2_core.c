@@ -210,7 +210,7 @@ void nnl2_init_reshaping();
 void nnl2_init_system() {      
 	// Initialization of random number generator
 	srand(time(NULL));               
-	              
+	                    
 	// Initialization of logger      
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       

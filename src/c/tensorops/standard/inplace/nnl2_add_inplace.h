@@ -1,6 +1,8 @@
 #ifndef NNL2_ADD_INPLACE_H
 #define NNL2_ADD_INPLACE_H
 
+#define nnl2_add_inplace(addend, sumend) addinplace(addend, sumend) // I'm too lazy to rename the function in all places
+
 /** @brief 
  * Performs element-wise addition of two tensors (naive implementation)
  * 
