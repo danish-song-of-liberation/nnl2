@@ -117,4 +117,9 @@ void* nnl2_get_one_value(nnl2_tensor_type dtype) {
 /// @}
 
 
+void nnl2_ad_zero_grad(nnl2_ad_tensor* ad_tensor) {
+	void* zero = nnl2_get_zero_value(ad_tensor->data->dtype);
+	inplace_fill(ad_tensor->grad, &zero, ad_tensor->data->dtype);
+}
+
 #endif /** NNL2_AUTODIFF_BACKEND **/

@@ -193,7 +193,7 @@ void nnl2_init_reshaping();
  *
  ** @see nnl2_init_accessors
  ** @see nnl2_init_tensor_creating
- ** @see nnl2_init_standard 
+ ** @see nnl2_init_standard   
  ** @see nnl2_init_standard_inplace
  ** @see nnl2_init_stack
  ** @see nnl2_init_activations_inplace
@@ -205,8 +205,8 @@ void nnl2_init_reshaping();
  ** @see nnl2_init_correspondence 
  ** @see nnl2_init_broadcasting_inplace   
  ** @see nnl2_init_broadcasting
- ** @see nnl2_init_reshaping  
- **/ 
+ ** @see nnl2_init_reshaping   
+ **/   
 void nnl2_init_system() {      
 	// Initialization of random number generator
 	srand(time(NULL));               
@@ -267,7 +267,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	                                          	
 }
                
-void nnl2_init_standard_inplace() {             
+void nnl2_init_standard_inplace() {               
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
 	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);         
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
@@ -283,7 +283,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));  
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
-}	 
+}	     
                                    
                                
 void nnl2_init_stack() {

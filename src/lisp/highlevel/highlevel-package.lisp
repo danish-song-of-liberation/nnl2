@@ -50,7 +50,8 @@
    #:print-data
    #:print-grad
    #:shapes-equal-p
-   #:object-type))
+   #:object-type
+   #:zero-grad))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
@@ -59,6 +60,8 @@
    #:.-
    #:.*
    #:./
+   #:.^
+   #:.abs
    #:gemm))   
 
 (defpackage #:nnl2.hli.ts

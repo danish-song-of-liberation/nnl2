@@ -117,6 +117,9 @@
 		
 		(nnl2.ffi:%ad-full shape rank dtype requires-grad name filler-pntr)))))
 	  
+(cffi:defcfun ("nnl2_ad_zero_grad" zero-grad) :void
+  (ad-tensor :pointer))	  
+	  
 (cffi:defcfun ("nnl2_ad_get_data" data) :pointer
   (ad-tensor :pointer))  
   
@@ -200,4 +203,16 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting
+	  
+(defun .^ (a b)
+  "Element-wise pow"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  
+	  
+(defun .abs (ad-tensor)
+  (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
 	  

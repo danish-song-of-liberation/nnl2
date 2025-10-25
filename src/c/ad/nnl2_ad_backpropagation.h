@@ -28,7 +28,7 @@ void nnl2_ad_backpropagation(nnl2_ad_tensor* tensor) {
     }
 	
     for (int i = topo_size - 1; i >= 0; i--) {
-        if (topo[i]->requires_grad && topo[i]->backward_fn) {
+        if (topo[i]->backward_fn) {
             topo[i]->backward_fn(topo[i]); 			
         }
     }

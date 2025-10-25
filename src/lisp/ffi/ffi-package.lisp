@@ -396,6 +396,8 @@
    #:%ad-gemm
    #:get-obj-type
    #:%ad-.-
-   #:%ad-./))
+   #:%ad-./
+   #:%ad-.abs
+   #:%ad-.^))
    
    

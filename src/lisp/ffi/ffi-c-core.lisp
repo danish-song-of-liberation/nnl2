@@ -534,7 +534,16 @@
 (cffi:defcfun ("nnl2_ad_div" %ad-./) :pointer
   (dividend :pointer)
   (divisor :pointer)
+  (mode ad-mode))   
+  
+(cffi:defcfun ("nnl2_ad_pow" %ad-.^) :pointer
+  (base :pointer)
+  (exponent :pointer)
   (mode ad-mode))     
+
+(cffi:defcfun ("nnl2_ad_abs" %ad-.abs) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode))    
 
 (cffi:defcfun ("nnl2_ad_add_broadcasting" %ad-.+/broadcasting) :pointer
   (summand :pointer)
