@@ -30,12 +30,36 @@
 (defpackage :nnl2.hli.ad
   (:use #:cl)
   (:export
+   #:empty
    #:zeros
    #:ones
    #:data
+   #:rank
+   #:shape
    #:full
    #:is-leaf
-   #:requires-grad))
+   #:requires-grad
+   #:grad
+   #:backpropagation
+   #:bp
+   #:backpropagation-through-time
+   #:bptt
+   #:free
+   #:tlet
+   #:with-tensor-dispatch
+   #:print-data
+   #:print-grad
+   #:shapes-equal-p
+   #:object-type))
+   
+(defpackage :nnl2.hli.ad.r
+  (:use #:cl)
+  (:export
+   #:.+
+   #:.-
+   #:.*
+   #:./
+   #:gemm))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -408,5 +432,9 @@
    #:rand-like
    #:fill!
    #:use-backend/axpy!
-   #:use-backend/axpy))
+   #:use-backend/axpy
+   #:any-scalar-p
+   #:shapes-equal-p
+   #:higher-rank-tensor
+   #:both-scalars-p))
    

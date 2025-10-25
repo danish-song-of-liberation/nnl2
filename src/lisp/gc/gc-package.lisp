@@ -17,5 +17,6 @@
 	#:*profile*
 	#:gc
 	#:push
-	#:clear))
+	#:clear
+	#:with-gc))
   

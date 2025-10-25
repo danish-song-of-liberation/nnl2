@@ -39,6 +39,12 @@
   (:nnl2notrans 111) 
   (:nnl2trans 112))  
   
+(cffi:defcenum nnl2-obj-type
+  "Determines the tensor type (ts/ad)"
+  :nnl2-type-ts 
+  :nnl2-type-ad
+  :nnl2-type-unknown)
+   
 (cffi:defcstruct tensor
   "Tensor structure representing a multi-dimensional array"
   (tensor-type tensor-type)  ;; Data type of tensor elements
@@ -47,7 +53,8 @@
   (strides :pointer)  		 ;; Array of byte strides for each dimension
   (rank :int)				 ;; Number of dimensions (ndim)	
   (is-view :bool)			 ;; Flag indicating if this is a view (not owning data)
-  (magic-number :char))      ;; This is necessary to avoid memory corruption when releasing the tensor
+  (magic-number :char)       ;; This is necessary to avoid memory corruption when releasing the tensor
+  (ts-obj nnl2-obj-type))	 ;; To separate TS tensors from AD tensors
   
 ;; -- Main operations --  
   
@@ -388,11 +395,14 @@
   (tensor :pointer)
   (index :int))
   
+(cffi:defcfun ("get_nnl2_object_type" get-obj-type) :int ;; faster that nnl2-obj-type
+  (tensor :pointer))  
+  
 (cffi:defcfun ("lisp_call_debug_blas_sgemminplace" %%internal-debug-sgemm!) :void
   (check-to :unsigned-long))  
 
 (cffi:defcfun ("get_mem_alignment" %get-mem-alignment) :int)
-
+	
 (cffi:defcfun ("make_tensor_from_flatten" %make-tensor-from-flatten) :pointer
   (data :pointer)
   (num-elems-data :int)
@@ -466,7 +476,22 @@
   (backward-fn :pointer)
   (roots :pointer)
   (num-roots :long)
-  (grad-computed :pointer)
+  (name :string)
+  (magic-number :char)
+  (grad-initialized :bool)
+  (ad-obj nnl2-obj-type))   ;; To separate AD tensors from TS tensors
+  
+(cffi:defcenum ad-mode 
+  ad-reverse-mode
+  ad-p1-mode
+  ad-p2-mode
+  ad-p3-mode)  
+
+(cffi:defcfun ("nnl2_ad_empty" %ad-empty) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
   (name :string))
 
 (cffi:defcfun ("nnl2_ad_zeros" %ad-zeros) :pointer
@@ -490,6 +515,42 @@
   (requires-grad :bool)
   (name :string)
   (filler :pointer))
+  
+(cffi:defcfun ("nnl2_ad_add" %ad-.+) :pointer
+  (summand :pointer)
+  (addend :pointer)
+  (mode ad-mode)) 
+  
+(cffi:defcfun ("nnl2_ad_sub" %ad-.-) :pointer
+  (minuend :pointer)
+  (subtrahend :pointer)
+  (mode ad-mode)) 
+  
+(cffi:defcfun ("nnl2_ad_mul" %ad-.*) :pointer
+  (multiplicand :pointer)
+  (multiplier :pointer)
+  (mode ad-mode))   
+  
+(cffi:defcfun ("nnl2_ad_div" %ad-./) :pointer
+  (dividend :pointer)
+  (divisor :pointer)
+  (mode ad-mode))     
+
+(cffi:defcfun ("nnl2_ad_add_broadcasting" %ad-.+/broadcasting) :pointer
+  (summand :pointer)
+  (addend :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_gemm" %ad-gemm) :pointer
+  (multiplicand :pointer)
+  (multiplier :pointer)
+  (mode ad-mode))   
+
+(cffi:defcfun ("nnl2_ad_get_shape" %ad-shape) :pointer
+  (ad-tensor :pointer))  
+  
+(cffi:defcfun ("nnl2_ad_get_rank" %ad-rank) :int
+  (ad-tensor :pointer))    
   
 ;; -- Backends --  
  

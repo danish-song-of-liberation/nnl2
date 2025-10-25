@@ -382,7 +382,20 @@
    #:%transpose
    #:%transpose!
    #:%fill!
+   #:%ad-empty
    #:%ad-zeros
    #:%ad-ones
-   #:%ad-full))
+   #:%ad-full
+   #:ad-mode
+   #:%ad-.+
+   #:ad-reverse-mode
+   #:%ad-.+/broadcasting
+   #:%ad-.*
+   #:%ad-shape
+   #:%ad-rank
+   #:%ad-gemm
+   #:get-obj-type
+   #:%ad-.-
+   #:%ad-./))
+   
    

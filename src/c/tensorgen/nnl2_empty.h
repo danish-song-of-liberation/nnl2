@@ -130,6 +130,7 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	tensor->dtype = dtype;
 	tensor->is_view = false;
 	tensor->magic_number = TENSOR_MAGIC_ALIVE;
+	tensor->ts_type = nnl2_type_ts;
 	
 	// Allocates memory for the shape array and copies the data into it
 	

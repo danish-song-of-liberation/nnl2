@@ -184,6 +184,18 @@ typedef enum {
 
 
 
+/// @{  
+
+typedef enum {
+	nnl2_type_ts,	///< nnl2_tensor
+	nnl2_type_ad,   ///< nnl2_ad_tensor
+	nnl2_type_unknown 
+} nnl2_object_type;
+
+/// @}
+
+
+
 /// @{
 
 /** @brief 
@@ -194,13 +206,14 @@ typedef enum {
  * It supports various data types and can represent both owned data and views
  */
 typedef struct {
-	TensorType dtype;	  ///< Data type of tensor elements
-	void* data;			  ///< Pointer to the raw tensor data
-	int32_t* shape;		  ///< Array of dimension sizes 
-	int32_t* strides;	  ///< Array of byte strides for each dimension
-	int32_t rank;		  ///< Number of dimensions (ndim)
-	int8_t magic_number;  ///< This is necessary to avoid memory corruption when releasing the tensor
-	bool is_view;		  ///< Flag indicating if this is a view (not owning data)
+	nnl2_object_type ts_type;   ///< To separate TS tensors from AD tensors
+	TensorType dtype;	  		///< Data type of tensor elements
+	void* data;			  		///< Pointer to the raw tensor data
+	int32_t* shape;		  		///< Array of dimension sizes 
+	int32_t* strides;	  		///< Array of byte strides for each dimension
+	int32_t rank;		  		///< Number of dimensions (ndim)
+	int8_t magic_number;  		///< This is necessary to avoid memory corruption when releasing the tensor
+	bool is_view;		        ///< Flag indicating if this is a view (not owning data)
 } Tensor;
 
 /// @}
@@ -653,7 +666,7 @@ typedef void (*sumwithoutaxisfn)(Tensor* a, void* result_ptr);
  ** @param a Input tensor (summed along axis in-place)
  ** @param axis Axis along which to compute sum
  **/
-typedef void (*sumwithaxisfn)(Tensor* a, int axis);
+typedef Tensor* (*sumwithaxisfn)(Tensor* a, int axis);
 
 /** @brief L2 norm computation function pointer
  ** @param a Input tensor

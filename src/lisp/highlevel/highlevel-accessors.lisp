@@ -209,6 +209,9 @@
 (declaim (inline stypeof)
 		 (ftype (function (atom) symbol) stypeof))
 
+(defun object-type (obj)
+  (nnl2.ffi:get-obj-type obj))
+
 (in-package :nnl2.hli.ts)
 
 (deftype nnl2-tensor () 
@@ -1595,7 +1598,7 @@
 	  
 (defun .+ (&rest args)
   "Reduce tensors with element-wise addition"
-  (reduce #'.+/internal args))  
+  (reduce #'.+/internal args))  ;; mem leak xd
 
 (defun +=/internal (a b)
   "In-place element-wise addition"

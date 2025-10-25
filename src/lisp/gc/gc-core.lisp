@@ -34,13 +34,7 @@
   (setq *gc* nil))	
 	
 (defun gc ()
-  "WARNING: 
-      This feature is greatly simplified and 
-	  is not yet complete. it will be completed 
-	  in the future, but for now it only supports 
-	  :nnl2.hli.ts tensors.
-  
-   Clears all tensors placed in nnl2.gc:*gc*"
+  "Clears all tensors placed in nnl2.gc:*gc*"
    
   (dolist (tensor *gc*)
     (let ((finalizer (cdr tensor)) (tensor-to-free (car tensor)))
@@ -48,8 +42,17 @@
 	    (when *profile* (nnl2.log:info "<=== Calling finalizer: ~d" finalizer))
 		(funcall finalizer tensor-to-free))
 		
-	  (when *profile* (nnl2.log:info "<=== Freeing tensor: ~a" tensor-to-free))
-	  (nnl2.hli.ts:free tensor-to-free)))
+	  
+	  (ecase (nnl2.ffi:get-obj-type tensor-to-free)
+	    (0 (progn
+		     (when *profile* (nnl2.log:info "<=== Freeing TS tensor: ~a" tensor-to-free))
+			 (nnl2.hli.ts:free tensor-to-free)))
+			 
+		(1 (progn
+		     (when *profile* (nnl2.log:info "<=== Freeing AD tensor: ~a" tensor-to-free))
+	    	 (nnl2.hli.ts:free tensor-to-free))))))
 	
   (reset))  
-	
+
+(defmacro with-gc (&body body)
+  `(progn ,@body) (nnl2.gc:gc))	

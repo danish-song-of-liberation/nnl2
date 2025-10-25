@@ -9,6 +9,8 @@ nnl2_ad_tensor* nnl2_ad_find_leaf(nnl2_ad_tensor* tensor) {
 		if(potential_leaf != NULL) {
 			return potential_leaf;
 		}
+		
+		nnl2_free_ad_tensor(potential_leaf);
 	}
 		
 	NNL2_WARN("Don't forget to add optimizations to nnl2_ad_find_leaf in the future");

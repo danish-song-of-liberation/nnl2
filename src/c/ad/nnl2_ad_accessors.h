@@ -51,4 +51,29 @@ bool nnl2_ad_get_requires_grad(nnl2_ad_tensor* ad_tensor) {
 	return ad_tensor->requires_grad;
 }
 
+int32_t* nnl2_ad_get_shape(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor->data->shape;
+}
+
+int32_t nnl2_ad_get_rank(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor->data->rank;
+}
+
+nnl2_tensor* nnl2_ad_get_grad(nnl2_ad_tensor* ad_tensor) {
+	if(!ad_tensor->requires_grad) {
+		if(ad_tensor->name != NULL) {
+			NNL2_ERROR("For tensor %x (namely %s), an attempt was made to obtain gradients when it did not require them. Did you forget`:requires-grad t` ?", ad_tensor, ad_tensor->name);
+		} else {
+			NNL2_ERROR("For tensor %x, an attempt was made to obtain gradients when it did not require them. Did you forget`:requires-grad t` ?", ad_tensor);
+		}
+	}
+	
+	if(ad_tensor->grad_initialized) {
+		return ad_tensor->grad;
+	} else {
+		NNL2_ERROR("An attempt was made to obtain an uninitialized gradient. Before getting the gradient, first perform backpropagation");
+		return NULL;
+	}
+}
+
 #endif /** NNL2_AD_ACCESSORS_H **/

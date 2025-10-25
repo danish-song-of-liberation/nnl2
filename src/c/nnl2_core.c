@@ -210,8 +210,8 @@ void nnl2_init_reshaping();
 void nnl2_init_system() {      
 	// Initialization of random number generator
 	srand(time(NULL));               
-	                    
-	// Initialization of logger      
+	                                      
+	// Initialization of logger            
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,             
@@ -220,9 +220,9 @@ void nnl2_init_system() {
 	);    
 			
 	// Initialization of all functions having several implementations
-	nnl2_init_accessors();	
+	nnl2_init_accessors();	 
 	nnl2_init_tensor_creating();
-	nnl2_init_standard();    
+	nnl2_init_standard();     
 	nnl2_init_standard_inplace();       
 	nnl2_init_stack();
 	nnl2_init_activations_inplace();       
@@ -250,12 +250,12 @@ void nnl2_init_accessors() {
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
-}   
+}          
     
 void nnl2_init_standard() {
 	EINIT_BACKEND(add, add_backends, current_backend(add));               
-	EINIT_BACKEND(sub, sub_backends, current_backend(sub));            
-	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	       
+	EINIT_BACKEND(sub, sub_backends, current_backend(sub));                
+	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	         
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));     
 	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));             
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
@@ -264,22 +264,22 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));         
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));          
-	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  	
+	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	                                          	
 }
-
-void nnl2_init_standard_inplace() {          
+               
+void nnl2_init_standard_inplace() {             
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
-	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);   
+	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);         
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, current_backend(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, current_backend(addinplace));       
-	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));    
+	EINIT_BACKEND(subinplace, subinplace_backends, current_backend(subinplace));                     
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));    
 	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));     	
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace));    
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));     
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace));   	
-	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace));  
+	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace));     
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));  
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
@@ -330,10 +330,10 @@ void nnl2_init_auxiliary() {
 
 void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
-	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends); 
+	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends);  
 	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends);  
 	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);    
-	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends); 
+	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends);  
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);  
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);      
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);  
@@ -343,7 +343,7 @@ void nnl2_init_correspondence() {
 	INIT_BACKEND(add_incf, add_incf_backends);    
 	INIT_BACKEND(sub_decf, sub_decf_backends);     
 	INIT_BACKEND(mul_mulf, mul_mulf_backends);          
-	INIT_BACKEND(div_divf, div_divf_backends);  
+	INIT_BACKEND(div_divf, div_divf_backends);   
 	INIT_BACKEND(pow_powf, pow_powf_backends);          
 	INIT_BACKEND(max_maxf, max_maxf_backends);      
 	INIT_BACKEND(min_minf, min_minf_backends); 
@@ -370,15 +370,15 @@ void nnl2_init_broadcasting() {
     INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 	
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
-}
+}     
 
 void nnl2_init_reshaping() {      
 	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));  
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
 }
-
-///@} [subinitializers]
-
+     
+///@} [subinitializers]   
+     
 ///@} [initilizing]
 
 
