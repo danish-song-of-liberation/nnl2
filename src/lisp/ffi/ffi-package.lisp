@@ -398,6 +398,12 @@
    #:%ad-.-
    #:%ad-./
    #:%ad-.abs
-   #:%ad-.^))
+   #:%ad-.^
+   #:%ad-.log
+   #:%ad-scale
+   #:%ad-.min
+   #:%ad-.max
+   #:%ad-axpy
+   #:%ad-.exp))
    
    

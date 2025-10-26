@@ -216,3 +216,39 @@
 (defun .abs (ad-tensor)
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
 	  
+(defun .min (a b)
+  "Element-wise min"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  	  
+	  
+(defun .max (a b)
+  "Element-wise max"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  	  
+	  
+(defun scale (a b &key save-type)
+  (nnl2.ffi:%ad-scale a b save-type	nnl2.ffi:ad-reverse-mode))
+
+(defun .log (ad-tensor &key save-type)
+  (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode))
+  
+(defun .exp (ad-tensor &key save-type)
+  (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode))  
+ 
+(defun axpy (a b &key (alpha 1.0))
+  "Element-wise a+b*c"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	 
+	  

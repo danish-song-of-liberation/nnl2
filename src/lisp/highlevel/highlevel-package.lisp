@@ -62,7 +62,13 @@
    #:./
    #:.^
    #:.abs
-   #:gemm))   
+   #:gemm
+   #:.min
+   #:.max
+   #:axpy
+   #:.exp
+   #:.log
+   #:scale))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

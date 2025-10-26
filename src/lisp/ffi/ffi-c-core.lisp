@@ -539,7 +539,39 @@
 (cffi:defcfun ("nnl2_ad_pow" %ad-.^) :pointer
   (base :pointer)
   (exponent :pointer)
-  (mode ad-mode))     
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_log" %ad-.log) :pointer
+  (ad-tensor :pointer)
+  (save-type :bool)
+  (mode ad-mode))    
+  
+(cffi:defcfun ("nnl2_ad_scale" %ad-scale) :pointer
+  (ad-tensor :pointer)
+  (multiplier :float)
+  (save-type :bool)
+  (mode ad-mode))    
+  
+(cffi:defcfun ("nnl2_ad_min" %ad-.min) :pointer
+  (a :pointer)
+  (b :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_max" %ad-.max) :pointer
+  (a :pointer)
+  (b :pointer)
+  (mode ad-mode))    
+  
+(cffi:defcfun ("nnl2_ad_exp" %ad-.exp) :pointer
+  (ad_tensor :pointer)
+  (save-type :bool)
+  (mode ad-mode)) 
+
+(cffi:defcfun ("nnl2_ad_axpy" %ad-axpy) :pointer
+  (summand :pointer)
+  (addend :pointer)
+  (multiplier :float)
+  (mode ad-mode))    
 
 (cffi:defcfun ("nnl2_ad_abs" %ad-.abs) :pointer
   (ad-pointer :pointer)
