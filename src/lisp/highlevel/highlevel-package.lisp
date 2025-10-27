@@ -57,18 +57,30 @@
   (:use #:cl)
   (:export
    #:.+
+   #:+=
    #:.-
+   #:-=
    #:.*
+   #:*=
    #:./
+   #:/!
    #:.^
+   #:^=
    #:.abs
+   #:.abs!
    #:gemm
    #:.min
+   #:.min!
    #:.max
+   #:.max!
    #:axpy
+   #:axpy!
    #:.exp
+   #:.exp!
    #:.log
-   #:scale))   
+   #:.log!
+   #:scale
+   #:scale!))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

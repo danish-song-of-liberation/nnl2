@@ -521,22 +521,47 @@
   (addend :pointer)
   (mode ad-mode)) 
   
+(cffi:defcfun ("nnl2_ad_add_inplace" %ad-+=) :void
+  (summand :pointer)
+  (addend :pointer)
+  (mode ad-mode))   
+  
 (cffi:defcfun ("nnl2_ad_sub" %ad-.-) :pointer
   (minuend :pointer)
   (subtrahend :pointer)
   (mode ad-mode)) 
+  
+(cffi:defcfun ("nnl2_ad_sub_inplace" %ad--=) :void
+  (minuend :pointer)
+  (subtrahend :pointer)
+  (mode ad-mode))   
   
 (cffi:defcfun ("nnl2_ad_mul" %ad-.*) :pointer
   (multiplicand :pointer)
   (multiplier :pointer)
   (mode ad-mode))   
   
+(cffi:defcfun ("nnl2_ad_mul_inplace" %ad-*=) :void
+  (multiplicand :pointer)
+  (multiplier :pointer)
+  (mode ad-mode))     
+  
 (cffi:defcfun ("nnl2_ad_div" %ad-./) :pointer
   (dividend :pointer)
   (divisor :pointer)
   (mode ad-mode))   
   
+(cffi:defcfun ("nnl2_ad_div_inplace" %ad-/!) :pointer
+  (dividend :pointer)
+  (divisor :pointer)
+  (mode ad-mode))     
+  
 (cffi:defcfun ("nnl2_ad_pow" %ad-.^) :pointer
+  (base :pointer)
+  (exponent :pointer)
+  (mode ad-mode))
+  
+(cffi:defcfun ("nnl2_ad_pow_inplace" %ad-^=) :void
   (base :pointer)
   (exponent :pointer)
   (mode ad-mode))
@@ -546,18 +571,37 @@
   (save-type :bool)
   (mode ad-mode))    
   
+(cffi:defcfun ("nnl2_ad_inplace_log" %ad-.log!) :void
+  (ad-tensor :pointer)
+  (mode ad-mode))   
+  
 (cffi:defcfun ("nnl2_ad_scale" %ad-scale) :pointer
   (ad-tensor :pointer)
   (multiplier :float)
   (save-type :bool)
-  (mode ad-mode))    
+  (mode ad-mode)) 
+
+(cffi:defcfun ("nnl2_ad_inplace_scale" %ad-scale!) :void
+  (ad-tensor :pointer)
+  (multiplier :float)
+  (mode ad-mode))      
   
 (cffi:defcfun ("nnl2_ad_min" %ad-.min) :pointer
   (a :pointer)
   (b :pointer)
   (mode ad-mode))
+  
+(cffi:defcfun ("nnl2_ad_min_inplace" %ad-.min!) :void
+  (a :pointer)
+  (b :pointer)
+  (mode ad-mode))  
 
 (cffi:defcfun ("nnl2_ad_max" %ad-.max) :pointer
+  (a :pointer)
+  (b :pointer)
+  (mode ad-mode))    
+
+(cffi:defcfun ("nnl2_ad_max_inplace" %ad-.max!) :void
   (a :pointer)
   (b :pointer)
   (mode ad-mode))    
@@ -567,15 +611,29 @@
   (save-type :bool)
   (mode ad-mode)) 
 
+(cffi:defcfun ("nnl2_ad_inplace_exp" %ad-.exp!) :void
+  (ad_tensor :pointer)
+  (mode ad-mode)) 
+  
 (cffi:defcfun ("nnl2_ad_axpy" %ad-axpy) :pointer
   (summand :pointer)
   (addend :pointer)
   (multiplier :float)
   (mode ad-mode))    
 
+(cffi:defcfun ("nnl2_ad_inplace_axpy" %ad-axpy!) :void
+  (summand :pointer)
+  (addend :pointer)
+  (multiplier :float)
+  (mode ad-mode)) 
+  
 (cffi:defcfun ("nnl2_ad_abs" %ad-.abs) :pointer
   (ad-pointer :pointer)
   (mode ad-mode))    
+  
+(cffi:defcfun ("nnl2_ad_inplace_abs" %ad-.abs!) :void
+  (ad-pointer :pointer)
+  (mode ad-mode))   
 
 (cffi:defcfun ("nnl2_ad_add_broadcasting" %ad-.+/broadcasting) :pointer
   (summand :pointer)

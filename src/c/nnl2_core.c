@@ -214,11 +214,11 @@ void nnl2_init_system() {
 	// Initialization of logger            
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
-		NNL2_LOG_DEFAULT_TIMESTAMPS,              
+		NNL2_LOG_DEFAULT_TIMESTAMPS,                  
 		NNL2_LOG_DEFAULT_DEBUG_INFO,          
 		NNL2_LOG_LEVEL_DEBUG   
 	);    
-			
+			         
 	// Initialization of all functions having several implementations
 	nnl2_init_accessors();	 
 	nnl2_init_tensor_creating();

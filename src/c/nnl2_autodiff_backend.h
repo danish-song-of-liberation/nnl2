@@ -33,7 +33,7 @@ typedef struct nnl2_ad_tensor {
 	char* name;  						       ///< Name for debugging
 	int8_t magic_number; 					   ///< This is necessary to avoid memory corruption when releasing the tensor
 	bool grad_initialized;					   ///< If false, the gradient is either NULL or has uninitialized memory
-	nnl2_float32 extra_multiplier;					   ///< For acute cases such as axpy, scale
+	nnl2_float32 extra_multiplier;			   ///< For acute cases such as axpy, scale
 } nnl2_ad_tensor;
 
 /// @} [nnl2_ad_tensor]

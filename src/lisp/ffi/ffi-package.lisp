@@ -404,6 +404,18 @@
    #:%ad-.min
    #:%ad-.max
    #:%ad-axpy
-   #:%ad-.exp))
+   #:%ad-.exp
+   #:%ad-+=
+   #:%ad--=
+   #:%ad-*=
+   #:%ad-/!
+   #:%ad-^=
+   #:%ad-scale!
+   #:%ad-.abs!
+   #:%ad-axpy!
+   #:%ad-.max!
+   #:%ad-.min!
+   #:%ad-.log!
+   #:%ad-.exp!))
    
    

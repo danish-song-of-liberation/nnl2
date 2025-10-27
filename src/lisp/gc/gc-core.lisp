@@ -41,8 +41,7 @@
 	  (when (functionp finalizer) 
 	    (when *profile* (nnl2.log:info "<=== Calling finalizer: ~d" finalizer))
 		(funcall finalizer tensor-to-free))
-		
-	  
+		  
 	  (ecase (nnl2.ffi:get-obj-type tensor-to-free)
 	    (0 (progn
 		     (when *profile* (nnl2.log:info "<=== Freeing TS tensor: ~a" tensor-to-free))
@@ -53,6 +52,3 @@
 	    	 (nnl2.hli.ts:free tensor-to-free))))))
 	
   (reset))  
-
-(defmacro with-gc (&body body)
-  `(progn ,@body) (nnl2.gc:gc))	

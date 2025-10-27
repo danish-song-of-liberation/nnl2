@@ -173,6 +173,15 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-.+ a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-.+/broadcasting a b nnl2.ffi:ad-reverse-mode))))
+	  
+(defun += (a b)
+  "In-place addition"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-+= a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting
   
 (defun .* (a b)
   "Element-wise multiplication"
@@ -182,6 +191,15 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-.* a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting
+
+(defun *= (a b)
+  "In-place multiplication"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-*= a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  
 	  
 (defun gemm (a b)
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode))
@@ -195,6 +213,15 @@
       (nnl2.ffi:%ad-.- a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting
 	  
+(defun -= (a b)
+  "In-place subtraction"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad--= a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  
+	  
 (defun ./ (a b)
   "Element-wise division"
   
@@ -203,7 +230,16 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting
-	  
+	
+(defun /! (a b)
+  "In-place division"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-/! a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting
+	
 (defun .^ (a b)
   "Element-wise pow"
   
@@ -213,9 +249,21 @@
       (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting	  
 	  
+(defun ^= (a b)
+  "In-place pow"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-^= a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  	  
+	  
 (defun .abs (ad-tensor)
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
-	  
+	
+(defun .abs! (ad-tensor)
+  (nnl2.ffi:%ad-.abs! ad-tensor nnl2.ffi:ad-reverse-mode))	
+	
 (defun .min (a b)
   "Element-wise min"
   
@@ -224,7 +272,16 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting	  	  
-	  
+	
+(defun .min! (a b)
+  "In-place min"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-.min! a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting
+	
 (defun .max (a b)
   "Element-wise max"
   
@@ -233,16 +290,34 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting	  	  
-	  
+	
+(defun .max! (a b)
+  "In-place max"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-.max! a b nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	  
+	
 (defun scale (a b &key save-type)
   (nnl2.ffi:%ad-scale a b save-type	nnl2.ffi:ad-reverse-mode))
 
+(defun scale! (a b)
+  (nnl2.ffi:%ad-scale! a b nnl2.ffi:ad-reverse-mode))
+  
 (defun .log (ad-tensor &key save-type)
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode))
   
+(defun .log! (ad-tensor)
+  (nnl2.ffi:%ad-.log! ad-tensor nnl2.ffi:ad-reverse-mode))  
+  
 (defun .exp (ad-tensor &key save-type)
   (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode))  
- 
+
+(defun .exp! (ad-tensor)
+  (nnl2.ffi:%ad-.exp! ad-tensor nnl2.ffi:ad-reverse-mode))  
+  
 (defun axpy (a b &key (alpha 1.0))
   "Element-wise a+b*c"
   
@@ -251,4 +326,13 @@
       nil ;; correspondence
       (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
       nil))) ;; broadcasting	 
-	  
+	 
+(defun axpy! (a b &key (alpha 1.0))
+  "In-place a+b*c"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      nil ;; correspondence
+      (nnl2.ffi:%ad-axpy! a b alpha nnl2.ffi:ad-reverse-mode)
+      nil))) ;; broadcasting	 
+	 
