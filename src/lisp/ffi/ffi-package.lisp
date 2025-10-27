@@ -416,6 +416,10 @@
    #:%ad-.max!
    #:%ad-.min!
    #:%ad-.log!
-   #:%ad-.exp!))
+   #:%ad-.exp!
+   #:%ad-.relu!
+   #:%ad-.leaky-relu!
+   #:%ad-.sigmoid!
+   #:%ad-.tanh!))
    
    

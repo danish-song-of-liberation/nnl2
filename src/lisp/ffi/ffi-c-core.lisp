@@ -644,7 +644,26 @@
   (multiplicand :pointer)
   (multiplier :pointer)
   (mode ad-mode))   
+  
+(cffi:defcfun ("nnl2_ad_inplace_leakyrelu" %ad-.leaky-relu!) :pointer
+  (ad-tensor :pointer)
+  (alpha :float)
+  (mode ad-mode))  
 
+(cffi:defcfun ("nnl2_ad_inplace_relu" %ad-.relu!) :pointer
+  (ad-tensor :pointer)
+  (mode ad-mode))  
+
+(cffi:defcfun ("nnl2_ad_inplace_sigmoid" %ad-.sigmoid!) :pointer
+  (ad-tensor :pointer)
+  (approx :bool)
+  (mode ad-mode))    
+ 
+(cffi:defcfun ("nnl2_ad_inplace_tanh" %ad-.tanh!) :pointer
+  (ad-tensor :pointer)
+  (approx :bool)
+  (mode ad-mode))  
+  
 (cffi:defcfun ("nnl2_ad_get_shape" %ad-shape) :pointer
   (ad-tensor :pointer))  
   

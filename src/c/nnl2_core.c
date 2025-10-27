@@ -207,7 +207,7 @@ void nnl2_init_reshaping();
  ** @see nnl2_init_broadcasting
  ** @see nnl2_init_reshaping   
  **/   
-void nnl2_init_system() {      
+void nnl2_init_system() {       
 	// Initialization of random number generator
 	srand(time(NULL));               
 	                                      
@@ -218,19 +218,19 @@ void nnl2_init_system() {
 		NNL2_LOG_DEFAULT_DEBUG_INFO,          
 		NNL2_LOG_LEVEL_DEBUG   
 	);    
-			         
+			          
 	// Initialization of all functions having several implementations
-	nnl2_init_accessors();	 
+	nnl2_init_accessors();	  
 	nnl2_init_tensor_creating();
 	nnl2_init_standard();     
 	nnl2_init_standard_inplace();       
-	nnl2_init_stack();
+	nnl2_init_stack(); 
 	nnl2_init_activations_inplace();       
 	nnl2_init_activations();  
 	nnl2_init_auxiliary();
 	nnl2_init_initializers();
-	nnl2_init_transposition(); 
-	nnl2_init_correspondence_inplace();
+	nnl2_init_transposition();   
+	nnl2_init_correspondence_inplace(); 
 	nnl2_init_correspondence();   
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    

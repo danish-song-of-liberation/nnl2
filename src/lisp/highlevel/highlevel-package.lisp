@@ -80,7 +80,15 @@
    #:.log
    #:.log!
    #:scale
-   #:scale!))   
+   #:scale!
+   #:.relu
+   #:.leaky-relu
+   #:.sigmoid
+   #:.tanh
+   #:.relu!
+   #:.leaky-relu!
+   #:.sigmoid!
+   #:.tanh!))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
