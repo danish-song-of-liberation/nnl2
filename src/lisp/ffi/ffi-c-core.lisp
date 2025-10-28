@@ -469,6 +469,7 @@
 
 (cffi:defcstruct ad-tensor
   "Tensor structure with support for automatic differentiation"
+  (ad-obj nnl2-obj-type)
   (data tensor)
   (grad tensor)
   (requires-grad :bool)
@@ -479,7 +480,8 @@
   (name :string)
   (magic-number :char)
   (grad-initialized :bool)
-  (ad-obj nnl2-obj-type))   ;; To separate AD tensors from TS tensors
+  (extra-multiplier :float)
+  (extra-bool :bool))  		 
   
 (cffi:defcenum ad-mode 
   ad-reverse-mode
@@ -645,21 +647,41 @@
   (multiplier :pointer)
   (mode ad-mode))   
   
-(cffi:defcfun ("nnl2_ad_inplace_leakyrelu" %ad-.leaky-relu!) :pointer
+(cffi:defcfun ("nnl2_ad_inplace_leakyrelu" %ad-.leaky-relu!) :void
   (ad-tensor :pointer)
   (alpha :float)
   (mode ad-mode))  
 
-(cffi:defcfun ("nnl2_ad_inplace_relu" %ad-.relu!) :pointer
+(cffi:defcfun ("nnl2_ad_leakyrelu" %ad-.leaky-relu) :pointer
+  (ad-tensor :pointer)
+  (alpha :float)
+  (save-type :bool)
+  (mode ad-mode)) 
+
+(cffi:defcfun ("nnl2_ad_inplace_relu" %ad-.relu!) :void
   (ad-tensor :pointer)
   (mode ad-mode))  
 
-(cffi:defcfun ("nnl2_ad_inplace_sigmoid" %ad-.sigmoid!) :pointer
+(cffi:defcfun ("nnl2_ad_relu" %ad-.relu) :pointer
+  (ad-tensor :pointer)
+  (mode ad-mode))  
+
+(cffi:defcfun ("nnl2_ad_inplace_sigmoid" %ad-.sigmoid!) :void
   (ad-tensor :pointer)
   (approx :bool)
   (mode ad-mode))    
  
-(cffi:defcfun ("nnl2_ad_inplace_tanh" %ad-.tanh!) :pointer
+(cffi:defcfun ("nnl2_ad_sigmoid" %ad-.sigmoid) :pointer
+  (ad-tensor :pointer)
+  (approx :bool)
+  (mode ad-mode))     
+ 
+(cffi:defcfun ("nnl2_ad_inplace_tanh" %ad-.tanh!) :void
+  (ad-tensor :pointer)
+  (approx :bool)
+  (mode ad-mode))  
+  
+(cffi:defcfun ("nnl2_ad_tanh" %ad-.tanh) :pointer
   (ad-tensor :pointer)
   (approx :bool)
   (mode ad-mode))  

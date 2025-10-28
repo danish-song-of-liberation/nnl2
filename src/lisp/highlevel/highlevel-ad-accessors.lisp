@@ -347,4 +347,16 @@
   
 (defun .tanh! (ad-tensor &key (approx t))
   (nnl2.ffi:%ad-.tanh! ad-tensor approx nnl2.ffi:ad-reverse-mode))    
-  
+
+(defun .relu (ad-tensor)
+  (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode)) 
+
+(defun .leaky-relu (ad-tensor &key save-type (alpha 0.01))
+  (nnl2.ffi:%ad-.leaky-relu ad-tensor alpha save-type nnl2.ffi:ad-reverse-mode)) 
+    
+(defun .sigmoid (ad-tensor &key (approx t))
+  (nnl2.ffi:%ad-.sigmoid ad-tensor approx nnl2.ffi:ad-reverse-mode))  
+  	
+(defun .tanh (ad-tensor &key (approx t))
+  (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode)) 	
+	

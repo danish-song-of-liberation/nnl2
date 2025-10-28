@@ -420,6 +420,10 @@
    #:%ad-.relu!
    #:%ad-.leaky-relu!
    #:%ad-.sigmoid!
-   #:%ad-.tanh!))
+   #:%ad-.tanh!
+   #:%ad-.relu
+   #:%ad-.leaky-relu
+   #:%ad-.sigmoid
+   #:%ad-.tanh))
    
    

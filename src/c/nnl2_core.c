@@ -230,7 +230,7 @@ void nnl2_init_system() {
 	nnl2_init_auxiliary();
 	nnl2_init_initializers();
 	nnl2_init_transposition();   
-	nnl2_init_correspondence_inplace(); 
+	nnl2_init_correspondence_inplace();   
 	nnl2_init_correspondence();   
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
