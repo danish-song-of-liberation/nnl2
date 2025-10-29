@@ -424,6 +424,22 @@
    #:%ad-.relu
    #:%ad-.leaky-relu
    #:%ad-.sigmoid
-   #:%ad-.tanh))
+   #:%ad-.tanh
+   #:%ad-add-broadcasting
+   #:%ad-axpy-broadcasting
+   #:%ad-div-broadcasting
+   #:%ad-max-broadcasting
+   #:%ad-min-broadcasting
+   #:%ad-mul-broadcasting
+   #:%ad-pow-broadcasting
+   #:%ad-sub-broadcasting
+   #:%ad-add-broadcasting-inplace
+   #:%ad-axpy-broadcasting-inplace
+   #:%ad-div-broadcasting-inplace
+   #:%ad-max-broadcasting-inplace 
+   #:%ad-min-broadcasting-inplace
+   #:%ad-mul-broadcasting-inplace
+   #:%ad-pow-broadcasting-inplace
+   #:%ad-sub-broadcasting-inplace))
    
    

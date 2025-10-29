@@ -164,7 +164,6 @@
   (nnl2.hli.ts:print-tensor (grad ad-tensor)))  
   
 (in-package :nnl2.hli.ad.r)
-
 (defun .+ (a b)
   "Element-wise addition"
   
@@ -172,7 +171,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.+ a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.+/broadcasting a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.ffi:%ad-add-broadcasting a b nnl2.ffi:ad-reverse-mode))))
 	  
 (defun += (a b)
   "In-place addition"
@@ -181,7 +180,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-+= a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting
+      (nnl2.ffi:%ad-add-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
   
 (defun .* (a b)
   "Element-wise multiplication"
@@ -190,7 +189,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.* a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting
+      (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode))))
 
 (defun *= (a b)
   "In-place multiplication"
@@ -199,7 +198,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-*= a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  
+      (nnl2.ffi:%ad-mul-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))	  
 	  
 (defun gemm (a b)
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode))
@@ -211,7 +210,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.- a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting
+      (nnl2.ffi:%ad-sub-broadcasting a b nnl2.ffi:ad-reverse-mode))))
 	  
 (defun -= (a b)
   "In-place subtraction"
@@ -220,7 +219,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad--= a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  
+      (nnl2.ffi:%ad-sub-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))	  
 	  
 (defun ./ (a b)
   "Element-wise division"
@@ -229,7 +228,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting
+      (nnl2.ffi:%ad-div-broadcasting a b nnl2.ffi:ad-reverse-mode))))
 	
 (defun /! (a b)
   "In-place division"
@@ -238,7 +237,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-/! a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting
+      (nnl2.ffi:%ad-div-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
 	
 (defun .^ (a b)
   "Element-wise pow"
@@ -247,7 +246,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  
+      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  
 	  
 (defun ^= (a b)
   "In-place pow"
@@ -256,7 +255,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-^= a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  	  
+      (nnl2.ffi:%ad-pow-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))	  	  
 	  
 (defun .abs (ad-tensor)
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
@@ -271,7 +270,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  	  
+      (nnl2.ffi:%ad-min-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  	  
 	
 (defun .min! (a b)
   "In-place min"
@@ -280,7 +279,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.min! a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting
+      (nnl2.ffi:%ad-min-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
 	
 (defun .max (a b)
   "Element-wise max"
@@ -289,7 +288,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  	  
+      (nnl2.ffi:%ad-max-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  	  
 	
 (defun .max! (a b)
   "In-place max"
@@ -298,7 +297,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-.max! a b nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	  
+      (nnl2.ffi:%ad-max-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))	  
 	
 (defun scale (a b &key save-type)
   (nnl2.ffi:%ad-scale a b save-type	nnl2.ffi:ad-reverse-mode))
@@ -325,7 +324,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	 
+      (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode))))	 
 	 
 (defun axpy! (a b &key (alpha 1.0))
   "In-place a+b*c"
@@ -334,7 +333,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       nil ;; correspondence
       (nnl2.ffi:%ad-axpy! a b alpha nnl2.ffi:ad-reverse-mode)
-      nil))) ;; broadcasting	 
+      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha nnl2.ffi:ad-reverse-mode))))
 	 
 (defun .relu! (ad-tensor)
   (nnl2.ffi:%ad-.relu! ad-tensor nnl2.ffi:ad-reverse-mode))  	 
