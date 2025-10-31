@@ -51,7 +51,25 @@
    #:print-grad
    #:shapes-equal-p
    #:object-type
-   #:zero-grad))
+   #:zero-grad
+   #:dtype
+   #:int-dtype
+   #:.+/ad/incf!
+   #:+=/ad/incf!
+   #:.*/ad/mulf!
+   #:*=/ad/mulf!
+   #:.-/ad/decf!
+   #:-=/ad/decf!
+   #:./ad/divf!
+   #:/!/ad/divf!
+   #:.^/ad/powf!
+   #:^=/ad/powf!
+   #:.min/ad/minf!
+   #:.min!/ad/minf!
+   #:.max/ad/maxf!
+   #:.max!/ad/maxf!
+   #:axpy/ad/axpf!
+   #:axpy!/ad/axpf!))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

@@ -440,6 +440,26 @@
    #:%ad-min-broadcasting-inplace
    #:%ad-mul-broadcasting-inplace
    #:%ad-pow-broadcasting-inplace
-   #:%ad-sub-broadcasting-inplace))
+   #:%ad-sub-broadcasting-inplace
+   #:%ad-add-correspondence
+   #:%ad-axpf
+   #:%ad-div-correspondence
+   #:%ad-max-correspondence
+   #:%ad-min-correspondence
+   #:%ad-mul-correspondence
+   #:%ad-pow-correspondence
+   #:%ad-sub-correspondence
+   #:%ad-add-incf-inplace
+   #:%ad-axpf-inplace
+   #:%ad-div-divf-inplace
+   #:%ad-max-maxf-inplace
+   #:%ad-min-minf-inplace
+   #:%ad-mul-mulf-inplace
+   #:%ad-pow-powf-inplace
+   #:%ad-sub-decf-inplace
+   #:%ad-dtype-as-data
+   #:%ad-dtype-as-data-int
+   #:%ad-dtype-as-grad
+   #:%ad-dtype-as-grad-int))
    
    

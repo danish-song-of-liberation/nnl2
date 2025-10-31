@@ -481,7 +481,8 @@
   (magic-number :char)
   (grad-initialized :bool)
   (extra-multiplier :float)
-  (extra-bool :bool))  		 
+  (extra-bool :bool)
+  (extra-correspondence :pointer))  
   
 (cffi:defcenum ad-mode 
   ad-reverse-mode
@@ -757,7 +758,7 @@
   (base :pointer)
   (exponent :pointer)
   (mode ad-mode))
-			  ; nnl2_ad_sub_broadcasting_inplace
+			  
 (cffi:defcfun ("nnl2_ad_sub_broadcasting_inplace" %ad-sub-broadcasting-inplace) :void
   (minuend :pointer)
   (subtrahend :pointer)
@@ -768,11 +769,105 @@
   (approx :bool)
   (mode ad-mode))  
   
+(cffi:defcfun ("nnl2_ad_add_correspondence" %ad-add-correspondence) :pointer
+  (tensor :pointer)
+  (inc :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_axpf" %ad-axpf) :pointer
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_div_correspondence" %ad-div-correspondence) :pointer
+  (tensor :pointer)
+  (divisor :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_max_correspondence" %ad-max-correspondence) :pointer
+  (tensor :pointer)
+  (threshold :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_min_correspondence" %ad-min-correspondence) :pointer
+  (tensor :pointer)
+  (threshold :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_mul_correspondence" %ad-mul-correspondence) :pointer
+  (tensor :pointer)
+  (multiplier :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_pow_correspondence" %ad-pow-correspondence) :pointer
+  (tensor :pointer)
+  (exponent :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_sub_correspondence" %ad-sub-correspondence) :pointer
+  (tensor :pointer)
+  (dec :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_add_incf_inplace" %ad-add-incf-inplace) :void
+  (tensor :pointer)
+  (inc :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_axpf_inplace" %ad-axpf-inplace) :void
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_div_divf_inplace" %ad-div-divf-inplace) :void
+  (tensor :pointer)
+  (divisor :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_max_maxf_inplace" %ad-max-maxf-inplace) :void
+  (tensor :pointer)
+  (threshold :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_min_minf_inplace" %ad-min-minf-inplace) :void
+  (tensor :pointer)
+  (threshold :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_mul_mulf_inplace" %ad-mul-mulf-inplace) :void
+  (tensor :pointer)
+  (multiplier :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_pow_powf_inplace" %ad-pow-powf-inplace) :void
+  (tensor :pointer)
+  (exponent :pointer)
+  (mode ad-mode))
+
+(cffi:defcfun ("nnl2_ad_sub_decf_inplace" %ad-sub-decf-inplace) :void
+  (tensor :pointer)
+  (dec :pointer)
+  (mode ad-mode))  
+  
 (cffi:defcfun ("nnl2_ad_get_shape" %ad-shape) :pointer
   (ad-tensor :pointer))  
   
 (cffi:defcfun ("nnl2_ad_get_rank" %ad-rank) :int
   (ad-tensor :pointer))    
+  
+(cffi:defcfun ("nnl2_ad_get_dtype_as_data" %ad-dtype-as-data) tensor-type
+  (ad-pointer :pointer))
+  
+(cffi:defcfun ("nnl2_ad_get_dtype_as_data" %ad-dtype-as-data-int) :int 
+  (ad-pointer :pointer))  
+
+(cffi:defcfun ("nnl2_ad_get_dtype_as_grad" %ad-dtype-as-grad) tensor-type
+  (ad-pointer :pointer))  
+
+(cffi:defcfun ("nnl2_ad_get_dtype_as_grad" %ad-dtype-as-grad-int) :int 
+  (ad-pointer :pointer))    
   
 ;; -- Backends --  
  

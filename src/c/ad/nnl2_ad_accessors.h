@@ -59,6 +59,14 @@ int32_t nnl2_ad_get_rank(nnl2_ad_tensor* ad_tensor) {
 	return ad_tensor->data->rank;
 }
 
+nnl2_tensor_type nnl2_ad_get_dtype_as_data(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor->data->dtype;
+}
+
+nnl2_tensor_type nnl2_ad_get_dtype_as_grad(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor->grad->dtype;;
+}
+
 nnl2_tensor* nnl2_ad_get_grad(nnl2_ad_tensor* ad_tensor) {
 	if(!ad_tensor->requires_grad) {
 		if(ad_tensor->name != NULL) {

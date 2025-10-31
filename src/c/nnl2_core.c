@@ -223,8 +223,8 @@ void nnl2_init_system() {
 	nnl2_init_accessors();	  
 	nnl2_init_tensor_creating();
 	nnl2_init_standard();     
-	nnl2_init_standard_inplace();       
-	nnl2_init_stack();   
+	nnl2_init_standard_inplace();          
+	nnl2_init_stack();    
 	nnl2_init_activations_inplace();        
 	nnl2_init_activations();   
 	nnl2_init_auxiliary();
@@ -245,7 +245,7 @@ void nnl2_init_accessors() {
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
 	INIT_BACKEND(tref_setter, tref_setter_backends);   
 	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
-}	
+}	     
      
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));

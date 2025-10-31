@@ -35,6 +35,7 @@ typedef struct nnl2_ad_tensor {
 	bool grad_initialized;					   ///< If false, the gradient is either NULL or has uninitialized memory
 	nnl2_float32 extra_multiplier;			   ///< For edgy cases such as axpy, scale
 	bool extra_bool;						   ///< For edgy cases requiring additional boolean
+	void* extra_correspondence;				   ///< For correspondence ops
 } nnl2_ad_tensor;
 
 /// @} [nnl2_ad_tensor]
