@@ -185,7 +185,7 @@
 	
 	(nnl2.ffi:%ad-add-correspondence tensor incf-pntr mode)))  
   
-(defun +=/ad/incf! (tensor increment mode)
+(defun +=/ad/incf! (tensor increment)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -193,7 +193,7 @@
          
     (setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
     
-    (nnl2.ffi:%ad-add-incf-inplace tensor incf-pntr mode)))  
+    (nnl2.ffi:%ad-add-incf-inplace tensor incf-pntr)))  
 
 (defun .*/ad/mulf! (tensor multiplier mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -205,7 +205,7 @@
     
     (nnl2.ffi:%ad-mul-correspondence tensor mulf-pntr mode)))
 
-(defun *=/ad/mulf! (tensor multiplier mode)
+(defun *=/ad/mulf! (tensor multiplier)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -213,7 +213,7 @@
          
     (setf (cffi:mem-ref mulf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
     
-    (nnl2.ffi:%ad-mul-mulf-inplace tensor mulf-pntr mode)))	
+    (nnl2.ffi:%ad-mul-mulf-inplace tensor mulf-pntr)))	
   
 (defun .-/ad/decf! (tensor decrement mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -225,7 +225,7 @@
     
     (nnl2.ffi:%ad-sub-correspondence tensor decf-pntr mode)))
 
-(defun -=/ad/decf! (tensor decrement mode)
+(defun -=/ad/decf! (tensor decrement)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -233,7 +233,7 @@
          
     (setf (cffi:mem-ref decf-pntr cffi-dtype) (coerce decrement lisp-dtype))
     
-    (nnl2.ffi:%ad-sub-decf-inplace tensor decf-pntr mode)))
+    (nnl2.ffi:%ad-sub-decf-inplace tensor decf-pntr)))
 	
 (defun ./ad/divf! (tensor divisor mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -245,7 +245,7 @@
     
     (nnl2.ffi:%ad-div-correspondence tensor divf-pntr mode)))	
 	
-(defun /!/ad/divf! (tensor divisor mode)
+(defun /!/ad/divf! (tensor divisor)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -253,7 +253,7 @@
          
     (setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divisor lisp-dtype))
     
-    (nnl2.ffi:%ad-div-divf-inplace tensor divf-pntr mode)))
+    (nnl2.ffi:%ad-div-divf-inplace tensor divf-pntr)))
 	
 (defun .^/ad/powf! (tensor exponent mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -265,7 +265,7 @@
     
     (nnl2.ffi:%ad-pow-correspondence tensor powf-pntr mode)))	
 
-(defun ^=/ad/powf! (tensor exponent mode)
+(defun ^=/ad/powf! (tensor exponent)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -273,7 +273,7 @@
          
     (setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce exponent lisp-dtype))
     
-    (nnl2.ffi:%ad-pow-powf-inplace tensor powf-pntr mode)))
+    (nnl2.ffi:%ad-pow-powf-inplace tensor powf-pntr)))
 	
 (defun .min/ad/minf! (tensor value mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -285,7 +285,7 @@
     
     (nnl2.ffi:%ad-min-correspondence tensor minf-pntr mode)))
 
-(defun .min!/ad/minf! (tensor value mode)
+(defun .min!/ad/minf! (tensor value)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -293,7 +293,7 @@
          
     (setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce value lisp-dtype))
     
-    (nnl2.ffi:%ad-min-minf-inplace tensor minf-pntr mode)))	
+    (nnl2.ffi:%ad-min-minf-inplace tensor minf-pntr)))	
 
 (defun .max/ad/maxf! (tensor value mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -305,7 +305,7 @@
     
     (nnl2.ffi:%ad-max-correspondence tensor maxf-pntr mode)))
 	
-(defun .max!/ad/maxf! (tensor value mode)
+(defun .max!/ad/maxf! (tensor value)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -313,7 +313,7 @@
          
     (setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce value lisp-dtype))
     
-    (nnl2.ffi:%ad-max-maxf-inplace tensor maxf-pntr mode)))
+    (nnl2.ffi:%ad-max-maxf-inplace tensor maxf-pntr)))
 	
 (defun axpy/ad/axpf! (tensor other alpha mode)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -325,7 +325,7 @@
     
     (nnl2.ffi:%ad-axpf tensor other-pntr (coerce alpha 'single-float) mode)))	
 	
-(defun axpy!/ad/axpf! (tensor other alpha mode)
+(defun axpy!/ad/axpf! (tensor other alpha)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -333,7 +333,7 @@
          
     (setf (cffi:mem-ref other-pntr cffi-dtype) (coerce other lisp-dtype))
     
-    (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float) mode)))	
+    (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float))))	
 	
 (in-package :nnl2.hli.ad.r)
 
@@ -351,9 +351,9 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:+=/ad/incf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-+= a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-add-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:+=/ad/incf! a b)
+      (nnl2.ffi:%ad-+= a b)
+      (nnl2.ffi:%ad-add-broadcasting-inplace a b))))
   
 (defun .* (a b)
   "Element-wise multiplication"
@@ -369,9 +369,9 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:*=/ad/mulf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-*= a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-mul-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))	  
+      (nnl2.hli.ad:*=/ad/mulf! a b)
+      (nnl2.ffi:%ad-*= a b)
+      (nnl2.ffi:%ad-mul-broadcasting-inplace a b))))	  
 	  
 (defun gemm (a b)
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode))
@@ -390,9 +390,9 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:-=/ad/decf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad--= a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-sub-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:-=/ad/decf! a b)
+      (nnl2.ffi:%ad--= a b)
+      (nnl2.ffi:%ad-sub-broadcasting-inplace a b))))
 	  
 (defun ./ (a b)
   "Element-wise division"
@@ -408,9 +408,9 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:/!/ad/divf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-/! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-div-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:/!/ad/divf! a b)
+      (nnl2.ffi:%ad-/! a b)
+      (nnl2.ffi:%ad-div-broadcasting-inplace a b))))
 	
 (defun .^ (a b)
   "Element-wise pow"
@@ -426,15 +426,15 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:^=/ad/powf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-^= a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-pow-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))	  
+      (nnl2.hli.ad:^=/ad/powf! a b)
+      (nnl2.ffi:%ad-^= a b)
+      (nnl2.ffi:%ad-pow-broadcasting-inplace a b))))	  
 	  
 (defun .abs (ad-tensor)
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
 	
 (defun .abs! (ad-tensor)
-  (nnl2.ffi:%ad-.abs! ad-tensor nnl2.ffi:ad-reverse-mode))	
+  (nnl2.ffi:%ad-.abs! ad-tensor))	
 	
 (defun .min (a b)
   "Element-wise min"
@@ -450,9 +450,9 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.min!/ad/minf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.min! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-min-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:.min!/ad/minf! a b)
+      (nnl2.ffi:%ad-.min! a b)
+      (nnl2.ffi:%ad-min-broadcasting-inplace a b))))
 	
 (defun .max (a b)
   "Element-wise max"
@@ -468,34 +468,34 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.max!/ad/maxf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.max! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-max-broadcasting-inplace a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:.max!/ad/maxf! a b)
+      (nnl2.ffi:%ad-.max! a b)
+      (nnl2.ffi:%ad-max-broadcasting-inplace a b))))
 	
 (defun scale (a b &key save-type)
-  (nnl2.ffi:%ad-scale a b save-type nnl2.ffi:ad-reverse-mode))
+  (nnl2.ffi:%ad-scale a (coerce b 'single-float) save-type nnl2.ffi:ad-reverse-mode))
 
 (defun scale! (a b)
-  (nnl2.ffi:%ad-scale! a b nnl2.ffi:ad-reverse-mode))
+  (nnl2.ffi:%ad-scale! a (coerce b 'single-float)))
   
 (defun .log (ad-tensor &key save-type)
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode))
   
 (defun .log! (ad-tensor)
-  (nnl2.ffi:%ad-.log! ad-tensor nnl2.ffi:ad-reverse-mode))  
+  (nnl2.ffi:%ad-.log!))  
   
 (defun .exp (ad-tensor &key save-type)
   (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode))  
 
 (defun .exp! (ad-tensor)
-  (nnl2.ffi:%ad-.exp! ad-tensor nnl2.ffi:ad-reverse-mode))  
+  (nnl2.ffi:%ad-.exp!))  
   
 (defun axpy (a b &key (alpha 1.0))
   "Element-wise a+b*c"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:axpy/ad/axpf! a b alpha nnl2.ffi:ad-reverse-mode)
+      (nnl2.hli.ad:axpy/ad/axpf! a b alpha)
       (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode))))
 	 
@@ -504,21 +504,21 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:axpy!/ad/axpf! a b alpha nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-axpy! a b alpha nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:axpy!/ad/axpf! a b alpha)
+      (nnl2.ffi:%ad-axpy! a b alpha)
+      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha))))
 	 
 (defun .relu! (ad-tensor)
-  (nnl2.ffi:%ad-.relu! ad-tensor nnl2.ffi:ad-reverse-mode))  	 
+  (nnl2.ffi:%ad-.relu! ad-tensor))  	 
 
 (defun .leaky-relu! (ad-tensor &key (alpha 0.01))
-  (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha nnl2.ffi:ad-reverse-mode))  	
+  (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha))  	
   
 (defun .sigmoid! (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.sigmoid! ad-tensor approx nnl2.ffi:ad-reverse-mode))  
+  (nnl2.ffi:%ad-.sigmoid! ad-tensor approx))  
   
 (defun .tanh! (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.tanh! ad-tensor approx nnl2.ffi:ad-reverse-mode))    
+  (nnl2.ffi:%ad-.tanh! ad-tensor approx))    
 
 (defun .relu (ad-tensor)
   (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode)) 

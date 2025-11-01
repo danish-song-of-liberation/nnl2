@@ -240,7 +240,7 @@ void nnl2_init_system() {
 ///@{ [subinitializers]     
 
 /** @brief See all doxygen at [subinitializers_declaration] **/
-
+              
 void nnl2_init_accessors() {
 	EINIT_BACKEND(nnl2_view, nnl2_view_backends, CURRENT_BACKEND(nnl2_view));
 	INIT_BACKEND(tref_setter, tref_setter_backends);   
@@ -253,7 +253,7 @@ void nnl2_init_tensor_creating() {
 }          
     
 void nnl2_init_standard() {
-	EINIT_BACKEND(add, add_backends, current_backend(add));               
+	EINIT_BACKEND(add, add_backends, current_backend(add));                      
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub));                
 	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	         
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));     
