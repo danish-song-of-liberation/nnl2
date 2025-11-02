@@ -746,9 +746,9 @@ Tensor* lisp_call_transposition(const Tensor* tensor) {
 }
  
 void lisp_call_transposition_inplace(Tensor* tensor) {
-	nnl2_transposition_inplace(tensor);
+	nnl2_transposition_inplace(tensor); 
 }
-
+    
 bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) { 
 	return inplace_fill(tensor, value, dtype);
 }
@@ -764,4 +764,4 @@ nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
 ///@} [lisp_wrappers]             
 		             
 #endif /** NNL2_CORE_C **/					 
-							     
+							                    

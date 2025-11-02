@@ -498,7 +498,7 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:axpy/ad/axpf! a b alpha)
+      (nnl2.hli.ad:axpy/ad/axpf! a b alpha nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode))))
 	 
