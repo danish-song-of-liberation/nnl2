@@ -740,11 +740,11 @@ Tensor* lisp_call_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to) 
 Tensor* lisp_call_cut(Tensor* tensor, int32_t* cut_from, int32_t* cut_to) {
 	return nnl2_cut(tensor, cut_from, cut_to);          
 }
-    
+          
 Tensor* lisp_call_transposition(const Tensor* tensor) {
 	return nnl2_transposition(tensor);
 }
-
+ 
 void lisp_call_transposition_inplace(Tensor* tensor) {
 	nnl2_transposition_inplace(tensor);
 }
@@ -757,11 +757,11 @@ void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
 }
 
-nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
+nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) { 
     return nnl2_neg(tensor);
 }
 
 ///@} [lisp_wrappers]             
 		             
 #endif /** NNL2_CORE_C **/					 
-					  
+							 
