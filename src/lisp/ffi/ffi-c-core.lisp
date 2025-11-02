@@ -1112,6 +1112,12 @@
 (cffi:defcfun ("set_transposition_inplace_backend" %set-transposition-inplace-backend) :void
   (backend-name :string))   
   
+(cffi:defcfun ("set_neginplace_backend" %set-neginplace-backend) :void
+  (backend-name :string))
+
+(cffi:defcfun ("set_neg_backend" %set-neg-backend) :void
+  (backend-name :string))    
+  
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
 (cffi:defcfun ("nnl2_get_empty_backend" %get-empty-backend) :string)  
@@ -1166,6 +1172,8 @@
 (cffi:defcfun ("get_cut_backend" %get-cut-backend) :string)
 (cffi:defcfun ("get_transposition_backend" %get-transposition-backend) :string)
 (cffi:defcfun ("get_transposition_inplace_backend" %get-transposition-inplace-backend) :string)
+(cffi:defcfun ("get_neginplace_backend" %get-neginplace-backend) :string)
+(cffi:defcfun ("get_neg_backend" %get-neg-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -1275,6 +1283,10 @@
 (cffi:defcfun ("get_transposition_inplace_num_backends" %get-transposition-inplace-num-backends) :int)
 (cffi:defcfun ("get_transposition_backends" %get-transposition-backends) :pointer)
 (cffi:defcfun ("get_transposition_inplace_backends" %get-transposition-inplace-backends) :pointer)
+(cffi:defcfun ("get_neginplace_backends" %get-neginplace-backends) :pointer)
+(cffi:defcfun ("get_neginplace_num_backends" %get-neginplace-num-backends) :int)
+(cffi:defcfun ("get_neg_backends" %get-neg-backends) :pointer)
+(cffi:defcfun ("get_neg_num_backends" %get-neg-num-backends) :int)
 
 ;; -- mem-aref setters/getters --
 

@@ -983,6 +983,23 @@ typedef Tensor* (*slicefn)(Tensor* tensor, int32_t* slice_from, int32_t* slice_t
  **/
 typedef Tensor* (*cutfn)(Tensor* tensor, int32_t* cut_from, int32_t* cut_to);
 
+/** @brief Applies element-wise negation to the input tensor (in-place)
+ ** @details Each element of the tensor is replaced with its negated value: tensor[i] = -tensor[i]
+ ** @param tensor Input tensor to be negated in-place
+ ** @note This operation modifies the input tensor directly
+ ** @see negfn
+ **/
+typedef void (*neginplacefn)(nnl2_tensor* tensor);
+
+/** @brief Returns a new tensor with element-wise negation of the input tensor
+ ** @details Each element of the tensor is replaced with its negated value: tensor[i] = -tensor[i]
+ ** @param tensor Input tensor
+ ** @return New tensor containing the negated values of the input tensor
+ ** @note The original tensor remains unchanged.=
+ ** @see neginplacefn
+ **/
+typedef nnl2_tensor* (*negfn)(nnl2_tensor* tensor);
+
 /// @} [typedef]
 
 

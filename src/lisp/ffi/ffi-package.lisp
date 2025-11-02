@@ -460,6 +460,14 @@
    #:%ad-dtype-as-data
    #:%ad-dtype-as-data-int
    #:%ad-dtype-as-grad
-   #:%ad-dtype-as-grad-int))
+   #:%ad-dtype-as-grad-int
+   #:%set-neginplace-backend
+   #:%get-neginplace-backend
+   #:%get-neginplace-backends
+   #:%get-neginplace-num-backends
+   #:%get-neg-backends
+   #:%get-neg-num-backends
+   #:%get-neg-backend
+   #:%set-neg-backend))
    
    

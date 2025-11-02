@@ -1209,7 +1209,7 @@
     (:l2 (l2-norm tensor :axes axes))
 	(otherwise (error "Incorrect :p key in norm~%"))))
 	
-(defun copy (tensor &key dtype)
+(defun copy (tensor &key dtype)	
   "Copies the passed tensor
    tensor: Tensor to copy
    dtype (&key): Type of new tensor"
@@ -1928,3 +1928,10 @@
     (let ((status (nnl2.ffi:%fill! tensor alloc dtype)))
 	  (cffi:foreign-free alloc)
 	  (unless status (warn "Failed to fill passed tensor (fill!)")))))
+
+(cffi:defcfun ("lisp_call_neg_inplace" .neg!) :void
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_neg" .neg) :pointer
+  (tensor :pointer))  
+  

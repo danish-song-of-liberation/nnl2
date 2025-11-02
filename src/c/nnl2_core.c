@@ -253,7 +253,7 @@ void nnl2_init_tensor_creating() {
 }          
     
 void nnl2_init_standard() {
-	EINIT_BACKEND(add, add_backends, current_backend(add));                      
+	EINIT_BACKEND(add, add_backends, current_backend(add));                       
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub));                
 	EINIT_BACKEND(mul, mul_backends, current_backend(mul));      	         
 	EINIT_BACKEND(nnl2_div, div_backends, current_backend(div));     
@@ -264,7 +264,8 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));         
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));          
-	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	                                          	
+	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  
+    EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));	
 }
                
 void nnl2_init_standard_inplace() {               
@@ -283,8 +284,8 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));  
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
-}	     
-                                   
+	EINIT_BACKEND(nnl2_neginplace, neginplace_backends, current_backend(neginplace));
+}	                              
                                
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
@@ -750,6 +751,14 @@ void lisp_call_transposition_inplace(Tensor* tensor) {
 
 bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) { 
 	return inplace_fill(tensor, value, dtype);
+}
+
+void lisp_call_neg_inplace(nnl2_tensor* tensor) {
+	nnl2_neginplace(tensor);
+}
+
+nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
+    return nnl2_neg(tensor);
 }
 
 ///@} [lisp_wrappers]             

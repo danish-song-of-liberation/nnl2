@@ -483,5 +483,15 @@
    #:any-scalar-p
    #:shapes-equal-p
    #:higher-rank-tensor
-   #:both-scalars-p))
+   #:both-scalars-p
+   #:.neg!
+   #:use-backend/.neg!
+   #:get-backend/.neg!
+   #:get-backends/.neg!
+   #:with-backend/.neg!
+   #:.neg
+   #:get-backends/.neg
+   #:get-backend/.neg
+   #:with-backend/.neg
+   #:use-backend/.neg))
    

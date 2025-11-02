@@ -232,6 +232,12 @@
   
 (define-backend-setter use-backend/axpy
   nnl2.ffi:%set-axpy-backend)   
+  
+(define-backend-setter use-backend/.neg!
+  nnl2.ffi:%set-neginplace-backend)  
+
+(define-backend-setter use-backend/.neg
+  nnl2.ffi:%set-neg-backend)    
 
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  
@@ -259,7 +265,7 @@
                               use-backend/.tanh use-backend/.tanh! use-backend/transpose
                               use-backend/transpose! use-backend/reshape use-backend/reinterpret
 							  use-backend/slice use-backend/cut use-backend/transposition
-							  use-backend/transposition!))
+							  use-backend/transposition! use-backend/.neg! use-backend/.neg))
 							  
       (funcall backend-function name)))
 	  
@@ -349,6 +355,8 @@
 (define-backend-getter-setter get-backend/cut use-backend/cut nnl2.ffi:%get-cut-backend)
 (define-backend-getter-setter get-backend/transposition use-backend/transposition nnl2.ffi:%get-transposition-backend)
 (define-backend-getter-setter get-backend/transposition! use-backend/transposition! nnl2.ffi:%get-transposition-inplace-backend)
+(define-backend-getter-setter get-backend/.neg! use-backend/.neg! nnl2.ffi:%get-neginplace-backend)
+(define-backend-getter-setter get-backend/.neg use-backend/.neg nnl2.ffi:%get-neg-backend)
 
 (defun get-backend/norm (&key (p :l2))
   "Gets current backend for norm operation. P: Norm type (:l2 supported)"
@@ -612,6 +620,14 @@
   nnl2.ffi:%get-transposition-inplace-num-backends
   nnl2.ffi:%get-transposition-inplace-backends)    
 
+(define-backends-getter get-backends/.neg!
+  nnl2.ffi:%get-neginplace-num-backends
+  nnl2.ffi:%get-neginplace-backends) 
+  
+(define-backends-getter get-backends/.neg
+  nnl2.ffi:%get-neg-num-backends
+  nnl2.ffi:%get-neg-backends) 
+  
 (defun get-backends/norm (&key (p :l2))
   "Returns list of available backends for norm operation. 
    P: Norm type (:l2 supported)"
@@ -696,4 +712,6 @@
 (define-with-backend with-backend/cut get-backend/cut)
 (define-with-backend with-backend/transposition get-backend/transposition)
 (define-with-backend with-backend/transposition! get-backend/transposition!)
+(define-with-backend with-backend/.neg! get-backend/.neg!)
+(define-with-backend with-backend/.neg get-backend/.neg)
 		 
