@@ -335,6 +335,9 @@
     
     (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float))))	
 	
+(cffi:defcfun ("nnl2_ad_neg_inplace" .neg!) :void
+  (ad-tensor :pointer))		
+  
 (in-package :nnl2.hli.ad.r)
 
 (defun .+ (a b)
@@ -531,4 +534,7 @@
   	
 (defun .tanh (ad-tensor &key (approx t))
   (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode)) 	
+	
+(defun .neg (ad-tensor)
+  (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode))
 	

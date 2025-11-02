@@ -468,6 +468,6 @@
    #:%get-neg-backends
    #:%get-neg-num-backends
    #:%get-neg-backend
-   #:%set-neg-backend))
-   
+   #:%set-neg-backend
+   #:%.neg))
    

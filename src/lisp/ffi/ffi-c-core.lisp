@@ -635,6 +635,10 @@
   (multiplicand :pointer)
   (multiplier :pointer)
   (mode ad-mode))   
+
+(cffi:defcfun ("nnl2_ad_neg" %.neg) :pointer
+  (ad-tensor :pointer)
+  (mode ad-mode))	  
   
 (cffi:defcfun ("nnl2_ad_inplace_leakyrelu" %ad-.leaky-relu!) :void
   (ad-tensor :pointer)

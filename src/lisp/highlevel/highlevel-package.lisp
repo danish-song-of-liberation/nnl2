@@ -69,7 +69,8 @@
    #:.max/ad/maxf!
    #:.max!/ad/maxf!
    #:axpy/ad/axpf!
-   #:axpy!/ad/axpf!))
+   #:axpy!/ad/axpf!
+   #:.neg!))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
@@ -106,7 +107,8 @@
    #:.relu!
    #:.leaky-relu!
    #:.sigmoid!
-   #:.tanh!))   
+   #:.tanh!
+   #:.neg))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

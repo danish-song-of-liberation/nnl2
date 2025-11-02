@@ -740,7 +740,7 @@ Tensor* lisp_call_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to) 
 Tensor* lisp_call_cut(Tensor* tensor, int32_t* cut_from, int32_t* cut_to) {
 	return nnl2_cut(tensor, cut_from, cut_to);          
 }
-
+    
 Tensor* lisp_call_transposition(const Tensor* tensor) {
 	return nnl2_transposition(tensor);
 }
