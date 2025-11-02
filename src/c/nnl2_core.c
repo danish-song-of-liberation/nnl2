@@ -764,4 +764,4 @@ nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
 ///@} [lisp_wrappers]             
 		             
 #endif /** NNL2_CORE_C **/					 
-							 
+							     
