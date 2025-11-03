@@ -3,7 +3,7 @@
 
 #define nnl2_ad_bptt(tensor) nnl2_ad_backpropagation_through_time(tensor)
 
-void nnl2_ad_backpropagation_through_time(nnl2_ad_tensor* tensor) {
+void nnl2_ad_backpropagation_through_time(nnl2_ad_tensor* tensor, bool retain_graph) {
     nnl2_ad_tensor* leaf_tensor = nnl2_ad_find_leaf(tensor);
     
     int topo_size;
@@ -40,6 +40,8 @@ void nnl2_ad_backpropagation_through_time(nnl2_ad_tensor* tensor) {
     }
     
     tensor->grad = leaf_tensor->grad;
+	
+	if(!retain_graph) nnl2_ad_clear_graph(topo, topo_size);
     
     free(topo);
 }

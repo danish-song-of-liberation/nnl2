@@ -141,23 +141,23 @@
 (cffi:defcfun ("nnl2_ad_get_requires_grad" requires-grad) :bool
   (ad-tensor :pointer))   
   
-(cffi:defcfun ("nnl2_ad_backpropagation" backpropagation) :void
-  (ad-tensor :pointer))
-  
-(cffi:defcfun ("nnl2_ad_backpropagation" bp) :void
-  (ad-tensor :pointer))  
-
-(cffi:defcfun ("nnl2_ad_backpropagation_through_time" backpropagation-through-time) :void
-  (ad-tensor :pointer))  
-  
-(cffi:defcfun ("nnl2_ad_backpropagation_through_time" bptt) :void
-  (ad-tensor :pointer))    
-  
 (cffi:defcfun ("nnl2_ad_get_grad" grad) :pointer
   (ad-tensor :pointer))
   
 (cffi:defcfun ("nnl2_free_ad_tensor" free) :void
   (ad-tensor :pointer))  
+  
+(defun bp (ad-tensor &key retain-graph)
+  (nnl2.ffi:%backpropagation ad-tensor retain-graph))  
+
+(defun backpropagation (ad-tensor &key retain-graph)
+  (nnl2.ffi:%backpropagation ad-tensor retain-graph))  
+  
+(defun bptt (ad-tensor &key retain-graph)
+  (nnl2.ffi:%bptt ad-tensor retain-graph))    
+  
+(defun backpropagation-through-time (ad-tensor &key retain-graph)
+  (nnl2.ffi:%bptt ad-tensor retain-graph))    
   
 (defmacro tlet ((&rest bindings) &body body)
   (let ((vars (mapcar #'car bindings)))
@@ -338,22 +338,22 @@
 (cffi:defcfun ("nnl2_ad_neg_inplace" .neg!) :void
   (ad-tensor :pointer))		
   
-(defun += (a b)
+(defun += (a b &key (track-graph t))
   "In-place addition"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (+=/ad/incf! a b)
-      (nnl2.ffi:%ad-+= a b)
+      (+=/ad/incf! a b)	
+      (nnl2.ffi:%ad-+= a b track-graph)
       (nnl2.ffi:%ad-add-broadcasting-inplace a b))))  
 	  
-(defun -= (a b)
+(defun -= (a b &key (track-graph t))
   "In-place subtraction"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       (-=/ad/decf! a b)
-      (nnl2.ffi:%ad--= a b)
+      (nnl2.ffi:%ad--= a b track-graph)
       (nnl2.ffi:%ad-sub-broadcasting-inplace a b))))	  
   
 (defun *= (a b)

@@ -1,7 +1,7 @@
 #ifndef NNL2_AD_BACKPROPAGATION_H
 #define NNL2_AD_BACKPROPAGATION_H
 
-void nnl2_ad_backpropagation(nnl2_ad_tensor* tensor) {
+void nnl2_ad_backpropagation(nnl2_ad_tensor* tensor, bool retain_graph) {
     int topo_size;
     nnl2_ad_tensor** topo = nnl2_ad_build_topo(tensor, &topo_size);
 
@@ -32,6 +32,8 @@ void nnl2_ad_backpropagation(nnl2_ad_tensor* tensor) {
             topo[i]->backward_fn(topo[i]); 			
         }
     }
+	
+	if(!retain_graph) nnl2_ad_clear_graph(topo, topo_size);
     
     free(topo);
 }

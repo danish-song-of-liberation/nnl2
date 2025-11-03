@@ -469,5 +469,7 @@
    #:%get-neg-num-backends
    #:%get-neg-backend
    #:%set-neg-backend
-   #:%.neg))
+   #:%.neg
+   #:%backpropagation
+   #:%bptt))
    

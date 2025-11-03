@@ -489,6 +489,14 @@
   ad-p1-mode
   ad-p2-mode
   ad-p3-mode)  
+  
+(cffi:defcfun ("nnl2_ad_backpropagation" %backpropagation) :void
+  (ad-tensor :pointer)
+  (retain-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_backpropagation_through_time" %bptt) :void
+  (ad-tensor :pointer)
+  (retain-graph :bool))      
 
 (cffi:defcfun ("nnl2_ad_empty" %ad-empty) :pointer
   (shape :pointer)
@@ -526,7 +534,8 @@
   
 (cffi:defcfun ("nnl2_ad_add_inplace" %ad-+=) :void
   (summand :pointer)
-  (addend :pointer))
+  (addend :pointer)
+  (track-graph :bool))
   
 (cffi:defcfun ("nnl2_ad_sub" %ad-.-) :pointer
   (minuend :pointer)
@@ -535,7 +544,8 @@
   
 (cffi:defcfun ("nnl2_ad_sub_inplace" %ad--=) :void
   (minuend :pointer)
-  (subtrahend :pointer))  
+  (subtrahend :pointer)
+  (track-graph :bool))  
   
 (cffi:defcfun ("nnl2_ad_mul" %ad-.*) :pointer
   (multiplicand :pointer)

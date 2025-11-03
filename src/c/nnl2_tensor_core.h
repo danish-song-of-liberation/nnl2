@@ -135,6 +135,7 @@
 #include "ad/nnl2_ad_accessors.h"
 #include "ad/nnl2_ad_copy.h"
 #include "ad/nnl2_ad_config.h"
+#include "ad/nnl2_ad_clear_graph.h"
 #include "ad/ops/standard/non_inplace/nnl2_ad_neg_backward.h"
 #include "ad/ops/standard/non_inplace/nnl2_ad_neg.h"
 #include "ad/ops/standard/non_inplace/nnl2_ad_add_backward.h"
