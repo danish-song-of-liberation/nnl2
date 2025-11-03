@@ -338,6 +338,102 @@
 (cffi:defcfun ("nnl2_ad_neg_inplace" .neg!) :void
   (ad-tensor :pointer))		
   
+(defun += (a b)
+  "In-place addition"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (+=/ad/incf! a b)
+      (nnl2.ffi:%ad-+= a b)
+      (nnl2.ffi:%ad-add-broadcasting-inplace a b))))  
+	  
+(defun -= (a b)
+  "In-place subtraction"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (-=/ad/decf! a b)
+      (nnl2.ffi:%ad--= a b)
+      (nnl2.ffi:%ad-sub-broadcasting-inplace a b))))	  
+  
+(defun *= (a b)
+  "In-place multiplication"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (*=/ad/mulf! a b)
+      (nnl2.ffi:%ad-*= a b)
+      (nnl2.ffi:%ad-mul-broadcasting-inplace a b))))
+  
+  (defun /! (a b)
+  "In-place division"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (/!/ad/divf! a b)
+      (nnl2.ffi:%ad-/! a b)
+      (nnl2.ffi:%ad-div-broadcasting-inplace a b))))
+
+(defun ^= (a b)
+  "In-place pow"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (^=/ad/powf! a b)
+      (nnl2.ffi:%ad-^= a b)
+      (nnl2.ffi:%ad-pow-broadcasting-inplace a b))))	
+	  
+(defun .abs! (ad-tensor)
+  (nnl2.ffi:%ad-.abs! ad-tensor))		  
+	  
+(defun .min! (a b)
+  "In-place min"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (nnl2.hli.ad:.min!/ad/minf! a b)
+      (nnl2.ffi:%ad-.min! a b)
+      (nnl2.ffi:%ad-min-broadcasting-inplace a b))))	  
+	  
+(defun .max! (a b)
+  "In-place max"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (nnl2.hli.ad:.max!/ad/maxf! a b)
+      (nnl2.ffi:%ad-.max! a b)
+      (nnl2.ffi:%ad-max-broadcasting-inplace a b))))
+	  
+(defun axpy! (a b &key (alpha 1.0))
+  "In-place a+b*c"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (nnl2.hli.ad:axpy!/ad/axpf! a b alpha)
+      (nnl2.ffi:%ad-axpy! a b alpha)
+      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha))))	  
+	  
+(defun scale! (a b)
+  (nnl2.ffi:%ad-scale! a (coerce b 'single-float)))
+  
+(defun .exp! (ad-tensor)
+  (nnl2.ffi:%ad-.exp! ad-tensor))  
+
+(defun .log! (ad-tensor)
+  (nnl2.ffi:%ad-.log! ad-tensor))    
+  
+(defun .relu! (ad-tensor)
+  (nnl2.ffi:%ad-.relu! ad-tensor))  	 
+
+(defun .leaky-relu! (ad-tensor &key (alpha 0.01))
+  (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha))  	
+  
+(defun .sigmoid! (ad-tensor &key (approx t))
+  (nnl2.ffi:%ad-.sigmoid! ad-tensor approx))  
+  
+(defun .tanh! (ad-tensor &key (approx t))
+  (nnl2.ffi:%ad-.tanh! ad-tensor approx))    
+  
 (in-package :nnl2.hli.ad.r)
 
 (defun .+ (a b)
@@ -348,15 +444,6 @@
       (nnl2.hli.ad:.+/ad/incf! a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-.+ a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-add-broadcasting a b nnl2.ffi:ad-reverse-mode))))
-	  
-(defun += (a b)
-  "In-place addition"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:+=/ad/incf! a b)
-      (nnl2.ffi:%ad-+= a b)
-      (nnl2.ffi:%ad-add-broadcasting-inplace a b))))
   
 (defun .* (a b)
   "Element-wise multiplication"
@@ -365,16 +452,7 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       (nnl2.hli.ad:.*/ad/mulf! a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-.* a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode))))
-
-(defun *= (a b)
-  "In-place multiplication"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:*=/ad/mulf! a b)
-      (nnl2.ffi:%ad-*= a b)
-      (nnl2.ffi:%ad-mul-broadcasting-inplace a b))))	  
+      (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  
 	  
 (defun gemm (a b)
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode))
@@ -388,15 +466,6 @@
       (nnl2.ffi:%ad-.- a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-sub-broadcasting a b nnl2.ffi:ad-reverse-mode))))
 	  
-(defun -= (a b)
-  "In-place subtraction"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:-=/ad/decf! a b)
-      (nnl2.ffi:%ad--= a b)
-      (nnl2.ffi:%ad-sub-broadcasting-inplace a b))))
-	  
 (defun ./ (a b)
   "Element-wise division"
   
@@ -406,15 +475,6 @@
       (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-div-broadcasting a b nnl2.ffi:ad-reverse-mode))))
 	
-(defun /! (a b)
-  "In-place division"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:/!/ad/divf! a b)
-      (nnl2.ffi:%ad-/! a b)
-      (nnl2.ffi:%ad-div-broadcasting-inplace a b))))
-	
 (defun .^ (a b)
   "Element-wise pow"
   
@@ -422,22 +482,10 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       (nnl2.hli.ad:.^/ad/powf! a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode))))  
-	  
-(defun ^= (a b)
-  "In-place pow"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:^=/ad/powf! a b)
-      (nnl2.ffi:%ad-^= a b)
-      (nnl2.ffi:%ad-pow-broadcasting-inplace a b))))	  
+      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode))))    
 	  
 (defun .abs (ad-tensor)
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
-	
-(defun .abs! (ad-tensor)
-  (nnl2.ffi:%ad-.abs! ad-tensor))	
 	
 (defun .min (a b)
   "Element-wise min"
@@ -448,15 +496,6 @@
       (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-min-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  	  
 	
-(defun .min! (a b)
-  "In-place min"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.min!/ad/minf! a b)
-      (nnl2.ffi:%ad-.min! a b)
-      (nnl2.ffi:%ad-min-broadcasting-inplace a b))))
-	
 (defun .max (a b)
   "Element-wise max"
   
@@ -466,32 +505,14 @@
       (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-max-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  	  
 	
-(defun .max! (a b)
-  "In-place max"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.max!/ad/maxf! a b)
-      (nnl2.ffi:%ad-.max! a b)
-      (nnl2.ffi:%ad-max-broadcasting-inplace a b))))
-	
 (defun scale (a b &key save-type)
   (nnl2.ffi:%ad-scale a (coerce b 'single-float) save-type nnl2.ffi:ad-reverse-mode))
-
-(defun scale! (a b)
-  (nnl2.ffi:%ad-scale! a (coerce b 'single-float)))
   
 (defun .log (ad-tensor &key save-type)
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode))
   
-(defun .log! (ad-tensor)
-  (nnl2.ffi:%ad-.log!))  
-  
 (defun .exp (ad-tensor &key save-type)
   (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode))  
-
-(defun .exp! (ad-tensor)
-  (nnl2.ffi:%ad-.exp!))  
   
 (defun axpy (a b &key (alpha 1.0))
   "Element-wise a+b*c"
@@ -501,27 +522,6 @@
       (nnl2.hli.ad:axpy/ad/axpf! a b alpha nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
       (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode))))
-	 
-(defun axpy! (a b &key (alpha 1.0))
-  "In-place a+b*c"
-  
-  (nnl2.hli:fastcall   
-    (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:axpy!/ad/axpf! a b alpha)
-      (nnl2.ffi:%ad-axpy! a b alpha)
-      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha))))
-	 
-(defun .relu! (ad-tensor)
-  (nnl2.ffi:%ad-.relu! ad-tensor))  	 
-
-(defun .leaky-relu! (ad-tensor &key (alpha 0.01))
-  (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha))  	
-  
-(defun .sigmoid! (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.sigmoid! ad-tensor approx))  
-  
-(defun .tanh! (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.tanh! ad-tensor approx))    
 
 (defun .relu (ad-tensor)
   (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode)) 

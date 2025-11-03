@@ -70,44 +70,44 @@
    #:.max!/ad/maxf!
    #:axpy/ad/axpf!
    #:axpy!/ad/axpf!
-   #:.neg!))
+   #:.neg!
+   #:+=
+   #:-=
+   #:*=
+   #:/!
+   #:^=
+   #:.abs!
+   #:.min!
+   #:.max!
+   #:axpy!
+   #:scale!
+   #:.exp!
+   #:.log!
+   #:.relu!
+   #:.leaky-relu!
+   #:.sigmoid!
+   #:.tanh!))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
   (:export
    #:.+
-   #:+=
    #:.-
-   #:-=
    #:.*
-   #:*=
    #:./
-   #:/!
    #:.^
-   #:^=
    #:.abs
-   #:.abs!
    #:gemm
    #:.min
-   #:.min!
    #:.max
-   #:.max!
    #:axpy
-   #:axpy!
    #:.exp
-   #:.exp!
    #:.log
-   #:.log!
    #:scale
-   #:scale!
    #:.relu
    #:.leaky-relu
    #:.sigmoid
    #:.tanh
-   #:.relu!
-   #:.leaky-relu!
-   #:.sigmoid!
-   #:.tanh!
    #:.neg))   
 
 (defpackage #:nnl2.hli.ts
