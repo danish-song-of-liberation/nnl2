@@ -246,12 +246,12 @@ void nnl2_init_accessors() {
 	INIT_BACKEND(tref_setter, tref_setter_backends);   
 	EINIT_BACKEND(nnl2_tref_getter, nnl2_tref_getter_backends, CURRENT_BACKEND(nnl2_tref_getter));
 }	     
-     
+       
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));   
 }          
-    
+     
 void nnl2_init_standard() {
 	EINIT_BACKEND(add, add_backends, current_backend(add));                       
 	EINIT_BACKEND(sub, sub_backends, current_backend(sub));                
@@ -439,7 +439,7 @@ Tensor* lisp_call_add(Tensor* summand, Tensor* addend) {
 
 Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) { 
 	return sub(summand, addend);  
-}             	                     
+}             	                      
                
 void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
 	mulinplace(multiplicand, multiplier);
