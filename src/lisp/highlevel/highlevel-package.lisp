@@ -89,7 +89,9 @@
    #:.sigmoid!
    #:.tanh!
    #:step-ts
-   #:step!))
+   #:step!
+   #:num-roots
+   #:roots))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

@@ -59,6 +59,14 @@ int32_t nnl2_ad_get_rank(nnl2_ad_tensor* ad_tensor) {
 	return ad_tensor->data->rank;
 }
 
+size_t nnl2_ad_get_num_roots(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor->num_roots;
+}
+
+nnl2_ad_tensor** nnl2_ad_get_roots(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor->roots;
+}
+
 nnl2_tensor_type nnl2_ad_get_dtype_as_data(nnl2_ad_tensor* ad_tensor) {
 	return ad_tensor->data->dtype;
 }

@@ -61,6 +61,18 @@
 		
     (equalp shape-a shape-b)))
 
+(cffi:defcfun ("nnl2_ad_get_num_roots" num-roots) :int
+  (ad-tensor :pointer))
+  
+(defun get-roots-as-list (roots-pointer num-roots)
+  (loop for i from 0 below num-roots
+		collect (cffi:mem-aref roots-pointer :pointer i)))
+  
+(defun roots (ad-tensor &key (as :list))
+  (ecase as 
+    (:pointer (nnl2.ffi:%ad-roots ad-tensor))
+	(:list (get-roots-as-list (nnl2.ffi:%ad-roots ad-tensor) (num-roots ad-tensor)))))
+
 (defun higher-rank-tensor (a b)
   "Returns a pair (higher lower) depending on the rank"
   (nnl2.hli:fastcall (if (> (rank a) (rank b))

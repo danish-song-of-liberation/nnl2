@@ -473,5 +473,6 @@
    #:%backpropagation
    #:%bptt
    #:%ad-step
-   #:%ad-step!))
+   #:%ad-step!
+   #:%ad-roots))
    

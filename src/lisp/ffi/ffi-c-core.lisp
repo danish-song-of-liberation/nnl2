@@ -490,6 +490,9 @@
   ad-p2-mode
   ad-p3-mode)  
   
+(cffi:defcfun ("nnl2_ad_get_roots" %ad-roots) :pointer
+  (ad-tensor :pointer))
+  
 (cffi:defcfun ("nnl2_ad_backpropagation" %backpropagation) :void
   (ad-tensor :pointer)
   (retain-graph :bool))
