@@ -67,6 +67,11 @@ nnl2_ad_tensor** nnl2_ad_get_roots(nnl2_ad_tensor* ad_tensor) {
 	return ad_tensor->roots;
 }
 
+void nnl2_ad_roots_setter(nnl2_ad_tensor* ad_tensor, nnl2_ad_tensor** new_roots, size_t new_num_roots) {
+	ad_tensor->roots = new_roots;
+	ad_tensor->num_roots = new_num_roots;
+}
+
 nnl2_tensor_type nnl2_ad_get_dtype_as_data(nnl2_ad_tensor* ad_tensor) {
 	return ad_tensor->data->dtype;
 }

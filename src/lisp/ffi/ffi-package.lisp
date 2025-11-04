@@ -474,5 +474,6 @@
    #:%bptt
    #:%ad-step
    #:%ad-step!
-   #:%ad-roots))
+   #:%ad-roots
+   #:%ad-roots-setter))
    

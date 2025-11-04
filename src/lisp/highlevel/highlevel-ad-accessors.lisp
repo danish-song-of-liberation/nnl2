@@ -72,6 +72,15 @@
   (ecase as 
     (:pointer (nnl2.ffi:%ad-roots ad-tensor))
 	(:list (get-roots-as-list (nnl2.ffi:%ad-roots ad-tensor) (num-roots ad-tensor)))))
+	
+(defun (setf roots) (ad-tensors-list self)
+  (let* ((new-len (length ad-tensors-list)) 
+         (tensors-pool (cffi:foreign-alloc :pointer :count new-len)))
+		 
+	(dotimes (i new-len)
+	  (setf (cffi:mem-aref tensors-pool :pointer i) (nth i ad-tensors-list)))
+	  
+	(nnl2.ffi:%ad-roots-setter self tensors-pool new-len)))
 
 (defun higher-rank-tensor (a b)
   "Returns a pair (higher lower) depending on the rank"
