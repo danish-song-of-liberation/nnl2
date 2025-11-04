@@ -471,5 +471,7 @@
    #:%set-neg-backend
    #:%.neg
    #:%backpropagation
-   #:%bptt))
+   #:%bptt
+   #:%ad-step
+   #:%ad-step!))
    

@@ -1,8 +1,8 @@
 #ifndef NNL2_AD_MAX_INPLACE_H
 #define NNL2_AD_MAX_INPLACE_H
 
-void nnl2_ad_max_inplace(nnl2_ad_tensor* result, nnl2_ad_tensor* operand) {
-    if(result->requires_grad) {
+void nnl2_ad_max_inplace(nnl2_ad_tensor* result, nnl2_ad_tensor* operand, bool retain_graph) {
+    if(result->requires_grad && retain_graph) {
         NNL2_AD_INPLACE_FATAL(".max! (.max in-place)", result);
     }
     

@@ -169,13 +169,32 @@
 		   ,@(loop for var in vars
 		           collect `(when (typep ,var 'nnl2-ad-tensor) (free ,var))))))))  
   
+(defmacro tlet* ((&rest bindings) &body body)
+  "The eigenform of let* for nnl2 ad tensors"
+  
+  (if (null bindings)
+   `(progn ,@body)
+    (let* ((binding (first bindings))
+           (var (if (consp binding) (car binding) binding))
+           (value (if (consp binding) (cadr binding) nil)))
+     `(let (,binding)
+        (unwind-protect
+          (tlet* ,(rest bindings) ,@body)
+          (when (typep ,var 'nnl2-ad-tensor) (free ,var)))))))  
+  
 (defun print-data (ad-tensor)
   (nnl2.hli.ts:print-tensor (data ad-tensor)))
   
 (defun print-grad (ad-tensor)
   (nnl2.hli.ts:print-tensor (grad ad-tensor)))
-
-(defun .+/ad/incf! (tensor increment mode)
+  
+(defun step-ts (ad-tensor &key (lr 1.0))
+  (nnl2.ffi:%ad-step ad-tensor (coerce lr 'single-float)))
+  
+(defun step! (ad-tensor &key (lr 1.0))
+  (nnl2.ffi:%ad-step! ad-tensor (coerce lr 'single-float)))
+  
+(defun .+/ad/incf! (tensor increment mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
 		 (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
 		 (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -183,9 +202,9 @@
 		 
 	(setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
 	
-	(nnl2.ffi:%ad-add-correspondence tensor incf-pntr mode)))  
+	(nnl2.ffi:%ad-add-correspondence tensor incf-pntr mode track-graph)))  
   
-(defun +=/ad/incf! (tensor increment)
+(defun +=/ad/incf! (tensor increment track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -193,9 +212,9 @@
          
     (setf (cffi:mem-ref incf-pntr cffi-dtype) (coerce increment lisp-dtype))
     
-    (nnl2.ffi:%ad-add-incf-inplace tensor incf-pntr)))  
+    (nnl2.ffi:%ad-add-incf-inplace tensor incf-pntr track-graph)))  
 
-(defun .*/ad/mulf! (tensor multiplier mode)
+(defun .*/ad/mulf! (tensor multiplier mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -203,9 +222,9 @@
          
     (setf (cffi:mem-ref mulf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
     
-    (nnl2.ffi:%ad-mul-correspondence tensor mulf-pntr mode)))
+    (nnl2.ffi:%ad-mul-correspondence tensor mulf-pntr mode track-graph)))
 
-(defun *=/ad/mulf! (tensor multiplier)
+(defun *=/ad/mulf! (tensor multiplier track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -213,9 +232,9 @@
          
     (setf (cffi:mem-ref mulf-pntr cffi-dtype) (coerce multiplier lisp-dtype))
     
-    (nnl2.ffi:%ad-mul-mulf-inplace tensor mulf-pntr)))	
+    (nnl2.ffi:%ad-mul-mulf-inplace tensor mulf-pntr track-graph)))	
   
-(defun .-/ad/decf! (tensor decrement mode)
+(defun .-/ad/decf! (tensor decrement mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -223,9 +242,9 @@
          
     (setf (cffi:mem-ref decf-pntr cffi-dtype) (coerce decrement lisp-dtype))
     
-    (nnl2.ffi:%ad-sub-correspondence tensor decf-pntr mode)))
+    (nnl2.ffi:%ad-sub-correspondence tensor decf-pntr mode track-graph)))
 
-(defun -=/ad/decf! (tensor decrement)
+(defun -=/ad/decf! (tensor decrement track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -233,9 +252,9 @@
          
     (setf (cffi:mem-ref decf-pntr cffi-dtype) (coerce decrement lisp-dtype))
     
-    (nnl2.ffi:%ad-sub-decf-inplace tensor decf-pntr)))
+    (nnl2.ffi:%ad-sub-decf-inplace tensor decf-pntr track-graph)))
 	
-(defun ./ad/divf! (tensor divisor mode)
+(defun ./ad/divf! (tensor divisor mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -243,9 +262,9 @@
          
     (setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divisor lisp-dtype))
     
-    (nnl2.ffi:%ad-div-correspondence tensor divf-pntr mode)))	
+    (nnl2.ffi:%ad-div-correspondence tensor divf-pntr mode track-graph)))	
 	
-(defun /!/ad/divf! (tensor divisor)
+(defun /!/ad/divf! (tensor divisor track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -253,9 +272,9 @@
          
     (setf (cffi:mem-ref divf-pntr cffi-dtype) (coerce divisor lisp-dtype))
     
-    (nnl2.ffi:%ad-div-divf-inplace tensor divf-pntr)))
+    (nnl2.ffi:%ad-div-divf-inplace tensor divf-pntr track-graph)))
 	
-(defun .^/ad/powf! (tensor exponent mode)
+(defun .^/ad/powf! (tensor exponent mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -263,9 +282,9 @@
          
     (setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce exponent lisp-dtype))
     
-    (nnl2.ffi:%ad-pow-correspondence tensor powf-pntr mode)))	
+    (nnl2.ffi:%ad-pow-correspondence tensor powf-pntr mode track-graph)))	
 
-(defun ^=/ad/powf! (tensor exponent)
+(defun ^=/ad/powf! (tensor exponent track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -273,9 +292,9 @@
          
     (setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce exponent lisp-dtype))
     
-    (nnl2.ffi:%ad-pow-powf-inplace tensor powf-pntr)))
+    (nnl2.ffi:%ad-pow-powf-inplace tensor powf-pntr track-graph)))
 	
-(defun .min/ad/minf! (tensor value mode)
+(defun .min/ad/minf! (tensor value mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -283,9 +302,9 @@
          
     (setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce value lisp-dtype))
     
-    (nnl2.ffi:%ad-min-correspondence tensor minf-pntr mode)))
+    (nnl2.ffi:%ad-min-correspondence tensor minf-pntr mode track-graph)))
 
-(defun .min!/ad/minf! (tensor value)
+(defun .min!/ad/minf! (tensor value track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -293,9 +312,9 @@
          
     (setf (cffi:mem-ref minf-pntr cffi-dtype) (coerce value lisp-dtype))
     
-    (nnl2.ffi:%ad-min-minf-inplace tensor minf-pntr)))	
+    (nnl2.ffi:%ad-min-minf-inplace tensor minf-pntr track-graph)))	
 
-(defun .max/ad/maxf! (tensor value mode)
+(defun .max/ad/maxf! (tensor value mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -303,9 +322,9 @@
          
     (setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce value lisp-dtype))
     
-    (nnl2.ffi:%ad-max-correspondence tensor maxf-pntr mode)))
+    (nnl2.ffi:%ad-max-correspondence tensor maxf-pntr mode track-graph)))
 	
-(defun .max!/ad/maxf! (tensor value)
+(defun .max!/ad/maxf! (tensor value track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -313,9 +332,9 @@
          
     (setf (cffi:mem-ref maxf-pntr cffi-dtype) (coerce value lisp-dtype))
     
-    (nnl2.ffi:%ad-max-maxf-inplace tensor maxf-pntr)))
+    (nnl2.ffi:%ad-max-maxf-inplace tensor maxf-pntr track-graph)))
 	
-(defun axpy/ad/axpf! (tensor other alpha mode)
+(defun axpy/ad/axpf! (tensor other alpha mode track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -323,9 +342,9 @@
          
     (setf (cffi:mem-ref other-pntr cffi-dtype) (coerce other lisp-dtype))
     
-    (nnl2.ffi:%ad-axpf tensor other-pntr (coerce alpha 'single-float) mode)))	
+    (nnl2.ffi:%ad-axpf tensor other-pntr (coerce alpha 'single-float) mode track-graph)))	
 	
-(defun axpy!/ad/axpf! (tensor other alpha)
+(defun axpy!/ad/axpf! (tensor other alpha track-graph)
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -333,7 +352,7 @@
          
     (setf (cffi:mem-ref other-pntr cffi-dtype) (coerce other lisp-dtype))
     
-    (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float))))	
+    (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float) track-graph)))	
 	
 (cffi:defcfun ("nnl2_ad_neg_inplace" .neg!) :void
   (ad-tensor :pointer))		
@@ -343,198 +362,198 @@
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (+=/ad/incf! a b)	
+      (+=/ad/incf! a b track-graph)	
       (nnl2.ffi:%ad-+= a b track-graph)
-      (nnl2.ffi:%ad-add-broadcasting-inplace a b))))  
+      (nnl2.ffi:%ad-add-broadcasting-inplace a b track-graph))))  
 	  
 (defun -= (a b &key (track-graph t))
   "In-place subtraction"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (-=/ad/decf! a b)
+      (-=/ad/decf! a b track-graph)
       (nnl2.ffi:%ad--= a b track-graph)
-      (nnl2.ffi:%ad-sub-broadcasting-inplace a b))))	  
+      (nnl2.ffi:%ad-sub-broadcasting-inplace a b track-graph))))	  
   
-(defun *= (a b)
+(defun *= (a b &key (track-graph t))
   "In-place multiplication"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (*=/ad/mulf! a b)
-      (nnl2.ffi:%ad-*= a b)
-      (nnl2.ffi:%ad-mul-broadcasting-inplace a b))))
+      (*=/ad/mulf! a b track-graph)
+      (nnl2.ffi:%ad-*= a b track-graph)
+      (nnl2.ffi:%ad-mul-broadcasting-inplace a b track-graph))))
   
-  (defun /! (a b)
+(defun /! (a b &key (track-graph t))
   "In-place division"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (/!/ad/divf! a b)
-      (nnl2.ffi:%ad-/! a b)
-      (nnl2.ffi:%ad-div-broadcasting-inplace a b))))
+      (/!/ad/divf! a b track-graph)
+      (nnl2.ffi:%ad-/! a b track-graph)
+      (nnl2.ffi:%ad-div-broadcasting-inplace a b track-graph))))
 
-(defun ^= (a b)
+(defun ^= (a b &key (track-graph t))
   "In-place pow"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (^=/ad/powf! a b)
-      (nnl2.ffi:%ad-^= a b)
-      (nnl2.ffi:%ad-pow-broadcasting-inplace a b))))	
+      (^=/ad/powf! a b track-graph)
+      (nnl2.ffi:%ad-^= a b track-graph)
+      (nnl2.ffi:%ad-pow-broadcasting-inplace a b track-graph))))	
 	  
-(defun .abs! (ad-tensor)
-  (nnl2.ffi:%ad-.abs! ad-tensor))		  
+(defun .abs! (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-.abs! ad-tensor track-graph))		  
 	  
-(defun .min! (a b)
+(defun .min! (a b &key (track-graph t))
   "In-place min"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.min!/ad/minf! a b)
-      (nnl2.ffi:%ad-.min! a b)
-      (nnl2.ffi:%ad-min-broadcasting-inplace a b))))	  
+      (nnl2.hli.ad:.min!/ad/minf! a b track-graph)
+      (nnl2.ffi:%ad-.min! a b track-graph)
+      (nnl2.ffi:%ad-min-broadcasting-inplace a b track-graph))))	  
 	  
-(defun .max! (a b)
+(defun .max! (a b &key (track-graph t))
   "In-place max"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.max!/ad/maxf! a b)
-      (nnl2.ffi:%ad-.max! a b)
-      (nnl2.ffi:%ad-max-broadcasting-inplace a b))))
+      (nnl2.hli.ad:.max!/ad/maxf! a b track-graph)
+      (nnl2.ffi:%ad-.max! a b track-graph)
+      (nnl2.ffi:%ad-max-broadcasting-inplace a b track-graph))))
 	  
-(defun axpy! (a b &key (alpha 1.0))
+(defun axpy! (a b &key (alpha 1.0) (track-graph t))
   "In-place a+b*c"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:axpy!/ad/axpf! a b alpha)
-      (nnl2.ffi:%ad-axpy! a b alpha)
-      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha))))	  
+      (nnl2.hli.ad:axpy!/ad/axpf! a b alpha track-graph)
+      (nnl2.ffi:%ad-axpy! a b alpha track-graph)
+      (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha track-graph))))	  
 	  
-(defun scale! (a b)
-  (nnl2.ffi:%ad-scale! a (coerce b 'single-float)))
+(defun scale! (a b &key (track-graph t))
+  (nnl2.ffi:%ad-scale! a (coerce b 'single-float) track-graph))
   
-(defun .exp! (ad-tensor)
-  (nnl2.ffi:%ad-.exp! ad-tensor))  
+(defun .exp! (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-.exp! ad-tensor track-graph))  
 
-(defun .log! (ad-tensor)
-  (nnl2.ffi:%ad-.log! ad-tensor))    
+(defun .log! (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-.log! ad-tensor track-graph))    
   
-(defun .relu! (ad-tensor)
-  (nnl2.ffi:%ad-.relu! ad-tensor))  	 
+(defun .relu! (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-.relu! ad-tensor track-graph))  	 
 
-(defun .leaky-relu! (ad-tensor &key (alpha 0.01))
-  (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha))  	
+(defun .leaky-relu! (ad-tensor &key (alpha 0.01) (track-graph t))
+  (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha track-graph))  	
   
-(defun .sigmoid! (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.sigmoid! ad-tensor approx))  
+(defun .sigmoid! (ad-tensor &key (approx t) (track-graph t))
+  (nnl2.ffi:%ad-.sigmoid! ad-tensor approx track-graph))  
   
-(defun .tanh! (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.tanh! ad-tensor approx))    
+(defun .tanh! (ad-tensor &key (approx t) (track-graph t))
+  (nnl2.ffi:%ad-.tanh! ad-tensor approx track-graph))    
   
 (in-package :nnl2.hli.ad.r)
 
-(defun .+ (a b)
+(defun .+ (a b &key (track-graph t))
   "Element-wise addition"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.+/ad/incf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.+ a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-add-broadcasting a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:.+/ad/incf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-.+ a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-add-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
   
-(defun .* (a b)
+(defun .* (a b &key (track-graph t))
   "Element-wise multiplication"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.*/ad/mulf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.* a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  
+      (nnl2.hli.ad:.*/ad/mulf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-.* a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  
 	  
-(defun gemm (a b)
-  (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode))
+(defun gemm (a b &key (track-graph t))
+  (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode track-graph))
 
-(defun .- (a b)
+(defun .- (a b &key (track-graph t))
   "Element-wise subtraction"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.-/ad/decf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.- a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-sub-broadcasting a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:.-/ad/decf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-.- a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-sub-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
 	  
-(defun ./ (a b)
+(defun ./ (a b &key (track-graph t))
   "Element-wise division"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:./ad/divf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-div-broadcasting a b nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:./ad/divf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-div-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
 	
-(defun .^ (a b)
+(defun .^ (a b &key (track-graph t))
   "Element-wise pow"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.^/ad/powf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode))))    
+      (nnl2.hli.ad:.^/ad/powf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))    
 	  
-(defun .abs (ad-tensor)
-  (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode))	  
+(defun .abs (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode track-graph))	  
 	
-(defun .min (a b)
+(defun .min (a b &key (track-graph t))
   "Element-wise min"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.min/ad/minf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-min-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  	  
+      (nnl2.hli.ad:.min/ad/minf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-min-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  	  
 	
-(defun .max (a b)
+(defun .max (a b &key (track-graph t))
   "Element-wise max"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:.max/ad/maxf! a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-max-broadcasting a b nnl2.ffi:ad-reverse-mode))))	  	  
+      (nnl2.hli.ad:.max/ad/maxf! a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-max-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  	  
 	
-(defun scale (a b &key save-type)
-  (nnl2.ffi:%ad-scale a (coerce b 'single-float) save-type nnl2.ffi:ad-reverse-mode))
+(defun scale (a b &key save-type (track-graph t))
+  (nnl2.ffi:%ad-scale a (coerce b 'single-float) save-type nnl2.ffi:ad-reverse-mode track-graph))
   
-(defun .log (ad-tensor &key save-type)
-  (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode))
+(defun .log (ad-tensor &key save-type (track-graph t))
+  (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
   
-(defun .exp (ad-tensor &key save-type)
-  (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode))  
+(defun .exp (ad-tensor &key save-type (track-graph t))
+  (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode  track-graph))  
   
-(defun axpy (a b &key (alpha 1.0))
+(defun axpy (a b &key (alpha 1.0) (track-graph t))
   "Element-wise a+b*c"
   
   (nnl2.hli:fastcall   
     (nnl2.hli.ad:with-tensor-dispatch (a b)
-      (nnl2.hli.ad:axpy/ad/axpf! a b alpha nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode)
-      (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode))))
+      (nnl2.hli.ad:axpy/ad/axpf! a b alpha nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode track-graph))))
 
-(defun .relu (ad-tensor)
-  (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode)) 
+(defun .relu (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode track-graph)) 
 
-(defun .leaky-relu (ad-tensor &key save-type (alpha 0.01))
-  (nnl2.ffi:%ad-.leaky-relu ad-tensor alpha save-type nnl2.ffi:ad-reverse-mode)) 
+(defun .leaky-relu (ad-tensor &key save-type (alpha 0.01) (track-graph t))
+  (nnl2.ffi:%ad-.leaky-relu ad-tensor alpha save-type nnl2.ffi:ad-reverse-mode track-graph)) 
     
-(defun .sigmoid (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.sigmoid ad-tensor approx nnl2.ffi:ad-reverse-mode))  
+(defun .sigmoid (ad-tensor &key (approx t) (track-graph t))
+  (nnl2.ffi:%ad-.sigmoid ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph))  
   	
-(defun .tanh (ad-tensor &key (approx t))
-  (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode)) 	
+(defun .tanh (ad-tensor &key (approx t) (track-graph t))
+  (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph)) 	
 	
-(defun .neg (ad-tensor)
-  (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode))
+(defun .neg (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
 	

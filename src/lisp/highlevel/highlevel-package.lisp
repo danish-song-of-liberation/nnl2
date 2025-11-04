@@ -46,6 +46,7 @@
    #:bptt
    #:free
    #:tlet
+   #:tlet*
    #:with-tensor-dispatch
    #:print-data
    #:print-grad
@@ -86,7 +87,9 @@
    #:.relu!
    #:.leaky-relu!
    #:.sigmoid!
-   #:.tanh!))
+   #:.tanh!
+   #:step-ts
+   #:step!))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

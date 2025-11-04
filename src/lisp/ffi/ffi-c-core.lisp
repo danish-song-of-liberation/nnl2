@@ -530,7 +530,8 @@
 (cffi:defcfun ("nnl2_ad_add" %ad-.+) :pointer
   (summand :pointer)
   (addend :pointer)
-  (mode ad-mode)) 
+  (mode ad-mode)
+  (track-grad :bool)) 
   
 (cffi:defcfun ("nnl2_ad_add_inplace" %ad-+=) :void
   (summand :pointer)
@@ -540,7 +541,8 @@
 (cffi:defcfun ("nnl2_ad_sub" %ad-.-) :pointer
   (minuend :pointer)
   (subtrahend :pointer)
-  (mode ad-mode)) 
+  (mode ad-mode)
+  (track-grad :bool)) 
   
 (cffi:defcfun ("nnl2_ad_sub_inplace" %ad--=) :void
   (minuend :pointer)
@@ -550,288 +552,359 @@
 (cffi:defcfun ("nnl2_ad_mul" %ad-.*) :pointer
   (multiplicand :pointer)
   (multiplier :pointer)
-  (mode ad-mode))   
+  (mode ad-mode)
+  (track-grad :bool))   
   
 (cffi:defcfun ("nnl2_ad_mul_inplace" %ad-*=) :void
   (multiplicand :pointer)
-  (multiplier :pointer))  
+  (multiplier :pointer)
+  (track-graph :bool))  
   
 (cffi:defcfun ("nnl2_ad_div" %ad-./) :pointer
   (dividend :pointer)
   (divisor :pointer)
-  (mode ad-mode))   
+  (mode ad-mode)
+  (track-grad :bool))   
   
 (cffi:defcfun ("nnl2_ad_div_inplace" %ad-/!) :pointer
   (dividend :pointer)
-  (divisor :pointer))   
+  (divisor :pointer)
+  (track-graph :bool))   
   
 (cffi:defcfun ("nnl2_ad_pow" %ad-.^) :pointer
   (base :pointer)
   (exponent :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
   
 (cffi:defcfun ("nnl2_ad_pow_inplace" %ad-^=) :void
   (base :pointer)
-  (exponent :pointer))
+  (exponent :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_log" %ad-.log) :pointer
   (ad-tensor :pointer)
   (save-type :bool)
-  (mode ad-mode))    
+  (mode ad-mode)
+  (track-grad :bool))    
   
 (cffi:defcfun ("nnl2_ad_inplace_log" %ad-.log!) :void
-  (ad-tensor :pointer))
+  (ad-tensor :pointer)
+  (track-graph :bool))
   
 (cffi:defcfun ("nnl2_ad_scale" %ad-scale) :pointer
   (ad-tensor :pointer)
   (multiplier :float)
   (save-type :bool)
-  (mode ad-mode)) 
+  (mode ad-mode)
+  (track-grad :bool)) 
 
 (cffi:defcfun ("nnl2_ad_inplace_scale" %ad-scale!) :void
   (ad-tensor :pointer)
-  (multiplier :float))
+  (multiplier :float)
+  (track-graph :bool))
   
 (cffi:defcfun ("nnl2_ad_min" %ad-.min) :pointer
   (a :pointer)
   (b :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
   
 (cffi:defcfun ("nnl2_ad_min_inplace" %ad-.min!) :void
   (a :pointer)
-  (b :pointer))
+  (b :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_max" %ad-.max) :pointer
   (a :pointer)
   (b :pointer)
-  (mode ad-mode))    
+  (mode ad-mode)
+  (track-grad :bool))    
 
 (cffi:defcfun ("nnl2_ad_max_inplace" %ad-.max!) :void
   (a :pointer)
-  (b :pointer))    
+  (b :pointer)
+  (track-graph :bool))    
   
 (cffi:defcfun ("nnl2_ad_exp" %ad-.exp) :pointer
   (ad_tensor :pointer)
   (save-type :bool)
-  (mode ad-mode)) 
+  (mode ad-mode)
+  (track-grad :bool)) 
 
 (cffi:defcfun ("nnl2_ad_inplace_exp" %ad-.exp!) :void
-  (ad_tensor :pointer))   
+  (ad_tensor :pointer)
+  (track-graph :bool))   
   
 (cffi:defcfun ("nnl2_ad_axpy" %ad-axpy) :pointer
   (summand :pointer)
   (addend :pointer)
   (multiplier :float)
-  (mode ad-mode))    
+  (mode ad-mode)
+  (track-grad :bool))    
 
 (cffi:defcfun ("nnl2_ad_inplace_axpy" %ad-axpy!) :void
   (summand :pointer)
   (addend :pointer)
-  (multiplier :float)) 
+  (multiplier :float)
+  (track-graph :bool)) 
   
 (cffi:defcfun ("nnl2_ad_abs" %ad-.abs) :pointer
   (ad-pointer :pointer)
-  (mode ad-mode))    
+  (mode ad-mode)
+  (track-grad :bool))    
   
 (cffi:defcfun ("nnl2_ad_inplace_abs" %ad-.abs!) :void
-  (ad-pointer :pointer))   
+  (ad-pointer :pointer)
+  (track-graph :bool))   
 
 (cffi:defcfun ("nnl2_ad_add_broadcasting" %ad-.+/broadcasting) :pointer
   (summand :pointer)
   (addend :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_gemm" %ad-gemm) :pointer
   (multiplicand :pointer)
   (multiplier :pointer)
-  (mode ad-mode))   
+  (mode ad-mode)
+  (track-grad :bool))   
 
 (cffi:defcfun ("nnl2_ad_neg" %.neg) :pointer
   (ad-tensor :pointer)
-  (mode ad-mode))	  
+  (mode ad-mode)
+  (track-grad :bool))	  
   
 (cffi:defcfun ("nnl2_ad_inplace_leakyrelu" %ad-.leaky-relu!) :void
   (ad-tensor :pointer)
-  (alpha :float))
+  (alpha :float)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_leakyrelu" %ad-.leaky-relu) :pointer
   (ad-tensor :pointer)
   (alpha :float)
   (save-type :bool)
-  (mode ad-mode)) 
+  (mode ad-mode)
+  (track-grad :bool)) 
 
 (cffi:defcfun ("nnl2_ad_inplace_relu" %ad-.relu!) :void
-  (ad-tensor :pointer))  
+  (ad-tensor :pointer)
+  (track-graph :bool))  
 
 (cffi:defcfun ("nnl2_ad_relu" %ad-.relu) :pointer
   (ad-tensor :pointer)
-  (mode ad-mode))  
+  (mode ad-mode)
+  (track-grad :bool))  
 
 (cffi:defcfun ("nnl2_ad_inplace_sigmoid" %ad-.sigmoid!) :void
   (ad-tensor :pointer)
-  (approx :bool))    
+  (approx :bool)
+  (track-graph :bool))
  
 (cffi:defcfun ("nnl2_ad_sigmoid" %ad-.sigmoid) :pointer
   (ad-tensor :pointer)
   (approx :bool)
-  (mode ad-mode))     
+  (mode ad-mode)
+  (track-grad :bool))     
  
 (cffi:defcfun ("nnl2_ad_inplace_tanh" %ad-.tanh!) :void
   (ad-tensor :pointer)
-  (approx :bool)) 
+  (approx :bool)
+  (track-graph :bool)) 
 
 (cffi:defcfun ("nnl2_ad_add_broadcasting" %ad-add-broadcasting) :pointer
   (addend :pointer)
   (sumend :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_axpy_broadcasting" %ad-axpy-broadcasting) :pointer
   (axpyend :pointer)
   (sumend :pointer)
   (multiplier :float)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_div_broadcasting" %ad-div-broadcasting) :pointer
   (dividend :pointer)
   (divisor :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_max_broadcasting" %ad-max-broadcasting) :pointer
   (tensor-a :pointer)
   (tensor-b :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_min_broadcasting" %ad-min-broadcasting) :pointer
   (tensor-a :pointer)
   (tensor-b :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_mul_broadcasting" %ad-mul-broadcasting) :pointer
   (multiplier :pointer)
   (multiplicand :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_pow_broadcasting" %ad-pow-broadcasting) :pointer
   (base :pointer)
   (exponent :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_sub_broadcasting" %ad-sub-broadcasting) :pointer
   (minuend :pointer)
   (subtrahend :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
   
 (cffi:defcfun ("nnl2_ad_add_broadcasting_inplace" %ad-add-broadcasting-inplace) :void
   (summand :pointer)
-  (addend :pointer))
+  (addend :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_axpy_broadcasting_inplace" %ad-axpy-broadcasting-inplace) :void
   (sumend :pointer)
   (axpyend :pointer)
-  (multiplier :float))
+  (multiplier :float)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_div_broadcasting_inplace" %ad-div-broadcasting-inplace) :void
   (dividend :pointer)
-  (divisor :pointer))
+  (divisor :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_max_broadcasting_inplace" %ad-max-broadcasting-inplace) :void
   (tensor-a :pointer)
-  (tensor-b :pointer))
+  (tensor-b :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_min_broadcasting_inplace" %ad-min-broadcasting-inplace) :void
   (tensor-a :pointer)
-  (tensor-b :pointer))
+  (tensor-b :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_mul_broadcasting_inplace" %ad-mul-broadcasting-inplace) :void
   (multiplicand :pointer)
-  (multiplier :pointer))
+  (multiplier :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_pow_broadcasting_inplace" %ad-pow-broadcasting-inplace) :void
   (base :pointer)
-  (exponent :pointer))
+  (exponent :pointer)
+  (track-graph :bool))
 			  
 (cffi:defcfun ("nnl2_ad_sub_broadcasting_inplace" %ad-sub-broadcasting-inplace) :void
   (minuend :pointer)
-  (subtrahend :pointer))
+  (subtrahend :pointer)
+  (track-graph :bool))
   
 (cffi:defcfun ("nnl2_ad_tanh" %ad-.tanh) :pointer
   (ad-tensor :pointer)
   (approx :bool)
-  (mode ad-mode))  
+  (mode ad-mode)
+  (track-grad :bool))  
   
 (cffi:defcfun ("nnl2_ad_add_correspondence" %ad-add-correspondence) :pointer
   (tensor :pointer)
   (inc :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_axpf" %ad-axpf) :pointer
   (summand :pointer)
   (sumend :pointer)
   (alpha :float)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_div_correspondence" %ad-div-correspondence) :pointer
   (tensor :pointer)
   (divisor :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_max_correspondence" %ad-max-correspondence) :pointer
   (tensor :pointer)
   (threshold :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_min_correspondence" %ad-min-correspondence) :pointer
   (tensor :pointer)
   (threshold :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_mul_correspondence" %ad-mul-correspondence) :pointer
   (tensor :pointer)
   (multiplier :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_pow_correspondence" %ad-pow-correspondence) :pointer
   (tensor :pointer)
   (exponent :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_sub_correspondence" %ad-sub-correspondence) :pointer
   (tensor :pointer)
   (dec :pointer)
-  (mode ad-mode))
+  (mode ad-mode)
+  (track-grad :bool))
 
 (cffi:defcfun ("nnl2_ad_add_incf_inplace" %ad-add-incf-inplace) :void
   (tensor :pointer)
-  (inc :pointer))
+  (inc :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_axpf_inplace" %ad-axpf-inplace) :void
   (summand :pointer)
   (sumend :pointer)
-  (alpha :float))
+  (alpha :float)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_div_divf_inplace" %ad-div-divf-inplace) :void
   (tensor :pointer)
-  (divisor :pointer))
+  (divisor :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_max_maxf_inplace" %ad-max-maxf-inplace) :void
   (tensor :pointer)
-  (threshold :pointer))
+  (threshold :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_min_minf_inplace" %ad-min-minf-inplace) :void
   (tensor :pointer)
-  (threshold :pointer))
+  (threshold :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_mul_mulf_inplace" %ad-mul-mulf-inplace) :void
   (tensor :pointer)
-  (multiplier :pointer))
+  (multiplier :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_pow_powf_inplace" %ad-pow-powf-inplace) :void
   (tensor :pointer)
-  (exponent :pointer))
+  (exponent :pointer)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_sub_decf_inplace" %ad-sub-decf-inplace) :void
   (tensor :pointer)
-  (dec :pointer))  
+  (dec :pointer)
+  (track-graph :bool))  
+  
+(cffi:defcfun ("nnl2_ad_step" %ad-step) :pointer
+  (ad-tensor :pointer)
+  (learning-rate :float))
+  
+(cffi:defcfun ("nnl2_ad_step_inplace" %ad-step!) :void
+  (ad-tensor :pointer)
+  (learning-rate :float))  
   
 (cffi:defcfun ("nnl2_ad_get_shape" %ad-shape) :pointer
   (ad-tensor :pointer))  
