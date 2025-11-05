@@ -104,7 +104,12 @@
 										   (:module "gc"
 										    :serial t
 											:components ((:file "gc-package" :type "lisp")
-														 (:file "gc-core" :type "lisp")))))))
+														 (:file "gc-core" :type "lisp")))
+														 
+										   (:module "compile"
+										    :serial t
+											:components ((:file "compile-package" :type "lisp")
+													     (:file "compile" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

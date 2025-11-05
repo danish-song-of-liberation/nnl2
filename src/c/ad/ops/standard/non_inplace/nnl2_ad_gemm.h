@@ -1,63 +1,231 @@
 #ifndef NNL2_AD_GEMM_H
 #define NNL2_AD_GEMM_H
 
-void nnl2_ad_reverse_backward_gemm(nnl2_ad_tensor* tensor) {
+/** @file nnl2_ad_gemm.h
+ ** @brief AD implementation for GEMM (General Matrix Multiplication) operation
+ ** @date 2025
+ ** @copyright MIT
+ **/
+
+/** @brief 
+ * Reverse mode backward pass for GEMM operation
+ *
+ ** @param tensor
+ * The output tensor from GEMM operation that needs gradient computation
+ *
+ ** @details
+ * Derivatives of matrix multiplication C = A @ B:
+ * - dC/dA = gradient @ B^T
+ * - dC/dB = A^T @ gradient
+ * Propagates gradients to both input matrices using matrix calculus rules
+ *
+ ** @exception NNL2Error
+ * If tensor is NULL and safety mode is MAX, function returns early
+ *
+ ** @exception NNL2Error
+ * If tensor->data is NULL and safety mode is MAX, function returns early
+ *
+ ** @exception NNL2Error
+ * If tensor->roots[0] or tensor->roots[1] is NULL and safety mode is MAX, function returns early
+ *
+ ** @see nnl2_ad_gemm()
+ ** @see nnl2_ad_reverse_derivative_gemm()
+ **/	
+static void nnl2_ad_reverse_backward_gemm(nnl2_ad_tensor* tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Safety checks
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "In function nnl2_ad_reverse_backward_gemm, passed AD tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "In function nnl2_ad_reverse_backward_gemm, passed AD tensor data is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->roots[0], "In function nnl2_ad_reverse_backward_gemm, multiplicand root tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->roots[1], "In function nnl2_ad_reverse_backward_gemm, multiplier root tensor is NULL");
+	#endif
+	
+	// Compute the derivative of GEMM operation and propagate to root tensors
     nnl2_ad_reverse_derivative_gemm(tensor, tensor->roots[0], tensor->roots[1]);
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
 }
 
+/** @brief 
+ * Create an automatic differentiation tensor for GEMM (General Matrix Multiplication) operation
+ *
+ ** @param multiplicand 
+ * First input tensor (matrix A) with shape [M, K]
+ *
+ ** @param multiplier 
+ * Second input tensor (matrix B) with shape [K, N]
+ *
+ ** @param ad_mode 
+ * Automatic differentiation mode (reverse/p1/p2/p3)
+ *
+ ** @param track_graph 
+ * Whether to track this operation in computation graph
+ *  
+ ** @return nnl2_ad_tensor*
+ * New AD tensor containing matrix product A × B with shape [M, N], or NULL on failure
+ *
+ ** @exception NNL2Error
+ * Returns NULL if multiplicand or multiplier is NULL (SAFETY_MODE_MODERATE+)
+ *
+ ** @exception NNL2Error
+ * Returns NULL if input tensors are not 2D matrices
+ *
+ ** @exception NNL2Error
+ * Returns NULL if inner dimensions don't match for matrix multiplication
+ *
+ ** @exception NNL2Error
+ * Returns NULL if memory allocation fails for result tensor
+ *
+ ** @exception NNL2Error
+ * Returns NULL if gemm operation fails on input data
+ *
+ ** @exception NNL2Error
+ * Returns NULL if gradient tensor allocation fails
+ *
+ ** @exception NNL2Error
+ * Returns NULL if roots array allocation fails when track_graph=true
+ *
+ ** @exception NNL2Error
+ * Returns NULL if unknown AD mode is specified
+ *
+ ** @see gemm()
+ ** @see nnl2_empty()
+ ** @see nnl2_free_ad_tensor()
+ **/
 nnl2_ad_tensor* nnl2_ad_gemm(nnl2_ad_tensor* multiplicand, nnl2_ad_tensor* multiplier, nnl2_ad_mode ad_mode, bool track_graph) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Basic null checks for input tensors
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand, "In function nnl2_ad_gemm, multiplicand AD tensor is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier, "In function nnl2_ad_gemm, multiplier AD tensor is NULL", NULL);
+	#endif
+	
+	// Comprehensive null checks for tensor components
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_FULL
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand->data, "In function nnl2_ad_gemm, multiplicand tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->data, "In function nnl2_ad_gemm, multiplier tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplicand->data->shape, "In function nnl2_ad_gemm, multiplicand tensor shape is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->data->shape, "In function nnl2_ad_gemm, multiplier tensor shape is NULL", NULL);
+	#endif
+	
+	// Check that both inputs are 2D matrices
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (multiplicand->data->rank != 2) {
+			NNL2_ERROR("In function nnl2_ad_gemm, multiplicand must be a 2D matrix");
+			return NULL;
+		}
+		if (multiplier->data->rank != 2) {
+			NNL2_ERROR("In function nnl2_ad_gemm, multiplier must be a 2D matrix");
+			return NULL;
+		}
+	#endif
+	
+	// Extract dimensions
+	int m = multiplicand->data->shape[0];  // rows of A
+	int k_multiplicand = multiplicand->data->shape[1];  // columns of A
+	int k_multiplier = multiplier->data->shape[0];      // rows of B
+	int n = multiplier->data->shape[1];    // columns of B
+	
+	// Check inner dimension compatibility
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		if (k_multiplicand != k_multiplier) {
+			NNL2_ERROR("In function nnl2_ad_gemm, inner dimensions don't match: %d != %d", k_multiplicand, k_multiplier);
+			return NULL;
+		}
+	#endif
+	
     nnl2_ad_tensor* result = malloc(sizeof(nnl2_ad_tensor));
-
-    int m = multiplicand->data->shape[0];
-    int k = multiplicand->data->shape[1];
-    int n = multiplier->data->shape[1];
-
+	if(!result) {
+		NNL2_MALLOC_ERROR();
+		return NULL;
+	}
+	
+	// To protect against re-freeing
+	result->magic_number = TENSOR_MAGIC_ALIVE;
+    
+	// Compute matrix multiplication using GEMM
     result->data = gemm(
         nnl2RowMajor,       // order
         nnl2NoTrans,        // transa
         nnl2NoTrans,        // transb
         m,                  // rows of result
         n,                  // cols of result
-        k,                  // common dimension
+        k_multiplicand,     // common dimension
         1.0,                // alpha
         multiplicand->data, // A
-        k,                  // lda
+        k_multiplicand,     // lda
         multiplier->data,   // B
         n,                  // ldb
         0.0                 // beta
     );
-
+    
+	if(!result->data) {
+		NNL2_ERROR("In function nnl2_ad_gemm, failed to compute matrix multiplication using gemm");
+		free(result);
+		return NULL;
+	}
+	
+	// Allocate gradient tensor with same shape as result
     result->grad = nnl2_empty(result->data->shape, result->data->rank, result->data->dtype);
-
-    if (track_graph) {
-        result->num_roots = 2;
-        result->roots = (nnl2_ad_tensor**)malloc(2 * sizeof(nnl2_ad_tensor*));
-        result->roots[0] = multiplicand;
-        result->roots[1] = multiplier;
-    } else {
-        result->num_roots = 0;
-        result->roots = NULL;
-    }
-
+	if(!result->grad) {
+		NNL2_ERROR("In function nnl2_ad_gemm, failed to allocate nnl2 empty tensor for gradient using nnl2_empty function");
+		nnl2_free_tensor(result->data); free(result);
+		return NULL;
+	}
+	
+	// Build computational graph if tracking is enabled
+	if(track_graph) {
+		result->num_roots = 2;
+		result->roots = (nnl2_ad_tensor**)malloc(2 * sizeof(*result->roots));
+		if(!result->roots) {
+			NNL2_MALLOC_ERROR();
+			nnl2_free_tensor(result->data);
+			nnl2_free_tensor(result->grad);
+			free(result);
+			return NULL;
+		}
+	
+	    // Set both input tensors as roots
+		result->roots[0] = multiplicand;  // matrix A
+		result->roots[1] = multiplier;    // matrix B
+		
+		// Set the appropriate backward function based on AD mode
+		switch(ad_mode) {
+			case nnl2_ad_reverse_mode: result->backward_fn = nnl2_ad_reverse_backward_gemm;  break;
+			
+			default: {
+				NNL2_UNKNOWN_AD_MODE_ERROR(ad_mode);
+				nnl2_free_ad_tensor(result);
+				return NULL;
+			}
+		}
+	} else {
+		// No computational graph tracking
+		result->num_roots = 0;
+		result->roots = NULL;
+		result->backward_fn = NULL;
+	}
+	
+	// Initialize tensor metadata
     result->requires_grad = multiplicand->requires_grad || multiplier->requires_grad;
-    result->magic_number = TENSOR_MAGIC_ALIVE;
     result->grad_initialized = false;
-    result->is_leaf = false;
+    result->is_leaf = false; 
     result->name = NULL;
     result->ts_type = nnl2_type_ad;
-
-    switch (ad_mode) {
-        case nnl2_ad_reverse_mode:
-            result->backward_fn = nnl2_ad_reverse_backward_gemm;
-            break;
-
-        default: {
-            NNL2_UNKNOWN_AD_MODE_ERROR(ad_mode);
-            nnl2_free_ad_tensor(result);
-            return NULL;
-        }
-    }
-
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+    
     return result;
 }
 

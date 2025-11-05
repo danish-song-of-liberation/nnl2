@@ -367,6 +367,11 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         NNL2_FUNC_ENTER();
     #endif
 	
+	if(!ad_tensor->magic_number) {
+		NNL2_ERROR("AD-tensor at %p has invalid magic number: %u (expected: %u)", ad_tensor, ad_tensor->magic_number, TENSOR_MAGIC_ALIVE);
+        return;
+	}
+	
 	if (ad_tensor->magic_number != TENSOR_MAGIC_ALIVE) return;
 	ad_tensor->magic_number = TENSOR_MAGIC_FREED;
     

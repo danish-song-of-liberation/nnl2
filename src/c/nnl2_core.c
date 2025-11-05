@@ -226,7 +226,7 @@ void nnl2_init_system() {
 	nnl2_init_standard_inplace();          
 	nnl2_init_stack();    
 	nnl2_init_activations_inplace();        
-	nnl2_init_activations();   
+	nnl2_init_activations();        
 	nnl2_init_auxiliary();
 	nnl2_init_initializers();
 	nnl2_init_transposition();   
@@ -235,7 +235,7 @@ void nnl2_init_system() {
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  	
-}                    
+}                          
   
 ///@{ [subinitializers]     
 
