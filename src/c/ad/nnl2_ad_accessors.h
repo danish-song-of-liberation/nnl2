@@ -115,7 +115,7 @@ int32_t* nnl2_ad_get_shape(nnl2_ad_tensor* ad_tensor) {
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_get_shape, ad_tensor is NULL", NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->shape, "In function nnl2_ad_get_shape, ad_tensor shape is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data->shape, "In function nnl2_ad_get_shape, ad_tensor shape is NULL", NULL);
 	#endif
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
@@ -263,8 +263,8 @@ nnl2_tensor_type nnl2_ad_get_dtype_as_data(nnl2_ad_tensor* ad_tensor) {
 	#endif 
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_get_dtype_as_data, ad_tensor is NULL", NNL2_TYPE_UNKNOWN);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data, "In function nnl2_ad_get_dtype_as_data, ad_tensor data is NULL", NNL2_TYPE_UNKNOWN);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_get_dtype_as_data, ad_tensor is NULL", -1);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data, "In function nnl2_ad_get_dtype_as_data, ad_tensor data is NULL", -1);
 	#endif
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
@@ -292,8 +292,8 @@ nnl2_tensor_type nnl2_ad_get_dtype_as_grad(nnl2_ad_tensor* ad_tensor) {
 	#endif 
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_get_dtype_as_grad, ad_tensor is NULL", NNL2_TYPE_UNKNOWN);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->grad, "In function nnl2_ad_get_dtype_as_grad, ad_tensor grad is NULL", NNL2_TYPE_UNKNOWN);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_get_dtype_as_grad, ad_tensor is NULL", -1);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->grad, "In function nnl2_ad_get_dtype_as_grad, ad_tensor grad is NULL", -1);
 	#endif
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
