@@ -235,7 +235,7 @@ void nnl2_init_system() {
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  	
-}                                 
+}                                     
   
 ///@{ [subinitializers]     
 
