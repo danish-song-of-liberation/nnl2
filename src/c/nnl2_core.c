@@ -179,7 +179,7 @@ void nnl2_init_reshaping();
  ** Calls all subsystem initialization functions to 
  ** register computational backends for operation
  *
- ** @code 
+ ** @code    
  * #include "input_here_pass_to_nnl2"
  * int main() {
  *     nnl2_init_system(); // Initialize the framefork first!
