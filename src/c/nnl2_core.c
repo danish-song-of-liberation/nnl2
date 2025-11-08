@@ -154,7 +154,7 @@ void nnl2_init_broadcasting();
     
 /** @brief 
  * Registers backend implementations for tensor reshaping operations
- *
+ *       
  ** @details 
  * Functions to change the shape or interpretation of a tensor's dimensions without copying data
  */
