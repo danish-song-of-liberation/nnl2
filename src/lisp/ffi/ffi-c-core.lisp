@@ -477,7 +477,7 @@
   (backward-fn :pointer)
   (roots :pointer)
   (num-roots :long)
-  (visited :bool)
+  (visited-gen :unsigned-long)
   (name :string)
   (magic-number :char)
   (grad-initialized :bool)

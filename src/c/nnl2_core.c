@@ -161,7 +161,7 @@ void nnl2_init_broadcasting();
 void nnl2_init_reshaping();
            
 ///@} [subinitializers_declaration]		
-		
+		 
 /** @brief
  * Fully initializes the nnl2
  *
@@ -179,7 +179,7 @@ void nnl2_init_reshaping();
  ** Calls all subsystem initialization functions to 
  ** register computational backends for operation
  *
- ** @code
+ ** @code 
  * #include "input_here_pass_to_nnl2"
  * int main() {
  *     nnl2_init_system(); // Initialize the framefork first!
@@ -235,7 +235,7 @@ void nnl2_init_system() {
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  	
-}                                           
+}                                               
   
 ///@{ [subinitializers]     
 

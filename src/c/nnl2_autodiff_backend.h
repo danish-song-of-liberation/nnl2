@@ -30,7 +30,7 @@ typedef struct nnl2_ad_tensor {
 	void (* backward_fn)(nnl2_ad_tensor *);    ///< AD-tensor function for backpropagation
 	nnl2_ad_tensor** roots; 			       ///< The roots of a tensor
 	size_t num_roots;   					   ///< Number of roots
-	bool visited;							   ///< To optimize topological sort
+	uint64_t visited_gen;					   ///< Used for topological sort (generation-based marking)
 	char* name;  						       ///< Name for debugging
 	int8_t magic_number; 					   ///< This is necessary to avoid memory corruption when releasing the tensor
 	bool grad_initialized;					   ///< If false, the gradient is either NULL or has uninitialized memory
