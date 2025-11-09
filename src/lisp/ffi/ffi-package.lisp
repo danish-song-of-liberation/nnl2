@@ -480,5 +480,10 @@
    #:%set-randn-inplace-backend
    #:%get-randn-inplace-backend
    #:%get-randn-inplace-num-backends
-   #:%get-randn-inplace-backends))
+   #:%get-randn-inplace-backends
+   #:%xavier-inplace
+   #:%set-xavier-inplace-backend
+   #:%get-xavier-inplace-backend
+   #:%get-xavier-inplace-backends
+   #:%get-xavier-inplace-num-backends))
    

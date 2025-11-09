@@ -311,6 +311,7 @@ void nnl2_init_initializers() {
     EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
     EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
     EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));    
+	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));
 }
 
 void nnl2_init_transposition() {
@@ -550,7 +551,7 @@ void lisp_call_tanhinplace(Tensor* tensor, bool approx) {
 	tanhinplace(tensor, approx);
 }    
 
-Tensor* lisp_call_tanh(Tensor* tensor, bool approx) { 
+Tensor* lisp_call_tanh(Tensor* tensor, bool approx) {   
 	return nnl2_tanh(tensor, approx); 
 }   
 
@@ -568,6 +569,10 @@ void lisp_call_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
+}       
+
+void lisp_call_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain, float distribution) {
+	xavier_inplace(tensor, in, out, gain, distribution);
 }       
  
 void lisp_call_transposeinplace(Tensor* tensor, bool force) {

@@ -1191,6 +1191,22 @@
 	    (:normal   (nnl2.ffi:%xavier shape rank dtype in out gain 2.0s0))
 	    (:uniform  (nnl2.ffi:%xavier shape rank dtype in out gain 6.0s0))
 	    (otherwise (error "Unknown xavier distribution: ~a%" distribution))))))
+		
+(defun xavier! (tensor &key (in 0) (out 0) (gain 1.0s0) (distribution :normal))
+  "Fills a tensor with the xavier distribution in the specified shape in place
+   tensor: Input tensor (vector/list)
+   in (&key): Number of inputs
+   out (&key): Number of outputs
+   gain (&key): Autologous
+   distribution (&key): Available: (:normal :uniform)"
+   
+  (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier!")
+  (assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to xavier!")
+  
+  (case distribution
+    (:normal   (nnl2.ffi:%xavier-inplace tensor in out gain 2.0s0))
+    (:uniform  (nnl2.ffi:%xavier-inplace tensor in out gain 6.0s0))
+	(otherwise (error "Unknown xavier distribution: ~a%" distribution))))
   
 (defun transpose (tensor &key force)
   (nnl2.ffi:%transpose tensor force))

@@ -506,5 +506,10 @@
    #:use-backend/randn!
    #:get-backend/randn!
    #:get-backends/randn!
-   #:with-backend/randn!))
+   #:with-backend/randn!
+   #:xavier!
+   #:use-backend/xavier!
+   #:get-backend/xavier!
+   #:get-backends/xavier!
+   #:with-backend/xavier!))
    

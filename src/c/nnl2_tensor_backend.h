@@ -1008,6 +1008,16 @@ typedef nnl2_tensor* (*negfn)(nnl2_tensor* tensor);
  **/
 typedef void (*randninplacefn)(nnl2_tensor* tensor, void* from, void* to);
 
+/** @brief Initializes the given tensor in-place using the Xavier distribution
+ ** @param tensor Tensor to initialize
+ ** @param in Number of input neurons (fan_in)
+ ** @param out Number of output neurons (fan_out)
+ ** @param gain Gain factor applied to the standard deviation
+ ** @param distribution Distribution scaling constant (usually 2.0 or 6.0)
+ ** @see xavierfn
+ **/
+typedef void (*xavierinplacefn)(nnl2_tensor* tensor, int in, int out, float gain, float distribution);
+
 /// @} [typedef]
 
 

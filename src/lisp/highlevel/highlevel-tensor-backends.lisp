@@ -196,6 +196,9 @@
 (define-backend-setter use-backend/xavier
   nnl2.ffi:%set-xavier-backend)
 
+(define-backend-setter use-backend/xavier!
+  nnl2.ffi:%set-xavier-inplace-backend)
+  
 (define-backend-setter use-backend/transpose!
   nnl2.ffi:%set-transposeinplace-backend)
 
@@ -269,7 +272,7 @@
                               use-backend/transpose! use-backend/reshape use-backend/reinterpret
 							  use-backend/slice use-backend/cut use-backend/transposition
 							  use-backend/transposition! use-backend/.neg! use-backend/.neg
-							  use-backend/randn!))
+							  use-backend/randn! use-backend/xavier!))
 							  
       (funcall backend-function name)))
 	  
@@ -351,6 +354,7 @@
 (define-backend-getter-setter get-backend/randn! use-backend/randn! nnl2.ffi:%get-randn-inplace-backend)
 (define-backend-getter-setter get-backend/randn-like use-backend/randn-like nil :like get-backend/randn)
 (define-backend-getter-setter get-backend/xavier use-backend/xavier nnl2.ffi:%get-xavier-backend)
+(define-backend-getter-setter get-backend/xavier! use-backend/xavier! nnl2.ffi:%get-xavier-inplace-backend)
 (define-backend-getter-setter get-backend/transpose use-backend/transpose nnl2.ffi:%get-transpose-backend)
 (define-backend-getter-setter get-backend/transpose! use-backend/transpose! nnl2.ffi:%get-transposeinplace-backend)
 (define-backend-getter-setter get-backend/reshape use-backend/reshape nnl2.ffi:%get-reshape-backend)
@@ -589,6 +593,10 @@
   nnl2.ffi:%get-xavier-num-backends 
   nnl2.ffi:%get-xavier-backends)
 
+(define-backends-getter get-backends/xavier!
+  nnl2.ffi:%get-xavier-inplace-num-backends 
+  nnl2.ffi:%get-xavier-inplace-backends)
+  
 (define-backends-getter get-backends/transpose 
   nnl2.ffi:%get-transpose-num-backends 
   nnl2.ffi:%get-transpose-backends)
@@ -712,6 +720,7 @@
 (define-with-backend with-backend/randn get-backend/randn)
 (define-with-backend with-backend/randn! get-backend/randn!)
 (define-with-backend with-backend/xavier get-backend/xavier)
+(define-with-backend with-backend/xavier! get-backend/xavier!)
 (define-with-backend with-backend/transpose get-backend/transpose)
 (define-with-backend with-backend/transpose! get-backend/transpose!)
 (define-with-backend with-backend/reshape get-backend/reshape)

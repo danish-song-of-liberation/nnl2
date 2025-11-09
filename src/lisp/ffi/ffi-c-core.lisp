@@ -295,6 +295,13 @@
   (gain :float)
   (distribution :float))  
   
+(cffi:defcfun ("lisp_call_xavier_inplace" %xavier-inplace) :void
+  (tensor :pointer)
+  (in :int)
+  (out :int)
+  (gain :float)
+  (distribution :float))  
+  
 (cffi:defcfun ("lisp_call_hstack" %hstack) :pointer
   (tensora :pointer)
   (tensorb :pointer))
@@ -1074,7 +1081,10 @@
   	
 (cffi:defcfun ("set_xavier_backend" %set-xavier-backend) :void
   (backend-name :string))  
-  	
+ 
+(cffi:defcfun ("set_xavier_inplace_backend" %set-xavier-inplace-backend) :void
+  (backend-name :string)) 
+	
 (cffi:defcfun ("set_transposeinplace_backend" %set-transposeinplace-backend) :void
   (backend-name :string))  
   	
@@ -1264,6 +1274,7 @@
 (cffi:defcfun ("get_randn_backend" %get-randn-backend) :string) 
 (cffi:defcfun ("get_randn_inplace_backend" %get-randn-inplace-backend) :string) 
 (cffi:defcfun ("get_xavier_backend" %get-xavier-backend) :string) 
+(cffi:defcfun ("get_xavier_inplace_backend" %get-xavier-inplace-backend) :string) 
 (cffi:defcfun ("get_transposeinplace_backend" %get-transposeinplace-backend) :string) 
 (cffi:defcfun ("get_transpose_backend" %get-transpose-backend) :string) 
 (cffi:defcfun ("get_sum_without_axis_backend" %get-sum-without-axis-backend) :string) 
@@ -1364,6 +1375,8 @@
 (cffi:defcfun ("get_randn_inplace_backends" %get-randn-inplace-backends) :pointer)
 (cffi:defcfun ("get_xavier_num_backends" %get-xavier-num-backends) :int)
 (cffi:defcfun ("get_xavier_backends" %get-xavier-backends) :pointer)
+(cffi:defcfun ("get_xavier_inplace_num_backends" %get-xavier-inplace-num-backends) :int)
+(cffi:defcfun ("get_xavier_inplace_backends" %get-xavier-inplace-backends) :pointer)
 (cffi:defcfun ("get_transposeinplace_num_backends" %get-transposeinplace-num-backends) :int)
 (cffi:defcfun ("get_transposeinplace_backends" %get-transposeinplace-backends) :pointer)
 (cffi:defcfun ("get_transpose_num_backends" %get-transpose-num-backends) :int)
