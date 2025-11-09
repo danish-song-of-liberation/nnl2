@@ -500,5 +500,11 @@
    #:get-backends/.neg
    #:get-backend/.neg
    #:with-backend/.neg
-   #:use-backend/.neg))
+   #:use-backend/.neg
+   #:randn!
+   #:rand!
+   #:use-backend/randn!
+   #:get-backend/randn!
+   #:get-backends/randn!
+   #:with-backend/randn!))
    

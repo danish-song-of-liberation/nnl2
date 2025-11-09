@@ -189,6 +189,9 @@
 
 (define-backend-setter use-backend/randn
   nnl2.ffi:%set-randn-backend)
+  
+(define-backend-setter use-backend/randn!
+  nnl2.ffi:%set-randn-inplace-backend)  
 
 (define-backend-setter use-backend/xavier
   nnl2.ffi:%set-xavier-backend)
@@ -265,7 +268,8 @@
                               use-backend/.tanh use-backend/.tanh! use-backend/transpose
                               use-backend/transpose! use-backend/reshape use-backend/reinterpret
 							  use-backend/slice use-backend/cut use-backend/transposition
-							  use-backend/transposition! use-backend/.neg! use-backend/.neg))
+							  use-backend/transposition! use-backend/.neg! use-backend/.neg
+							  use-backend/randn!))
 							  
       (funcall backend-function name)))
 	  
@@ -344,6 +348,7 @@
 (define-backend-getter-setter get-backend/.tanh use-backend/.tanh nnl2.ffi:%get-tanh-backend)
 (define-backend-getter-setter get-backend/.tanh! use-backend/.tanh! nnl2.ffi:%get-tanhinplace-backend)
 (define-backend-getter-setter get-backend/randn use-backend/randn nnl2.ffi:%get-randn-backend)
+(define-backend-getter-setter get-backend/randn! use-backend/randn! nnl2.ffi:%get-randn-inplace-backend)
 (define-backend-getter-setter get-backend/randn-like use-backend/randn-like nil :like get-backend/randn)
 (define-backend-getter-setter get-backend/xavier use-backend/xavier nnl2.ffi:%get-xavier-backend)
 (define-backend-getter-setter get-backend/transpose use-backend/transpose nnl2.ffi:%get-transpose-backend)
@@ -573,6 +578,10 @@
 (define-backends-getter get-backends/randn 
   nnl2.ffi:%get-randn-num-backends 
   nnl2.ffi:%get-randn-backends)
+  
+(define-backends-getter get-backends/randn! 
+  nnl2.ffi:%get-randn-inplace-num-backends 
+  nnl2.ffi:%get-randn-inplace-backends)  
 
 (define-backends-getter get-backends/randn-like :like get-backends/randn)
 
@@ -701,6 +710,7 @@
 (define-with-backend with-backend/.tanh get-backend/.tanh)
 (define-with-backend with-backend/.tanh! get-backend/.tanh!)
 (define-with-backend with-backend/randn get-backend/randn)
+(define-with-backend with-backend/randn! get-backend/randn!)
 (define-with-backend with-backend/xavier get-backend/xavier)
 (define-with-backend with-backend/transpose get-backend/transpose)
 (define-with-backend with-backend/transpose! get-backend/transpose!)

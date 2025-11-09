@@ -10,6 +10,7 @@
 #include "../tensorgen/nnl2_ones.h"
 #include "../tensorgen/nnl2_full.h"
 #include "../tensorgen/nnl2_randn.h"
+#include "../tensorgen/nnl2_randn_inplace.h"
 #include "../tensorgen/nnl2_xavier.h"
 #include "../tensorgen/nnl2_like_constructors.h"
 #include "../tensorformat/nnl2_1d.h"

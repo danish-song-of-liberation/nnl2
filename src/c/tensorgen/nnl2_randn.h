@@ -30,7 +30,7 @@
  ** @example
  * // Create a 3x3 tensor of random floats between 0.0 and 1.0
  * float min = 0.0f, max = 1.0f;
- * Tensor* quantum_blockchain_nft = nnl2_naive_randn((int[]){3, 3}, 2, FLOAT64, &min, &max);
+ * nnl2_tensor* mega_quantum_blockchain_nft = nnl2_naive_randn((int[]){3, 3}, 2, FLOAT64, &min, &max);
  *
  ** @see nnl2_empty
  ** @see product

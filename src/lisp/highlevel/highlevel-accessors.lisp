@@ -1080,23 +1080,61 @@
 			
 	  (nnl2.ffi:%randn shape rank dtype from-pntr to-pntr))))
 	  
-(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from -1.0d0) (to 1.0d0))
+(defun %internal-rand-inplace (tensor from to &key type-hint)
+  "Fills a tensor with random numbers
+   indices: Input tensor
+   from: Value to fill from
+   to: Value to fill to
+   type-hint (&key): You can hint a type to optimal performance"
+   
+  (let* ((dtype (if type-hint type-hint (dtype tensor)))
+		 (cffi-type (type/nnl2->cffi dtype))
+		 (lisp-type (type/nnl2->lisp dtype))
+		 (coerced-from (coerce from lisp-type))
+		 (coerced-to   (coerce to lisp-type))
+		 (from-pntr (cffi:foreign-alloc cffi-type))
+		 (to-pntr   (cffi:foreign-alloc cffi-type)))
+		 
+	(setf (cffi:mem-ref from-pntr cffi-type) coerced-from
+		  (cffi:mem-ref to-pntr   cffi-type) coerced-to)
+		  
+	(nnl2.ffi:%randn-inplace tensor from-pntr to-pntr)))
+	  
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (from -1) (to 1))
   "Creates a tensor of the specified shape filled with random numbers from -1 to 1
    indices: Input shape
    dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
-   from (&key) (default: -1.0d0): Value to fill from
-   to (&key) (default: 1.0d0): Value to fill to"
+   from (&key) (default: -1): Value to fill from
+   to (&key) (default: 1): Value to fill to"
    
    (%internal-rand indices dtype from to))
    
-(defun rand (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0.0d0) (to 1.0d0))
+(defun rand (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0) (to 1))
   "Creates a tensor of the specified shape filled with random numbers from 0 to 1
    indices: Input shape
    dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
-   from (&key) (default: 0.0d0): Value to fill from
-   to (&key) (default: 1.0d0): Value to fill to"
+   from (&key) (default: 0): Value to fill from
+   to (&key) (default: 1): Value to fill to"
    
    (%internal-rand indices dtype from to))   
+  
+(defun randn! (tensor &key type-hint (from -1) (to 1))
+  "Fills an existing tensor with random numbers from [-1, 1]
+   tensor: Input tensor
+   type-hint (&key): You can hint a type to optimal performance
+   from (&key) (default: -1): Value to fill from
+   to (&key) (default: 1): Value to fill to"
+   
+  (%internal-rand-inplace tensor from to :type-hint type-hint))
+   
+(defun rand! (tensor &key type-hint (from 0) (to 1))
+  "Fills an existing tensor with random numbers from [0, 1]
+   tensor: Input tensor
+   type-hint (&key): You can hint a type to optimal performance
+   from (&key) (default: -1): Value to fill from
+   to (&key) (default: 1): Value to fill to"
+   
+  (%internal-rand-inplace tensor from to :type-hint type-hint))
 
 (defun %internal-randn-like (tensor from to dtype)
   "Сreates a tensor filled with random numbers of the same shape as the passed tensor

@@ -25,7 +25,7 @@
  * available leaf tensora to the original tensor.
  * This works for a = a * a and other recursive calculations
  */
-void nnl2_ad_backpropagation_through_time(nnl2_ad_tensor* tensor, bool retain_graph) {
+void nnl2_ad_backpropagation_through_time(nnl2_ad_tensor* restrict tensor, bool retain_graph) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
 		NNL2_FUNC_ENTER();
 	#endif
@@ -53,14 +53,22 @@ void nnl2_ad_backpropagation_through_time(nnl2_ad_tensor* tensor, bool retain_gr
 		NNL2_CHECK_NULL_IF_ERR_RETURN(topo, "Failed to build topo in backpropagation through time");
 	#endif
 
+	void* zero_value = nnl2_get_zero_value(tensor->grad->dtype);
+    void* one_value  = nnl2_get_one_value(tensor->grad->dtype);
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (!zero_value || !one_value) {
+			NNL2_ERROR("Failed to obtain scalar constants for dtype %d", tensor->grad->dtype);
+			free(topo);
+			return;
+		}
+	#endif
+	
     // Initialize gradients to zero for all tensors that require gradients
     for (int i = 0; i < topo_size; i++) {
-        if (topo[i]->requires_grad && !topo[i]->grad_initialized) {
-            void* zero_value = nnl2_get_zero_value(topo[i]->grad->dtype);
-            if (zero_value) {
-                inplace_fill(topo[i]->grad, zero_value, topo[i]->grad->dtype);
-                topo[i]->grad_initialized = true;
-            }
+        if (topo[i]->requires_grad) {
+            inplace_fill(topo[i]->grad, zero_value, topo[i]->grad->dtype);
+            topo[i]->grad_initialized = true;
         }
     }
 

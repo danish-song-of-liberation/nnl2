@@ -1000,6 +1000,14 @@ typedef void (*neginplacefn)(nnl2_tensor* tensor);
  **/
 typedef nnl2_tensor* (*negfn)(nnl2_tensor* tensor);
 
+/** @brief Fills the given tensor with random values from the specified range (in-place)
+ ** @param tensor Tensor to fill with random values
+ ** @param from Pointer to the lower bound of the random range
+ ** @param to Pointer to the upper bound of the random range
+ ** @see randnfn
+ **/
+typedef void (*randninplacefn)(nnl2_tensor* tensor, void* from, void* to);
+
 /// @} [typedef]
 
 

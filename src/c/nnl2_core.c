@@ -153,8 +153,8 @@ void nnl2_init_broadcasting_inplace();
 void nnl2_init_broadcasting();    
     
 /** @brief 
- * Registers backend implementations for tensor reshaping operations
- *       
+ * Registers backend implementations for tensor reshaping operations 
+ *           
  ** @details 
  * Functions to change the shape or interpretation of a tensor's dimensions without copying data
  */
@@ -308,9 +308,10 @@ void nnl2_init_activations() {
 }
      
 void nnl2_init_initializers() {
-	EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
-	EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
-}   
+    EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
+    EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
+    EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));    
+}
 
 void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
@@ -559,6 +560,10 @@ Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
 
 Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
 	return randn(shape, rank, dtype, from, to);
+}
+
+void lisp_call_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
+	randn_inplace(tensor, from, to);
 }
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {

@@ -475,5 +475,10 @@
    #:%ad-step
    #:%ad-step!
    #:%ad-roots
-   #:%ad-roots-setter))
+   #:%ad-roots-setter
+   #:%randn-inplace
+   #:%set-randn-inplace-backend
+   #:%get-randn-inplace-backend
+   #:%get-randn-inplace-num-backends
+   #:%get-randn-inplace-backends))
    
