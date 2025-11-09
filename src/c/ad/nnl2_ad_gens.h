@@ -341,6 +341,151 @@ nnl2_ad_tensor* nnl2_ad_ones(int32_t* shape, int rank, nnl2_tensor_type dtype, b
     
     return ad_tensor;
 }
+
+/** @brief 
+ * Creates a new AD tensor and fills it with random values from the specified range
+ *
+ ** @param shape 
+ * Pointer to an array specifying tensor dimensions
+ *
+ ** @param rank 
+ * Number of dimensions in the tensor
+ *
+ ** @param dtype 
+ * Data type of the tensor elements
+ *
+ ** @param requires_grad 
+ * Whether to track this tensor in the AD graph
+ *
+ ** @param name 
+ * Optional tensor name for debugging or inspection
+ *
+ ** @param from 
+ * Pointer to the lower bound of the random range
+ *
+ ** @param to 
+ * Pointer to the upper bound of the random range
+ *
+ ** @return 
+ * Pointer to a newly created AD tensor filled with random values
+ * Returns NULL if allocation fails or input validation fails
+ *
+ ** @exception NNL2Error [nnl2_safety_mode_min+]
+ * If from is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mode_min+]
+ * If to is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mode_moderate+]
+ * If shape is NULL
+ *
+ ** @exception NNL2Error
+ * If created empty tensor in ```nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(...)``` is NULL (failed)
+ *
+ ** @see randn_inplace 
+ ** @see nnl2_ad_empty
+ ** @see nnl2_ad_tensor
+ **/
+nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name, void* from, void* to) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	// Safety checks
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(from, "In function nnl2_ad_randn, void* from is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(to, "In function nnl2_ad_randn, void* to is NULL", NULL);
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape, "In function nnl2_ad_randn, int32_t* shape is NULL", NULL);
+	#endif
+    
+    // Create empty tensor
+    nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(shape, rank, dtype, requires_grad, name);
+    if(ad_tensor == NULL) {
+        NNL2_TENSOR_ERROR("empty");
+        return NULL;
+    }
+	
+	randn_inplace(ad_tensor->data, from, to);
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return ad_tensor;
+}
+
+/** @brief 
+ * Creates a new AD tensor and initializes it using Xavier initialization
+ *
+ ** @param shape 
+ * Pointer to an array specifying tensor dimensions
+ *
+ ** @param rank 
+ * Number of dimensions in the tensor
+ *
+ ** @param dtype 
+ * Data type of the tensor elements
+ *
+ ** @param requires_grad 
+ * Whether to track this tensor in the AD graph
+ *
+ ** @param name 
+ * Optional tensor name for debugging or inspection
+ *
+ ** @param in 
+ * Number of input units
+ *
+ ** @param out 
+ * Number of output units
+ *
+ ** @param gain 
+ * Scaling factor for the initialization
+ *
+ ** @param distribution 
+ * Distribution type for initialization (6 for uniform, 2 for normal)
+ *
+ ** @return 
+ * Pointer to a newly created AD tensor initialized with Xavier method
+ * Returns NULL if allocation fails or input validation fails
+ *
+ ** @exception NNL2Error [nnl2_safety_mode_moderate+]
+ * If shape is NULL
+ *
+ ** @exception NNL2Error
+ * If created empty tensor in ```nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(...)``` is NULL (failed)
+ *
+ ** @see xavier_inplace 
+ ** @see nnl2_ad_empty
+ ** @see nnl2_ad_tensor
+ **/
+nnl2_ad_tensor* nnl2_ad_xavier(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name, int in, int out, float gain, float distribution) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	// Safety checks
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape, "In function nnl2_ad_randn, int32_t* shape is NULL", NULL);
+	#endif
+    
+    // Create empty tensor
+    nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(shape, rank, dtype, requires_grad, name);
+    if(ad_tensor == NULL) {
+        NNL2_TENSOR_ERROR("empty");
+        return NULL;
+    }
+	
+	xavier_inplace(ad_tensor->data, in, out, gain, distribution);
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return ad_tensor;
+}
  
 /** @brief 
  * Frees all memory associated with an automatic differentiation tensor

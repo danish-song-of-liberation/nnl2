@@ -150,6 +150,38 @@
 		
 		(nnl2.ffi:%ad-full shape rank dtype requires-grad name filler-pntr)))))
 	  
+(defun %internal-randn (indices dtype requires-grad name from to)
+  (nnl2.hli:fastcall
+    (let* ((cffi-type    (nnl2.hli.ts:type/nnl2->cffi dtype))
+		   (lisp-type    (nnl2.hli.ts:type/nnl2->lisp dtype))
+		   (from-pntr    (cffi:foreign-alloc cffi-type))
+		   (to-pntr      (cffi:foreign-alloc cffi-type))
+		   (coerced-to   (coerce to lisp-type))
+		   (coerced-from (coerce from lisp-type)))
+		   
+	 (setf (cffi:mem-ref from-pntr cffi-type) coerced-from
+		   (cffi:mem-ref to-pntr cffi-type) coerced-to)
+		   
+     (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+	   (declare (type integer rank))
+	   (nnl2.ffi:%ad-randn shape rank dtype requires-grad name from-pntr to-pntr)))))
+	
+(defun rand (indices &key (from 0) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  (%internal-randn indices dtype requires-grad name from to))
+	
+(defun randn (indices &key (from -1) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  (%internal-randn indices dtype requires-grad name from to))
+	 
+(defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (in 0) (out 0) (gain 1.0s0) (distribution :normal))
+  (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier (AD)")
+  (assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to xavier (AD)")
+  
+  (nnl2.hli:fastcall
+    (let ((dist (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
+      (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+	    (declare (type integer rank))
+        (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
+
 (cffi:defcfun ("nnl2_ad_zero_grad" zero-grad) :void
   (ad-tensor :pointer))	  
 	  

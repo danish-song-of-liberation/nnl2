@@ -313,7 +313,7 @@ void nnl2_init_initializers() {
     EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));    
 	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));
 }
-
+   
 void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  

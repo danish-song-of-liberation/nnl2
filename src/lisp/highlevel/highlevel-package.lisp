@@ -91,7 +91,10 @@
    #:step-ts
    #:step!
    #:num-roots
-   #:roots))
+   #:roots
+   #:rand
+   #:randn
+   #:xavier))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

@@ -547,6 +547,26 @@
   (requires-grad :bool)
   (name :string)
   (filler :pointer))
+ 
+(cffi:defcfun ("nnl2_ad_randn" %ad-randn) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string)
+  (from :pointer)
+  (to :pointer))
+  
+(cffi:defcfun ("nnl2_ad_xavier" %ad-xavier) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string)
+  (in :int)
+  (out :int)
+  (gain :float)
+  (distribution :float))
   
 (cffi:defcfun ("nnl2_ad_add" %ad-.+) :pointer
   (summand :pointer)
