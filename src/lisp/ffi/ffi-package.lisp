@@ -487,5 +487,9 @@
    #:%get-xavier-inplace-backends
    #:%get-xavier-inplace-num-backends
    #:%ad-randn
-   #:%ad-xavier))
+   #:%ad-xavier
+   #:%ad-transposition-inplace
+   #:%ad-transpose-inplace
+   #:%ad-transpose
+   #:%ad-transposition))
    

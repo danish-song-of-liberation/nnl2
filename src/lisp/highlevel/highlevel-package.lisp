@@ -94,7 +94,9 @@
    #:roots
    #:rand
    #:randn
-   #:xavier))
+   #:xavier
+   #:transposition!
+   #:transpose!))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
@@ -116,7 +118,9 @@
    #:.leaky-relu
    #:.sigmoid
    #:.tanh
-   #:.neg))   
+   #:.neg
+   #:transpose
+   #:transposition))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

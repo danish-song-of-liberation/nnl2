@@ -182,6 +182,12 @@
 	    (declare (type integer rank))
         (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
 
+(defun transposition! (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-transposition-inplace ad-tensor track-graph))
+  
+(defun transpose! (ad-tensor &key (track-graph t) force)
+  (nnl2.ffi:%ad-transpose-inplace ad-tensor track-graph force))  
+  
 (cffi:defcfun ("nnl2_ad_zero_grad" zero-grad) :void
   (ad-tensor :pointer))	  
 	  
@@ -610,3 +616,8 @@
 (defun .neg (ad-tensor &key (track-graph t))
   (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
 	
+(defun transposition (ad-tensor &key (track-graph t))
+  (nnl2.ffi:%ad-transposition ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
+  
+(defun transpose (ad-tensor &key (track-graph t) force)
+  (nnl2.ffi:%ad-transpose ad-tensor nnl2.ffi:ad-reverse-mode track-graph force))    

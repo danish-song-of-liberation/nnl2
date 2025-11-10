@@ -947,6 +947,26 @@
   (ad-tensor :pointer)
   (learning-rate :float))  
   
+(cffi:defcfun ("nnl2_ad_inplace_transposition" %ad-transposition-inplace) :void
+  (ad-tensor :pointer)
+  (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_inplace_transpose" %ad-transpose-inplace) :void
+  (ad-tensor :pointer)
+  (track-graph :bool)
+  (force :bool))
+  
+(cffi:defcfun ("nnl2_ad_transpose" %ad-transpose) :pointer
+  (ad-tensor :pointer)
+  (mode ad-mode)
+  (track-graph :bool)
+  (force :bool))
+  
+(cffi:defcfun ("nnl2_ad_transposition" %ad-transposition) :pointer
+  (ad-tensor :pointer)
+  (mode ad-mode)
+  (track-graph :bool))
+  
 (cffi:defcfun ("nnl2_ad_get_shape" %ad-shape) :pointer
   (ad-tensor :pointer))  
   
