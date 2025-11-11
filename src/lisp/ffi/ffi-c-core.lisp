@@ -371,7 +371,8 @@
   
 (cffi:defcfun ("lisp_call_sum_with_axis" %sum-with-axis) tensor
   (tensor :pointer)
-  (axis :int))    
+  (axis :int)
+  (keepdim :bool))    
   
 (cffi:defcfun ("lisp_call_l2norm" %l2norm) :void
   (tensor :pointer)

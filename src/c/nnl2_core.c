@@ -569,7 +569,7 @@ void lisp_call_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
-}               
+}                
 
 void lisp_call_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain, float distribution) {
 	xavier_inplace(tensor, in, out, gain, distribution);
@@ -587,8 +587,8 @@ void lisp_call_sum_without_axis(Tensor* tensor, void* filler) {
 	nnl2_sum_without_axis(tensor, filler);
 }
 
-void lisp_call_sum_with_axis(Tensor* tensor, int axis) {
-	nnl2_sum_with_axis(tensor, axis); 
+void lisp_call_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
+	nnl2_sum_with_axis(tensor, axis, keepdim); 
 }
 
 void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {

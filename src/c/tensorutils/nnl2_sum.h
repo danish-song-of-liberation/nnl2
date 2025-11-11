@@ -468,7 +468,7 @@ void* nnl2_own_paxis_sum(void* arg);
 /** @brief
  * High-performance parallel implementation of axis-wise tensor sum
  */
-Tensor* nnl2_own_sum_with_axis(Tensor* tensor, int axis);
+Tensor* nnl2_own_sum_with_axis(Tensor* tensor, int axis, bool keepdim);
 
 #endif
 
@@ -481,10 +481,13 @@ Tensor* nnl2_own_sum_with_axis(Tensor* tensor, int axis);
  ** @param axis
  * Axis along which to sum (0-based index)
  *
+ ** @param keepdim
+ * If true, retains reduced dimensions with size 1
+ *
  ** @return
  * Tensor* New tensor with reduced rank containing the sums
  */
-Tensor* naive_sum_with_axis(Tensor* tensor, int axis) {
+Tensor* naive_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -497,8 +500,11 @@ Tensor* naive_sum_with_axis(Tensor* tensor, int axis) {
 		}
 	#endif
     
-	// Allocate memory for result shape (rank reduced by 1)
-    int* result_shape = malloc((tensor->rank - 1) * sizeof(int));
+    // Calculate result rank
+    int result_rank = keepdim ? tensor->rank : tensor->rank - 1;
+    
+	// Allocate memory for result shape
+    int* result_shape = malloc(result_rank * sizeof(int));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if(result_shape == NULL) {
@@ -507,16 +513,24 @@ Tensor* naive_sum_with_axis(Tensor* tensor, int axis) {
 		}
 	#endif
 	
-	// Construct result shape by excluding the summation axis
-    int j = 0;
-    for (int i = 0; i < tensor->rank; i++) {
-        if (i != axis) {
-            result_shape[j++] = tensor->shape[i];
+	// Construct result shape
+    if (keepdim) {
+        // Keep all dimensions, set summed axis to 1
+        for (int i = 0; i < tensor->rank; i++) {
+            result_shape[i] = (i == axis) ? 1 : tensor->shape[i];
+        }
+    } else {
+        // Exclude the summation axis
+        int j = 0;
+        for (int i = 0; i < tensor->rank; i++) {
+            if (i != axis) {
+                result_shape[j++] = tensor->shape[i];
+            }
         }
     }
 
     // Create empty result tensor with appropriate shape and dtype
-    Tensor* result = nnl2_empty(result_shape, tensor->rank - 1, tensor->dtype);
+    Tensor* result = nnl2_empty(result_shape, result_rank, tensor->dtype);
     free(result_shape);
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
@@ -532,7 +546,7 @@ Tensor* naive_sum_with_axis(Tensor* tensor, int axis) {
     // Use optimized implementation for large tensors
     #ifdef NNL2_PTHREAD_AVAILABLE
 		if (result_numel * elements_along_axis >= NNL2_SUM_PARALLEL_THRESHOLD) {
-			return nnl2_own_sum_with_axis(tensor, axis);
+			return nnl2_own_sum_with_axis(tensor, axis, keepdim);
 		}
     #endif
 	
@@ -572,26 +586,34 @@ Tensor* naive_sum_with_axis(Tensor* tensor, int axis) {
 
 #ifdef NNL2_PTHREAD_AVAILABLE
 
-Tensor* nnl2_own_sum_with_axis(Tensor* tensor, int axis) {
+Tensor* nnl2_own_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
-    // Create result tensor (same logic as naive version)
-    int* result_shape = malloc((tensor->rank - 1) * sizeof(int));
+    // Calculate result rank and shape
+    int result_rank = keepdim ? tensor->rank : tensor->rank - 1;
+    int* result_shape = malloc(result_rank * sizeof(int));
     if(result_shape == NULL) {
         NNL2_ERROR("Failed to allocate memory");
         return NULL;
     }
     
-    int j = 0;
-    for (int i = 0; i < tensor->rank; i++) {
-        if (i != axis) {
-            result_shape[j++] = tensor->shape[i];
+    // Construct result shape
+    if (keepdim) {
+        for (int i = 0; i < tensor->rank; i++) {
+            result_shape[i] = (i == axis) ? 1 : tensor->shape[i];
+        }
+    } else {
+        int j = 0;
+        for (int i = 0; i < tensor->rank; i++) {
+            if (i != axis) {
+                result_shape[j++] = tensor->shape[i];
+            }
         }
     }
 
-    Tensor* result = nnl2_empty(result_shape, tensor->rank - 1, tensor->dtype);
+    Tensor* result = nnl2_empty(result_shape, result_rank, tensor->dtype);
     free(result_shape);
     
     if(result == NULL) {
@@ -874,13 +896,18 @@ Implementation sum_with_axis_backends[] = {
 };	
 
 /**
- * @brief Function pointer for sum with axis operation
+ * @brief Function pointer type for sum with axis operation with keepdim
+ */
+typedef Tensor* (*sumwithaxiskeepdimfn)(Tensor*, int, bool);
+
+/**
+ * @brief Function pointer for sum with axis operation with keepdim
  * @ingroup backend_system 
  * 
  * This function pointer is used to call the currently active backend
  * implementation for summing tensor elements along specified dimensions.
  */
-sumwithaxisfn nnl2_sum_with_axis;
+sumwithaxiskeepdimfn nnl2_sum_with_axis;
 
 /** 
  * @brief Makes the sum with axis backend current

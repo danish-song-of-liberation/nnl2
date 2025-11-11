@@ -1214,23 +1214,29 @@
 (defun transpose! (tensor &key force)
   (nnl2.ffi:%transpose! tensor force))
   
-(defun sum (tensor &key axis &aux (dtype (dtype tensor)))
+(defun sum (tensor &key axis keepdim &aux (dtype (dtype tensor)))
   "WARNING: YET NOT SUPPORT MULTIPLE AXES
   
    Summarizes all tensor elements 
    along the selected axis
     
    tensor: Input tensor
-   axis (&key): Axis to sum"
+   axis (&key): Axis to sum
+   keepdim (&key): Autologous"
+   
+  (assert (not (and (not axis) keepdim)) nil 
+    (format nil "[nnl2] In call `~a`: Cannot keep dimension in sum. Maybe you didn't specify the axis?" `(|sum| ,tensor |:keepdim| |t|)))
    
   (let* ((type-t (type/nnl2->cffi dtype))
 		 (out (cffi:foreign-alloc type-t)))
 					
 	(if axis				
-	  (nnl2.ffi:%sum-with-axis tensor axis)
+	  (nnl2.ffi:%sum-with-axis tensor axis keepdim)
 	  (progn
-	    (nnl2.ffi:%sum-without-axis tensor out)
-		(cffi:mem-ref out type-t)))))
+        (nnl2.ffi:%sum-without-axis tensor out)
+        (let ((result (cffi:mem-ref out type-t)))
+          (cffi:foreign-free out) 
+          result))))) 
 	
 (defun l2-norm (tensor &key (axes #(0)) &aux (dtype (dtype tensor)))
   "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
