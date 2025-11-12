@@ -491,5 +491,7 @@
    #:%ad-transposition-inplace
    #:%ad-transpose-inplace
    #:%ad-transpose
-   #:%ad-transposition))
+   #:%ad-transposition
+   #:%ad-reshape
+   #:%ad-reinterpret))
    

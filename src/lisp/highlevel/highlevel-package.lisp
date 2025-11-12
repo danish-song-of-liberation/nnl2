@@ -120,7 +120,9 @@
    #:.tanh
    #:.neg
    #:transpose
-   #:transposition))   
+   #:transposition
+   #:reshape
+   #:reinterpret))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

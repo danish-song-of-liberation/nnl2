@@ -968,6 +968,22 @@
   (mode ad-mode)
   (track-graph :bool))
   
+(cffi:defcfun ("nnl2_ad_reshape" %ad-reshape) :pointer
+  (tensor :pointer)
+  (new-shape :pointer)
+  (new-shape-len :int)
+  (force :bool)
+  (ad-mode ad-mode)
+  (track-graph :bool))
+   
+(cffi:defcfun ("nnl2_ad_reinterpret" %ad-reinterpret) :pointer
+  (tensor :pointer)
+  (new-shape :pointer)
+  (new-shape-len :int)
+  (force :bool)
+  (ad-mode ad-mode)
+  (track-graph :bool))
+  
 (cffi:defcfun ("nnl2_ad_get_shape" %ad-shape) :pointer
   (ad-tensor :pointer))  
   

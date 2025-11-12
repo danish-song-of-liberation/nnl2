@@ -745,32 +745,32 @@ NNL2_FORCE_INLINE static size_t nnl2_naive_calculate_original_index_for_sum_with
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
-	
-	size_t original_index = 0;
-    int temp = result_index;
-    
-	// Reconstruct original coordinates from flattened result index
+
+    size_t original_index = 0;
+    int temp = (int)result_index;
+
+    bool keepdim = (result->rank == tensor->rank);
+
     for (int dim = result->rank - 1; dim >= 0; dim--) {
         int coord = temp % result->shape[dim];
         temp /= result->shape[dim];
 
-		// Adjust dimension index to account for removed axis
-        int original_dim = dim;
-        if (original_dim >= axis) {
-            original_dim++; 
+        int original_dim;
+        if (keepdim) {
+            original_dim = dim;
+        } else {
+            original_dim = (dim >= axis) ? (dim + 1) : dim;
         }
-        
-		// Add contribution from this dimension using original strides
-        original_index += coord * tensor->strides[original_dim];
+
+        original_index += (size_t)coord * tensor->strides[original_dim];
     }
-    
-	// Add contribution from the summation axis
-    original_index += axis_index * tensor->strides[axis];
-	
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+
+    original_index += (size_t)axis_index * tensor->strides[axis];
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_EXIT();
     #endif
-	
+
     return original_index;
 }
 

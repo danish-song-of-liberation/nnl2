@@ -621,3 +621,12 @@
   
 (defun transpose (ad-tensor &key (track-graph t) force)
   (nnl2.ffi:%ad-transpose ad-tensor nnl2.ffi:ad-reverse-mode track-graph force))    
+
+(defun reshape (tensor new-shape &key force (track-graph t))
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
+    (nnl2.ffi:%ad-reshape tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))
+
+(defun reinterpret (tensor new-shape &key force (track-graph t))
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
+    (nnl2.ffi:%ad-reinterpret tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))	
+	

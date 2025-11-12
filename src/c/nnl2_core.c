@@ -342,7 +342,7 @@ void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);  
 }
 
-void nnl2_init_correspondence() {
+void nnl2_init_correspondence() { 
 	INIT_BACKEND(add_incf, add_incf_backends);    
 	INIT_BACKEND(sub_decf, sub_decf_backends);     
 	INIT_BACKEND(mul_mulf, mul_mulf_backends);          
@@ -410,7 +410,7 @@ void* lisp_call_tref_getter(Tensor* tensor, int32_t* indices, uint8_t num_indice
 Tensor* lisp_call_empty(const int* shape, int rank, TensorType dtype) {
 	return nnl2_empty(shape, rank, dtype);
 }                          
-         
+          
 Tensor* lisp_call_dgemm(const nnl2_order order, const nnl2_transpose transa, 
 						const nnl2_transpose transb, const int m, const int n, 
 						const int k, const double alpha, const Tensor* a, const int lda,
@@ -546,7 +546,7 @@ void lisp_call_sigmoidinplace(Tensor* tensor, bool approx) {
 Tensor* lisp_call_sigmoid(Tensor* tensor, bool approx) {  
 	return sigmoid(tensor, approx); 
 }  
-  
+    
 void lisp_call_tanhinplace(Tensor* tensor, bool approx) { 
 	tanhinplace(tensor, approx);
 }    
@@ -560,7 +560,7 @@ Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
 }        
 
 Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
-	return randn(shape, rank, dtype, from, to);
+	return randn(shape, rank, dtype, from, to);  
 }
 
 void lisp_call_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
@@ -569,7 +569,7 @@ void lisp_call_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {
 	return xavier(shape, rank, dtype, in, out, gain, distribution);
-}                
+}                 
 
 void lisp_call_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain, float distribution) {
 	xavier_inplace(tensor, in, out, gain, distribution);
