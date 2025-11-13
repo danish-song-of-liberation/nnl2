@@ -242,6 +242,12 @@
 (define-backend-setter use-backend/.neg
   nnl2.ffi:%set-neg-backend)    
 
+(define-backend-setter use-backend/.sqrt!
+  nnl2.ffi:%set-sqrtinplace-backend)  
+
+(define-backend-setter use-backend/.sqrt
+  nnl2.ffi:%set-sqrt-backend)    
+  
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  
 (defun use-backend/empty-like (name) (use-backend/empty name))  
@@ -269,7 +275,8 @@
                               use-backend/transpose! use-backend/reshape use-backend/reinterpret
 							  use-backend/cut use-backend/transposition
 							  use-backend/transposition! use-backend/.neg! use-backend/.neg
-							  use-backend/randn! use-backend/xavier!))
+							  use-backend/randn! use-backend/xavier! use-backend/.sqrt! 
+							  use-backend/.sqrt))
 							  
       (funcall backend-function name)))
 	  
@@ -362,6 +369,8 @@
 (define-backend-getter-setter get-backend/transposition! use-backend/transposition! nnl2.ffi:%get-transposition-inplace-backend)
 (define-backend-getter-setter get-backend/.neg! use-backend/.neg! nnl2.ffi:%get-neginplace-backend)
 (define-backend-getter-setter get-backend/.neg use-backend/.neg nnl2.ffi:%get-neg-backend)
+(define-backend-getter-setter get-backend/.sqrt! use-backend/.sqrt! nnl2.ffi:%get-sqrtinplace-backend)
+(define-backend-getter-setter get-backend/.sqrt use-backend/.sqrt nnl2.ffi:%get-sqrt-backend)
 
 (defun get-backend/norm (&key (p :l2))
   "Gets current backend for norm operation. P: Norm type (:l2 supported)"
@@ -637,6 +646,14 @@
   nnl2.ffi:%get-neg-num-backends
   nnl2.ffi:%get-neg-backends) 
   
+(define-backends-getter get-backends/.sqrt!
+  nnl2.ffi:%get-sqrtinplace-num-backends
+  nnl2.ffi:%get-sqrtinplace-backends) 
+  
+(define-backends-getter get-backends/.sqrt
+  nnl2.ffi:%get-sqrt-num-backends
+  nnl2.ffi:%get-sqrt-backends) 
+  
 (defun get-backends/norm (&key (p :l2))
   "Returns list of available backends for norm operation. 
    P: Norm type (:l2 supported)"
@@ -724,4 +741,6 @@
 (define-with-backend with-backend/transposition! get-backend/transposition!)
 (define-with-backend with-backend/.neg! get-backend/.neg!)
 (define-with-backend with-backend/.neg get-backend/.neg)
+(define-with-backend with-backend/.sqrt! get-backend/.sqrt!)
+(define-with-backend with-backend/.sqrt get-backend/.sqrt)
 		 

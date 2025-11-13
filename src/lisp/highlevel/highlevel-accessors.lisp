@@ -1964,3 +1964,9 @@
 (cffi:defcfun ("lisp_call_neg" .neg) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("lisp_call_sqrt" .sqrt) :pointer
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_sqrt_inplace" .sqrt!) :void
+  (tensor :pointer))  
+  

@@ -1018,6 +1018,19 @@ typedef void (*randninplacefn)(nnl2_tensor* tensor, void* from, void* to);
  **/
 typedef void (*xavierinplacefn)(nnl2_tensor* tensor, int in, int out, float gain, float distribution);
 
+/** @brief Creates a new tensor with element-wise square root of the input tensor
+ ** @param tensor Input tensor to compute square root of
+ ** @return New tensor with square root values
+ ** @see sqrtfn
+ **/
+typedef nnl2_tensor* (*sqrtfn)(const nnl2_tensor* tensor);
+
+/** @brief Applies element-wise square root to the input tensor (in-place)
+ ** @param tensor Tensor to modify with square root values
+ ** @see sqrtinplacefn
+ **/
+typedef void (*sqrtinplacefn)(nnl2_tensor* tensor);
+
 /// @} [typedef]
 
 

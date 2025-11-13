@@ -265,7 +265,8 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));          
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  
-    EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));	
+    EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));
+	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt));
 }
                
 void nnl2_init_standard_inplace() {               
@@ -285,7 +286,8 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
 	EINIT_BACKEND(nnl2_neginplace, neginplace_backends, current_backend(neginplace));
-}	                              
+	EINIT_BACKEND(nnl2_sqrtinplace, sqrtinplace_backends, current_backend(sqrtinplace));
+}                            
                                
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
@@ -328,7 +330,7 @@ void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
-}
+} 
 
 void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
@@ -513,7 +515,7 @@ void lisp_call_absinplace(Tensor* tensor) {
 Tensor* lisp_call_abs(Tensor* tensor) {     
 	return nnl2_abs(tensor);       
 }            
-        
+			 
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
 	return hstack(tensora, tensorb);
 }               
@@ -522,13 +524,13 @@ Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 	return vstack(tensora, tensorb);
 }
   
-void lisp_call_reluinplace(Tensor* tensor) {
-	reluinplace(tensor); 
-}  	
-  
-Tensor* lisp_call_relu(Tensor* tensor) {
-	return relu(tensor);
-}          
+void lisp_call_sqrt_inplace(nnl2_tensor* tensor) {
+    nnl2_sqrtinplace(tensor);
+}
+
+nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {
+    return nnl2_sqrt(tensor);
+} 
  
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha);    

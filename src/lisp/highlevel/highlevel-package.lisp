@@ -96,7 +96,8 @@
    #:randn
    #:xavier
    #:transposition!
-   #:transpose!))
+   #:transpose!
+   #:.sqrt!))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
@@ -122,7 +123,8 @@
    #:transpose
    #:transposition
    #:reshape
-   #:reinterpret))   
+   #:reinterpret
+   #:.sqrt))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -515,5 +517,15 @@
    #:use-backend/xavier!
    #:get-backend/xavier!
    #:get-backends/xavier!
-   #:with-backend/xavier!))
+   #:with-backend/xavier!
+   #:.sqrt
+   #:.sqrt!
+   #:use-backend/.sqrt!
+   #:use-backend/.sqrt
+   #:get-backend/.sqrt!
+   #:get-backend/.sqrt
+   #:get-backends/.sqrt!
+   #:get-backends/.sqrt
+   #:with-backend/.sqrt!
+   #:with-backend/.sqrt))
    

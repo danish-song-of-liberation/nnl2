@@ -489,5 +489,15 @@
    #:%ad-transpose
    #:%ad-transposition
    #:%ad-reshape
-   #:%ad-reinterpret))
+   #:%ad-reinterpret
+   #:%ad-sqrt
+   #:%ad-sqrt-inplace
+   #:%set-sqrtinplace-backend
+   #:%set-sqrt-backend
+   #:%get-sqrtinplace-backend
+   #:%get-sqrt-backend
+   #:%get-sqrtinplace-backends
+   #:%get-sqrtinplace-num-backends
+   #:%get-sqrt-backends
+   #:%get-sqrt-num-backends))
    

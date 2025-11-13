@@ -512,6 +512,9 @@
 (defun .tanh! (ad-tensor &key (approx t) (track-graph t))
   (nnl2.ffi:%ad-.tanh! ad-tensor approx track-graph))    
   
+(defun .sqrt! (tensor &key (track-graph t))
+  (nnl2.ffi:%ad-sqrt-inplace tensor track-graph))
+  
 (in-package :nnl2.hli.ad.r)
 
 (defun .+ (a b &key (track-graph t))
@@ -630,3 +633,6 @@
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%ad-reinterpret tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))	
 	
+(defun .sqrt (tensor &key (track-graph t))
+  (nnl2.ffi:%ad-sqrt tensor nnl2.ffi:ad-reverse-mode track-graph))
+  
