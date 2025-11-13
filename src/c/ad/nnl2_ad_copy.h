@@ -19,7 +19,7 @@
  ** @return 
  * Pointer to the newly allocated autodiff tensor copy, or NULL if failure
  */
-static inline nnl2_ad_tensor* nnl2_ad_copy(nnl2_ad_tensor* restrict ad_tensor, nnl2_tensor_type dtype) {
+nnl2_ad_tensor* nnl2_ad_copy(nnl2_ad_tensor* restrict ad_tensor, nnl2_tensor_type dtype) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif

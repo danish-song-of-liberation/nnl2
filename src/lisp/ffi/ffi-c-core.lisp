@@ -1006,6 +1006,10 @@
 (cffi:defcfun ("nnl2_ad_get_dtype_as_grad" %ad-dtype-as-grad-int) :int 
   (ad-pointer :pointer))    
   
+(cffi:defcfun ("nnl2_ad_copy" %ad-copy) :pointer
+  (ad-tensor :pointer)  
+  (dtype tensor-type))
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void

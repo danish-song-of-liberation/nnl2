@@ -52,7 +52,7 @@
    #:print-grad
    #:shapes-equal-p
    #:object-type
-   #:zero-grad
+   #:zero-grad!
    #:dtype
    #:int-dtype
    #:.+/ad/incf!
@@ -97,7 +97,9 @@
    #:xavier
    #:transposition!
    #:transpose!
-   #:.sqrt!))
+   #:.sqrt!
+   #:copy
+   #:with-notrack))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

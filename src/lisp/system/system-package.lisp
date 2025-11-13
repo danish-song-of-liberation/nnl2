@@ -27,5 +27,5 @@
     #:*avx512-available* 
 	#:*avx128-available* 
 	#:alist-to-int
-	#:*leaky-relu-default-shift*))
-  
+	#:*leaky-relu-default-shift*
+	#:*ad-default-track-graph*))

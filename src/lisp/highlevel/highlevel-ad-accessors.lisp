@@ -188,7 +188,7 @@
 (defun transpose! (ad-tensor &key (track-graph t) force)
   (nnl2.ffi:%ad-transpose-inplace ad-tensor track-graph force))  
   
-(cffi:defcfun ("nnl2_ad_zero_grad" zero-grad) :void
+(cffi:defcfun ("nnl2_ad_zero_grad" zero-grad!) :void
   (ad-tensor :pointer))	  
 	  
 (cffi:defcfun ("nnl2_ad_get_data" data) :pointer
@@ -413,6 +413,11 @@
     
     (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float) track-graph)))	
 	
+(defmacro with-notrack (&body body)
+  `(progn
+     (let ((nnl2.system:*ad-default-track-graph* nil))
+       ,@body)))
+	
 (cffi:defcfun ("nnl2_ad_neg_inplace" .neg!) :void
   (ad-tensor :pointer))		
   
@@ -515,9 +520,12 @@
 (defun .sqrt! (tensor &key (track-graph t))
   (nnl2.ffi:%ad-sqrt-inplace tensor track-graph))
   
+(defun copy (tensor &key (dtype (dtype tensor)))
+  (nnl2.ffi:%ad-copy tensor dtype))    
+  
 (in-package :nnl2.hli.ad.r)
 
-(defun .+ (a b &key (track-graph t))
+(defun .+ (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise addition"
   
   (nnl2.hli:fastcall   
@@ -526,7 +534,7 @@
       (nnl2.ffi:%ad-.+ a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-add-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
   
-(defun .* (a b &key (track-graph t))
+(defun .* (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise multiplication"
   
   (nnl2.hli:fastcall   
@@ -535,10 +543,10 @@
       (nnl2.ffi:%ad-.* a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  
 	  
-(defun gemm (a b &key (track-graph t))
+(defun gemm (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode track-graph))
 
-(defun .- (a b &key (track-graph t))
+(defun .- (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise subtraction"
   
   (nnl2.hli:fastcall   
@@ -547,7 +555,7 @@
       (nnl2.ffi:%ad-.- a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-sub-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
 	  
-(defun ./ (a b &key (track-graph t))
+(defun ./ (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise division"
   
   (nnl2.hli:fastcall   
@@ -556,7 +564,7 @@
       (nnl2.ffi:%ad-./ a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-div-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
 	
-(defun .^ (a b &key (track-graph t))
+(defun .^ (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise pow"
   
   (nnl2.hli:fastcall   
@@ -565,10 +573,10 @@
       (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))    
 	  
-(defun .abs (ad-tensor &key (track-graph t))
+(defun .abs (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode track-graph))	  
 	
-(defun .min (a b &key (track-graph t))
+(defun .min (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise min"
   
   (nnl2.hli:fastcall   
@@ -577,7 +585,7 @@
       (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-min-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  	  
 	
-(defun .max (a b &key (track-graph t))
+(defun .max (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise max"
   
   (nnl2.hli:fastcall   
@@ -586,16 +594,16 @@
       (nnl2.ffi:%ad-.max a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-max-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  	  
 	
-(defun scale (a b &key save-type (track-graph t))
+(defun scale (a b &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-scale a (coerce b 'single-float) save-type nnl2.ffi:ad-reverse-mode track-graph))
   
-(defun .log (ad-tensor &key save-type (track-graph t))
+(defun .log (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
   
-(defun .exp (ad-tensor &key save-type (track-graph t))
+(defun .exp (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode  track-graph))  
   
-(defun axpy (a b &key (alpha 1.0) (track-graph t))
+(defun axpy (a b &key (alpha 1.0) (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise a+b*c"
   
   (nnl2.hli:fastcall   
@@ -604,35 +612,35 @@
       (nnl2.ffi:%ad-axpy a b alpha nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode track-graph))))
 
-(defun .relu (ad-tensor &key (track-graph t))
+(defun .relu (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode track-graph)) 
 
-(defun .leaky-relu (ad-tensor &key save-type (alpha 0.01) (track-graph t))
+(defun .leaky-relu (ad-tensor &key save-type (alpha 0.01) (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.leaky-relu ad-tensor alpha save-type nnl2.ffi:ad-reverse-mode track-graph)) 
     
-(defun .sigmoid (ad-tensor &key (approx t) (track-graph t))
+(defun .sigmoid (ad-tensor &key (approx t) (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.sigmoid ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph))  
   	
-(defun .tanh (ad-tensor &key (approx t) (track-graph t))
+(defun .tanh (ad-tensor &key (approx t) (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph)) 	
 	
-(defun .neg (ad-tensor &key (track-graph t))
+(defun .neg (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
 	
-(defun transposition (ad-tensor &key (track-graph t))
+(defun transposition (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-transposition ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
   
-(defun transpose (ad-tensor &key (track-graph t) force)
+(defun transpose (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*) force)
   (nnl2.ffi:%ad-transpose ad-tensor nnl2.ffi:ad-reverse-mode track-graph force))    
 
-(defun reshape (tensor new-shape &key force (track-graph t))
+(defun reshape (tensor new-shape &key force (track-graph nnl2.system:*ad-default-track-graph*))
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%ad-reshape tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))
 
-(defun reinterpret (tensor new-shape &key force (track-graph t))
+(defun reinterpret (tensor new-shape &key force (track-graph nnl2.system:*ad-default-track-graph*))
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%ad-reinterpret tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))	
 	
-(defun .sqrt (tensor &key (track-graph t))
+(defun .sqrt (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-sqrt tensor nnl2.ffi:ad-reverse-mode track-graph))
   

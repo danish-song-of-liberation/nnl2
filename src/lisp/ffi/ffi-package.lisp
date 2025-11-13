@@ -499,5 +499,6 @@
    #:%get-sqrtinplace-backends
    #:%get-sqrtinplace-num-backends
    #:%get-sqrt-backends
-   #:%get-sqrt-num-backends))
+   #:%get-sqrt-num-backends
+   #:%ad-copy))
    
