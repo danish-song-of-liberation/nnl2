@@ -107,4 +107,31 @@ Tensor* nnl2_randn_like(Tensor* tensor, void* from, void* to) {
 	return randn(tensor->shape, tensor->rank, tensor->dtype, from, to);
 }
 
+/** @brief
+ * Creates a new tensor of the same shape and type, initialized with Xavier/Glorot initialization
+ *
+ ** @param tensor
+ * The initial tensor from which shape, rank and dtype are taken
+ *
+ ** @param in
+ * Number of input units (fan_in) for the layer
+ *
+ ** @param out
+ * Number of output units (fan_out) for the layer
+ *
+ ** @param gain
+ * Scaling factor for the initialization (optional, typically 1.0)
+ *
+ ** @param dist
+ * 6 for uniform, 2 for normal distribution
+ *
+ ** @return nnl2_tensor* 
+ * Pointer to a new tensor filled with Xavier-initialized values
+ *
+ ** @see xavier
+ **/
+nnl2_tensor* nnl2_xavier_like(nnl2_tensor* tensor, int in, int out, float gain, float dist) {
+	return xavier(tensor->shape, tensor->rank, tensor->dtype, in, out, gain, dist);
+}
+
 #endif /** NNL2_LIKE_CONSTRUCTORS_H **/

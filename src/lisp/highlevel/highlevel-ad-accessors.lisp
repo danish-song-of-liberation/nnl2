@@ -523,6 +523,37 @@
 (defun copy (tensor &key (dtype (dtype tensor)))
   (nnl2.ffi:%ad-copy tensor dtype))    
   
+(cffi:defcfun ("nnl2_ad_empty_like" empty-like) :pointer
+  (ad-tensor :pointer))    
+  
+(cffi:defcfun ("nnl2_ad_zeros_like" zeros-like) :pointer
+  (ad-tensor :pointer))  
+  
+(cffi:defcfun ("nnl2_ad_ones_like" ones-like) :pointer
+  (ad-tensor :pointer))    
+
+(cffi:defcfun ("nnl2_ad_rand_like" rand-like) :pointer
+  (ad-tensor :pointer))    
+
+(cffi:defcfun ("nnl2_ad_randn_like" randn-like) :pointer
+  (ad-tensor :pointer))    
+  
+(defun full-like (ad-tensor &key (filler 0))
+  (let* ((dtype (dtype ad-tensor))
+		 (cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype))
+		 (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype))
+		 (filler-pntr (cffi:foreign-alloc cffi-type)))
+		 
+	(setf (cffi:mem-ref filler-pntr cffi-type) (coerce filler lisp-type))
+	
+	(let ((result (nnl2.ffi:%ad-full-like ad-tensor filler-pntr)))
+	  (cffi:foreign-free filler-pntr)
+	  result)))
+
+(defun xavier-like (ad-tensor &key in out (gain 1.0s0) (distribution :normal))
+  (assert (and in out gain distribution) nil "Incorrect keys was passed in xavier-like")
+  (nnl2.ffi:%ad-xavier-like ad-tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
+  
 (in-package :nnl2.hli.ad.r)
 
 (defun .+ (a b &key (track-graph nnl2.system:*ad-default-track-graph*))

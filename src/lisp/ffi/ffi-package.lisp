@@ -397,6 +397,7 @@
    #:%ad-.^
    #:%ad-.log
    #:%ad-scale
+   #:%ad-full-like
    #:%ad-.min
    #:%ad-.max
    #:%ad-axpy
@@ -500,5 +501,7 @@
    #:%get-sqrtinplace-num-backends
    #:%get-sqrt-backends
    #:%get-sqrt-num-backends
-   #:%ad-copy))
+   #:%ad-copy
+   #:%ad-xavier-like
+   #:%xavier-like))
    

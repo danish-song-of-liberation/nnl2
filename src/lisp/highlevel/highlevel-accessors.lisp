@@ -842,14 +842,29 @@
    tensor: Tensor from which to take the shape and type
    filler (&key): Value to fill new tensor"
    
-  (let* ((filler-type (nnl2.hli:stypeof filler))
-		 (keyword-type (type/lisp->cffi filler-type))
+  (let* ((dtype (dtype tensor))
+		 (lisp-type (type/nnl2->lisp dtype))
+		 (keyword-type (type/nnl2->cffi dtype))
 		 (filler-pntr (cffi:foreign-alloc keyword-type))) 
 		 
-    (setf (cffi:mem-ref filler-pntr keyword-type) filler)
-	  (let ((result (nnl2.ffi:%full-like tensor filler-pntr)))
-	    (cffi:foreign-free filler-pntr)
+    (setf (cffi:mem-ref filler-pntr keyword-type) (coerce filler lisp-type))
+	
+    (let ((result (nnl2.ffi:%full-like tensor filler-pntr)))
+      (cffi:foreign-free filler-pntr)
 		result)))
+		
+(defun xavier-like (tensor &key in out (gain 1.0s0) (distribution :normal))
+  "Creates a new tensor of the same shape and type as the input tensor,
+   initialized using Xavier/Glorot initialization method
+   
+   tensor: The input tensor from which shape and data type are derived
+   in (&key) (default - nil): Number of input units
+   out (&key) (default - nil): Number of output units
+   gain (&key) (default - 1.0s0): Scaling factor 
+   distribution (&key) (default - :normal): Type of distribution (:normal/:uniform)"
+   
+  (assert (and in out gain distribution) nil "Incorrect keys was passed in xavier-like")
+  (nnl2.ffi:%xavier-like tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
   
 (defun .abs! (tensor)
   "Applies the modulus of a number to a tensor in-place"

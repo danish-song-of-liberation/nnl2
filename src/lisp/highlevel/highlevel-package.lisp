@@ -99,7 +99,14 @@
    #:transpose!
    #:.sqrt!
    #:copy
-   #:with-notrack))
+   #:with-notrack
+   #:empty-like
+   #:zeros-like
+   #:ones-like
+   #:full-like
+   #:rand-like
+   #:randn-like
+   #:xavier-like))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
@@ -181,6 +188,7 @@
    #:.abs
    #:.map!
    #:empty-like
+   #:xavier-like
    #:.map
    #:hstack
    #:vstack

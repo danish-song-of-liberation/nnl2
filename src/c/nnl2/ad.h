@@ -127,6 +127,7 @@
 #include "../ad/ops/other/nnl2_ad_reshape.h"
 #include "../ad/ops/other/nnl2_ad_reinterpret_backward.h"
 #include "../ad/ops/other/nnl2_ad_reinterpret.h"
+#include "../ad/nnl2_ad_like_constructors.h"
 #include "../ad/nnl2_ad_topo.h"
 #include "../ad/nnl2_ad_leaf.h"
 #include "../ad/nnl2_ad_backpropagation.h"

@@ -511,12 +511,12 @@ Tensor* lisp_call_min(Tensor* tensora, Tensor* tensorb) {
 void lisp_call_absinplace(Tensor* tensor) {  
 	absinplace(tensor);     
 }
-  
-Tensor* lisp_call_abs(Tensor* tensor) {     
+   
+Tensor* lisp_call_abs(Tensor* tensor) {          
 	return nnl2_abs(tensor);       
-}            
+}              
 			  
-Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {
+Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {  
 	return hstack(tensora, tensorb);
 }               
 
@@ -528,11 +528,11 @@ void lisp_call_sqrt_inplace(nnl2_tensor* tensor) {
     nnl2_sqrtinplace(tensor);
 }
 
-nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {
+nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {  
     return nnl2_sqrt(tensor);
 } 
  
-void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
+void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {  
 	leakyreluinplace(tensor, alpha);    
 } 
    

@@ -473,6 +473,13 @@
   (value :pointer)
   (dtype tensor-type))  
   
+(cffi:defcfun ("nnl2_xavier_like" %xavier-like) :pointer
+  (tensor :pointer)
+  (in :int)
+  (out :int)
+  (gain :float)
+  (dist :float))
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
@@ -1009,6 +1016,17 @@
 (cffi:defcfun ("nnl2_ad_copy" %ad-copy) :pointer
   (ad-tensor :pointer)  
   (dtype tensor-type))
+  
+(cffi:defcfun ("nnl2_ad_full_like" %ad-full-like) :pointer
+  (ad-tensor :pointer)
+  (filler :pointer))
+ 
+(cffi:defcfun ("nnl2_ad_xavier_like" %ad-xavier-like) :pointer
+  (ad-tensor :pointer)
+  (in :int)
+  (out :int)
+  (gain :float)
+  (dist :float))
   
 ;; -- Backends --  
  
