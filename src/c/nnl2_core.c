@@ -328,7 +328,6 @@ void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
-	EINIT_BACKEND(nnl2_cut, cut_backends, CURRENT_BACKEND(cut));
 }
 
 void nnl2_init_correspondence_inplace() {
@@ -745,10 +744,6 @@ Tensor* lisp_call_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_sh
 
 Tensor* lisp_call_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to) {
 	return nnl2_slice(tensor, slice_from, slice_to);          
-}
-
-Tensor* lisp_call_cut(Tensor* tensor, int32_t* cut_from, int32_t* cut_to) {
-	return nnl2_cut(tensor, cut_from, cut_to);          
 }
           
 Tensor* lisp_call_transposition(const Tensor* tensor) {

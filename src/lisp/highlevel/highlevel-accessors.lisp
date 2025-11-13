@@ -1923,38 +1923,7 @@
          (pntr-from (nnl2.hli:make-shape-pntr from))
          (pntr-to (nnl2.hli:make-shape-pntr processed-to)))
     
-    (nnl2.ffi:%slice tensor pntr-from pntr-to)))
-  							
-(defun cut (tensor &key from to)  
-  "Return a sliced view of the tensor with the specified range
-    
-   Args:
-       tensor: The input tensor to slice
-	   
-	   from: Starting indices for each dimension (vector/list)
-			  If not provided, defaults to zeros for all dimensions
-			  
-       to: Ending indices for each dimension (vector/list)
-	        If not provided, defaults to the tensor's shape (full tensor)
-			Use -1 to automatically use the full dimension size
-			
-   Examples:
-       (cut tensor :from #(0 0) :to #(3 3))    ;; Slice from (0,0) to (3,3)
-	   (cut tensor :from #(1 1) :to #(-1 -1))  ;; Slice from (1,1) to end
-	   (cut tensor :to #(2 2))                 ;; Slice from start to (2,2)
-	   (cut tensor :from #(0 1))               ;; Slice from (0,1) to end
-
-   Returns:
-       A new tensor view containing the sliced data (not a copy)"
-	   
-  (let* ((tensor-shape (shape tensor :as :vector))
-         (from (if from from (make-array (list (length tensor-shape)) :initial-element 0)))
-         (to (if to to tensor-shape))
-         (processed-to (process-to-indices to tensor-shape))
-         (pntr-from (nnl2.hli:make-shape-pntr from))
-         (pntr-to (nnl2.hli:make-shape-pntr processed-to)))
-    
-    (nnl2.ffi:%cut tensor pntr-from pntr-to)))																		
+    (nnl2.ffi:%slice tensor pntr-from pntr-to)))																
 							
 (cffi:defcfun ("nnl2_nrows" nrows) :int
   (tensor :pointer))

@@ -255,7 +255,6 @@
    #:%get-reshape-backend
    #:%get-reinterpret-backend
    #:%get-slice-backend
-   #:%get-cut-backend
    #:%get-transposition-backend
    #:%get-transposition-inplace-backend
    #:%get-view-backends
@@ -364,8 +363,6 @@
    #:%get-reinterpret-num-backends
    #:%get-slice-backends
    #:%get-slice-num-backends
-   #:%get-cut-backends
-   #:%get-cut-num-backends
    #:%get-transposition-num-backends
    #:%get-transposition-inplace-num-backends
    #:%get-transposition-backends
@@ -378,7 +375,6 @@
    #:mem-aref-setter-float32 
    #:mem-aref-setter-int32
    #:%slice
-   #:%cut
    #:%transpose
    #:%transpose!
    #:%fill!

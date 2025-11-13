@@ -459,11 +459,6 @@
   (tensor :pointer)
   (slice-from :pointer)
   (slice-to :pointer))  
-  
-(cffi:defcfun ("lisp_call_cut" %cut) :pointer
-  (tensor :pointer)
-  (slice-from :pointer)
-  (slice-to :pointer)) 
 
 (cffi:defcfun ("lisp_call_transpose" %transpose) :pointer
   (tensor :pointer)
@@ -1274,9 +1269,6 @@
 (cffi:defcfun ("set_slice_backend" %set-slice-backend) :void
   (backend-name :string)) 
 
-(cffi:defcfun ("set_cut_backend" %set-cut-backend) :void
-  (backend-name :string)) 
-
 (cffi:defcfun ("set_transposition_backend" %set-transposition-backend) :void
   (backend-name :string)) 
 
@@ -1342,7 +1334,6 @@
 (cffi:defcfun ("get_reshape_backend" %get-reshape-backend) :string) 
 (cffi:defcfun ("get_reinterpret_backend" %get-reinterpret-backend) :string) 
 (cffi:defcfun ("get_slice_backend" %get-slice-backend) :string)
-(cffi:defcfun ("get_cut_backend" %get-cut-backend) :string)
 (cffi:defcfun ("get_transposition_backend" %get-transposition-backend) :string)
 (cffi:defcfun ("get_transposition_inplace_backend" %get-transposition-inplace-backend) :string)
 (cffi:defcfun ("get_neginplace_backend" %get-neginplace-backend) :string)
@@ -1454,8 +1445,6 @@
 (cffi:defcfun ("get_reinterpret_backends" %get-reinterpret-backends) :pointer)
 (cffi:defcfun ("get_slice_num_backends" %get-slice-num-backends) :int)
 (cffi:defcfun ("get_slice_backends" %get-slice-backends) :pointer)
-(cffi:defcfun ("get_cut_num_backends" %get-cut-num-backends) :int)
-(cffi:defcfun ("get_cut_backends" %get-cut-backends) :pointer)
 (cffi:defcfun ("get_transposition_num_backends" %get-transposition-num-backends) :int)
 (cffi:defcfun ("get_transposition_inplace_num_backends" %get-transposition-inplace-num-backends) :int)
 (cffi:defcfun ("get_transposition_backends" %get-transposition-backends) :pointer)

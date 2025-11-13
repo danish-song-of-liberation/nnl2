@@ -35,8 +35,10 @@ to be more specific, due to problems with BPTT, recurrent graphs, and poor libra
 The framework is divided into three main components:
 
 1. Tensor System (100% complete)
-2. Autodiff System (with 5 different modes) (30% complete) (I have completely completed a prototype in Lisp that allows me to process graphs of any complexity)
+2. Autodiff System (with 5 different modes) (50% complete) (MVP is 70-80% ready)
 3. Neural Networks Implementations
+
+Its only beginning.
 
 # Documentation
 

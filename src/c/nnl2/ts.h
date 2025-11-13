@@ -24,7 +24,6 @@
 #include "../tensorutils/nnl2_fill_with_data.h"
 #include "../tensorutils/nnl2_from_flatten.h"
 #include "../tensorutils/nnl2_slice.h"
-#include "../tensorutils/nnl2_cut.h"
 #include "../tensornorm/nnl2_l2.h"
 #include "../tensorops/gemm/nnl2_sgemm_inplace.h"
 #include "../tensorops/gemm/nnl2_dgemm_inplace.h"

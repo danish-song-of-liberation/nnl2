@@ -296,7 +296,6 @@
    #:use-backend/reshape
    #:use-backend/reinterpret
    #:use-backend/slice
-   #:use-backend/cut
    #:use-backend/transposition
    #:use-backend/transposition!
    #:get-backend/view
@@ -357,7 +356,6 @@
    #:get-backend/reshape
    #:get-backend/reinterpret
    #:get-backend/slice
-   #:get-backend/cut
    #:get-backend/transposition
    #:get-backend/transposition!
    #:get-backends/tref
@@ -418,7 +416,6 @@
    #:get-backends/reshape
    #:get-backends/reinterpret
    #:get-backends/slice
-   #:get-backends/cut
    #:get-backends/transposition
    #:get-backends/transposition!
    #:with-backend/view
@@ -475,7 +472,6 @@
    #:with-backend/reshape
    #:with-backend/reinterpret
    #:with-backend/slice
-   #:with-backend/cut
    #:with-backend/transposition
    #:with-backend/transposition!
    #:tensor-p
@@ -486,7 +482,6 @@
    #:free
    #:empty-with-shape-pntr
    #:slice
-   #:cut
    #:nrows
    #:ncols
    #:transposition
