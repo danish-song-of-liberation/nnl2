@@ -106,7 +106,8 @@
    #:full-like
    #:rand-like
    #:randn-like
-   #:xavier-like))
+   #:xavier-like
+   #:ncast))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

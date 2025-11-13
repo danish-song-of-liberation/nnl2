@@ -525,7 +525,7 @@ Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {
 }
   
 void lisp_call_sqrt_inplace(nnl2_tensor* tensor) {
-    nnl2_sqrtinplace(tensor);
+    nnl2_sqrtinplace(tensor); 
 }
 
 nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {  

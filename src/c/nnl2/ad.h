@@ -134,6 +134,7 @@
 #include "../ad/nnl2_ad_backpropagation_through_time.h"
 #include "../ad/utils/nnl2_ad_step.h"
 #include "../ad/utils/nnl2_ad_step_inplace.h"
+#include "../ad/utils/nnl2_ad_ncast.h"
 #include "../nnl2_config_part_2.h"
 
 #endif /** NNL2_AD_INCLUDE_H **/

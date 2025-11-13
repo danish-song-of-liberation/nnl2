@@ -521,7 +521,7 @@
   (nnl2.ffi:%ad-sqrt-inplace tensor track-graph))
   
 (defun copy (tensor &key (dtype (dtype tensor)))
-  (nnl2.ffi:%ad-copy tensor dtype))    
+  (nnl2.ffi:%ad-copy tensor dtype))   
   
 (cffi:defcfun ("nnl2_ad_empty_like" empty-like) :pointer
   (ad-tensor :pointer))    
@@ -553,6 +553,10 @@
 (defun xavier-like (ad-tensor &key in out (gain 1.0s0) (distribution :normal))
   (assert (and in out gain distribution) nil "Incorrect keys was passed in xavier-like")
   (nnl2.ffi:%ad-xavier-like ad-tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
+  
+(cffi:defcfun ("nnl2_ad_ncast" ncast) :pointer
+  (ad-tensor :pointer)
+  (cast-to nnl2.ffi:tensor-type))  
   
 (in-package :nnl2.hli.ad.r)
 
