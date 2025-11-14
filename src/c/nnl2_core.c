@@ -215,7 +215,7 @@ void nnl2_init_system() {
 	nnl2_log_init(             
 		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,                  
-		NNL2_LOG_DEFAULT_DEBUG_INFO,          
+		NNL2_LOG_DEFAULT_DEBUG_INFO,           
 		NNL2_LOG_LEVEL_DEBUG   
 	);    
 			          
@@ -330,6 +330,7 @@ void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
+	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);
 } 
 
 void nnl2_init_correspondence_inplace() {
@@ -515,7 +516,7 @@ void lisp_call_absinplace(Tensor* tensor) {
 Tensor* lisp_call_abs(Tensor* tensor) {          
 	return nnl2_abs(tensor);       
 }              
-			  
+					 
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {  
 	return hstack(tensora, tensorb);  
 }               
@@ -686,7 +687,7 @@ void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
 
 Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
 	return div_broadcasting(dividend, divisor);
-}
+} 
 
 void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 	return pow_broadcasting_inplace(base, exponent);
@@ -750,9 +751,9 @@ Tensor* lisp_call_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to) 
           
 Tensor* lisp_call_transposition(const Tensor* tensor) {
 	return nnl2_transposition(tensor);
-}
+}  
  
-void lisp_call_transposition_inplace(Tensor* tensor) {
+void lisp_call_transposition_inplace(Tensor* tensor) {    
 	nnl2_transposition_inplace(tensor); 
 }
     
@@ -764,7 +765,7 @@ void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
 }
 
-nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) { 
+nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {    
     return nnl2_neg(tensor);
 }
 

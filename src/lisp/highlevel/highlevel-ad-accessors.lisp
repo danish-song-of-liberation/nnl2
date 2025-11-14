@@ -685,3 +685,13 @@
 (defun .sqrt (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   (nnl2.ffi:%ad-sqrt tensor nnl2.ffi:ad-reverse-mode track-graph))
   
+(defun slice (tensor &key from to (track-graph nnl2.system:*ad-default-track-graph*))
+  (let* ((tensor-shape (nnl2.hli.ad:shape tensor :as :vector))
+         (from (if from from (make-array (list (length tensor-shape)) :initial-element 0)))
+         (to (if to to tensor-shape))
+         (processed-to (nnl2.hli.ts:process-to-indices to tensor-shape))
+         (pntr-from (nnl2.hli:make-shape-pntr from))
+         (pntr-to (nnl2.hli:make-shape-pntr processed-to)))
+    
+    (nnl2.ffi:%ad-slice tensor pntr-from pntr-to nnl2.ffi:ad-reverse-mode track-graph)))	  
+  

@@ -503,5 +503,6 @@
    #:%get-sqrt-num-backends
    #:%ad-copy
    #:%ad-xavier-like
-   #:%xavier-like))
+   #:%xavier-like
+   #:%ad-slice))
    

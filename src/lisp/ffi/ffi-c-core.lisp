@@ -717,7 +717,14 @@
 (cffi:defcfun ("nnl2_ad_neg" %.neg) :pointer
   (ad-tensor :pointer)
   (mode ad-mode)
-  (track-grad :bool))	  
+  (track-grad :bool))	
+
+(cffi:defcfun ("nnl2_ad_slice" %ad-slice) :pointer
+  (ad-tensor :pointer)
+  (slice-from :pointer)
+  (slice-to :pointer)
+  (mode ad-mode)
+  (track-graph :bool))  
   
 (cffi:defcfun ("nnl2_ad_inplace_leakyrelu" %ad-.leaky-relu!) :void
   (ad-tensor :pointer)

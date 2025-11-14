@@ -136,7 +136,8 @@
    #:transposition
    #:reshape
    #:reinterpret
-   #:.sqrt))   
+   #:.sqrt
+   #:slice))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -166,6 +167,7 @@
    #:-=
    #:size
    #:size-in-bytes
+   #:process-to-indices
    #:.+
    #:.-
    #:*=

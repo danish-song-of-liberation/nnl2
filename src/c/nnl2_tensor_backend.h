@@ -1031,6 +1031,12 @@ typedef nnl2_tensor* (*sqrtfn)(const nnl2_tensor* tensor);
  **/
 typedef void (*sqrtinplacefn)(nnl2_tensor* tensor);
 
+/** @brief Function pointer for regional AXPY inplace operation
+ ** @warning Strictly internal function. DO not use it in your code
+ ** @warning There is no backend change
+ */
+typedef void (*axpy_inplace_region_fn)(Tensor* summand, Tensor* sumend, float alpha, int* from, int* to);
+
 /// @} [typedef]
 
 
