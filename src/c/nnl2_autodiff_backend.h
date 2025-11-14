@@ -121,9 +121,36 @@ void* nnl2_get_one_value(nnl2_tensor_type dtype) {
 /// @}
 
 
+/** @brief 
+ * Zeroes the gradient of an autodiff tensor
+ *
+ ** @param ad_tensor 
+ * Pointer to the autodiff tensor whose gradient will be zeroed
+ *
+ ** @see nnl2_get_zero_value
+ **/
 void nnl2_ad_zero_grad(nnl2_ad_tensor* ad_tensor) {
 	void* zero = nnl2_get_zero_value(ad_tensor->data->dtype);
 	inplace_fill(ad_tensor->grad, &zero, ad_tensor->data->dtype);
+}
+
+/** @brief
+ * Sets the internal data pointer of an autodiff tensor to share another tensor's data
+ * 
+ ** @param ad_tensor 
+ * Pointer to the autodiff tensor that will share data
+ *
+ ** @param share_tensor 
+ * Pointer to the tensor whose data will be shared
+ *
+ ** @warning
+ * Function should be used strictly for list wrappers
+ *
+ ** @note
+ * Used to directly create a tensor from your own data in Lisp
+ */
+void nnl2_ad_internal_lisp_data_pntr_share_setter(nnl2_ad_tensor* ad_tensor, nnl2_tensor* share_tensor) {
+	ad_tensor->data = share_tensor;
 }
 
 #endif /** NNL2_AUTODIFF_BACKEND **/

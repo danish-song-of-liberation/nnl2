@@ -1035,6 +1035,10 @@
   (gain :float)
   (dist :float))
   
+(cffi:defcfun ("nnl2_ad_internal_lisp_data_pntr_share_setter" %data-pntr-share-setter) :void
+  (ad-tensor :pointer)
+  (tensor :pointer))
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void

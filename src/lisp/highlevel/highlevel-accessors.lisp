@@ -474,14 +474,14 @@
 		  (cffi:foreign-free data-pntr) ; Freeing up C memory
 		  result))))) ; Return of the created tensor
 
-(defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
+(defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*) (shape-hint nil))
   "Makes a tensor from the specified data
    Example: (make-tensor #2A((1 2 3) (4 5 6))) or (make-tensor '((1 2 3) (4 5 6)))
    Tip: Try to use vectors instead of lists. This will give you a speed boost of ~2-3+ times"
    
   (etypecase data
     (array
-	  (let* ((data-shape (array-dimensions data))
+	  (let* ((data-shape (if shape-hint shape-hint (array-dimensions data)))
 			 ;; Create a flat view of the array without copying data
 			 (flat-data (make-array (array-total-size data) 
 						  :element-type (array-element-type data) 

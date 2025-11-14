@@ -240,14 +240,10 @@ Tensor* nnl2_own_copy(Tensor* tensor, TensorType copy_type) {
     // Fallback to naive implementation for small tensors or type conversion
     if(total_elems < NNL2_COPY_PARALLEL_THRESHOLD || dtype != copy_type) {
         // For type conversion or small tensors, use optimized sequential approach
-        if(dtype == copy_type) {
-            // Same type - use memcpy for small tensors
-            size_t bytes = total_elems * get_dtype_size(dtype);
-            memcpy(result->data, tensor->data, bytes);
-        } else {
-            // Type conversion - fallback to naive
-            naive_copy(tensor, copy_type);
-        }
+        if(dtype != copy_type) {
+			nnl2_free_tensor(result);          
+			return naive_copy(tensor, copy_type);  
+		}
         
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

@@ -504,5 +504,6 @@
    #:%ad-copy
    #:%ad-xavier-like
    #:%xavier-like
-   #:%ad-slice))
+   #:%ad-slice
+   #:%data-pntr-share-setter))
    

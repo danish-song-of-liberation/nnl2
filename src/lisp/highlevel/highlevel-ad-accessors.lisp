@@ -182,6 +182,23 @@
 	    (declare (type integer rank))
         (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
 
+(defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
+  (let* ((shape (array-dimensions data))
+		 (ts-tensor (nnl2.hli.ts:make-tensor data :dtype dtype :shape-hint shape))
+		 (ad-tensor (empty shape :dtype dtype)))
+		 
+	(nnl2.ffi:%data-pntr-share-setter ad-tensor ts-tensor)
+	
+	ad-tensor))
+	
+(defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
+  (let ((ad-tensor (empty indices :dtype dtype))
+		(ts-tensor (nnl2.hli.ts:from-flatten flatten-data indices :dtype dtype)))
+		
+	(nnl2.ffi:%data-pntr-share-setter ad-tensor ts-tensor)
+	
+	ad-tensor))
+	
 (defun transposition! (ad-tensor &key (track-graph t))
   (nnl2.ffi:%ad-transposition-inplace ad-tensor track-graph))
   

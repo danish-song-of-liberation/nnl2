@@ -109,7 +109,9 @@
    #:xavier-like
    #:ncast
    #:detach!
-   #:detach))
+   #:detach
+   #:make-tensor
+   #:from-flatten))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
