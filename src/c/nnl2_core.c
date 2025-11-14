@@ -517,15 +517,15 @@ Tensor* lisp_call_abs(Tensor* tensor) {
 }              
 			  
 Tensor* lisp_call_hstack(Tensor* tensora, Tensor* tensorb) {  
-	return hstack(tensora, tensorb);
+	return hstack(tensora, tensorb);  
 }               
-
+ 
 Tensor* lisp_call_vstack(Tensor* tensora, Tensor* tensorb) {  
 	return vstack(tensora, tensorb);
 }
   
 void lisp_call_sqrt_inplace(nnl2_tensor* tensor) {
-    nnl2_sqrtinplace(tensor); 
+    nnl2_sqrtinplace(tensor);    
 }
 
 nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {  

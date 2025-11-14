@@ -556,7 +556,13 @@
   
 (cffi:defcfun ("nnl2_ad_ncast" ncast) :pointer
   (ad-tensor :pointer)
-  (cast-to nnl2.ffi:tensor-type))  
+  (cast-to nnl2.ffi:tensor-type)) 
+
+(cffi:defcfun ("nnl2_ad_detach_inplace" detach!) :void
+  (ad-tensor :pointer))  
+
+(cffi:defcfun ("nnl2_ad_detach" detach) :pointer
+  (ad-tensor :pointer))  
   
 (in-package :nnl2.hli.ad.r)
 

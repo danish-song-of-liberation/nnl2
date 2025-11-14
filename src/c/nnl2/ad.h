@@ -132,9 +132,12 @@
 #include "../ad/nnl2_ad_leaf.h"
 #include "../ad/nnl2_ad_backpropagation.h"
 #include "../ad/nnl2_ad_backpropagation_through_time.h"
+#include "../ad/internal/nnl2_ad_share.h"
 #include "../ad/utils/nnl2_ad_step.h"
 #include "../ad/utils/nnl2_ad_step_inplace.h"
 #include "../ad/utils/nnl2_ad_ncast.h"
+#include "../ad/utils/nnl2_ad_detach_inplace.h"
+#include "../ad/utils/nnl2_ad_detach.h"
 #include "../nnl2_config_part_2.h"
 
 #endif /** NNL2_AD_INCLUDE_H **/

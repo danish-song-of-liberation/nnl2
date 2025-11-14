@@ -107,7 +107,9 @@
    #:rand-like
    #:randn-like
    #:xavier-like
-   #:ncast))
+   #:ncast
+   #:detach!
+   #:detach))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
