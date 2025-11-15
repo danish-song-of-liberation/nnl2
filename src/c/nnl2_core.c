@@ -593,9 +593,9 @@ void lisp_call_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
 	nnl2_sum_with_axis(tensor, axis, keepdim); 
 }
 
-void lisp_call_l2norm(Tensor* tensor, int* axes, int num_axes) {
-	l2norm(tensor, axes, num_axes); 
-}   
+void lisp_call_l2norm(Tensor* tensor, void* record) {
+	l2norm(tensor, record); 
+}     
 
 Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
 	return nnl2_copy(tensor, copy_type);    
@@ -650,7 +650,7 @@ Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
 }
  
 void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
-	min_minf_inplace(tensor, minf);
+	min_minf_inplace(tensor, minf); 
 } 
 
 Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
@@ -687,7 +687,7 @@ void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
 
 Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
 	return div_broadcasting(dividend, divisor);
-}   
+}    
 
 void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 	return pow_broadcasting_inplace(base, exponent);

@@ -505,5 +505,6 @@
    #:%ad-xavier-like
    #:%xavier-like
    #:%ad-slice
-   #:%data-pntr-share-setter))
+   #:%data-pntr-share-setter
+   #:%ad-l2norm))
    

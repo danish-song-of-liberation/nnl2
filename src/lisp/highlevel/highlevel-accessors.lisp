@@ -1261,12 +1261,12 @@
    tensor: Input tensor
    axes (&key): Axes to apply the norm. DOES NOT WORK YET"
    
+  (declare (ignore axes))
+   
   (let* ((type-t (type/nnl2->cffi dtype))
-		 (axes-pntr (nnl2.hli:make-shape-pntr axes))
-		 (axes-len (length axes))
 		 (out (cffi:foreign-alloc type-t)))
 					
-	(nnl2.ffi:%l2norm tensor axes-pntr axes-len out)
+	(nnl2.ffi:%l2norm tensor out)
 				
 	(let ((result (cffi:mem-ref out type-t)))
 	  (cffi:foreign-free out)

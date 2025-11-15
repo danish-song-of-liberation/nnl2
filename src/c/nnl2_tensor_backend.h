@@ -670,10 +670,9 @@ typedef Tensor* (*sumwithaxisfn)(Tensor* a, int axis);
 
 /** @brief L2 norm computation function pointer
  ** @param a Input tensor
- ** @param axes Array of axes along which to compute norm
- ** @param num_axes Number of axes in the array
+ ** @param result Pointer to where the result will be stored
  **/
-typedef void (*l2normfn)(const Tensor* a, int* axes, int num_axes);
+typedef void (*l2normfn)(const Tensor* a, void* result);
 
 /** @brief Tensor copy function pointer (creates new tensor)
  ** @param a Input tensor to copy

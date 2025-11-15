@@ -139,7 +139,8 @@
    #:reshape
    #:reinterpret
    #:.sqrt
-   #:slice))   
+   #:slice
+   #:norm))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

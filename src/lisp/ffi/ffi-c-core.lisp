@@ -376,8 +376,6 @@
   
 (cffi:defcfun ("lisp_call_l2norm" %l2norm) :void
   (tensor :pointer)
-  (axes :pointer)
-  (num-axes :int)
   (out :pointer))   
 
 (cffi:defcfun ("lisp_call_copy" %copy) :pointer
@@ -871,6 +869,12 @@
   (alpha :float)
   (mode ad-mode)
   (track-grad :bool))
+  
+(cffi:defcfun ("nnl2_ad_l2norm" %ad-l2norm) :pointer
+  (input :pointer)
+  (force :bool)
+  (mode ad-mode)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_div_correspondence" %ad-div-correspondence) :pointer
   (tensor :pointer)

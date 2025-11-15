@@ -129,6 +129,8 @@
 #include "../ad/ops/other/nnl2_ad_reinterpret.h"
 #include "../ad/ops/other/nnl2_ad_slice_backward.h"
 #include "../ad/ops/other/nnl2_ad_slice.h"
+#include "../ad/ops/other/nnl2_ad_l2norm_backward.h"
+#include "../ad/ops/other/nnl2_ad_l2norm.h"
 #include "../ad/nnl2_ad_like_constructors.h"
 #include "../ad/nnl2_ad_topo.h"
 #include "../ad/nnl2_ad_leaf.h"

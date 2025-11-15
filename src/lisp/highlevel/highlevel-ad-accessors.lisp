@@ -712,3 +712,25 @@
     
     (nnl2.ffi:%ad-slice tensor pntr-from pntr-to nnl2.ffi:ad-reverse-mode track-graph)))	  
   
+(defun l2-norm (tensor &key force (axes #(0)) (track-graph t) &aux (dtype (nnl2.hli.ad:dtype tensor)))
+  (declare (ignore axes))
+   
+  (let ((out (nnl2.ffi:%ad-l2norm tensor force nnl2.ffi:ad-reverse-mode track-graph)))
+    (if force 
+	  (let ((cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype)))
+	    (cffi:mem-ref out cffi-type))
+		
+	  out)))
+  
+(defun norm (tensor &key force (axes #(0)) (p :l2) (track-graph t))
+  "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
+   
+   Applies passed norm to passed norm (available: (:l2))
+   
+   tensor: Input tensor
+   axes (&key): Axes to apply the norm. DOES NOT FULLY WORK YET"
+   
+  (case p
+    (:l2 (l2-norm tensor :axes axes :force force :track-graph track-graph))
+	(otherwise (error "Incorrect :p key in norm~%"))))
+  
