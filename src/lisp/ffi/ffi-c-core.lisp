@@ -875,6 +875,19 @@
   (force :bool)
   (mode ad-mode)
   (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_sum_without_axis" %ad-sum-without-axis) :pointer
+  (input :pointer)
+  (force :bool)
+  (mode ad-mode)
+  (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_sum_with_axis" %ad-sum-with-axis) :pointer
+  (input :pointer)
+  (axis :int)
+  (keepdim :bool)
+  (mode ad-mode)
+  (track-graph :bool))
 
 (cffi:defcfun ("nnl2_ad_div_correspondence" %ad-div-correspondence) :pointer
   (tensor :pointer)

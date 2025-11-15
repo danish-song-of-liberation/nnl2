@@ -506,5 +506,7 @@
    #:%xavier-like
    #:%ad-slice
    #:%data-pntr-share-setter
-   #:%ad-l2norm))
+   #:%ad-l2norm
+   #:%ad-sum-without-axis
+   #:%ad-sum-with-axis))
    

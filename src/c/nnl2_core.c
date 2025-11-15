@@ -599,12 +599,12 @@ void lisp_call_l2norm(Tensor* tensor, void* record) {
 
 Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
 	return nnl2_copy(tensor, copy_type);    
-} 
+}    
    
 void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) { 
 	add_incf_inplace(tensor, inc);      
-}   
-   
+}    
+    
 Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {  
 	return add_incf(tensor, inc);    
 }      

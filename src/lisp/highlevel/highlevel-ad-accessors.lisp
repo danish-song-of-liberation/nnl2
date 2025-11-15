@@ -721,6 +721,16 @@
 	    (cffi:mem-ref out cffi-type))
 		
 	  out)))
+	  
+(defun sum (ad-tensor &key axis keepdim force (track-graph t) &aux (dtype (nnl2.hli.ad:dtype ad-tensor)))
+  (if axis
+    (nnl2.ffi:%ad-sum-with-axis ad-tensor axis keepdim nnl2.ffi:ad-reverse-mode track-graph)
+	(let ((result (nnl2.ffi:%ad-sum-without-axis ad-tensor force nnl2.ffi:ad-reverse-mode track-graph)))
+	  (if force
+	    (let ((cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype)))
+	      (cffi:mem-ref result cffi-type))
+		  
+		result))))
   
 (defun norm (tensor &key force (axes #(0)) (p :l2) (track-graph t))
   "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)

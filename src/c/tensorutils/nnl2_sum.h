@@ -57,22 +57,6 @@ void naive_sum_without_axis(Tensor* tensor, void* result) {
 #ifdef NNL2_PTHREAD_AVAILABLE
 
 /** @brief
- * Task structure for parallel sum without axis operations
- */
-typedef struct {
-    void* src_data;           /**< Pointer to source data */
-    size_t start_idx;         /**< Start index for this thread */
-    size_t end_idx;           /**< End index for this thread */
-    TensorType dtype;         /**< Data type of the tensor */
-    bool aligned;             /**< Whether memory is aligned */
-    union {
-        double float64_acc;
-        float float32_acc;
-        int32_t int32_acc;
-    } accumulator;            /**< Thread-local accumulator */
-} sum_ptask;
-
-/** @brief
  * Threshold for enabling parallel execution of sum operation
  */
 #define NNL2_SUM_PARALLEL_THRESHOLD 100000
