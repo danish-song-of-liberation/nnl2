@@ -508,5 +508,8 @@
    #:%data-pntr-share-setter
    #:%ad-l2norm
    #:%ad-sum-without-axis
-   #:%ad-sum-with-axis))
+   #:%ad-sum-with-axis
+   #:%ad-vstack
+   #:%ad-hstack
+   #:%ad-concat))
    

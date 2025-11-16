@@ -141,7 +141,10 @@
    #:.sqrt
    #:slice
    #:norm
-   #:sum))   
+   #:sum
+   #:vstack
+   #:hstack
+   #:concat))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)

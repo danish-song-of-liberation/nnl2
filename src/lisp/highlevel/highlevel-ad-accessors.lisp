@@ -712,7 +712,7 @@
     
     (nnl2.ffi:%ad-slice tensor pntr-from pntr-to nnl2.ffi:ad-reverse-mode track-graph)))	  
   
-(defun l2-norm (tensor &key force (axes #(0)) (track-graph t) &aux (dtype (nnl2.hli.ad:dtype tensor)))
+(defun l2-norm (tensor &key force (axes #(0)) (track-graph nnl2.system:*ad-default-track-graph*) &aux (dtype (nnl2.hli.ad:dtype tensor)))
   (declare (ignore axes))
    
   (let ((out (nnl2.ffi:%ad-l2norm tensor force nnl2.ffi:ad-reverse-mode track-graph)))
@@ -722,7 +722,7 @@
 		
 	  out)))
 	  
-(defun sum (ad-tensor &key axis keepdim force (track-graph t) &aux (dtype (nnl2.hli.ad:dtype ad-tensor)))
+(defun sum (ad-tensor &key axis keepdim force (track-graph nnl2.system:*ad-default-track-graph*) &aux (dtype (nnl2.hli.ad:dtype ad-tensor)))
   (if axis
     (nnl2.ffi:%ad-sum-with-axis ad-tensor axis keepdim nnl2.ffi:ad-reverse-mode track-graph)
 	(let ((result (nnl2.ffi:%ad-sum-without-axis ad-tensor force nnl2.ffi:ad-reverse-mode track-graph)))
@@ -732,7 +732,7 @@
 		  
 		result))))
   
-(defun norm (tensor &key force (axes #(0)) (p :l2) (track-graph t))
+(defun norm (tensor &key force (axes #(0)) (p :l2) (track-graph nnl2.system:*ad-default-track-graph*))
   "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
    
    Applies passed norm to passed norm (available: (:l2))
@@ -743,4 +743,13 @@
   (case p
     (:l2 (l2-norm tensor :axes axes :force force :track-graph track-graph))
 	(otherwise (error "Incorrect :p key in norm~%"))))
+  
+(defun vstack (tensora tensorb &key (track-graph nnl2.system:*ad-default-track-graph*))
+  (nnl2.ffi:%ad-vstack tensora tensorb nnl2.ffi:ad-reverse-mode track-graph))
+  
+(defun hstack (tensora tensorb &key (track-graph nnl2.system:*ad-default-track-graph*))
+  (nnl2.ffi:%ad-hstack tensora tensorb nnl2.ffi:ad-reverse-mode track-graph))
+  
+(defun concat (axis tensora tensorb &key (track-graph nnl2.system:*ad-default-track-graph*))
+  (nnl2.ffi:%ad-concat tensora tensorb axis nnl2.ffi:ad-reverse-mode track-graph))
   

@@ -594,20 +594,20 @@ void lisp_call_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
 }
 
 void lisp_call_l2norm(Tensor* tensor, void* record) {
-	l2norm(tensor, record); 
-}     
-
-Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
+	l2norm(tensor, record);  
+}          
+ 
+Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {   
 	return nnl2_copy(tensor, copy_type);    
-}    
+}       
    
-void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) { 
-	add_incf_inplace(tensor, inc);      
-}    
+void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {   
+	add_incf_inplace(tensor, inc);            
+}               
     
 Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {  
-	return add_incf(tensor, inc);    
-}      
+	return add_incf(tensor, inc);     
+}        
  
 void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {  
 	sub_decf_inplace(tensor, dec); 

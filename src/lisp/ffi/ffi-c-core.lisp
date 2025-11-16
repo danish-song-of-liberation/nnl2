@@ -1056,6 +1056,25 @@
   (ad-tensor :pointer)
   (tensor :pointer))
   
+(cffi:defcfun ("nnl2_ad_vstack" %ad-vstack) :pointer
+  (tensora :pointer)
+  (tensorb :pointer)  
+  (mode ad-mode)
+  (track-graph :bool))
+
+(cffi:defcfun ("nnl2_ad_hstack" %ad-hstack) :pointer
+  (tensora :pointer)
+  (tensorb :pointer)  
+  (mode ad-mode)
+  (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_concat" %ad-concat) :pointer
+  (tensora :pointer)
+  (tensorb :pointer) 
+  (axis :int)  
+  (mode ad-mode)
+  (track-graph :bool))  
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void

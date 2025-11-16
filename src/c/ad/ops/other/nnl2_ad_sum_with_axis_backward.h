@@ -32,10 +32,6 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_sum_axis(nnl2_ad_tensor
     #endif
     
     if(!input_tensor->requires_grad) {
-        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-            NNL2_DEBUG("Exiting nnl2_ad_reverse_derivative_sum_axis because input_tensor is not requiring gradient");
-            NNL2_FUNC_EXIT();
-        #endif
         return;
     }
     
