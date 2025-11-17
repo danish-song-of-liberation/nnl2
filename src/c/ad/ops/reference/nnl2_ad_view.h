@@ -44,7 +44,7 @@ static void nnl2_ad_reverse_backward_view(nnl2_ad_tensor* tensor) {
 	int32_t* indices = (int32_t*)tensor -> extra_correspondence;
 	
 	// Compute the derivative of view operation
-    nnl2_ad_reverse_derivative_view(tensor, tensor -> roots[0], indices, tensor -> extra_integer);
+    nnl2_ad_reverse_derivative_view(tensor, tensor -> roots[0], indices, tensor -> extra_integer, tensor -> extra_bool);
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
@@ -116,7 +116,9 @@ void* nnl2_ad_view(nnl2_ad_tensor* tensor, int32_t* indices, uint8_t num_indices
 		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor -> data -> shape, "In function nnl2_ad_view, AD tensor shape is NULL", NULL);
 	#endif
 	
-    if(force && (tensor -> data -> rank == num_indices)) {
+	bool scalar_exit_p = tensor -> data -> rank == num_indices;
+	
+    if(force && scalar_exit_p) {
         void* scalar_result = (void*)nnl2_view(tensor->data, indices, num_indices);
         
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -124,6 +126,7 @@ void* nnl2_ad_view(nnl2_ad_tensor* tensor, int32_t* indices, uint8_t num_indices
         #endif
         
         return scalar_result;
+		
 	} else {
 		nnl2_ad_tensor* result = malloc(sizeof(nnl2_ad_tensor));
 		if(!result) {
@@ -135,16 +138,22 @@ void* nnl2_ad_view(nnl2_ad_tensor* tensor, int32_t* indices, uint8_t num_indices
 		result -> magic_number = TENSOR_MAGIC_ALIVE;
 		
 		// Compute horizontal stacking of tensors
-		result -> data = nnl2_view(tensor -> data, indices, num_indices);
-		if(!result->data) {
-			NNL2_ERROR("In function nnl2_ad_view, failed to allocate view tensor");
-			free(result);
-			return NULL;
+		if(!scalar_exit_p) {
+			result -> data = nnl2_view(tensor -> data, indices, num_indices);
+			if(!result->data) {
+				NNL2_ERROR("In function nnl2_ad_view, failed to allocate view tensor");
+				free(result);
+				return NULL;
+			}
+			
+		} else {
+			result -> data = nnl2_empty((int32_t[]){1}, 1, tensor -> data -> dtype);
+			result -> data -> data = (void*)nnl2_view(tensor -> data, indices, num_indices);
 		}
 		
 		// Allocate gradient tensor with same shape as result
 		result -> grad = nnl2_empty(result -> data -> shape, result -> data -> rank, result -> data -> dtype);
-		if(!result->grad) {
+		if(!result -> grad) {
 			NNL2_ERROR("In function nnl2_ad_view, failed to allocate gradient tensor");
 			nnl2_free_tensor(result->data);
 			free(result);
@@ -196,6 +205,7 @@ void* nnl2_ad_view(nnl2_ad_tensor* tensor, int32_t* indices, uint8_t num_indices
 		result -> ts_type = nnl2_type_ad;
 		result -> visited_gen = 0;
 		result -> extra_integer = num_indices;
+		result -> extra_bool = scalar_exit_p;
 		
 		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 			NNL2_FUNC_EXIT();
