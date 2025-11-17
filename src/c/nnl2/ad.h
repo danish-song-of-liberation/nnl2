@@ -143,6 +143,8 @@
 #include "../ad/ops/stack/nnl2_ad_concat.h"
 #include "../ad/ops/reference/nnl2_ad_view_backward.h"
 #include "../ad/ops/reference/nnl2_ad_view.h"
+#include "../ad/ops/reference/nnl2_ad_tref_backward.h"
+#include "../ad/ops/reference/nnl2_ad_tref.h"
 #include "../ad/nnl2_ad_like_constructors.h"
 #include "../ad/nnl2_ad_topo.h"
 #include "../ad/nnl2_ad_leaf.h"

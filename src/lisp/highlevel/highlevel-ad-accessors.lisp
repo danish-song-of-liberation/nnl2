@@ -756,4 +756,8 @@
 (defun view (tensor indices &key (track-graph nnl2.system:*ad-default-track-graph*) force)
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%ad-view tensor shape rank nnl2.ffi:ad-reverse-mode track-graph force)))
-  
+
+(defun tref (tensor indices &key (track-graph nnl2.system:*ad-default-track-graph*) force)
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%ad-tref tensor shape rank nnl2.ffi:ad-reverse-mode track-graph force)))
+	

@@ -22,7 +22,7 @@
  ** @warning
  * Strictly internal function. DO not use it in your code
  */
-void nnl2_naive_axpy_inplace_region(Tensor* summand, Tensor* sumend, float alpha, int* from, int* to) {
+void nnl2_naive_axpy_inplace_region(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif

@@ -478,6 +478,13 @@
   (gain :float)
   (dist :float))
   
+(cffi:defcfun ("lisp_call_axpy_inplace_regional" %ts-regional-axpy-inplace) :void
+  (summand :pointer)
+  (sumend :pointer)
+  (alpha :float)
+  (from :pointer)
+  (to :pointer))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
@@ -1076,6 +1083,14 @@
   (track-graph :bool))  
   
 (cffi:defcfun ("nnl2_ad_view" %ad-view) :pointer
+  (ad-tensor :pointer)
+  (indices :pointer)
+  (num-indices :char)
+  (mode ad-mode)
+  (track-graph :bool)
+  (force :bool))
+
+(cffi:defcfun ("nnl2_ad_tref_getter" %ad-tref) :pointer
   (ad-tensor :pointer)
   (indices :pointer)
   (num-indices :char)

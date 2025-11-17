@@ -109,7 +109,12 @@
 										   (:module "compile"
 										    :serial t
 											:components ((:file "compile-package" :type "lisp")
-													     (:file "compile" :type "lisp")))))))
+													     (:file "compile" :type "lisp")))
+														 
+										   (:module "internal"
+										    :serial t
+											:components ((:file "internal-package" :type "lisp")
+														 (:file "internal-main" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

@@ -512,5 +512,7 @@
    #:%ad-vstack
    #:%ad-hstack
    #:%ad-concat
-   #:%ad-view))
+   #:%ad-view
+   #:%ts-regional-axpy-inplace
+   #:%ad-tref))
    

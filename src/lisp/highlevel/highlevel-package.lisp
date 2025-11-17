@@ -145,7 +145,8 @@
    #:vstack
    #:hstack
    #:concat
-   #:view))   
+   #:view
+   #:tref))   
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
