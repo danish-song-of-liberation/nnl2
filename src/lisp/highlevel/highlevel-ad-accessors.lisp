@@ -170,7 +170,7 @@
   (%internal-randn indices dtype requires-grad name from to))
 	
 (defun randn (indices &key (from -1) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
-  (%internal-randn indices dtype requires-grad name from to))
+  (%internal-randn indices dtype requires-grad name from to)) 
 	 
 (defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier (AD)")
@@ -761,3 +761,6 @@
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%ad-tref tensor shape rank nnl2.ffi:ad-reverse-mode track-graph force)))
 	
+(defun (setf tref) (change-to tensor &rest shape)
+  (setf (apply #'nnl2.hli.ts:tref (nnl2.hli.ad:data tensor) shape) change-to))		
+  
