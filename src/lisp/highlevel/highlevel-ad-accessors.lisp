@@ -82,6 +82,11 @@
 	  
 	(nnl2.ffi:%ad-roots-setter self tensors-pool new-len)))
 
+(defun strides (ad-tensor &key (from :data) (as :vector))
+  (ecase from
+    (:data (nnl2.hli.ts:strides (data ad-tensor) :as as))
+	(:grad (nnl2.hli.ts:strides (grad ad-tensor) :as as))))
+
 (defun higher-rank-tensor (a b)
   "Returns a pair (higher lower) depending on the rank"
   (nnl2.hli:fastcall (if (> (rank a) (rank b))

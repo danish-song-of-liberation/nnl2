@@ -605,7 +605,7 @@
 	  
 	vec))
 	
-(defmacro strides (tensor &key (as :vector))
+(defun strides (tensor &key (as :vector))
   "Function for getting the strides of a tensor
   
    tensor: Input tensor
@@ -618,9 +618,9 @@
    Example 3: (strides foo :as :pointer) -> Depends on the lisp implementation"
    
   (case as
-    (:list    `(get-strides-as-list ,tensor))
-    (:vector  `(get-strides-as-vector ,tensor))
-	(:pointer `(nnl2.ffi:get-pointer-to-tensor-strides ,tensor))
+    (:list     (get-strides-as-list tensor))
+    (:vector   (get-strides-as-vector tensor))
+	(:pointer  (nnl2.ffi:get-pointer-to-tensor-strides tensor))
 	(otherwise (error "Unknown type: ~a~%" as))))
 
 (defun gemm (a b &key (order :nnl2rowmajor) (transa :nnl2notrans) (transb :nnl2notrans) (alpha 1.0d0) (beta 0.0d0) m n k lda ldb)
