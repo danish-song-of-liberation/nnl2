@@ -35,6 +35,7 @@ typedef struct nnl2_ad_tensor {
 	int8_t magic_number; 					   ///< This is necessary to avoid memory corruption when releasing the tensor
 	bool grad_initialized;					   ///< If false, the gradient is either NULL or has uninitialized memory
 	nnl2_float32 extra_multiplier;			   ///< For edgy cases such as axpy, scale
+	uint8_t extra_integer;				       ///< For edgy cases such as tref, view
 	bool extra_bool;						   ///< For edgy cases requiring additional boolean
 	void* extra_correspondence;				   ///< For correspondence ops
 } nnl2_ad_tensor;

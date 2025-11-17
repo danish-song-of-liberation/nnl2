@@ -1075,6 +1075,14 @@
   (mode ad-mode)
   (track-graph :bool))  
   
+(cffi:defcfun ("nnl2_ad_view" %ad-view) :pointer
+  (ad-tensor :pointer)
+  (indices :pointer)
+  (num-indices :char)
+  (mode ad-mode)
+  (track-graph :bool)
+  (force :bool))
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void

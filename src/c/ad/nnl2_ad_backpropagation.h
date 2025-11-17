@@ -35,7 +35,18 @@ void nnl2_ad_backpropagation(nnl2_ad_tensor* restrict tensor, bool retain_graph)
 	#endif
 	
 	void* zero_value = nnl2_get_zero_value(tensor->grad->dtype);
-    void* one_value  = nnl2_get_one_value(tensor->grad->dtype);
+	if (!zero_value) {
+		NNL2_ERROR("Failed to allocate zero value for dtype %d", tensor->grad->dtype);
+		free(topo);  
+		return;
+	}
+
+	void* one_value = nnl2_get_one_value(tensor->grad->dtype);
+	if (!one_value) {
+		NNL2_ERROR("Failed to allocate one value for dtype %d", tensor->grad->dtype);
+		free(topo);  
+		return;
+	}
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (!zero_value || !one_value) {
@@ -47,22 +58,14 @@ void nnl2_ad_backpropagation(nnl2_ad_tensor* restrict tensor, bool retain_graph)
 
 	// Initialize gradients to zero for all tensors that require gradients
     for (int i = 0; i < topo_size; i++) {
-        if (topo[i]->requires_grad) {
+        if (topo[i]->requires_grad && !topo[i]->grad_initialized) {
             inplace_fill(topo[i]->grad, zero_value, topo[i]->grad->dtype);
             topo[i]->grad_initialized = true;
         }
     }
-
-	// Set initial gradient to 1 for the output tensor 
-    void* grad_init_value = nnl2_get_one_value(tensor->grad->dtype);
-    if (!grad_init_value) {
-		NNL2_ERROR("Failed to initialize passed tensor with 1.0 in backpropagation");
-        free(topo);
-        return;
-    }
     
     // Initialize the output tensor's gradient to 1 to start backpropagation
-    bool success = inplace_fill(tensor->grad, grad_init_value, tensor->grad->dtype);
+    bool success = inplace_fill(tensor->grad, one_value, tensor->grad->dtype);
     if (!success) {
 		NNL2_ERROR("Failed to initialize passed tensor with 1.0 in backpropagation");
         free(topo);

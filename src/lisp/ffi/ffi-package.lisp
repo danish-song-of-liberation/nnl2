@@ -511,5 +511,6 @@
    #:%ad-sum-with-axis
    #:%ad-vstack
    #:%ad-hstack
-   #:%ad-concat))
+   #:%ad-concat
+   #:%ad-view))
    

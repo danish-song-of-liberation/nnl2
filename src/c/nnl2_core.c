@@ -603,7 +603,7 @@ Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {
    
 void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {   
 	add_incf_inplace(tensor, inc);            
-}               
+}                     
     
 Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {  
 	return add_incf(tensor, inc);     
@@ -612,7 +612,7 @@ Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {
 void lisp_call_sub_decf_inplace(Tensor* tensor, void* dec) {  
 	sub_decf_inplace(tensor, dec); 
 }   
-   
+    
 Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
 	return sub_decf(tensor, dec);
 }
@@ -623,21 +623,21 @@ void lisp_call_mul_mulf_inplace(Tensor* tensor, void* mulf) {
 
 Tensor* lisp_call_mul_mulf(Tensor* tensor, void* mulf) {
 	return mul_mulf(tensor, mulf);
-}
-
+} 
+ 
 void lisp_call_div_divf_inplace(Tensor* tensor, void* divf) {
 	div_divf_inplace(tensor, divf);
 }
 
 Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) {
-	return div_divf(tensor, divf);
-}
-
+	return div_divf(tensor, divf);  
+} 
+  
 void lisp_call_pow_powf_inplace(Tensor* tensor, void* powf_arg) {
 	pow_powf_inplace(tensor, powf_arg);
 }
-   
-Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {
+        
+Tensor* lisp_call_pow_powf(Tensor* tensor, void* powf) {     
 	return pow_powf(tensor, powf);
 }
 	 
@@ -646,10 +646,10 @@ void lisp_call_max_maxf_inplace(Tensor* tensor, void* maxf) {
 }
          
 Tensor* lisp_call_max_maxf(Tensor* tensor, void* maxf) {
-	return max_maxf(tensor, maxf);
+	return max_maxf(tensor, maxf);      	   
 }
  
-void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) {
+void lisp_call_min_minf_inplace(Tensor* tensor, void* minf) { 
 	min_minf_inplace(tensor, minf); 
 } 
 
@@ -657,7 +657,7 @@ Tensor* lisp_call_min_minf(Tensor* tensor, void* minf) {
 	return min_minf(tensor, minf);
 }  
   
-void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
+void lisp_call_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {  	
 	return add_broadcasting_inplace(summand, sumend);
 }
 

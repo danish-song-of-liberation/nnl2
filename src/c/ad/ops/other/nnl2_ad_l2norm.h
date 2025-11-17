@@ -110,7 +110,6 @@ void* nnl2_ad_l2norm(nnl2_ad_tensor* input, bool force, nnl2_ad_mode ad_mode, bo
     
     // Compute L2 norm
     if (force) {
-        // Force mode: return scalar value, cannot continue graph
         void* scalar_result = malloc(sizeof(nnl2_float32));
         if(!scalar_result) {
             NNL2_MALLOC_ERROR();
@@ -125,9 +124,8 @@ void* nnl2_ad_l2norm(nnl2_ad_tensor* input, bool force, nnl2_ad_mode ad_mode, bo
         #endif
         
         return scalar_result;
-        
     } else {
-        // Normal mode: returns AD tensor that can continue computation graph
+        // Returns AD tensor that can continue computation graph
         nnl2_ad_tensor* result = malloc(sizeof(nnl2_ad_tensor));
         if(!result) {
             NNL2_MALLOC_ERROR();
