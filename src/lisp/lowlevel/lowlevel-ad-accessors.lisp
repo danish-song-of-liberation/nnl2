@@ -1,5 +1,15 @@
 (in-package :nnl2.lli.ad)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/lowlevel/lowlevel-ad-accessors.lisp
+;; File: lowlevel-ad-accessors.lisp
+
+;; Contains lowlevel AD advanced functions
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (cffi:defcenum nnl2-object-type
   (:nnl2-type-ts 0)     ;; nnl2_tensor
   (:nnl2-type-ad 1)     ;; nnl2_ad_tensor  
@@ -41,12 +51,6 @@
 (defun (setf magic-number) (new-magic ad-tensor)
   (nnl2.ffi:%nnl2-ad-magic-number-setter ad-tensor new-magic))    
   
-(cffi:defcfun ("nnl2_ad_tensor_name_getter" name) :string
-  (ad-tensor :pointer))
-
-(defun (setf name) (new-name ad-tensor)
-  (nnl2.ffi:%nnl2-ad-name-setter ad-tensor new-name))    
-  
 (cffi:defcfun ("nnl2_ad_tensor_visited_gen_getter" visited-gen) :unsigned-long
   (ad-tensor :pointer))
 
@@ -59,3 +63,51 @@
 (defun (setf object-type) (new-obj ad-tensor)
   (nnl2.ffi:%nnl2-ad-object-type-setter ad-tensor new-obj))    
     
+(defmacro iterate-across-tensor-data ((iterator ad-tensor) &body body)
+  "Iterates over each element of the AD tensor's data"
+  `(nnl2.lli.ts:iatd (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	
+
+(defmacro iatd ((iterator ad-tensor) &body body)
+  "Shorthand for `iterate-across-tensor-data`"
+  `(nnl2.lli.ts:iatd (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	
+  
+(defmacro parallel-iterate-across-tensor-data ((iterator ad-tensor) &body body)
+  "Parallel iteration over each element of the AD tensor's data"
+  `(nnl2.lli.ts:piatd (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))		
+  
+(defmacro piatd ((iterator ad-tensor) &body body)
+  "Shorthand for `parallel-iterate-across-tensor-data`"
+  `(nnl2.lli.ts:piatd (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))			
+ 
+(defmacro iterate-across-tensor-grad ((iterator ad-tensor) &body body)
+  "Iterates over each element of the AD tensor's gradient"
+  `(nnl2.lli.ts:iatd (,iterator (nnl2.hli.ad:grad ,ad-tensor)) ,@body))	
+
+(defmacro iatg ((iterator ad-tensor) &body body)
+  "Shorthand for `iterate-across-tensor-grad`"
+  `(nnl2.lli.ts:iatd (,iterator (nnl2.hli.ad:grad ,ad-tensor)) ,@body))	
+  
+(defmacro parallel-iterate-across-tensor-grad ((iterator ad-tensor) &body body)
+  "Parallel iteration over each element of the AD tensor's gradient"
+  `(nnl2.lli.ts:piatd (,iterator (nnl2.hli.ad:grad ,ad-tensor)) ,@body))		
+  
+(defmacro piatg ((iterator ad-tensor) &body body)
+  "Shorthand for `parallel-iterate-across-tensor-grad`"
+  `(nnl2.lli.ts:piatd (,iterator (nnl2.hli.ad:grad ,ad-tensor)) ,@body))		
+
+(defmacro iterate-across-tensor-shape ((iterator ad-tensor) &body body)
+  "Iterates over the shape vector of the AD tensor's data"
+  `(nnl2.lli.ts:iats (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	 
+  
+(defmacro iats ((iterator ad-tensor) &body body)
+  "Shorthand for `iterate-across-tensor-shape`"
+  `(nnl2.lli.ts:iats (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	 
+
+(defmacro iterate-across-tensor-strides ((iterator ad-tensor) &body body)
+  "Iterates over the strides vector of the AD tensor's data"
+  `(nnl2.lli.ts:iatst (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	 
+  
+(defmacro iatst ((iterator ad-tensor) &body body)
+  "Shorthand for `iterate-across-tensor-strides`"
+  `(nnl2.lli.ts:iatst (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	 
+  

@@ -5,7 +5,7 @@
 ;; Filepath: nnl2/src/lisp/highlevel/highlevel-accessors.lisp
 ;; File: highlevel-accessors.lisp
 
-;; Contains a high-level interface for all the main functions in ffi-c-core.lisp
+;; Contains a high-level interface for all the main TS functions in ffi-c-core.lisp
 
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2

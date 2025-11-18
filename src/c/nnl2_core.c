@@ -759,21 +759,26 @@ void lisp_call_transposition_inplace(Tensor* tensor) {
     
 bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) { 
 	return inplace_fill(tensor, value, dtype);
-}
+} 
   
 void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
 }
      
 nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {    
-    return nnl2_neg(tensor);  
+    return nnl2_neg(tensor);   
 }
 
 void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
 }      
 
+int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {
+	return tensor -> strides 
+					 [index];
+}
+
 ///@} [lisp_wrappers]             
 		             
 #endif /** NNL2_CORE_C **/					 
-							                    
+							                     

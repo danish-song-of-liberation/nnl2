@@ -1,3 +1,13 @@
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/ffi/ffi-package.lisp
+;; File: ffi-package.lisp
+
+;; Contains definition of :nnl2.ffi package
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (defpackage #:nnl2.ffi
   (:use #:cl)
   (:export 
@@ -523,5 +533,6 @@
    #:%nnl2-ad-magic-number-setter
    #:%nnl2-ad-name-setter
    #:%nnl2-ad-visited-gen-setter
-   #:%nnl2-ad-object-type-setter))
+   #:%nnl2-ad-object-type-setter
+   #:strides-at))
    

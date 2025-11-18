@@ -112,7 +112,10 @@
    #:detach
    #:make-tensor
    #:from-flatten
-   #:strides))
+   #:strides
+   #:name
+   #:nrows
+   #:ncols))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)

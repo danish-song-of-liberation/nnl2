@@ -161,4 +161,19 @@
 (defmacro iats ((iterator tensor) &body body)
   "Short name for iterate-across-tensor-shape (see docstring)"
   `(iterate-across-tensor-shape (,iterator ,tensor) ,@body))					  
+
+(defmacro iterate-across-tensor-strides ((iterator tensor) &body body)
+  "Iterates across all dimensions of tensor strides
+   
+   iterator: Variable to bind each dimension size
+   tensor: Tenosr object
+   body: Forms to execute for each dimension"
+   
+  `(loop for i from 0 below (nnl2.hli.ts:rank ,tensor)
+		 do (let ((,iterator (nnl2.ffi:strides-at ,tensor i)))
+			  (progn ,@body))))
 			  
+(defmacro iatst ((iterator tensor) &body body)
+  "Short name for iterate-across-tensor-strides (see docstring)"
+  `(iterate-across-tensor-strides (,iterator ,tensor) ,@body))						  
+  

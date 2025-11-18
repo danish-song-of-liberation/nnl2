@@ -1,5 +1,15 @@
 (in-package :nnl2.hli.ad)
 
+;; NNL2
+
+;; Filepath: nnl2/src/lisp/highlevel/highlevel-ad-accessors.lisp
+;; File: highlevel-ad-accessors.lisp
+
+;; Contains a high-level interface for all the main AD functions in ffi-c-core.lisp
+
+;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
+;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
 (deftype nnl2-ad-tensor () 
   #+sbcl      'sb-sys:system-area-pointer
   #+clisp     'fi:foreign-data
@@ -10,33 +20,99 @@
   #+allegro   'excl:foreign-pointer)  
 
 (defun ad-get-shape-as-list (ad-tensor rank)
-  "Gets the shape of AD tensor as a list"
+  "Gets the shape of AD tensor as a list
+  
+   Args:
+       ad-tensor: Input tensor
+	   rank: Tensor number dimensions
+	   
+   Returns:
+       Shape of ad tensor as a list
+	   
+   Example:
+       (nnl2.hli.ad:tlet ((foo (nnl2.hli.ad:ones #(5 5)))) ;; #(5 5) - 2 dimensions
+	     (nnl2.hli.ad::ad-get-shape-as-list foo 2)) ;; '(5 5)"
+	   
   (loop with rank-t = (if rank rank (rank ad-tensor))
         with shape-pointer = (nnl2.ffi:%ad-shape ad-tensor)
         for i from 0 below rank-t
         collect (cffi:mem-aref shape-pointer :int i)))
 
 (defun ad-get-shape-as-vector (ad-tensor rank)
-  "Gets the shape of AD tensor as a vector"
+  "Gets the shape of AD tensor as a vector
+  
+   Args:
+       ad-tensor: Input AD tensor
+       rank: Tensor number of dimensions
+       
+   Returns:
+       Shape of AD tensor as a vector
+       
+   Example:
+       (nnl2.hli.ad:tlet ((foo (nnl2.hli.ad:ones #(3 4)))) ;; #(3 4) - 2 dimensions
+         (nnl2.hli.ad::ad-get-shape-as-vector foo 2)) ;; #(3 4)"
+  
   (let* ((rank-t (if rank rank (rank ad-tensor)))
          (vec (make-array rank-t))
          (shape-pointer (nnl2.ffi:%ad-shape ad-tensor)))
 		 
+	;; Copying data	 
     (dotimes (i rank-t)
       (setf (aref vec i) (cffi:mem-aref shape-pointer :int i)))
 	  
     vec))
 
 (defun rank (ad-tensor)
-  "Gets rank of AD tensor"
+  "Gets rank (number of dimensions) of an AD tensor
+  
+   Args:
+       ad-tensor: Input AD tensor
+       
+   Returns:
+       Integer rank (number of dimensions) of the tensor
+       
+   Example:
+       (nnl2.hli.ad:tlet ((foo (nnl2.hli.ad:ones #(2 3 4)))) ;; rank = 3
+         (nnl2.hli.ad:rank foo)) ;; 3"
+		 
   (nnl2.ffi:%ad-rank ad-tensor))
 
 (defun dtype (ad-tensor &key (from :data))
+  "Gets the dtype of an AD tensor as a keyword symbol 
+  
+   Args:
+       ad-tensor: Input AD tensor
+       from (&key): Which dtype to return (:data or :grad)
+       
+   Returns:
+       Keyword symbol representing dtype of the tensor's data or gradient
+       
+   Example:
+       (nnl2.hli.ad:tlet ((foo (nnl2.hli.ad:ones #(5 5) :dtype :float64)))
+         (nnl2.hli.ad:dtype foo)) ;; :float64
+		 
+       (nnl2.hli.ad:dtype foo :from :grad)   ;; dtype of gradient tensor"
+		 
   (ecase from
     (:data (nnl2.ffi:%ad-dtype-as-data ad-tensor))
-	(:grad (nnl2.ffi:%ad-dtype-as-grad ad-tensor))))
-
+    (:grad (nnl2.ffi:%ad-dtype-as-grad ad-tensor))))
+  
 (defun int-dtype (ad-tensor &key (from :data))
+  "Gets the dtype of an AD tensor as an integer enum value (C enum)
+  
+   Args:
+       ad-tensor: Input AD tensor
+       from (&key): Which dtype to return (:data or :grad)
+       
+   Returns:
+       Integer value representing dtype enum (matches C backend)
+       
+   Example:
+       (nnl2.hli.ad:tlet ((foo (nnl2.hli.ad:ones #(5 5) :dtype :float64)))
+         (nnl2.hli.ad:int-dtype foo)) ;; nnl2 C Enum value of float64
+		 
+       (nnl2.hli.ad:int-dtype foo :from :grad)"
+
   (ecase from
     (:data (nnl2.ffi:%ad-dtype-as-data-int ad-tensor))
 	(:grad (nnl2.ffi:%ad-dtype-as-grad-int ad-tensor))))
@@ -46,7 +122,25 @@
          (ftype (function (nnl2-ad-tensor) integer) ad-rank))
 
 (defun shape (ad-tensor &key (as :vector))
-  "Function for getting the shape of an AD tensor"
+  "Gets the shape of an AD tensor
+  
+   Args:
+       ad-tensor: Input AD tensor
+       as (&key): Return type (:vector, :list, or :pointer)
+       
+   Returns:
+       Shape of the tensor in the specified format:
+         :vector - simple-vector of dimensions
+         :list - list of dimensions
+         :pointer - raw CFFI pointer to shape array
+       
+   Example:
+       (nnl2.hli.ad:tlet ((foo (nnl2.hli.ad:ones #(2 3))))
+         (nnl2.hli.ad:shape foo)) ;; #(2 3)
+		 
+       (nnl2.hli.ad:shape foo :as :list) ;; '(2 3)
+       (nnl2.hli.ad:shape foo :as :pointer) ;; Depends on your lisp implementation. Usually something like `<sb-sys:int-sap ...>` (sbcl), `fi:foreign-data ...` (clisp)"
+	   
   (let ((rank (rank ad-tensor)))
     (case as
       (:list    (ad-get-shape-as-list ad-tensor rank))
@@ -55,7 +149,20 @@
       (otherwise (error "Unknown type: ~a~%" as)))))
 
 (defun shapes-equal-p (ad-tensor-a ad-tensor-b)
-  "Compares shapes of two AD tensors"
+  "Checks whether shapes of two AD tensors are equal
+   Needs for internal tensor dispatch
+  
+   Args:
+       ad-tensor-a: First tensor
+       ad-tensor-b: Second tensor
+       
+   Returns:
+       T if shapes are equal, NIL otherwise
+       
+   Example:
+       (nnl2.hli.ad:tlet ((a (nnl2.hli.ad:ones #(3 4))) (b (nnl2.hli.ad:rand #(3 4))))
+         (nnl2.hli.ad::shapes-equal-p a b)) ;; T"
+		 
   (let ((shape-a (shape ad-tensor-a :as :vector))
         (shape-b (shape ad-tensor-b :as :vector)))
 		
@@ -65,15 +172,31 @@
   (ad-tensor :pointer))
   
 (defun get-roots-as-list (roots-pointer num-roots)
+  "Converts roots pointer to a Lisp list of pointers"
   (loop for i from 0 below num-roots
 		collect (cffi:mem-aref roots-pointer :pointer i)))
   
 (defun roots (ad-tensor &key (as :list))
+  "Gets roots of an AD tensor
+  
+   Args:
+       ad-tensor: Input tensor
+       as (&key): Return type (:list or :pointer)
+	   
+   Returns:
+       List of root tensors or raw pointer"
+	   
   (ecase as 
     (:pointer (nnl2.ffi:%ad-roots ad-tensor))
 	(:list (get-roots-as-list (nnl2.ffi:%ad-roots ad-tensor) (num-roots ad-tensor)))))
 	
 (defun (setf roots) (ad-tensors-list self)
+  "Sets roots of an AD tensor
+  
+   Args:
+       ad-tensors-list: List of AD tensors
+       self: Target tensor"
+	   
   (let* ((new-len (length ad-tensors-list)) 
          (tensors-pool (cffi:foreign-alloc :pointer :count new-len)))
 		 
@@ -83,18 +206,36 @@
 	(nnl2.ffi:%ad-roots-setter self tensors-pool new-len)))
 
 (defun strides (ad-tensor &key (from :data) (as :vector))
+  "Gets strides of an AD tensor
+  
+   Args:
+       ad-tensor: Input tensor
+       from (&key): Source (:data or :grad)
+       as (&key): Return type (:vector or :list)
+	   
+   Returns:
+       Strides of the tensor"
+	   
   (ecase from
     (:data (nnl2.hli.ts:strides (data ad-tensor) :as as))
 	(:grad (nnl2.hli.ts:strides (grad ad-tensor) :as as))))
 
 (defun higher-rank-tensor (a b)
-  "Returns a pair (higher lower) depending on the rank"
-  (nnl2.hli:fastcall (if (> (rank a) (rank b))
-					   (values a b)
-					   (values b a))))  
+  "Returns two (with `(values ...)`) tensors (higher . lower) depending on their rank"
+  (nnl2.hli:fastcall (if (> (rank a) (rank b)) (values a b) (values b a))))  
 
 (defmacro with-tensor-dispatch ((a b) tensor-case same-shape-case broadcast-case)
-  "Universal dispatcher for tensor operations"
+  "Dispatcher for binary tensor operations
+  
+   Args:
+       a: First tensor
+       b: Second tensor
+       tensor-case: Form executed when b is a scalar
+       same-shape-case: Form executed when shapes match
+       broadcast-case: Form executed when broadcasting is required
+	   
+   Returns:
+       Expanded conditional form selecting one of the given cases"
   
   (let ((a-sym (gensym "A"))
         (b-sym (gensym "B")))
@@ -103,12 +244,31 @@
            (,b-sym ,b))
    
        (cond
+	   
+		 ;; a=ad-tensor, b=number
 	     ((typep ,b-sym 'real) ,tensor-case)
+		 
+		 ;; a=number, b=ad-tensor
 		 ((typep ,a-sym 'real) (error "You can't apply a tensor function to a scalar"))
+		 
+		 ;; a=ad-tensor[5, 5], b=ad-tensor[5, 5]
          ((shapes-equal-p ,a-sym ,b-sym) ,same-shape-case)
+		 
+		 ;; a=ad-tensor[5, 5], b=ad-tensor[5]
 		 (t (multiple-value-bind (higher lower) (higher-rank-tensor ,a-sym ,b-sym) ,broadcast-case))))))
 
 (defun empty (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  "Creates an uninitialized AD tensor
+  
+   Args:
+       indices: Shape specification
+       dtype (&key): Tensor dtype
+       requires-grad (&key): Whether the tensor requires gradients
+       name (&key): Optional tensor name
+	   
+   Returns:
+       New AD tensor with uninitialized data"
+	   
   (declare (type keyword dtype)
 		   (type boolean requires-grad)
 		   (type string name))
@@ -119,6 +279,17 @@
 	  (nnl2.ffi:%ad-empty shape rank dtype requires-grad name))))
 
 (defun zeros (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  "Creates an AD tensor filled with zeros
+  
+   Args:
+       indices: Shape specification
+       dtype (&key): Tensor dtype
+       requires-grad (&key): Whether the tensor requires gradients
+       name (&key): Optional tensor name
+	   
+   Returns:
+       New AD tensor filled with zeros"
+	   
   (declare (type keyword dtype)
 		   (type boolean requires-grad)
 		   (type string name))
@@ -129,6 +300,17 @@
 	  (nnl2.ffi:%ad-zeros shape rank dtype requires-grad name))))
 	  
 (defun ones (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  "Creates an AD tensor filled with ones
+  
+   Args:
+       indices: Shape specification
+       dtype (&key): Tensor dtype
+       requires-grad (&key): Whether the tensor requires gradients
+       name (&key): Optional tensor name
+	   
+   Returns:
+       New AD tensor filled with ones"
+	   
   (declare (type keyword dtype)
 		   (type boolean requires-grad)
 		   (type string name))
@@ -139,6 +321,18 @@
 	  (nnl2.ffi:%ad-ones shape rank dtype requires-grad name))))
 	  	  
 (defun full (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (filler 1.0))
+  "Creates an AD tensor filled with a constant value
+  
+   Args:
+       indices: Shape specification
+       dtype (&key): Tensor dtype
+       requires-grad (&key): Whether the tensor requires gradients
+       name (&key): Optional tensor name
+       filler (&key): Constant value to fill with
+	   
+   Returns:
+       New AD tensor filled with a constant value"
+	   
   (declare (type keyword dtype)
 		   (type boolean requires-grad)
 		   (type string name))
@@ -156,6 +350,8 @@
 		(nnl2.ffi:%ad-full shape rank dtype requires-grad name filler-pntr)))))
 	  
 (defun %internal-randn (indices dtype requires-grad name from to)
+  "Internal helper for creating random AD tensors in a given range"
+  
   (nnl2.hli:fastcall
     (let* ((cffi-type    (nnl2.hli.ts:type/nnl2->cffi dtype))
 		   (lisp-type    (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -172,12 +368,29 @@
 	   (nnl2.ffi:%ad-randn shape rank dtype requires-grad name from-pntr to-pntr)))))
 	
 (defun rand (indices &key (from 0) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  "Creates an AD tensor with random values in the given range (default [0, 1])"
   (%internal-randn indices dtype requires-grad name from to))
 	
 (defun randn (indices &key (from -1) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  "Creates an AD tensor with random values in the given range (default [-1, 1])"
   (%internal-randn indices dtype requires-grad name from to)) 
 	 
 (defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (in 0) (out 0) (gain 1.0s0) (distribution :normal))
+  "Creates an AD tensor initialized with Xavier initialization
+  
+   Args:
+       indices: Shape specification
+       dtype (&key): Tensor dtype
+       requires-grad (&key): Whether gradients are required
+       name (&key): Optional tensor name
+       in (&key): Number of input units
+       out (&key): Number of output units
+       gain (&key): Gain factor
+       distribution (&key): :normal or :uniform
+	   
+   Returns:
+       AD tensor initialized using Xavier method"
+	   
   (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier (AD)")
   (assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to xavier (AD)")
   
@@ -188,6 +401,15 @@
         (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
 
 (defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
+  "Creates an AD tensor from a Lisp array
+  
+   Args:
+       data: Lisp array
+       dtype (&key): Tensor dtype
+	   
+   Returns:
+       AD tensor sharing memory with a TS tensor"
+	   
   (let* ((shape (array-dimensions data))
 		 (ts-tensor (nnl2.hli.ts:make-tensor data :dtype dtype :shape-hint shape))
 		 (ad-tensor (empty shape :dtype dtype)))
@@ -197,6 +419,16 @@
 	ad-tensor))
 	
 (defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
+  "Creates an AD tensor from a flat list and target shape
+  
+   Args:
+       flatten-data: Flat list of values
+       indices:      Shape specification
+       dtype (&key):        Tensor dtype
+	   
+   Returns:
+       AD tensor reconstructed from flat data"
+	   
   (let ((ad-tensor (empty indices :dtype dtype))
 		(ts-tensor (nnl2.hli.ts:from-flatten flatten-data indices :dtype dtype)))
 		
@@ -205,9 +437,42 @@
 	ad-tensor))
 	
 (defun transposition! (ad-tensor &key (track-graph t))
+  "WARNING. 
+  
+   This function intentionally returns mathematically 
+   incorrect results for maximum performance. 
+   
+   For correctness, use transpose! with the :force t flag
+  
+   Performs in-place transposition of an AD tensor (O(1))
+  
+   Args:
+       ad-tensor: Input tensor
+       track-graph: Whether to track operation in autograd graph
+	   
+   Returns:
+       AD tensor with transposed shape (in-place)"
+	   
   (nnl2.ffi:%ad-transposition-inplace ad-tensor track-graph))
   
 (defun transpose! (ad-tensor &key (track-graph t) force)
+  "WARNING. 
+  
+   For maximum performance, the function intentionally 
+   returns incorrect mathematical results. 
+   
+   For correctness, add the :force t flag
+   
+   Performs in-place transpose of an AD tensor (O(n))
+  
+   Args:
+       ad-tensor: Input tensor
+       track-graph (&key): Whether to track operation in autograd graph
+       force (&key): Optional flag to mathematical correctness
+	   
+   Returns:
+       AD tensor transposed in-place"
+	   
   (nnl2.ffi:%ad-transpose-inplace ad-tensor track-graph force))  
   
 (cffi:defcfun ("nnl2_ad_zero_grad" zero-grad!) :void
@@ -229,18 +494,64 @@
   (ad-tensor :pointer))  
   
 (defun bp (ad-tensor &key retain-graph)
+  "Performs backpropagation on an AD tensor
+  
+   Args:
+       ad-tensor: Input tensor
+       retain-graph (&key): Whether to retain the computational graph
+	   
+   Returns:
+       AD tensor after backpropagation"
+	   
   (nnl2.ffi:%backpropagation ad-tensor retain-graph))  
 
 (defun backpropagation (ad-tensor &key retain-graph)
+  "Alias for `bp`; performs backpropagation on an AD tensor
+  
+   Args:
+       ad-tensor: Input tensor
+       retain-graph (&key): Whether to retain the computational graph
+	   
+   Returns:
+       AD tensor after backpropagation"
+	   
   (nnl2.ffi:%backpropagation ad-tensor retain-graph))  
   
 (defun bptt (ad-tensor &key retain-graph)
+  "Performs simplified backpropagation through time (BPTT) on an AD tensor
+   Needs for RNN
+  
+   Args:
+       ad-tensor: Input tensor
+       retain-graph (&key): Whether to retain the computational graph
+	   
+   Returns:
+       AD tensor after BPTT"
+	   
   (nnl2.ffi:%bptt ad-tensor retain-graph))    
   
 (defun backpropagation-through-time (ad-tensor &key retain-graph)
+  "Alias for `bptt`; performs backpropagation through time on an AD tensor
+  
+   Args:
+       ad-tensor: Input tensor
+       retain-graph (&key): Whether to retain the computational graph
+	   
+   Returns:
+       AD tensor after BPTT"
+	   
   (nnl2.ffi:%bptt ad-tensor retain-graph))    
   
 (defmacro tlet ((&rest bindings) &body body)
+  "Like `let` but automatically frees AD tensors after use
+  
+   Args:
+       bindings ((&rest)): List of variable bindings
+       body (&body): Forms to evaluate
+	   
+   Returns:
+       Result of body; frees any nnl2 AD tensors in bindings afterwards"
+	   
   (let ((vars (mapcar #'car bindings)))
     `(let ,bindings
 	   (unwind-protect
@@ -251,7 +562,14 @@
 		           collect `(when (typep ,var 'nnl2-ad-tensor) (free ,var))))))))  
   
 (defmacro tlet* ((&rest bindings) &body body)
-  "The eigenform of let* for nnl2 ad tensors"
+  "Like `let*` but automatically frees AD tensors after use
+  
+   Args:
+       bindings: List of variable bindings
+       body:     Forms to evaluate
+	   
+   Returns:
+       Result of body; frees any nnl2 AD tensors in bindings afterwards"
   
   (if (null bindings)
    `(progn ,@body)
@@ -264,18 +582,39 @@
           (when (typep ,var 'nnl2-ad-tensor) (free ,var)))))))  
   
 (defun print-data (ad-tensor)
+  "Prints the data of an AD tensor"
   (nnl2.hli.ts:print-tensor (data ad-tensor)))
-  
+
 (defun print-grad (ad-tensor)
+  "Prints the gradient of an AD tensor"
   (nnl2.hli.ts:print-tensor (grad ad-tensor)))
   
 (defun step-ts (ad-tensor &key (lr 1.0))
+  "Performs a gradient descent step on the tensor's data and returns a TS tensor
+  
+   Args:
+       ad-tensor: AD tensor whose data will be updated
+       lr (&key): Learning rate
+	   
+   Returns:
+       TS tensor with updated data (original AD tensor remains unchanged)"
+	   
   (nnl2.ffi:%ad-step ad-tensor (coerce lr 'single-float)))
   
 (defun step! (ad-tensor &key (lr 1.0))
+  "Performs an in-place gradient descent step on an AD tensor's data
+  
+   Args:
+       ad-tensor: AD tensor whose data will be updated in-place
+       lr (&key): Learning rate
+	   
+   Returns:
+       AD tensor with data updated by subtracting lr * grad (in-place)"
+	   
   (nnl2.ffi:%ad-step! ad-tensor (coerce lr 'single-float)))
   
 (defun .+/ad/incf! (tensor increment mode track-graph)
+  "Adds increment to tensor"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
 		 (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
 		 (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -286,6 +625,7 @@
 	(nnl2.ffi:%ad-add-correspondence tensor incf-pntr mode track-graph)))  
   
 (defun +=/ad/incf! (tensor increment track-graph)
+  "Adds increment to tensor in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -296,6 +636,7 @@
     (nnl2.ffi:%ad-add-incf-inplace tensor incf-pntr track-graph)))  
 
 (defun .*/ad/mulf! (tensor multiplier mode track-graph)
+  "Multiplies tensor by multiplier"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -306,6 +647,7 @@
     (nnl2.ffi:%ad-mul-correspondence tensor mulf-pntr mode track-graph)))
 
 (defun *=/ad/mulf! (tensor multiplier track-graph)
+  "Multiplies tensor by multiplier in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -316,6 +658,7 @@
     (nnl2.ffi:%ad-mul-mulf-inplace tensor mulf-pntr track-graph)))	
   
 (defun .-/ad/decf! (tensor decrement mode track-graph)
+  "Subtracts decrement from tensor"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -326,6 +669,7 @@
     (nnl2.ffi:%ad-sub-correspondence tensor decf-pntr mode track-graph)))
 
 (defun -=/ad/decf! (tensor decrement track-graph)
+  "Subtracts decrement from tensor in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -336,6 +680,7 @@
     (nnl2.ffi:%ad-sub-decf-inplace tensor decf-pntr track-graph)))
 	
 (defun ./ad/divf! (tensor divisor mode track-graph)
+  "Divides tensor by divisor"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -346,6 +691,7 @@
     (nnl2.ffi:%ad-div-correspondence tensor divf-pntr mode track-graph)))	
 	
 (defun /!/ad/divf! (tensor divisor track-graph)
+  "Divides tensor by divisor in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -356,6 +702,7 @@
     (nnl2.ffi:%ad-div-divf-inplace tensor divf-pntr track-graph)))
 	
 (defun .^/ad/powf! (tensor exponent mode track-graph)
+  "Raises tensor to exponent"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -366,6 +713,7 @@
     (nnl2.ffi:%ad-pow-correspondence tensor powf-pntr mode track-graph)))	
 
 (defun ^=/ad/powf! (tensor exponent track-graph)
+  "Raises tensor to exponent in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -376,6 +724,7 @@
     (nnl2.ffi:%ad-pow-powf-inplace tensor powf-pntr track-graph)))
 	
 (defun .min/ad/minf! (tensor value mode track-graph)
+  "Applies elementwise minimum with value"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -386,6 +735,7 @@
     (nnl2.ffi:%ad-min-correspondence tensor minf-pntr mode track-graph)))
 
 (defun .min!/ad/minf! (tensor value track-graph)
+  "Applies elementwise minimum with value in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -396,6 +746,7 @@
     (nnl2.ffi:%ad-min-minf-inplace tensor minf-pntr track-graph)))	
 
 (defun .max/ad/maxf! (tensor value mode track-graph)
+  "Applies elementwise maximum with value"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -406,6 +757,7 @@
     (nnl2.ffi:%ad-max-correspondence tensor maxf-pntr mode track-graph)))
 	
 (defun .max!/ad/maxf! (tensor value track-graph)
+  "Applies elementwise maximum with value in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -416,6 +768,7 @@
     (nnl2.ffi:%ad-max-maxf-inplace tensor maxf-pntr track-graph)))
 	
 (defun axpy/ad/axpf! (tensor other alpha mode track-graph)
+  "Performs axpy: tensor + alpha * other"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -426,6 +779,7 @@
     (nnl2.ffi:%ad-axpf tensor other-pntr (coerce alpha 'single-float) mode track-graph)))	
 	
 (defun axpy!/ad/axpf! (tensor other alpha track-graph)
+  "Performs axpy in-place: tensor += alpha * other"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
          (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
          (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -436,6 +790,7 @@
     (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float) track-graph)))	
 	
 (defmacro with-notrack (&body body)
+  "Temporarily disables autograd graph tracking for the enclosed body"
   `(progn
      (let ((nnl2.system:*ad-default-track-graph* nil))
        ,@body)))
@@ -489,6 +844,7 @@
       (nnl2.ffi:%ad-pow-broadcasting-inplace a b track-graph))))	
 	  
 (defun .abs! (ad-tensor &key (track-graph t))
+  "In-place abs"
   (nnl2.ffi:%ad-.abs! ad-tensor track-graph))		  
 	  
 (defun .min! (a b &key (track-graph t))
@@ -519,30 +875,39 @@
       (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha track-graph))))	  
 	  
 (defun scale! (a b &key (track-graph t))
+  "Scales tensor a by scalar b in-place"
   (nnl2.ffi:%ad-scale! a (coerce b 'single-float) track-graph))
   
 (defun .exp! (ad-tensor &key (track-graph t))
+  "In-place elementwise exponential"
   (nnl2.ffi:%ad-.exp! ad-tensor track-graph))  
 
 (defun .log! (ad-tensor &key (track-graph t))
+  "In-place elementwise natural logarithm"
   (nnl2.ffi:%ad-.log! ad-tensor track-graph))    
   
 (defun .relu! (ad-tensor &key (track-graph t))
+  "In-place ReLU activation"
   (nnl2.ffi:%ad-.relu! ad-tensor track-graph))  	 
 
-(defun .leaky-relu! (ad-tensor &key (alpha 0.01) (track-graph t))
+(defun .leaky-relu! (ad-tensor &key (alpha nnl2.system:*leaky-relu-default-shift*) (track-graph t))
+  "In-place Leaky ReLU activation with slope alpha"
   (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha track-graph))  	
   
 (defun .sigmoid! (ad-tensor &key (approx t) (track-graph t))
+  "In-place sigmoid activation; approx enables fast approximation"
   (nnl2.ffi:%ad-.sigmoid! ad-tensor approx track-graph))  
   
 (defun .tanh! (ad-tensor &key (approx t) (track-graph t))
+  "In-place tanh activation; approx enables fast approximation"
   (nnl2.ffi:%ad-.tanh! ad-tensor approx track-graph))    
   
 (defun .sqrt! (tensor &key (track-graph t))
+  "In-place elementwise square root"
   (nnl2.ffi:%ad-sqrt-inplace tensor track-graph))
   
 (defun copy (tensor &key (dtype (dtype tensor)))
+  "Returns a copy of the tensor, optionally casting to a different dtype"
   (nnl2.ffi:%ad-copy tensor dtype))   
   
 (cffi:defcfun ("nnl2_ad_empty_like" empty-like) :pointer
@@ -561,6 +926,7 @@
   (ad-tensor :pointer))    
   
 (defun full-like (ad-tensor &key (filler 0))
+  "Creates a tensor like ad-tensor, filled with the given value"
   (let* ((dtype (dtype ad-tensor))
 		 (cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype))
 		 (lisp-type (nnl2.hli.ts:type/nnl2->lisp dtype))
@@ -573,6 +939,7 @@
 	  result)))
 
 (defun xavier-like (ad-tensor &key in out (gain 1.0s0) (distribution :normal))
+  "Fills a tensor like ad-tensor using Xavier initialization"
   (assert (and in out gain distribution) nil "Incorrect keys was passed in xavier-like")
   (nnl2.ffi:%ad-xavier-like ad-tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
   
@@ -585,6 +952,21 @@
 
 (cffi:defcfun ("nnl2_ad_detach" detach) :pointer
   (ad-tensor :pointer))  
+  
+(cffi:defcfun ("nnl2_ad_tensor_name_getter" name) :string
+  (ad-tensor :pointer))
+
+(defun (setf name) (new-name ad-tensor)
+  "Sets the name of an AD tensor"
+  (nnl2.ffi:%nnl2-ad-name-setter ad-tensor new-name))      
+  
+(defun nrows (ad-tensor)
+  "Returns the number of rows of the AD tensor's data"	
+  (nnl2.hli.ts:nrows (data ad-tensor)))	
+
+(defun ncols (ad-tensor)
+  "Returns the number of columns of the AD tensor's data"
+  (nnl2.hli.ts:ncols (data ad-tensor)))	
   
 (in-package :nnl2.hli.ad.r)
 
@@ -607,6 +989,7 @@
       (nnl2.ffi:%ad-mul-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  
 	  
 (defun gemm (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Performs matrix multiplication (a @ b) with AD tracking"
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode track-graph))
 
 (defun .- (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
@@ -637,6 +1020,7 @@
       (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))    
 	  
 (defun .abs (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes elementwise absolute value with AD tracking"
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode track-graph))	  
 	
 (defun .min (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
@@ -658,12 +1042,15 @@
       (nnl2.ffi:%ad-max-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  	  
 	
 (defun scale (a b &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
+  "Scales tensor a by scalar b with AD tracking, returns a new tensor"
   (nnl2.ffi:%ad-scale a (coerce b 'single-float) save-type nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun .log (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes elementwise natural logarithm with AD tracking, returns a new tensor"
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun .exp (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes elementwise exponential with AD tracking, returns a new tensor"
   (nnl2.ffi:%ad-.exp ad-tensor save-type nnl2.ffi:ad-reverse-mode  track-graph))  
   
 (defun axpy (a b &key (alpha 1.0) (track-graph nnl2.system:*ad-default-track-graph*))
@@ -676,38 +1063,50 @@
       (nnl2.ffi:%ad-axpy-broadcasting a b alpha nnl2.ffi:ad-reverse-mode track-graph))))
 
 (defun .relu (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with ReLU activation applied"
   (nnl2.ffi:%ad-.relu ad-tensor nnl2.ffi:ad-reverse-mode track-graph)) 
 
-(defun .leaky-relu (ad-tensor &key save-type (alpha 0.01) (track-graph nnl2.system:*ad-default-track-graph*))
-  (nnl2.ffi:%ad-.leaky-relu ad-tensor alpha save-type nnl2.ffi:ad-reverse-mode track-graph)) 
+(defun .leaky-relu (ad-tensor &key save-type (alpha nnl2.system:*leaky-relu-default-shift*) (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with Leaky ReLU activation applied, slope alpha"
+  (nnl2.ffi:%ad-.leaky-relu ad-tensor alpha save-type nnl2.ffi:ad-reverse-mode track-graph)) 	
     
 (defun .sigmoid (ad-tensor &key (approx t) (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with sigmoid activation applied"
   (nnl2.ffi:%ad-.sigmoid ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph))  
   	
 (defun .tanh (ad-tensor &key (approx t) (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with tanh activation applied"
   (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph)) 	
 	
 (defun .neg (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with elementwise negation"
   (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
 	
 (defun transposition (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a transposed view of the tensor (O(1))"
   (nnl2.ffi:%ad-transposition ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun transpose (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*) force)
+  "Returns a new transposed tensor (O(n))"
   (nnl2.ffi:%ad-transpose ad-tensor nnl2.ffi:ad-reverse-mode track-graph force))    
 
 (defun reshape (tensor new-shape &key force (track-graph nnl2.system:*ad-default-track-graph*))
+  "Reshapes tensor to new shape, optionally forcing a copy"
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%ad-reshape tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))
 
 (defun reinterpret (tensor new-shape &key force (track-graph nnl2.system:*ad-default-track-graph*))
+  "Reinterprets tensor as new shape without copying, optionally forcing"
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr new-shape)
     (nnl2.ffi:%ad-reinterpret tensor shape rank force nnl2.ffi:ad-reverse-mode track-graph)))	
 	
 (defun .sqrt (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with elementwise square root"
   (nnl2.ffi:%ad-sqrt tensor nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun slice (tensor &key from to (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a sliced view of the tensor from `from` to `to` indices"
+  
   (let* ((tensor-shape (nnl2.hli.ad:shape tensor :as :vector))
          (from (if from from (make-array (list (length tensor-shape)) :initial-element 0)))
          (to (if to to tensor-shape))
@@ -718,6 +1117,8 @@
     (nnl2.ffi:%ad-slice tensor pntr-from pntr-to nnl2.ffi:ad-reverse-mode track-graph)))	  
   
 (defun l2-norm (tensor &key force (axes #(0)) (track-graph nnl2.system:*ad-default-track-graph*) &aux (dtype (nnl2.hli.ad:dtype tensor)))
+  "Computes the L2 norm of the tensor, optionally returning a raw scalar when `force` is true"
+  
   (declare (ignore axes))
    
   (let ((out (nnl2.ffi:%ad-l2norm tensor force nnl2.ffi:ad-reverse-mode track-graph)))
@@ -728,6 +1129,8 @@
 	  out)))
 	  
 (defun sum (ad-tensor &key axis keepdim force (track-graph nnl2.system:*ad-default-track-graph*) &aux (dtype (nnl2.hli.ad:dtype ad-tensor)))
+  "Computes the sum of elements along a given axis or the entire tensor, optionally forcing a scalar result"
+  
   (if axis
     (nnl2.ffi:%ad-sum-with-axis ad-tensor axis keepdim nnl2.ffi:ad-reverse-mode track-graph)
 	(let ((result (nnl2.ffi:%ad-sum-without-axis ad-tensor force nnl2.ffi:ad-reverse-mode track-graph)))
@@ -750,22 +1153,28 @@
 	(otherwise (error "Incorrect :p key in norm~%"))))
   
 (defun vstack (tensora tensorb &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Vertically stacks two tensors along the first axis"
   (nnl2.ffi:%ad-vstack tensora tensorb nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun hstack (tensora tensorb &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Horizontally stacks two tensors along the last axis"
   (nnl2.ffi:%ad-hstack tensora tensorb nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun concat (axis tensora tensorb &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Concatenates two tensors along a specified axis"
   (nnl2.ffi:%ad-concat tensora tensorb axis nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun view (tensor indices &key (track-graph nnl2.system:*ad-default-track-graph*) force)
+  "Returns a reshaped view of the tensor according to `indices`"
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%ad-view tensor shape rank nnl2.ffi:ad-reverse-mode track-graph force)))
 
 (defun tref (tensor indices &key (track-graph nnl2.system:*ad-default-track-graph*) force)
+  "Returns a tensor reference (tref) with the specified indices, optionally forcing a copy"
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%ad-tref tensor shape rank nnl2.ffi:ad-reverse-mode track-graph force)))
 	
 (defun (setf tref) (change-to tensor &rest shape)
+  "Sets the values at the specified tref indices to `change-to`"
   (setf (apply #'nnl2.hli.ts:tref (nnl2.hli.ad:data tensor) shape) change-to))		
   

@@ -32,7 +32,9 @@
 	#:iats
     #:iterate-across-tensor-data 
 	#:parallel-iterate-across-tensor-data
-    #:iterate-across-tensor-shape))
+    #:iterate-across-tensor-shape
+	#:iterate-across-tensor-strides
+	#:iatst))
   
 (defpackage :nnl2.lli.ad
   (:use #:cl)  
@@ -43,10 +45,18 @@
 	#:backward-fn
 	#:grad-initialized
 	#:magic-number
-	#:name
 	#:visited-gen
-	#:object-type))
-	
-	
-	
+	#:object-type
+	#:iterate-across-tensor-data
+	#:parallel-iterate-across-tensor-data
+	#:iatd
+	#:piatd
+	#:iterate-across-tensor-grad
+	#:parallel-iterate-across-tensor-grad
+	#:iatg
+	#:piatg
+	#:iterate-across-tensor-shape
+	#:iats
+	#:iterate-across-tensor-strides
+	#:iatst))
 	

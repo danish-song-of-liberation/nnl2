@@ -406,6 +406,10 @@
   (tensor :pointer)
   (index :int))
   
+(cffi:defcfun ("nnl2_strides_at" strides-at) :int
+  (tensor :pointer)
+  (index :int))  
+  
 (cffi:defcfun ("get_nnl2_object_type" get-obj-type) :int ;; faster that nnl2-obj-type
   (tensor :pointer))  
   
@@ -489,21 +493,22 @@
 
 (cffi:defcstruct ad-tensor
   "Tensor structure with support for automatic differentiation"
-  (ad-obj nnl2-obj-type)
-  (data tensor)
-  (grad tensor)
-  (requires-grad :bool)
-  (is-leaf :bool)
-  (backward-fn :pointer)
-  (roots :pointer)
-  (num-roots :long)
-  (visited-gen :unsigned-long)
-  (name :string)
-  (magic-number :char)
-  (grad-initialized :bool)
-  (extra-multiplier :float)
-  (extra-bool :bool)
-  (extra-correspondence :pointer))  
+  (ad-obj nnl2-obj-type)  		    	;; To separate AD tensors from TS tensors
+  (data tensor)							;; Data of the AD tensor
+  (grad tensor)							;; Gradient of the AD tensor
+  (requires-grad :bool)					;; A flag that determines whether to count the gradient or not
+  (is-leaf :bool)						;; Is the AD tensor the main one or not
+  (backward-fn :pointer)				;; AD-tensor function for backpropagation
+  (roots :pointer)						;; The roots of a tensor
+  (num-roots :long)						;; Number of roots
+  (visited-gen :unsigned-long)			;; Used for topological sort (generation-based marking)
+  (name :string)						;; Name for debugging
+  (magic-number :char)					;; This is necessary to avoid memory corruption when releasing the tensor
+  (grad-initialized :bool)				;; If false, the gradient is either NULL or has uninitialized memory
+  (extra-multiplier :float)				;; For edgy cases such as axpy, scale
+  (extra-integer :unsigned-char)		;; For edgy cases such as tref, view	
+  (extra-bool :bool)					;; For edgy cases requiring additional boolean
+  (extra-correspondence :pointer))  	;; For correspondence ops
   
 (cffi:defcenum ad-mode 
   ad-reverse-mode
@@ -512,8 +517,8 @@
   ad-p3-mode)  
   
 (cffi:defcenum nnl2-object-type
-  (:nnl2-type-ts 0)     ;; nnl2_tensor
-  (:nnl2-type-ad 1)     ;; nnl2_ad_tensor  
+  (:nnl2-type-ts 0)        ;; nnl2_tensor
+  (:nnl2-type-ad 1)        ;; nnl2_ad_tensor  
   (:nnl2-type-unknown 2))  
   
 (cffi:defcfun ("nnl2_ad_get_roots" %ad-roots) :pointer
