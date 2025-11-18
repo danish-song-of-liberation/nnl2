@@ -534,5 +534,7 @@
    #:%nnl2-ad-name-setter
    #:%nnl2-ad-visited-gen-setter
    #:%nnl2-ad-object-type-setter
-   #:strides-at))
+   #:strides-at
+   #:%ad-trefw
+   #:%ad-flat))
    

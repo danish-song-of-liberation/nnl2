@@ -58,5 +58,7 @@
 	#:iterate-across-tensor-shape
 	#:iats
 	#:iterate-across-tensor-strides
-	#:iatst))
+	#:iatst
+	#:trefw
+	#:flat))
 	

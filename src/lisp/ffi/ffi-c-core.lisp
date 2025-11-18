@@ -1107,6 +1107,21 @@
   (mode ad-mode)
   (track-graph :bool)
   (force :bool))
+
+(cffi:defcfun ("nnl2_ad_trefw" %ad-trefw) :pointer
+  (ad-tensor :pointer)
+  (indices :pointer)
+  (num-indices :char)
+  (mode ad-mode)
+  (track-graph :bool)
+  (force :bool))
+
+(cffi:defcfun ("nnl2_ad_flat" %ad-flat) :pointer
+  (ad-tensor :pointer)
+  (at :unsigned-long)
+  (mode ad-mode)
+  (track-graph :bool)
+  (force :bool))
   
 (cffi:defcfun ("nnl2_ad_extra_multiplier_setter" %nnl2-ad-extra-multiplier-setter) :void
   (ad-tensor :pointer)

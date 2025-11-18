@@ -111,3 +111,13 @@
   "Shorthand for `iterate-across-tensor-strides`"
   `(nnl2.lli.ts:iatst (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	 
   
+(defun trefw (tensor indices &key (track-graph nnl2.system:*ad-default-track-graph*) force)
+  "Returns a tensor element at specified indices"
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%ad-trefw tensor shape rank nnl2.ffi:ad-reverse-mode track-graph force)))
+	
+(defun flat (tensor index &key (track-graph nnl2.system:*ad-default-track-graph*) force)
+  "Retrieves the tensor element value by linear index"
+  (nnl2.ffi:%ad-flat tensor index nnl2.ffi:ad-reverse-mode track-graph force))
+  
+	

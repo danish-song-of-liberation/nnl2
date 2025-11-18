@@ -759,7 +759,7 @@ void lisp_call_transposition_inplace(Tensor* tensor) {
     
 bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) { 
 	return inplace_fill(tensor, value, dtype);
-} 
+}  	 
   
 void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
