@@ -35,7 +35,7 @@ to be more specific, due to problems with BPTT, recurrent graphs, and poor libra
 The framework is divided into three main components:
 
 1. Tensor System (100% complete)
-2. Autodiff System (with 5 different modes) (50% complete) (MVP is 70-80% ready)
+2. Autodiff System (60% complete) (MVP is 100% ready) (so yet only reverse mode is ready)
 3. Neural Networks Implementations
 
 Its only beginning.
