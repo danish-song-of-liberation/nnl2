@@ -514,5 +514,14 @@
    #:%ad-concat
    #:%ad-view
    #:%ts-regional-axpy-inplace
-   #:%ad-tref))
+   #:%ad-tref
+   #:%nnl2-ad-extra-multiplier-setter
+   #:%nnl2-ad-extra-bool-setter
+   #:%nnl2-ad-extra-integer-setter
+   #:%nnl2-ad-backward-fn-setter
+   #:%nnl2-ad-grad-initialized-setter
+   #:%nnl2-ad-magic-number-setter
+   #:%nnl2-ad-name-setter
+   #:%nnl2-ad-visited-gen-setter
+   #:%nnl2-ad-object-type-setter))
    

@@ -108,6 +108,7 @@ nnl2_ad_tensor* nnl2_ad_empty(int32_t* shape, int rank, nnl2_tensor_type dtype, 
 	ad_tensor->magic_number = TENSOR_MAGIC_ALIVE;
 	ad_tensor->grad_initialized = false;
 	ad_tensor->ts_type = nnl2_type_ad;
+	ad_tensor->extra_correspondence = NULL;
     
     if(name[0] == '\0') {
         ad_tensor->name = malloc(strlen(name) + 1);

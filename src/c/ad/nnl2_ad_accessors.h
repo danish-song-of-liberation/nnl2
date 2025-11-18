@@ -352,4 +352,184 @@ nnl2_tensor* nnl2_ad_get_grad(nnl2_ad_tensor* ad_tensor) {
 	}
 }
 
+/** @brief
+ * Gets the extra multiplier from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.extra_multiplier
+ */
+nnl2_float32 nnl2_ad_extra_multiplier_getter(nnl2_ad_tensor* ad_tensor) {
+	return ad_tensor -> extra_multiplier;
+}
+
+/** @brief
+ * Sets the extra multiplier in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.extra_multiplier
+ */
+void nnl2_ad_extra_multiplier_setter(nnl2_ad_tensor* ad_tensor, nnl2_float32 new_multiplier) {
+	ad_tensor -> extra_multiplier = new_multiplier;
+}
+
+/** @brief
+ * Gets the extra boolean from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.extra_bool
+ */
+bool nnl2_ad_extra_bool_getter(nnl2_ad_tensor* ad_tensor) {
+    return ad_tensor -> extra_bool;
+}
+
+/** @brief
+ * Sets the extra boolean in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.extra_bool
+ */
+void nnl2_ad_extra_bool_setter(nnl2_ad_tensor* ad_tensor, bool new_bool) {
+    ad_tensor -> extra_bool = new_bool;
+}
+
+/** @brief
+ * Gets the extra integer from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.extra_integer
+ */
+uint8_t nnl2_ad_extra_integer_getter(nnl2_ad_tensor* ad_tensor) {
+    return ad_tensor -> extra_integer;
+}
+
+/** @brief
+ * Sets the extra integer in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.extra_integer
+ */
+void nnl2_ad_extra_integer_setter(nnl2_ad_tensor* ad_tensor, uint8_t new_integer) {
+    ad_tensor -> extra_integer = new_integer;
+}
+
+/** @brief
+ * Gets the backward function from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.backward_fn
+ */
+void (* nnl2_ad_tensor_backward_fn_getter(nnl2_ad_tensor* tensor)) (nnl2_ad_tensor *) {
+    return tensor -> backward_fn;
+}
+
+/** @brief
+ * Sets the backward function in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.backward_fn
+ */
+void nnl2_ad_tensor_backward_fn_setter (nnl2_ad_tensor* tensor, void (* new_backward_fn)(nnl2_ad_tensor *)) {
+    tensor -> backward_fn = new_backward_fn;
+}
+
+/** @brief
+ * Gets the grad_initialized flag from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.grad_initialized
+ */
+bool nnl2_ad_tensor_grad_initialized_getter(nnl2_ad_tensor* tensor) {
+    return tensor -> grad_initialized;
+}
+
+/** @brief
+ * Sets the grad_initialized flag in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.grad_initialized
+ */
+void nnl2_ad_tensor_grad_initialized_setter(nnl2_ad_tensor* tensor, bool new_bool) {
+    tensor -> grad_initialized = new_bool;
+}
+
+/** @brief
+ * Gets the magic number from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.magic_number
+ */
+int8_t nnl2_ad_tensor_magic_number_getter(nnl2_ad_tensor* tensor) {
+    return tensor -> magic_number;
+}
+
+/** @brief
+ * Sets the magic number in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.magic_number
+ */
+void nnl2_ad_tensor_magic_number_setter(nnl2_ad_tensor* tensor, int8_t new_magic) {
+    tensor -> magic_number = new_magic;
+}
+
+/** @brief
+ * Gets the name from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.name
+ */
+char* nnl2_ad_tensor_name_getter(nnl2_ad_tensor* tensor) {
+    return tensor -> name;
+}
+
+/** @brief
+ * Sets the name in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.name
+ */
+void nnl2_ad_tensor_name_setter(nnl2_ad_tensor* tensor, char* new_name) {
+    tensor -> name = new_name;
+}
+
+/** @brief
+ * Gets the visited generation from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.visited_gen
+ */
+uint64_t nnl2_ad_tensor_visited_gen_getter(nnl2_ad_tensor* tensor) {
+    return tensor -> visited_gen;
+}
+
+/** @brief
+ * Sets the visited generation in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.visited_gen
+ */
+void nnl2_ad_tensor_visited_gen_setter(nnl2_ad_tensor* tensor, uint64_t new_visited_gen) {
+    tensor -> visited_gen = new_visited_gen;
+}
+
+/** @brief
+ * Gets the tensor type from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.ts_type
+ */
+nnl2_object_type nnl2_ad_tensor_ts_type_getter(nnl2_ad_tensor* tensor) {
+    return tensor -> ts_type;
+}
+
+/** @brief
+ * Sets the tensor type in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.ts_type
+ */
+void nnl2_ad_tensor_ts_type_setter(nnl2_ad_tensor* tensor, nnl2_object_type new_type) {
+    tensor -> ts_type = new_type;
+}
+
 #endif /** NNL2_AD_ACCESSORS_H **/

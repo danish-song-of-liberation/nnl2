@@ -73,7 +73,8 @@
 										   (:module "lowlevel"
 											:serial t
 											:components ((:file "lowlevel-package" :type "lisp")
-														 (:file "lowlevel-accessors" :type "lisp")))
+														 (:file "lowlevel-accessors" :type "lisp")
+														 (:file "lowlevel-ad-accessors" :type "lisp")))
 														 
 										   (:module "convert"
 										    :serial t
@@ -201,43 +202,12 @@
 #+lparallel
 (setf lparallel:*kernel* (lparallel:make-kernel *kernel-count*))
 
-(defvar *nnl2-framework-name* "nnl2" 
-  "Stores the name of the framework used for the build. 
+(defvar *nnl2-library-name* "nnl2" 
+  "Stores the name of the library used for the build. 
    This allows you to identify the build in the debugger 
    and when analyzing the executable file")  
   
 (defvar *build-location* "MADE IN NNL2"
   "Same thing.
    Used to track the origin of a build in the debugger")  
-   
-#| My interpretation of the classical theory 
-   of technological singularity/intelligence 
-   explosion, or the second theory of 
-   intelligence explosion:  
-   
-   The key factor in the speed of development of 
-   new technologies was the existing ones, and with 
-   the advent of more and more modern technologies, 
-   the development of new ones is becoming shorter. 
-   
-   Now that AI has emerged as an easily accessible 
-   and powerful technology, growth is changing dramatically, 
-   the classic theory of the intelligence explosion says 
-   that there will be an AI capable of recursively 
-   recreating itself in a new and better form in the 
-   shortest possible time, having reached a level of 
-   knowledge that is incomprehensible to us.
-
-   My second theory changes the conditions: for an AI 
-   that will be able to recursively recreate itself 
-   in a better form, a fairly powerful AI is needed 
-   to begin with. We are entering a closed (and possibly 
-   vicious) circle: there is a powerful AI -> people 
-   invent a new, even more powerful AI together with
-   the help of the old one -> technology growth accelerates 
-   -> the circle closes. And in this circle, each iteration 
-   is faster than the previous one, and this circle 
-   will continue until an AI capable of achieving the
-   original goal of recursively creating an improved 
-   version of itself appears. |#
    

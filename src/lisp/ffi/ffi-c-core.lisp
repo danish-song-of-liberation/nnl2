@@ -511,6 +511,11 @@
   ad-p2-mode
   ad-p3-mode)  
   
+(cffi:defcenum nnl2-object-type
+  (:nnl2-type-ts 0)     ;; nnl2_tensor
+  (:nnl2-type-ad 1)     ;; nnl2_ad_tensor  
+  (:nnl2-type-unknown 2))  
+  
 (cffi:defcfun ("nnl2_ad_get_roots" %ad-roots) :pointer
   (ad-tensor :pointer))
   
@@ -1097,6 +1102,42 @@
   (mode ad-mode)
   (track-graph :bool)
   (force :bool))
+  
+(cffi:defcfun ("nnl2_ad_extra_multiplier_setter" %nnl2-ad-extra-multiplier-setter) :void
+  (ad-tensor :pointer)
+  (new-multiplier :float))
+
+(cffi:defcfun ("nnl2_ad_extra_bool_setter" %nnl2-ad-extra-bool-setter) :void
+  (ad-tensor :pointer)
+  (new-bool :bool))  
+  
+(cffi:defcfun ("nnl2_ad_extra_integer_setter" %nnl2-ad-extra-integer-setter) :void
+  (ad-tensor :pointer)
+  (new-integer :unsigned-char))
+  
+(cffi:defcfun ("nnl2_ad_tensor_backward_fn_setter" %nnl2-ad-backward-fn-setter) :void
+  (ad-tensor :pointer)
+  (new-backward-fn :pointer))  
+  
+(cffi:defcfun ("nnl2_ad_tensor_grad_initialized_setter" %nnl2-ad-grad-initialized-setter) :void
+  (ad-tensor :pointer)
+  (new-bool :bool))  
+  
+(cffi:defcfun ("nnl2_ad_tensor_magic_number_setter" %nnl2-ad-magic-number-setter) :void
+  (ad-tensor :pointer)
+  (new-magic :unsigned-char))  
+  
+(cffi:defcfun ("nnl2_ad_tensor_name_setter" %nnl2-ad-name-setter) :void
+  (tensor :pointer)
+  (new-name :string))
+  
+(cffi:defcfun ("nnl2_ad_tensor_visited_gen_setter" %nnl2-ad-visited-gen-setter) :void
+  (tensor :pointer)
+  (new-visited-gen :unsigned-long))
+  
+(cffi:defcfun ("nnl2_ad_tensor_ts_type_setter" %nnl2-ad-object-type-setter) :void
+  (tensor :pointer)
+  (new-type nnl2-object-type))
   
 ;; -- Backends --  
  

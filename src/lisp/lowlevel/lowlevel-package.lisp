@@ -7,18 +7,21 @@
 ;; lli stays for low-level-interface, ts stays for
 ;; tensor system
 
+;; UPD: Added :nnl2.lli.ad package where ad stays
+;; for automatic differentiation
+
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
 
 (defpackage :nnl2.lli
-  (:use :cl)
+  (:use #:cl)
   (:export
     #:fast-mem-aref-setter
 	#:fast-mem-aref-getter
     #:alignment))
   
 (defpackage :nnl2.lli.ts
-  (:use :cl)
+  (:use #:cl)
   (:export 
     #:flat 
     #:trefw 
@@ -31,3 +34,19 @@
 	#:parallel-iterate-across-tensor-data
     #:iterate-across-tensor-shape))
   
+(defpackage :nnl2.lli.ad
+  (:use #:cl)  
+  (:export
+    #:extra-multiplier
+	#:extra-bool
+	#:extra-integer
+	#:backward-fn
+	#:grad-initialized
+	#:magic-number
+	#:name
+	#:visited-gen
+	#:object-type))
+	
+	
+	
+	
