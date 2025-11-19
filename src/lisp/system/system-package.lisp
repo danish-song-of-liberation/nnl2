@@ -28,4 +28,6 @@
 	#:*avx128-available* 
 	#:alist-to-int
 	#:*leaky-relu-default-shift*
-	#:*ad-default-track-graph*))
+	#:*ad-default-track-graph*
+	#:*default-optimize-level*
+	#:*default-compile-name*))

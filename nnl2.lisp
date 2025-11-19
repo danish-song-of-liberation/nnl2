@@ -15,7 +15,7 @@
   :license "MIT"
   :description "Common Lisp (CL) neural networks framework"
   :serial t
-  :version "0.1.0"
+  :version "0.0.0"
   :author "danish-song-of-liberation"
   :maintainer (:email "nnl.dev@proton.me")
   :homepage "https://github.com/danish-song-of-liberation/nnl2"
@@ -110,6 +110,7 @@
 										   (:module "compile"
 										    :serial t
 											:components ((:file "compile-package" :type "lisp")
+														 (:file "compile-clear" :type "lisp")
 													     (:file "compile" :type "lisp")))
 														 
 										   (:module "internal"

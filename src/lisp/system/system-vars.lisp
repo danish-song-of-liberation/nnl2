@@ -29,3 +29,6 @@
 
 (defparameter *ad-default-track-graph* t)	
 	
+(defparameter *default-compile-name* "unnamed")
+(defparameter *default-optimize-level* 2)
+	
