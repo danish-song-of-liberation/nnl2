@@ -11,7 +11,7 @@
   "Contains the project path")  
 
 (asdf:defsystem "nnl2"
-  :depends-on (:cffi :fiveam)
+  :depends-on (:cffi :fiveam :trivial-garbage)
   :license "MIT"
   :description "Common Lisp (CL) neural networks framework"
   :serial t
@@ -116,7 +116,12 @@
 										   (:module "internal"
 										    :serial t
 											:components ((:file "internal-package" :type "lisp")
-														 (:file "internal-main" :type "lisp")))))))
+														 (:file "internal-main" :type "lisp")))
+														 
+										   (:module "optim"
+										    :serial t
+											:components ((:file "optim-package" :type "lisp")
+														 (:file "optim-accessors" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

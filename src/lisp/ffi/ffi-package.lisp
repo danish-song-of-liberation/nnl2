@@ -536,5 +536,6 @@
    #:%nnl2-ad-object-type-setter
    #:strides-at
    #:%ad-trefw
-   #:%ad-flat))
+   #:%ad-flat
+   #:%optim-make-gd))
    
