@@ -537,5 +537,6 @@
    #:strides-at
    #:%ad-trefw
    #:%ad-flat
-   #:%optim-make-gd))
+   #:%optim-make-gd
+   #:%narrow))
    

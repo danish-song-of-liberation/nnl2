@@ -619,7 +619,7 @@ Tensor* lisp_call_sub_decf(Tensor* tensor, void* dec) {
        
 void lisp_call_mul_mulf_inplace(Tensor* tensor, void* mulf) {	
 	mul_mulf_inplace(tensor, mulf); 
-}	
+}	  
 
 Tensor* lisp_call_mul_mulf(Tensor* tensor, void* mulf) {
 	return mul_mulf(tensor, mulf);
@@ -629,7 +629,7 @@ void lisp_call_div_divf_inplace(Tensor* tensor, void* divf) {
 	div_divf_inplace(tensor, divf);
 }
 
-Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) {
+Tensor* lisp_call_div_divf(Tensor* tensor, void* divf) { 
 	return div_divf(tensor, divf);  
 } 
   
@@ -773,8 +773,8 @@ void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, 
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
 }      
 
-int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) { 
-	return tensor -> strides 
+int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {   
+	return tensor -> strides       
 					 [index];
 }
 

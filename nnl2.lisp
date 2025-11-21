@@ -68,7 +68,11 @@
 														 (:file "highlevel-accessors" :type "lisp")
 														 (:file "highlevel-utils" :type "lisp")
 														 (:file "highlevel-tensor-backends" :type "lisp")
-														 (:file "highlevel-ad-accessors" :type "lisp")))
+														 (:file "highlevel-ad-accessors" :type "lisp")
+														 (:module "utils"
+														  :serial t
+														  :components ((:file "highlevel-utils-package" :type "lisp")
+															    	   (:file "highlevel-utils-ts" :type "lisp")))))
 														 
 										   (:module "lowlevel"
 											:serial t

@@ -489,6 +489,12 @@
   (from :pointer)
   (to :pointer))  
   
+(cffi:defcfun ("nnl2_narrow" %narrow) :pointer
+  (tensor :pointer)
+  (dim :unsigned-char)
+  (start :unsigned-long)
+  (len :unsigned-long))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
