@@ -32,3 +32,4 @@
 (defparameter *default-compile-name* "unnamed")
 (defparameter *default-optimize-level* 2)
 	
+(defparameter *default-learning-rate* 0.1)

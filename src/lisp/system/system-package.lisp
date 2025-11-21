@@ -30,4 +30,5 @@
 	#:*leaky-relu-default-shift*
 	#:*ad-default-track-graph*
 	#:*default-optimize-level*
-	#:*default-compile-name*))
+	#:*default-compile-name*
+	#:*default-learning-rate*))
