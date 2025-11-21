@@ -20,3 +20,7 @@
 		
 	(nnl2.ffi:%ts-regional-axpy-inplace addend summand alpha from-pntr to-pntr)))
 	
+(cffi:defcfun ("nnl2_ad_tensor_share_data" ad-share-data) :pointer
+  (ad-tensor :pointer))  
+	
+	

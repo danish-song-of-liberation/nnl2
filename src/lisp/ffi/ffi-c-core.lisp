@@ -1164,7 +1164,7 @@
 (cffi:defcfun ("nnl2_ad_tensor_ts_type_setter" %nnl2-ad-object-type-setter) :void
   (tensor :pointer)
   (new-type nnl2-object-type))
-
+  
 ;; -- Optimizers --  
   
 (cffi:defcfun ("nnl2_optim_gd_create" %optim-make-gd) :pointer
