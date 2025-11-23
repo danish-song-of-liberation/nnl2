@@ -31,4 +31,5 @@
 	#:*ad-default-track-graph*
 	#:*default-optimize-level*
 	#:*default-compile-name*
-	#:*default-learning-rate*))
+	#:*default-learning-rate*
+	#:*default-batch-size*))

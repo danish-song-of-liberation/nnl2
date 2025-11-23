@@ -33,3 +33,5 @@
 (defparameter *default-optimize-level* 2)
 	
 (defparameter *default-learning-rate* 0.1)
+
+(defparameter *default-batch-size* 16)

@@ -1,8 +1,9 @@
 #ifndef NNL2_NARROW_H
 #define NNL2_NARROW_H
 
-#include <inttypes.h> // PRIu8
-
+#include <inttypes.h>  // PRIu8
+#include <string.h>
+ 
 // NNL2
 
 /** @file nnl2_narrow.h
@@ -37,6 +38,11 @@ nnl2_tensor* nnl2_narrow(nnl2_tensor* tensor, uint8_t dim, int64_t start, int64_
 	// Safety checks
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "In function nnl2_narrow, tensor is NULL", NULL);
+		
+		if(tensor->magic_number != TENSOR_MAGIC_ALIVE) {
+            NNL2_ERROR("In narrow, tensor has invalid magic number");
+            return NULL;
+        }
 
 		if(dim >= tensor -> rank) {
 			NNL2_ERROR("In narrow, passed dimension is too big. Dim: %" PRIu8 ", tensor rank: %d. Valid dimensions: 0 to %d", 
@@ -60,40 +66,64 @@ nnl2_tensor* nnl2_narrow(nnl2_tensor* tensor, uint8_t dim, int64_t start, int64_
 		}
 	#endif
 	
-	// Create new shape array
-	int32_t* new_shape = (int32_t *)malloc(tensor -> rank * sizeof(int32_t));
+	nnl2_tensor* result = (nnl2_tensor*)malloc(sizeof(nnl2_tensor));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		if(!new_shape) {
+		if (!result) {
 			NNL2_MALLOC_ERROR();
+			return NULL;
+		}
+	#endif
+	
+	// Copy metadata
+	result -> ts_type = tensor->ts_type;  
+    result -> dtype = tensor->dtype;     
+    result -> rank = tensor->rank;      
+    result -> magic_number = TENSOR_MAGIC_ALIVE;
+    result -> is_view = true; 	 // This is a view!
+	
+	result -> shape = (int32_t *)malloc(tensor->rank * sizeof(int32_t));
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (!result -> shape) {
+			free(result);
+			NNL2_MALLOC_ERROR();
+			return NULL;
 		}
 	#endif
 
-    // Copy original shape, replacing the narrowed dimension with the new length
-	for(int32_t i = 0; i < tensor->rank; i++) 
-		new_shape[i] = (i == dim ? length : tensor -> shape[i]);
+    // Copy original shape, replacing the narrowed dimension with new length
+    for (int32_t i = 0; i < tensor -> rank; i++) 
+        result -> shape[i] = (i == dim) ? length : tensor -> shape[i];
 	
-	// Create empty tensor with the new shape (same dtype and rank)
-	nnl2_tensor* result = nnl2_empty(new_shape, tensor -> rank, tensor -> dtype);
+	// Allocate and copy strides array
+    result -> strides = (int32_t *)malloc(tensor->rank * sizeof(int32_t));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		if(!result) {
-			NNL2_TENSOR_ERROR("Uninitialized data (empty)");
+		if(!result -> strides) {
+			free(result -> shape);
+			free(result);
+			NNL2_MALLOC_ERROR();
+			return NULL;
 		}
 	#endif
 	
-	free(new_shape);
+	if(!memcpy(result -> strides, tensor -> strides, tensor -> rank * sizeof(int32_t))) {
+		NNL2_ERROR("In narrow, failed to memcpy");
+		free(result->strides);
+		free(result->shape);
+		free(result);
+		return NULL;
+	}
 	
-	// Set result data pointer to the start position in original tensor data
-	// start index * stride for the narrowed dimension
-	result -> data = tensor -> data + start * tensor -> strides[dim];
-	
-	// To indicate shared data ownership
-	result -> is_view = true;
+	// Calculate data pointer offset
+    size_t element_size = get_dtype_size(tensor -> dtype);
+    result -> data = (char*)tensor -> data + start * tensor -> strides[dim] * element_size;
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-		NNL2_FUNC_EXIT();
-	#endif 
+        NNL2_DEBUG("Created narrow view: dim=%d, start=%ld, length=%ld", dim, start, length);
+        NNL2_FUNC_EXIT();
+    #endif 
 	
 	return result;
 }

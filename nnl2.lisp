@@ -125,7 +125,12 @@
 										   (:module "optim"
 										    :serial t
 											:components ((:file "optim-package" :type "lisp")
-														 (:file "optim-accessors" :type "lisp")))))))
+														 (:file "optim-accessors" :type "lisp")))
+														 
+										   (:module "utils"
+										    :serial t
+											:components ((:file "utils-package" :type "lisp")
+														 (:file "utils-dataloader" :type "lisp")))))))
 							  
 			   (:module "tests"
 			    :serial t

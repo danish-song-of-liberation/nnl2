@@ -686,7 +686,7 @@ void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
 }
 
 Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
-	return div_broadcasting(dividend, divisor);
+	return div_broadcasting(dividend, divisor);    
 }    
 
 void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
