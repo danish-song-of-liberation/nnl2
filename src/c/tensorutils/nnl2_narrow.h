@@ -51,16 +51,16 @@ nnl2_tensor* nnl2_narrow(nnl2_tensor* tensor, uint8_t dim, int64_t start, int64_
 			return NULL;
 		}
 		
-		if(start >= tensor->shape[dim]) {
+		if(start >= tensor -> shape[dim]) {
 			NNL2_ERROR("In narrow, start index %ld is out of bounds for dimension %d of size %d", 
-						start, dim, tensor->shape[dim]);
+						start, dim, tensor -> shape[dim]);
 						
 		    return NULL;
 		}
 						
-		if(start + length > tensor->shape[dim]) {
+		if(start + length > tensor -> shape[dim]) {
 			NNL2_ERROR("In narrow, length %ld is invalid for start %ld and dimension size %d", 
-						length, start, tensor->shape[dim]);	
+						length, start, tensor -> shape[dim]);	
 
 		    return NULL;
 		}
@@ -81,8 +81,8 @@ nnl2_tensor* nnl2_narrow(nnl2_tensor* tensor, uint8_t dim, int64_t start, int64_
     result -> rank = tensor->rank;      
     result -> magic_number = TENSOR_MAGIC_ALIVE;
     result -> is_view = true; 	 // This is a view!
-	
-	result -> shape = (int32_t *)malloc(tensor->rank * sizeof(int32_t));
+	 
+	result -> shape = (int32_t *)malloc(tensor -> rank * sizeof(int32_t));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (!result -> shape) {
@@ -97,7 +97,7 @@ nnl2_tensor* nnl2_narrow(nnl2_tensor* tensor, uint8_t dim, int64_t start, int64_
         result -> shape[i] = (i == dim) ? length : tensor -> shape[i];
 	
 	// Allocate and copy strides array
-    result -> strides = (int32_t *)malloc(tensor->rank * sizeof(int32_t));
+    result -> strides = (int32_t *)malloc(tensor -> rank * sizeof(int32_t));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if(!result -> strides) {

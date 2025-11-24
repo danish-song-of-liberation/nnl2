@@ -147,7 +147,7 @@ Tensor* nnl2_naive_empty(const int32_t* shape, const int32_t rank, const TensorT
 	
 	memcpy(tensor->shape, shape, rank * sizeof(int));
 	
-	tensor->strides = malloc(rank);
+	tensor->strides = malloc(rank * sizeof(int32_t));
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if (tensor->strides == NULL) {

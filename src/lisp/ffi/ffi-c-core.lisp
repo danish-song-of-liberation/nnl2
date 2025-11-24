@@ -1172,7 +1172,7 @@
   (len :int)
   (mode ad-mode)
   (track-graph :bool))  
-  
+    
 ;; -- Optimizers --  
   
 (cffi:defcfun ("nnl2_optim_gd_create" %optim-make-gd) :pointer

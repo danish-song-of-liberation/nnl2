@@ -495,7 +495,7 @@ void nnl2_ad_tensor_name_setter(nnl2_ad_tensor* tensor, char* new_name) {
 /** @brief
  * Gets the visited generation from ad tensor
  *
- ** @note
+ ** @note/
  * Lisp wrapper for accessing nnl2_ad_tensor.visited_gen
  */
 uint64_t nnl2_ad_tensor_visited_gen_getter(nnl2_ad_tensor* tensor) {
