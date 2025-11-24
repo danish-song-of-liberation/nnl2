@@ -682,12 +682,12 @@ Tensor* lisp_call_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) {
 }
 
 void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
-	return div_broadcasting_inplace(dividend, divisor);
+	return div_broadcasting_inplace(dividend, divisor);  
 }
 
 Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
-	return div_broadcasting(dividend, divisor);    
-}    
+	return div_broadcasting(dividend, divisor);     
+}          	
 
 void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 	return pow_broadcasting_inplace(base, exponent);
@@ -696,7 +696,7 @@ void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) { 
 	return pow_broadcasting(base, exponent);
 } 
-	 
+	     
 void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {
 	return max_broadcasting_inplace(a, b);  
 }

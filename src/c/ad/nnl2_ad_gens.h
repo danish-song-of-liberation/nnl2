@@ -109,6 +109,8 @@ nnl2_ad_tensor* nnl2_ad_empty(int32_t* shape, int rank, nnl2_tensor_type dtype, 
 	ad_tensor->grad_initialized = false;
 	ad_tensor->ts_type = nnl2_type_ad;
 	ad_tensor->extra_correspondence = NULL;
+	ad_tensor->extra_field = NULL;
+	ad_tensor->extra_free = NULL;
     
     if(name[0] == '\0') {
         ad_tensor->name = malloc(strlen(name) + 1);
@@ -554,6 +556,15 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         #endif
         
         free(ad_tensor->roots);
+    }
+	
+	// Free extra_field if there's a cleanup function
+    if (ad_tensor->extra_free && ad_tensor->extra_field) {
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+            NNL2_DEBUG("Freeing AD-tensor extra_field at %x with custom free function", ad_tensor->extra_field);
+        #endif
+        
+        ad_tensor->extra_free(ad_tensor->extra_field);
     }
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL

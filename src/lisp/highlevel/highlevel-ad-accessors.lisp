@@ -1176,5 +1176,5 @@
 	
 (defun (setf tref) (change-to tensor &rest shape)
   "Sets the values at the specified tref indices to `change-to`"
-  (setf (apply #'nnl2.hli.ts:tref (nnl2.hli.ad:data tensor) shape) change-to))		
+  (setf (apply #'nnl2.hli.ts:tref (nnl2.hli.ad:data tensor) shape) change-to))		  
   

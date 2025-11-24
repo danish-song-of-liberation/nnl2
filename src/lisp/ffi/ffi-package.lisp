@@ -538,5 +538,6 @@
    #:%ad-trefw
    #:%ad-flat
    #:%optim-make-gd
-   #:%narrow))
+   #:%narrow
+   #:%ad-narrow))
    

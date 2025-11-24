@@ -22,8 +22,8 @@
      (let* ((predcomp1 (nnl2-internal-dataloader-batch-size ,dataloader))
 			(predcomp2 (* predcomp1 ,epoch)))
 		
-		(nnl2.hli.ts:tlet ((,batch-x (nnl2.hli.ts.utils:narrow (nnl2-internal-dataloader-samples ,dataloader) :dim 0 :start predcomp2 :len predcomp1))
-						   (,batch-y (nnl2.hli.ts.utils:narrow (nnl2-internal-dataloader-labels ,dataloader) :dim 0 :start predcomp2 :len predcomp1)))
+		(nnl2.hli.ts:tlet ((,batch-x (nnl2.hli.ts.utils:narrow (nnl2.hli.ad:data (nnl2-internal-dataloader-samples ,dataloader)) :dim 0 :start predcomp2 :len predcomp1))
+						   (,batch-y (nnl2.hli.ts.utils:narrow (nnl2.hli.ad:data (nnl2-internal-dataloader-labels ,dataloader)) :dim 0 :start predcomp2 :len predcomp1)))
 					 
 		  ,@body))
 	  

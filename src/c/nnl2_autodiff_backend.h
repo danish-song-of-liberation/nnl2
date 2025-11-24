@@ -38,6 +38,8 @@ typedef struct nnl2_ad_tensor {
 	uint8_t extra_integer;				       ///< For edgy cases such as tref, view
 	bool extra_bool;						   ///< For edgy cases requiring additional boolean
 	void* extra_correspondence;				   ///< For correspondence ops
+	void* extra_field;						   ///< Put ANYTHING in here. you can't even imagine what the structure went through when I added this field
+	void (* extra_free) (void* extra_object);  ///< Free up the garbage in extra_field
 } nnl2_ad_tensor;
 
 /// @} [nnl2_ad_tensor]

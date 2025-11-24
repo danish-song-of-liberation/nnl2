@@ -135,6 +135,8 @@
 #include "../ad/ops/other/nnl2_ad_sum_without_axis.h"
 #include "../ad/ops/other/nnl2_ad_sum_with_axis_backward.h"
 #include "../ad/ops/other/nnl2_ad_sum_with_axis.h"
+#include "../ad/ops/other/nnl2_ad_narrow_backward.h"
+#include "../ad/ops/other/nnl2_ad_narrow.h"
 #include "../ad/ops/stack/nnl2_ad_vstack_backward.h"
 #include "../ad/ops/stack/nnl2_ad_vstack.h"
 #include "../ad/ops/stack/nnl2_ad_hstack_backward.h"

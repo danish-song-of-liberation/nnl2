@@ -1165,6 +1165,14 @@
   (tensor :pointer)
   (new-type nnl2-object-type))
   
+(cffi:defcfun ("nnl2_ad_narrow" %ad-narrow) :pointer
+  (ad-tensor :pointer)
+  (ndim :unsigned-char)
+  (start :int)
+  (len :int)
+  (mode ad-mode)
+  (track-graph :bool))  
+  
 ;; -- Optimizers --  
   
 (cffi:defcfun ("nnl2_optim_gd_create" %optim-make-gd) :pointer
