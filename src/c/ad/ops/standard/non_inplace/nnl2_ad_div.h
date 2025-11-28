@@ -27,6 +27,9 @@ nnl2_ad_tensor* nnl2_ad_div(nnl2_ad_tensor* dividend, nnl2_ad_tensor* divisor, n
     result->is_leaf = false;
     result->name = NULL;
     result->ts_type = nnl2_type_ad;
+	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
 
     switch (ad_mode) {
         case nnl2_ad_reverse_mode:

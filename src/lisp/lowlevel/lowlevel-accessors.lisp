@@ -10,6 +10,9 @@
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
 
+(cffi:defcfun ("nnl2_free_ad_tensor" free) :void
+  (ad-tensor :pointer))  
+  
 (defmacro fast-mem-aref-getter (data index dtype)
   "Fast memory reference getter with type specialization.
    

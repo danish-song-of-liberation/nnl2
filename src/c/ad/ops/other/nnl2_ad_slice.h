@@ -221,6 +221,9 @@ nnl2_ad_tensor* nnl2_ad_slice(nnl2_ad_tensor* tensor, int32_t* slice_from, int32
     result->visited_gen = 0;
     result->extra_multiplier = 0.0f;
     result->extra_bool = false;
+	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();

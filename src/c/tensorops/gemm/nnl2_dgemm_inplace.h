@@ -197,6 +197,7 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 }
 
 #ifdef OPENBLAS_AVAILABLE
+
 /** @brief
  * BLAS-accelerated implementation of double-precision general matrix multiplication (DGEMM) in-place
  * Uses highly optimized OpenBLAS library for matrix multiplication operations

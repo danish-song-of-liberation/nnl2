@@ -703,6 +703,11 @@
     (nnl2.ffi:%gemm! order transa transb m n k alpha a lda b ldb beta out ldc)))      
 
 (declaim (inline gemm gemm!))
+  
+(cffi:defcfun ("nnl2_gemmvp" gemmvp) :pointer
+  (a :pointer)
+  (b :pointer)
+  (vector :pointer)) 
 
 (defun .exp! (tensor)
   "Applies the exponent to the tensor in place
@@ -1201,7 +1206,7 @@
     (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to xavier")
 	(assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to xavier")
   
-    (multiple-value-bind (shape rank) (make-shape-pntr indices)
+    (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
       (case distribution
 	    (:normal   (nnl2.ffi:%xavier shape rank dtype in out gain 2.0s0))
 	    (:uniform  (nnl2.ffi:%xavier shape rank dtype in out gain 6.0s0))

@@ -239,6 +239,9 @@ nnl2_ad_tensor* nnl2_ad_narrow(nnl2_ad_tensor* input, uint8_t dim, int32_t start
     result->extra_integer = 0;
     result->extra_bool = false;
     result->extra_correspondence = NULL;
+	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();

@@ -161,7 +161,7 @@
   (ldb :int)
   (beta :double)
   (c :pointer)
-  (ldc :int))    
+  (ldc :int))     
   
 (cffi:defcfun ("lisp_call_addinplace" %+=) :void
   (summand :pointer)
@@ -1129,6 +1129,13 @@
   (track-graph :bool)
   (force :bool))
   
+(cffi:defcfun ("nnl2_ad_gemmvp" %ad-gemmvp) :pointer
+  (multiplicand :pointer)
+  (multiplier :pointer)
+  (vector :pointer)
+  (mode ad-mode)
+  (track-graph :bool))
+  
 (cffi:defcfun ("nnl2_ad_extra_multiplier_setter" %nnl2-ad-extra-multiplier-setter) :void
   (ad-tensor :pointer)
   (new-multiplier :float))
@@ -1179,6 +1186,30 @@
   (tensors :pointer)
   (num-tensors :long)
   (learning-rate :float))  
+  
+;; -- Neural Networks --
+
+(cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
+  (in-features :int)
+  (out-features :int)
+  (use-bias :bool)
+  (dtype tensor-type))
+  
+(cffi:defcfun ("nnl2_nn_fnn_forward" %nn-fnn-forward) :pointer
+  (nn :pointer)
+  (x :pointer))
+  
+(cffi:defcfun ("nnl2_nn_get_type" %nn-get-type) :int
+  (nn :pointer))
+  
+(cffi:defcfun ("nnl2_ann_num_parameters" %nn-get-num-parameters) :long
+  (nn :pointer)) 
+  
+(cffi:defcfun ("nnl2_ann_parameters" %nn-get-parameters) :pointer
+  (nn :pointer))   
+  
+(cffi:defcfun ("nnl2_ann_free_parameters" %nn-free-parameters) :void
+  (parameters :pointer))
   
 ;; -- Backends --  
  

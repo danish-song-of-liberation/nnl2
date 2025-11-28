@@ -5,7 +5,7 @@
 	#include <xmmintrin.h>
 #endif
     
-#ifdef NNL2_AVX256_AVAILABLE
+#ifdef NNL2_AVX256_AVAILABLE  
 	#include <immintrin.h> 
 #endif  	
 
@@ -29,21 +29,21 @@
 /** @file nnl2_core.c
  ** @brief Contains a function with system initialization and lisp-wrappers
  ** @copyright MIT License 
- ** @date 2025    
+ ** @date 2025     
  *
  * File contains the full system initialization 
  * declaration as well as all lisp wrappers 
  * for cffi (or sb-alien) 
  *
  ** Filepath: nnl2/src/c/nnl2_core.c
- ** File: nnl2_core.c
- **      
+ ** File: nnl2_core.c   
+ **          
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
  **/     
        
-///@{ [initilizing]  
-
+///@{ [initilizing]   
+ 
 ///@{ [subinitializers_declaration]            
 
 /** @brief
@@ -312,34 +312,34 @@ void nnl2_init_activations() {
 void nnl2_init_initializers() {
     EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
     EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
-    EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));    
-	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));
+    EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));     
+	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	  
 }
    
-void nnl2_init_transposition() {
-	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace)); 
+void nnl2_init_transposition() {  
+	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace));    
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, current_backend(transposition_inplace)); 
-	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));  
-}
+	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));           
+} 
     
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
-	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);   
+	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);     
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));      
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
-	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);
+	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends); 
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
 	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);
-} 
+}  
 
-void nnl2_init_correspondence_inplace() {
+void nnl2_init_correspondence_inplace() {    
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
 	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends);  
-	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends);  
+	INIT_BACKEND(mul_mulf_inplace, mul_mulf_inplace_backends);    
 	INIT_BACKEND(div_divf_inplace, div_divf_inplace_backends);    
 	INIT_BACKEND(pow_powf_inplace, pow_powf_inplace_backends);  
-	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);  
+	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);       
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);      
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);  
 }
@@ -362,9 +362,9 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(div_broadcasting_inplace, div_broadcasting_inplace_backends);
 	INIT_BACKEND(pow_broadcasting_inplace, pow_broadcasting_inplace_backends);
 	INIT_BACKEND(max_broadcasting_inplace, max_broadcasting_inplace_backends);
-	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends);
+	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends); 
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
-}
+} 
          
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
@@ -691,21 +691,21 @@ Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) {
 
 void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 	return pow_broadcasting_inplace(base, exponent);
-}     
-
+}      
+               
 Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) { 
 	return pow_broadcasting(base, exponent);
 } 
-	             
-void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {
-	return max_broadcasting_inplace(a, b);  
+	               
+void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {     
+	return max_broadcasting_inplace(a, b);          
 }
 
 void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {
 	return min_broadcasting_inplace(a, b);
 }
  
-Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) { 
+Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) {         
 	return max_broadcasting(a, b);
 }  
 
@@ -716,7 +716,7 @@ Tensor* lisp_call_min_broadcasting(Tensor* a, Tensor* b) {
 void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 	axpy_inplace(summand, sumend, alpha);    
 }
-
+ 
 Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 	return axpy(summand, sumend, alpha);    
 }     

@@ -203,6 +203,9 @@ void* nnl2_ad_l2norm(nnl2_ad_tensor* input, bool force, nnl2_ad_mode ad_mode, bo
         result->extra_multiplier = 1.0f;
         result->extra_bool = false;
         result->extra_correspondence = NULL;
+		
+		result -> extra_field = NULL;
+		result -> extra_free = NULL;
         
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

@@ -60,5 +60,6 @@
 	#:iterate-across-tensor-strides
 	#:iatst
 	#:trefw
-	#:flat))
+	#:flat
+	#:free))
 	

@@ -6,27 +6,23 @@ OBJ = $(SRC:.c=.o)
 
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-OPENBLAS0330WOA64STATIC_DIRECTORY := $(MAKEFILE_DIR)backends/OpenBLAS-0.3.30-woa64-64-static/OpenBLAS
-
-OPENBLAS0330WOA64STATIC_INCLUDE := $(OPENBLAS0330WOA64STATIC_DIRECTORY)/include/openblas64
-OPENBLAS0330WOA64STATIC_LIB := $(OPENBLAS0330WOA64STATIC_DIRECTORY)/lib
-OPENBLAS0330WOA64STATIC_SHARED := openblas
+OPENBLAS_DIR := backends/OpenBLAS-0.3.30-woa64-64-static/OpenBLAS
+OPENBLAS_INCLUDE := $(OPENBLAS_DIR)/include/openblas64
+OPENBLAS_LIB := $(OPENBLAS_DIR)/lib
 
 ifeq ($(OS),Windows_NT)
     TARGET = src/c/libnnl.dll
-    LIBSUFFIX = .dll
     LDFLAGS = -shared
 else
     TARGET = src/c/libnnl.so
-    LIBSUFFIX = .so
     LDFLAGS = -shared 
 endif
 
 ifeq ($(openblas0330woa64static_available), 1)
-	CFLAGS += -I$(OPENBLAS0330WOA64STATIC_INCLUDE)
+	CFLAGS += -I$(OPENBLAS_INCLUDE)
 	CFLAGS += -DOPENBLAS_AVAILABLE
 	CFLAGS += -DNNL2_NUM_THREADS=$(kernel_count)
-    LDFLAGS += -L$(OPENBLAS0330WOA64STATIC_LIB) -l$(OPENBLAS0330WOA64STATIC_SHARED)
+    LDFLAGS += -L$(OPENBLAS_LIB) -l:libopenblas_haswellp-r0.3.30.dev.a
 endif
 
 ifeq ($(avx256_available), 1)
@@ -34,8 +30,7 @@ ifeq ($(avx256_available), 1)
 endif
 
 all: $(TARGET)
-	@echo OS=$(OS)
-	@echo Building $(TARGET)
+	@echo Building $(TARGET) for $(OS)
 
 $(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
@@ -44,6 +39,6 @@ $(OBJ): $(SRC)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	git clean -fdX -- $(MAKEFILE_DIR)src/c/nnl2_core.o
+	git clean -fdX -- src/c/nnl2_core.o
 
 .PHONY: all clean

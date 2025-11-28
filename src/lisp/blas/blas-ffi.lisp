@@ -1,0 +1,42 @@
+(in-package :nnl2.blas)
+
+(defconstant +cblas-row-major+ 101)
+(defconstant +cblas-col-major+ 102)
+(defconstant +cblas-no-trans+ 111)
+(defconstant +cblas-trans+ 112)
+(defconstant +cblas-conj-trans+ 113)
+
+(cffi:defcfun ("cblas_dgemm" dgemm) :void
+  (order :int)     
+  (transa :int)  
+  (transb :int)     
+  (m :int)         
+  (n :int)          
+  (k :int)         
+  (alpha :double)   
+  (a :pointer)      
+  (lda :int)      
+  (b :pointer)      
+  (ldb :int)      
+  (beta :double)  
+  (c :pointer)    
+  (ldc :int))
+  
+(cffi:defcfun ("cblas_sgemm" sgemm) :void
+  (order :int)     
+  (transa :int)  
+  (transb :int)     
+  (m :int)         
+  (n :int)          
+  (k :int)         
+  (alpha :float)   
+  (a :pointer)      
+  (lda :int)      
+  (b :pointer)      
+  (ldb :int)      
+  (beta :float)  
+  (c :pointer)    
+  (ldc :int))
+  
+(declaim (inline dgemm sgemm))  
+  

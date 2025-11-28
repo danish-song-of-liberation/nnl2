@@ -15,8 +15,8 @@
  *
  ** @details
  * Derivatives of matrix multiplication C = A @ B:
- * - dC/dA = gradient @ B^T
- * - dC/dB = A^T @ gradient
+ * dC/dA = gradient @ B^T
+ * dC/dB = A^T @ gradient
  * Propagates gradients to both input matrices using matrix calculus rules
  *
  ** @exception NNL2Error
@@ -130,10 +130,8 @@ nnl2_ad_tensor* nnl2_ad_gemm(nnl2_ad_tensor* multiplicand, nnl2_ad_tensor* multi
 	#endif
 	
 	// Extract dimensions
-	int m = multiplicand->data->shape[0];  // rows of A
 	int k_multiplicand = multiplicand->data->shape[1];  // columns of A
 	int k_multiplier = multiplier->data->shape[0];      // rows of B
-	int n = multiplier->data->shape[1];    // columns of B
 	
 	// Check inner dimension compatibility
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
@@ -153,19 +151,9 @@ nnl2_ad_tensor* nnl2_ad_gemm(nnl2_ad_tensor* multiplicand, nnl2_ad_tensor* multi
 	result->magic_number = TENSOR_MAGIC_ALIVE;
     
 	// Compute matrix multiplication using GEMM
-    result->data = gemm(
-        nnl2RowMajor,       // order
-        nnl2NoTrans,        // transa
-        nnl2NoTrans,        // transb
-        m,                  // rows of result
-        n,                  // cols of result
-        k_multiplicand,     // common dimension
-        1.0,                // alpha
-        multiplicand->data, // A
-        k_multiplicand,     // lda
-        multiplier->data,   // B
-        n,                  // ldb
-        0.0                 // beta
+    result->data = nnl2_quick_gemm(
+        multiplicand -> data, // A
+        multiplier -> data   // B
     );
     
 	if(!result->data) {
@@ -221,6 +209,9 @@ nnl2_ad_tensor* nnl2_ad_gemm(nnl2_ad_tensor* multiplicand, nnl2_ad_tensor* multi
     result->is_leaf = false; 
     result->name = NULL;
     result->ts_type = nnl2_type_ad;
+	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();

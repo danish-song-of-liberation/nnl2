@@ -5,12 +5,7 @@ void nnl2_ad_reverse_backward_mul_broadcasting(nnl2_ad_tensor* tensor) {
     nnl2_ad_reverse_derivative_mul_broadcasting(tensor, tensor->roots[0], tensor->roots[1]);
 }   
 
-nnl2_ad_tensor* nnl2_ad_mul_broadcasting(
-    nnl2_ad_tensor* multiplier,
-    nnl2_ad_tensor* multiplicand,
-    nnl2_ad_mode ad_mode,
-    bool track_graph
-) {
+nnl2_ad_tensor* nnl2_ad_mul_broadcasting(nnl2_ad_tensor* multiplier, nnl2_ad_tensor* multiplicand, nnl2_ad_mode ad_mode, bool track_graph) {
     nnl2_ad_tensor* result = malloc(sizeof(nnl2_ad_tensor));
 
     result->data = mul_broadcasting(multiplier->data, multiplicand->data);
@@ -19,6 +14,8 @@ nnl2_ad_tensor* nnl2_ad_mul_broadcasting(
     result->magic_number = TENSOR_MAGIC_ALIVE;
     result->grad_initialized = false;
     result->ts_type = nnl2_type_ad;
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
 
     if (track_graph && result->requires_grad) {
         result->num_roots = 2;

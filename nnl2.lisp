@@ -13,7 +13,7 @@
 (asdf:defsystem "nnl2"
   :depends-on (:cffi :fiveam :trivial-garbage)
   :license "MIT"
-  :description "Common Lisp (CL) neural networks framework"
+  :description "Common Lisp (CL) neural networks meta-library"
   :serial t
   :version "0.0.0"
   :author "danish-song-of-liberation"
@@ -49,6 +49,11 @@
 														 (:file "ffi-c-core" :type "lisp")
 														 (:file "ffi-status" :type "lisp")))
 														 
+										   (:module "blas"
+										    :serial t
+											:components ((:file "blas-package" :type "lisp")
+														 (:file "blas-ffi" :type "lisp")))
+														 
 										   (:module "threading"
 										    :serial t
 											:components ((:file "threading-package" :type "lisp")
@@ -69,6 +74,7 @@
 														 (:file "highlevel-utils" :type "lisp")
 														 (:file "highlevel-tensor-backends" :type "lisp")
 														 (:file "highlevel-ad-accessors" :type "lisp")
+														 (:file "highlevel-nn-accessors" :type "lisp")
 														 (:module "utils"
 														  :serial t
 														  :components ((:file "highlevel-utils-package" :type "lisp")

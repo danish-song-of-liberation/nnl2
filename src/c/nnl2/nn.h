@@ -1,0 +1,7 @@
+#include "../nn/ann/nnl2_ann_backend.h"
+#include "../nn/ann/fnn/nnl2_fnn_backend.h"
+#include "../nn/ann/fnn/nnl2_fnn_forward.h"
+#include "../nn/ann/nnl2_ann_free.h"
+#include "../nn/ann/nnl2_ann_num_parameters.h"
+#include "../nn/ann/nnl2_ann_parameters.h"
+#include "../nn/ann/nnl2_ann_parameters_free.h"

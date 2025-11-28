@@ -14,6 +14,8 @@ nnl2_ad_tensor* nnl2_ad_sub_broadcasting(nnl2_ad_tensor* minuend, nnl2_ad_tensor
     result->magic_number = TENSOR_MAGIC_ALIVE;
     result->grad_initialized = false;
     result->ts_type = nnl2_type_ad;
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
 
     if (track_graph) {
         result->num_roots = 2;

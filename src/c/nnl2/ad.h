@@ -40,6 +40,8 @@
 #include "../ad/ops/standard/non_inplace/nnl2_ad_axpy.h"
 #include "../ad/ops/standard/non_inplace/nnl2_ad_gemm_backward.h"
 #include "../ad/ops/standard/non_inplace/nnl2_ad_gemm.h"
+#include "../ad/ops/standard/non_inplace/nnl2_ad_gemmvp_backward.h"
+#include "../ad/ops/standard/non_inplace/nnl2_ad_gemmvp.h"
 #include "../ad/ops/standard/inplace/nnl2_ad_sqrt_inplace.h"
 #include "../ad/ops/standard/inplace/nnl2_ad_neg_inplace.h"
 #include "../ad/ops/standard/inplace/nnl2_ad_add_inplace.h"

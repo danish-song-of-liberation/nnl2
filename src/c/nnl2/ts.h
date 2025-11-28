@@ -95,6 +95,8 @@
 #include "../tensorops/broadcasting/non_inplace/nnl2_broadcasting_max.h"
 #include "../tensorops/broadcasting/non_inplace/nnl2_broadcasting_min.h"
 #include "../tensorops/broadcasting/non_inplace/nnl2_broadcasting_axpy.h"
+#include "../tensorops/gemm/nnl2_quick_gemm.h"
+#include "../tensorops/gemm/nnl2_gemmvp.h"
 #include "../tensorstack/nnl2_hstack.h"
 #include "../tensorstack/nnl2_vstack.h"
 #include "../tensorstack/nnl2_concat.h"

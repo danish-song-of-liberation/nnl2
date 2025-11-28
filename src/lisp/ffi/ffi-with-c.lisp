@@ -56,3 +56,5 @@
   (compile-makefile nnl2.intern-system:*current-dir* nil)
   (clean-makefile nnl2.intern-system:*current-dir* nil)
   (load-c-library c-dir))
+  
+(cffi:load-foreign-library "libopenblas.dll")  

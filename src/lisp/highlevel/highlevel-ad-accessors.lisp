@@ -992,6 +992,10 @@
   "Performs matrix multiplication (a @ b) with AD tracking"
   (nnl2.ffi:%ad-gemm a b nnl2.ffi:ad-reverse-mode track-graph))
 
+(defun gemmvp (a b vector &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Performs matrix multiplication with bias (a @ b + vector) with AD tracking"
+  (nnl2.ffi:%ad-gemmvp a b vector nnl2.ffi:ad-reverse-mode track-graph))
+
 (defun .- (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise subtraction"
   

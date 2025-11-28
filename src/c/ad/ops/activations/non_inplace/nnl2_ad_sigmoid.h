@@ -174,6 +174,8 @@ nnl2_ad_tensor* nnl2_ad_sigmoid(nnl2_ad_tensor* ad_tensor, bool approx, nnl2_ad_
     result->is_leaf = false; 
     result->name = NULL;
     result->ts_type = nnl2_type_ad;
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();

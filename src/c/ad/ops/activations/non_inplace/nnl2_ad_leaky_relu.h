@@ -176,6 +176,8 @@ nnl2_ad_tensor* nnl2_ad_leakyrelu(nnl2_ad_tensor* ad_tensor, float alpha, bool s
     result->is_leaf = false; 
     result->name = NULL;
     result->ts_type = nnl2_type_ad;
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();

@@ -179,6 +179,9 @@ nnl2_ad_tensor* nnl2_ad_scale(nnl2_ad_tensor* ad_tensor, nnl2_float32 multiplier
     result->ts_type = nnl2_type_ad;
     result->extra_multiplier = multiplier;  // Store multiplier for backward pass
 	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
+	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif

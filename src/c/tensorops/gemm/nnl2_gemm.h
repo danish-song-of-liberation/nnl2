@@ -60,10 +60,10 @@
  ** @see sgemm()
  ** @see dgemm()
  **/
-Tensor* gemm(const nnl2_order order, const nnl2_transpose transa, 
-			 const nnl2_transpose transb, const int m, const int n, 
-		     const int k, const double alpha, const Tensor* a, const int lda,
-			 const Tensor* b, const int ldb, const double beta) {
+nnl2_tensor* gemm(const nnl2_order order, const nnl2_transpose transa, 
+				  const nnl2_transpose transb, const int m, const int n, 
+				  const int k, const double alpha, const Tensor* a, const int lda,
+				  const Tensor* b, const int ldb, const double beta) {
 		
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();

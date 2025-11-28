@@ -521,6 +521,10 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
 	
 	if (ad_tensor->magic_number != TENSOR_MAGIC_ALIVE) return;
 	ad_tensor->magic_number = TENSOR_MAGIC_FREED;
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_DEBUG("Freeing %p tensor (name: %s)", ad_tensor, ad_tensor -> name);
+    #endif
     
     // Free the main data tensor
     if (ad_tensor->data) {
@@ -565,6 +569,9 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         #endif
         
         ad_tensor->extra_free(ad_tensor->extra_field);
+		
+		ad_tensor->extra_field = NULL;
+		ad_tensor->extra_free = NULL;
     }
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL

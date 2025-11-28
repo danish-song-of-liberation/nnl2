@@ -1,6 +1,11 @@
 #ifndef NNL2_XAVIER_H
 #define NNL2_XAVIER_H
 
+#define NNL2_XAVIER_NO_GAIN 1.0f
+
+#define NNL2_XAVIER_NORMAL_DIST 2.0f
+#define NNL2_XAVIER_UNIFORM_DIST 6.0f
+
 /** @brief
  * Initializing a tensor using the Xavier distribution
  *

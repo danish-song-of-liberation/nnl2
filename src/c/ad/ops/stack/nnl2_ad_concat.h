@@ -188,6 +188,9 @@ nnl2_ad_tensor* nnl2_ad_concat(nnl2_ad_tensor* tensora, nnl2_ad_tensor* tensorb,
     result->requires_grad = tensora->requires_grad || tensorb->requires_grad;
     result->grad_initialized = false;
     result->is_leaf = false;
+	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
     
     // Store axis in extra_correspondence for backward pass
     int* axis_ptr = malloc(sizeof(int));

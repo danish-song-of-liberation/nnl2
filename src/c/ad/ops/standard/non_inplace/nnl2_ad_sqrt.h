@@ -172,6 +172,9 @@ nnl2_ad_tensor* nnl2_ad_sqrt(nnl2_ad_tensor* ad_tensor, nnl2_ad_mode ad_mode, bo
     result->name = NULL;
     result->ts_type = nnl2_type_ad;
 	
+	result -> extra_field = NULL;
+	result -> extra_free = NULL;
+	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif

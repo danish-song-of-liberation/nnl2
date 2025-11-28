@@ -217,6 +217,8 @@ void* nnl2_ad_flat(nnl2_ad_tensor* tensor, size_t at, nnl2_ad_mode ad_mode, bool
         result -> ts_type = nnl2_type_ad;
         result -> visited_gen = 0;
         result -> extra_integer = 0; // Not used for flat
+		result -> extra_field = NULL;
+		result -> extra_free = NULL;
         
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

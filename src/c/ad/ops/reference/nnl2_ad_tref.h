@@ -205,6 +205,8 @@ void* nnl2_ad_tref_getter(nnl2_ad_tensor* tensor, int32_t* indices, uint8_t num_
 		result -> ts_type = nnl2_type_ad;
 		result -> visited_gen = 0;
 		result -> extra_integer = num_indices;
+		result -> extra_field = NULL;
+		result -> extra_free = NULL;
 		
 		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 			NNL2_FUNC_EXIT();

@@ -539,5 +539,13 @@
    #:%ad-flat
    #:%optim-make-gd
    #:%narrow
-   #:%ad-narrow))
+   #:%ad-narrow
+   #:%ad-gemmvp
+   #:%create-nn-fnn
+   #:%nn-fnn-forward
+   #:%nn-get-type
+   #:%nn-fnn-get-parameters
+   #:%nn-get-num-parameters
+   #:%nn-get-parameters
+   #:%nn-free-parameters))
    

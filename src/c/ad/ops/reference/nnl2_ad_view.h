@@ -206,6 +206,8 @@ void* nnl2_ad_view(nnl2_ad_tensor* tensor, int32_t* indices, uint8_t num_indices
 		result -> visited_gen = 0;
 		result -> extra_integer = num_indices;
 		result -> extra_bool = scalar_exit_p;
+		result -> extra_field = NULL;
+		result -> extra_free = NULL;
 		
 		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 			NNL2_FUNC_EXIT();

@@ -210,6 +210,8 @@ void* nnl2_ad_trefw(nnl2_ad_tensor* tensor, int32_t* coords, int32_t coords_len,
         result -> ts_type = nnl2_type_ad;
         result -> visited_gen = 0;
         result -> extra_integer = coords_len;
+		result -> extra_field = NULL;
+		result -> extra_free = NULL;
         
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

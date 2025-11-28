@@ -8,8 +8,21 @@
 ;; ts stays for tensor system, ad stays for automatic 
 ;; differentiation
 
+;; UPD: also definition of nnl2.hli.nn package
+;; where nn i think is autologous
+
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
+(defpackage :nnl2.hli.nn
+  (:use #:cl)
+  (:export
+   #:fnn
+   #:free
+   #:forward
+   #:nnlet
+   #:nnlet*
+   #:parameters))
 
 (defpackage #:nnl2.hli
   (:use #:cl)
@@ -44,7 +57,6 @@
    #:bp
    #:backpropagation-through-time
    #:bptt
-   #:free
    #:tlet
    #:tlet*
    #:with-tensor-dispatch
@@ -127,6 +139,7 @@
    #:.^
    #:.abs
    #:gemm
+   #:gemmvp
    #:.min
    #:.max
    #:axpy
@@ -168,6 +181,7 @@
    #:strides
    #:dtype
    #:int-dtype
+   #:gemmvp
    #:reshape
    #:reinterpret
    #:shape-pointer

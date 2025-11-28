@@ -50,20 +50,20 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_gemm(nnl2_ad_tensor* ou
 		NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->data->shape, "In function nnl2_ad_reverse_derivative_gemm, sumend shape is NULL");
 	#endif
     
-    int m = out_tensor->grad->shape[0];
-    int k = out_tensor->grad->shape[1];
-    int n = sumend->data->shape[1];
+    int m = out_tensor->grad->shape[0];  // rows of output
+    int n = out_tensor->grad->shape[1];  // cols of output
+    int k = addend->data->shape[1];      // inner dimension
     
     nnl2_tensor* grad_out_a = gemm(
         nnl2RowMajor, 		     // order
         nnl2NoTrans,    		 // transa
         nnl2Trans,          	 // transb
         m, 					     // rows of result
-        addend->data->shape[1],  // cols of result  
-        k, 						 // common dimension
+        k,                      // cols of result  
+        n,                      // common dimension 
         1.0, 					 // alpha
         out_tensor->grad,        // A
-        k, 						 // lda
+        n, 						 // lda
         sumend->data,		     // B
         n,  					 // ldb
         0.0  					 // beta
@@ -73,7 +73,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_gemm(nnl2_ad_tensor* ou
         nnl2RowMajor,   		 // order
         nnl2Trans,  	    	 // transa
         nnl2NoTrans, 		     // transb
-        addend->data->shape[0],  // rows of result
+        k,                       // rows of result 
         n,  					 // cols of result
         m,  					 // common dimension
         1.0, 					 // alpha
