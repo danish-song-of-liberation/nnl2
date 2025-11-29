@@ -495,6 +495,12 @@
   (start :unsigned-long)
   (len :unsigned-long))  
   
+(cffi:defcfun ("lisp_call_mse" %mse) :void
+  (prediction :pointer)
+  (target :pointer)
+  (record :pointer)
+  (force :bool))
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
@@ -1499,7 +1505,10 @@
   (backend-name :string))
 
 (cffi:defcfun ("set_sqrt_backend" %set-sqrt-backend) :void
-  (backend-name :string))      
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_mse_backend" %set-mse-backend) :void
+  (backend-name :string))   
   
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
@@ -1560,6 +1569,7 @@
 (cffi:defcfun ("get_neg_backend" %get-neg-backend) :string)
 (cffi:defcfun ("get_sqrtinplace_backend" %get-sqrtinplace-backend) :string)
 (cffi:defcfun ("get_sqrt_backend" %get-sqrt-backend) :string)
+(cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -1679,6 +1689,8 @@
 (cffi:defcfun ("get_sqrtinplace_num_backends" %get-sqrtinplace-num-backends) :int)
 (cffi:defcfun ("get_sqrt_backends" %get-sqrt-backends) :pointer)
 (cffi:defcfun ("get_sqrt_num_backends" %get-sqrt-num-backends) :int)
+(cffi:defcfun ("get_mse_backends" %get-mse-backends) :pointer)
+(cffi:defcfun ("get_mse_num_backends" %get-mse-num-backends) :int)
 
 ;; -- mem-aref setters/getters --
 

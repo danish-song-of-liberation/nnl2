@@ -8,8 +8,10 @@
 ;; ts stays for tensor system, ad stays for automatic 
 ;; differentiation
 
-;; UPD: also definition of nnl2.hli.nn package
+;; UPD: also definition of :nnl2.hli.nn package
 ;; where nn i think is autologous
+
+;; UPD: also added definition of :nnl2.hli.ts.loss package
 
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
@@ -164,6 +166,11 @@
    #:concat
    #:view
    #:tref))   
+   
+(defpackage :nnl2.hli.ts.loss
+  (:use #:cl)
+  (:export
+   #:mse))  
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -569,5 +576,10 @@
    #:get-backends/.sqrt!
    #:get-backends/.sqrt
    #:with-backend/.sqrt!
-   #:with-backend/.sqrt))
+   #:with-backend/.sqrt
+   #:use-backend/mse
+   #:get-backend/mse
+   #:use-backend/mse
+   #:get-backends/mse
+   #:with-backend/mse))
    

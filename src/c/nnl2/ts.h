@@ -122,5 +122,6 @@
 #include "../tensorref/nnl2_tensor_direct_accessors.h"
 #include "../tensorshape/nnl2_reshape.h"
 #include "../tensorshape/nnl2_reinterpret.h"
+#include "../tensorloss/nnl2_mse.h"
 
 #endif /** NNL2_TS_INCLUDE_H **/

@@ -1036,6 +1036,16 @@ typedef void (*sqrtinplacefn)(nnl2_tensor* tensor);
  */
 typedef void (*axpy_inplace_region_fn)(Tensor* summand, Tensor* sumend, float alpha, int* from, int* to);
 
+/** @brief Computes Mean Squared Error between prediction and target tensors
+ ** @param prediction Tensor containing predicted values
+ ** @param target Tensor containing ground truth values
+ ** @param record Pointer to record result
+ ** @param force Try to save int type
+ ** @return Tensor containing MSE loss value(s)
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor_type (*msefn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record, bool force);
+
 /// @} [typedef]
 
 

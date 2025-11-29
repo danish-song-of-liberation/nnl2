@@ -37,7 +37,7 @@
  *
  ** Filepath: nnl2/src/c/nnl2_core.c
  ** File: nnl2_core.c   
- **          
+ **           
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
  **/     
@@ -159,6 +159,15 @@ void nnl2_init_broadcasting();
  * Functions to change the shape or interpretation of a tensor's dimensions without copying data
  */
 void nnl2_init_reshaping();
+
+
+/** @brief 
+ * Registers backend implementations for loss functions 
+ *           
+ ** @details 
+ * Functions to compute various loss metrics between predicted and target values like MSE, BCE, e.t.c
+ */
+void nnl2_init_loss();
            
 ///@} [subinitializers_declaration]		
 		 
@@ -234,7 +243,8 @@ void nnl2_init_system() {
 	nnl2_init_correspondence();   
 	nnl2_init_broadcasting_inplace();
 	nnl2_init_broadcasting();    
-	nnl2_init_reshaping();  	
+	nnl2_init_reshaping();  
+    nnl2_init_loss();  	
 }                                               
   
 ///@{ [subinitializers]     
@@ -284,7 +294,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(mulinplace, mulinplace_backends, current_backend(mulinplace));     
 	EINIT_BACKEND(divinplace, divinplace_backends, current_backend(divinplace));  
 	EINIT_BACKEND(absinplace, absinplace_backends, current_backend(absinplace));
-	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	
+	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	 
 	EINIT_BACKEND(nnl2_neginplace, neginplace_backends, current_backend(neginplace));
 	EINIT_BACKEND(nnl2_sqrtinplace, sqrtinplace_backends, current_backend(sqrtinplace));
 }                            
@@ -380,6 +390,10 @@ void nnl2_init_broadcasting() {
 void nnl2_init_reshaping() {      
 	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));  
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
+}
+
+void nnl2_init_loss() {
+	EINIT_BACKEND(nnl2_mse, mse_backends, CURRENT_BACKEND(mse));
 }
      
 ///@} [subinitializers]   
@@ -771,11 +785,18 @@ nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
 
 void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
-}      
+}        
 
 int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {   
 	return tensor -> strides       
 					 [index];
+}
+
+/** @note 
+ * The return value of mse (nnl2_tensor_type) is only for AD purposes, so it's omitted here
+ */
+void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record, bool force) {  
+	nnl2_mse(prediction, target, record, force);
 }
 
 ///@} [lisp_wrappers]                

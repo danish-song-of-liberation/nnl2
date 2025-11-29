@@ -547,5 +547,10 @@
    #:%nn-fnn-get-parameters
    #:%nn-get-num-parameters
    #:%nn-get-parameters
-   #:%nn-free-parameters))
+   #:%nn-free-parameters
+   #:%mse
+   #:%set-mse-backend
+   #:%get-mse-backend
+   #:%get-mse-backends
+   #:%get-mse-num-backends))
    

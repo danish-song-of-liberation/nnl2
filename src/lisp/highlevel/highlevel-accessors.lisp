@@ -1990,3 +1990,14 @@
 (cffi:defcfun ("lisp_call_sqrt_inplace" .sqrt!) :void
   (tensor :pointer))  
   
+(in-package :nnl2.hli.ts.loss)
+  
+(defun mse (prediction target)
+  (let* ((result-pntr (cffi:foreign-alloc :double)))	 
+	(nnl2.ffi:%mse prediction target result-pntr nil)
+	
+	(let ((result (cffi:mem-ref result-pntr :double)))
+	  (cffi:foreign-free result-pntr)
+	  
+	  result)))
+	
