@@ -519,7 +519,9 @@
   (extra-multiplier :float)				;; For edgy cases such as axpy, scale
   (extra-integer :unsigned-char)		;; For edgy cases such as tref, view	
   (extra-bool :bool)					;; For edgy cases requiring additional boolean
-  (extra-correspondence :pointer))  	;; For correspondence ops
+  (extra-correspondence :pointer)	  	;; For correspondence ops
+  (extra-field :pointer)				;; Put anything in here
+  (extra-free :pointer))				;; Free up the garbage in extra-field
   
 (cffi:defcenum ad-mode 
   ad-reverse-mode
@@ -1176,6 +1178,18 @@
 (cffi:defcfun ("nnl2_ad_tensor_ts_type_setter" %nnl2-ad-object-type-setter) :void
   (tensor :pointer)
   (new-type nnl2-object-type))
+  
+(cffi:defcfun ("nnl2_ad_tensor_extra_correspondence_setter" %nnl2-ad-extra-correspondence-setter) :void
+  (tensor :pointer)
+  (new-correspondence :pointer))  
+  
+(cffi:defcfun ("nnl2_ad_tensor_extra_field_setter" %nnl2-ad-extra-field-setter) :void
+  (tensor :pointer)
+  (new-extra-field :pointer))
+
+(cffi:defcfun ("nnl2_ad_tensor_extra_free_setter" %nnl2-ad-extra-free-setter) :void
+  (tensor :pointer)
+  (new-extra-free :pointer))
   
 (cffi:defcfun ("nnl2_ad_narrow" %ad-narrow) :pointer
   (ad-tensor :pointer)

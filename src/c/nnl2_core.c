@@ -375,7 +375,7 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(max_broadcasting_inplace, max_broadcasting_inplace_backends);
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends); 
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
-}  
+}    
          
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);

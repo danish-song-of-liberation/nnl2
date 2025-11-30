@@ -61,7 +61,10 @@
 	#:iatst
 	#:trefw
 	#:flat
-	#:free))
+	#:free
+	#:extra-correspondence
+	#:extra-field
+	#:extra-free))
 	
 (defpackage :nnl2.lli.ad.utils
   (:use #:cl)

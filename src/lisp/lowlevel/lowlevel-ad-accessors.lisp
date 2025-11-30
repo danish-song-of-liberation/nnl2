@@ -63,6 +63,24 @@
 (defun (setf object-type) (new-obj ad-tensor)
   (nnl2.ffi:%nnl2-ad-object-type-setter ad-tensor new-obj))    
     
+(cffi:defcfun ("nnl2_ad_tensor_extra_correspondence_getter" extra-correspondence) :pointer
+  (ad-tensor :pointer))
+    
+(defun (setf extra-correspondence) (new-correspondence ad-tensor)
+  (nnl2.ffi:%nnl2-ad-extra-correspondence-setter ad-tensor new-correspondence))
+    
+(cffi:defcfun ("nnl2_ad_tensor_extra_field_getter" extra-field) :pointer
+  (ad-tensor :pointer))
+    
+(defun (setf extra-field) (new-extra-field ad-tensor)
+  (nnl2.ffi:%nnl2-ad-extra-field-setter ad-tensor new-extra-field))
+
+(cffi:defcfun ("nnl2_ad_tensor_extra_free_getter" extra-free) :pointer
+  (ad-tensor :pointer))
+    
+(defun (setf extra-free) (new-extra-free ad-tensor)
+  (nnl2.ffi:%nnl2-ad-extra-free-setter ad-tensor new-extra-free))	
+	
 (defmacro iterate-across-tensor-data ((iterator ad-tensor) &body body)
   "Iterates over each element of the AD tensor's data"
   `(nnl2.lli.ts:iatd (,iterator (nnl2.hli.ad:data ,ad-tensor)) ,@body))	

@@ -531,5 +531,65 @@ nnl2_object_type nnl2_ad_tensor_ts_type_getter(nnl2_ad_tensor* tensor) {
 void nnl2_ad_tensor_ts_type_setter(nnl2_ad_tensor* tensor, nnl2_object_type new_type) {
     tensor -> ts_type = new_type;
 }
+	  
+/** @brief
+ * Gets the extra correspondence pointer from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.extra_correspondence
+ */
+void* nnl2_ad_tensor_extra_correspondence_getter(nnl2_ad_tensor* tensor) {
+	return tensor -> extra_correspondence;
+}
+
+/** @brief
+ * Sets the extra correspondence pointer in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.extra_correspondence
+ */
+void nnl2_ad_tensor_extra_correspondence_setter(nnl2_ad_tensor* tensor, void* new_corresnpondence) {
+	tensor -> extra_correspondence = new_corresnpondence;
+}
+
+/** @brief
+ * Gets the extra field pointer from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.extra_field
+ */
+void* nnl2_ad_tensor_extra_field_getter(nnl2_ad_tensor* tensor) {
+    return tensor->extra_field;
+}
+
+/** @brief
+ * Sets the extra field pointer in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.extra_field
+ */
+void nnl2_ad_tensor_extra_field_setter(nnl2_ad_tensor* tensor, void* new_extra_field) {
+    tensor->extra_field = new_extra_field;
+}
+
+/** @brief
+ * Gets the extra free function pointer from ad tensor
+ *
+ ** @note
+ * Lisp wrapper for accessing nnl2_ad_tensor.extra_free
+ */
+void* nnl2_ad_tensor_extra_free_getter(nnl2_ad_tensor* tensor) {
+    return (void*)tensor->extra_free;
+}
+
+/** @brief
+ * Sets the extra free function pointer in autodiff tensor
+ *
+ ** @note
+ * Lisp wrapper for modifying nnl2_ad_tensor.extra_free
+ */
+void nnl2_ad_tensor_extra_free_setter(nnl2_ad_tensor* tensor, void (*new_extra_free)(void*)) {
+    tensor->extra_free = new_extra_free;
+}
 
 #endif /** NNL2_AD_ACCESSORS_H **/

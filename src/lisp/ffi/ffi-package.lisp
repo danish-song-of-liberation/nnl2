@@ -553,5 +553,8 @@
    #:%get-mse-backend
    #:%get-mse-backends
    #:%get-mse-num-backends
-   #:%ad-mse))
+   #:%ad-mse
+   #:%nnl2-ad-extra-correspondence-setter
+   #:%nnl2-ad-extra-field-setter
+   #:%nnl2-ad-extra-free-setter))
    
