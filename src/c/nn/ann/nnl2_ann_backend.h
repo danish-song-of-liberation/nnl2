@@ -57,7 +57,7 @@ nnl2_nn_type nnl2_nn_get_type(void* nn) {
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if (nn == NULL) {
             #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
-                NNL2_DEBUG_LOG("In function nnl2_nn_get_type, nn is NULL. returning unknown type (nnl2_nn_type_unknown)");
+                NNL2_DEBUG("In function nnl2_nn_get_type, nn is NULL. returning unknown type (nnl2_nn_type_unknown)");
             #endif
                 
             return nnl2_nn_type_unknown;

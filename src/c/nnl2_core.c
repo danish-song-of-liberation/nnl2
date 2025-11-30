@@ -186,7 +186,7 @@ void nnl2_init_loss();
  ** settings and debug level
  *** Then
  ** Calls all subsystem initialization functions to 
- ** register computational backends for operation
+ ** register computational backends for operation     
  *
  ** @code    
  * #include "input_here_pass_to_nnl2"
@@ -214,17 +214,18 @@ void nnl2_init_loss();
  ** @see nnl2_init_correspondence 
  ** @see nnl2_init_broadcasting_inplace   
  ** @see nnl2_init_broadcasting
- ** @see nnl2_init_reshaping   
+ ** @see nnl2_init_reshaping 
+ ** @see nnl2_init_loss 
  **/   
 void nnl2_init_system() {       
 	// Initialization of random number generator
 	srand(time(NULL));               
 	                                      
 	// Initialization of logger            
-	nnl2_log_init(             
+	nnl2_log_init(                
 		NNL2_LOG_DEFAULT_COLOR,       
 		NNL2_LOG_DEFAULT_TIMESTAMPS,                  
-		NNL2_LOG_DEFAULT_DEBUG_INFO,           
+		NNL2_LOG_DEFAULT_DEBUG_INFO,              
 		NNL2_LOG_LEVEL_DEBUG   
 	);    
 			          
@@ -374,7 +375,7 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(max_broadcasting_inplace, max_broadcasting_inplace_backends);
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends); 
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
-} 
+}  
          
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
@@ -778,7 +779,7 @@ bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
 }           
-         
+           
 nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {    
     return nnl2_neg(tensor);   
 }
@@ -799,4 +800,4 @@ void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
 ///@} [lisp_wrappers]                
 		             
 #endif /** NNL2_CORE_C **/					 
-							                      
+							                         
