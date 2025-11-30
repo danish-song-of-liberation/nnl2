@@ -475,7 +475,7 @@
   (value :pointer)
   (dtype tensor-type))  
   
-(cffi:defcfun ("nnl2_xavier_like" %xavier-like) :pointer
+(cffi:defcfun ("nnl2_xavier_like" %xavier-like) :pointer	
   (tensor :pointer)
   (in :int)
   (out :int)
@@ -498,8 +498,7 @@
 (cffi:defcfun ("lisp_call_mse" %mse) :void
   (prediction :pointer)
   (target :pointer)
-  (record :pointer)
-  (force :bool))
+  (record :pointer))
   
 ;; -- AD --
 
@@ -1186,6 +1185,13 @@
   (mode ad-mode)
   (track-graph :bool))  
     
+(cffi:defcfun ("nnl2_ad_mse" %ad-mse) :pointer
+  (prediction :pointer)
+  (target :pointer)
+  (force :bool)
+  (mode ad-mode)
+  (track-graph :bool))  
+	
 ;; -- Optimizers --  
   
 (cffi:defcfun ("nnl2_optim_gd_create" %optim-make-gd) :pointer

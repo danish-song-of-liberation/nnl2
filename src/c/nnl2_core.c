@@ -3,7 +3,7 @@
 
 #ifdef __SSE__ 
 	#include <xmmintrin.h>
-#endif
+#endif    
     
 #ifdef NNL2_AVX256_AVAILABLE  
 	#include <immintrin.h> 
@@ -11,7 +11,7 @@
 
 #ifdef __SSE2__ 
 	#include <emmintrin.h> 
-#endif        
+#endif               
   
 #include <stdlib.h> 
 #include <time.h>        
@@ -778,7 +778,7 @@ bool lisp_call_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
 }           
-        
+         
 nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {    
     return nnl2_neg(tensor);   
 }
@@ -792,11 +792,8 @@ int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {
 					 [index];
 }
 
-/** @note 
- * The return value of mse (nnl2_tensor_type) is only for AD purposes, so it's omitted here
- */
-void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record, bool force) {  
-	nnl2_mse(prediction, target, record, force);
+void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {  
+	nnl2_mse(prediction, target, record);
 }
 
 ///@} [lisp_wrappers]                

@@ -120,4 +120,14 @@
   "Retrieves the tensor element value by linear index"
   (nnl2.ffi:%ad-flat tensor index nnl2.ffi:ad-reverse-mode track-graph force))
   
+(in-package :nnl2.lli.ad.utils)
+
+(defun extract-scalar (ad-tensor)
+  (let* ((dtype (nnl2.hli.ad:dtype ad-tensor))
+		 (cffi-type (nnl2.hli.ts:type/nnl2->cffi dtype))
+		 (raw-data (nnl2.lli.ts:data (nnl2.hli.ad:data ad-tensor))))
+		 
+	(cffi:mem-ref raw-data cffi-type)))
+	
+  
 	

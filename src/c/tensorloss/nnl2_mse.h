@@ -14,16 +14,9 @@
  *
  ** @param record 
  * Pointer to memory where result will be stored
- *
- ** @param force 
- * If true, attempts to maintain input dtype for INT32 case
- *
- ** @return nnl2_tensor_type 
- * Data type of the computed result
  */
-nnl2_tensor_type nnl2_naive_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record, bool force) {
+void nnl2_naive_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
     size_t numel = product(prediction -> shape, prediction -> rank);
-    nnl2_tensor_type result_type = prediction->dtype; 
     
     switch(prediction -> dtype) {
         case FLOAT64: {
@@ -38,11 +31,8 @@ nnl2_tensor_type nnl2_naive_mse(nnl2_tensor* prediction, nnl2_tensor* target, vo
                 acc += diff * diff;  
             }
             
-			// Store result and normalize by number of elements
             nnl2_float64* result = (nnl2_float64*)record;
             *result = (numel > 0) ? acc / (nnl2_float64)numel : 0.0;
-            result_type = FLOAT64;
-			
             break;
         }
         
@@ -56,11 +46,8 @@ nnl2_tensor_type nnl2_naive_mse(nnl2_tensor* prediction, nnl2_tensor* target, vo
                 acc += diff * diff;
             }
             
-			// Store result and normalize by number of elements
             nnl2_float32* result = (nnl2_float32*)record;
             *result = (numel > 0) ? acc / (nnl2_float32)numel : 0.0f;
-            result_type = FLOAT32; 
-			
             break;
         }
         
@@ -74,35 +61,17 @@ nnl2_tensor_type nnl2_naive_mse(nnl2_tensor* prediction, nnl2_tensor* target, vo
                 acc += (int64_t)diff * diff;
             }
             
-            if (!force) {
-				// Promote to FLOAT64
-                nnl2_float64* result = (nnl2_float64*)record;
-                *result = (numel > 0) ? (nnl2_float64)acc / (nnl2_float64)numel : 0.0;
-                result_type = FLOAT64;
-            } else {
-				// Try to maintain INT32 if divisible without remainder
-                if (numel > 0 && (acc % numel == 0)) {
-                    nnl2_int32* result = (nnl2_int32*)record;
-                    *result = (nnl2_int32)(acc / numel);
-                    result_type = INT32;
-                } else {
-					// Fall back to FLOAT64 if division would have remainder
-                    nnl2_float64* result = (nnl2_float64*)record;
-                    *result = (numel > 0) ? (nnl2_float64)acc / (nnl2_float64)numel : 0.0;
-                    result_type = FLOAT64; 
-                }
-            }
-			
+            // Always use FLOAT64 for INT32 inputs
+            nnl2_float64* result = (nnl2_float64*)record;
+            *result = (numel > 0) ? (nnl2_float64)acc / (nnl2_float64)numel : 0.0;
             break;
         }
         
         default: {
             NNL2_TYPE_ERROR(prediction -> dtype);
-			return -1;
+            break;
         }
     }
-    
-    return result_type;
 }
 
 /**

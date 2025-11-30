@@ -1994,7 +1994,7 @@
   
 (defun mse (prediction target)
   (let* ((result-pntr (cffi:foreign-alloc :double)))	 
-	(nnl2.ffi:%mse prediction target result-pntr nil)
+	(nnl2.ffi:%mse prediction target result-pntr)
 	
 	(let ((result (cffi:mem-ref result-pntr :double)))
 	  (cffi:foreign-free result-pntr)

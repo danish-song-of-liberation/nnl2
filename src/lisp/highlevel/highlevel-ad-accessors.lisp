@@ -418,7 +418,7 @@
 	
 	ad-tensor))
 	
-(defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
+(defun from-flatten (flatten-data indices &key requires-grad (dtype nnl2.system:*default-tensor-type*))
   "Creates an AD tensor from a flat list and target shape
   
    Args:
@@ -429,7 +429,7 @@
    Returns:
        AD tensor reconstructed from flat data"
 	   
-  (let ((ad-tensor (empty indices :dtype dtype))
+  (let ((ad-tensor (empty indices :dtype dtype :requires-grad requires-grad))
 		(ts-tensor (nnl2.hli.ts:from-flatten flatten-data indices :dtype dtype)))
 		
 	(nnl2.ffi:%data-pntr-share-setter ad-tensor ts-tensor)
@@ -1181,4 +1181,17 @@
 (defun (setf tref) (change-to tensor &rest shape)
   "Sets the values at the specified tref indices to `change-to`"
   (setf (apply #'nnl2.hli.ts:tref (nnl2.hli.ad:data tensor) shape) change-to))		  
+  
+(in-package :nnl2.hli.ad.r.loss)  
+  
+(defun mse (prediction target &key force (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes Mean-Squared error
+  
+   Example:
+       (nnl2.hli.ts.loss:mse prediction target) -> loss (scalar)"
+   
+  (let ((out (nnl2.ffi:%ad-mse prediction target force nnl2.ffi:ad-reverse-mode track-graph)))
+    (if force 
+	  (cffi:mem-ref out :double)
+	  out)))  
   

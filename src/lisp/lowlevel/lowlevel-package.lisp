@@ -63,3 +63,8 @@
 	#:flat
 	#:free))
 	
+(defpackage :nnl2.lli.ad.utils
+  (:use #:cl)
+  (:export
+    #:extract-scalar))
+	

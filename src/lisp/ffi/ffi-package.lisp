@@ -552,5 +552,6 @@
    #:%set-mse-backend
    #:%get-mse-backend
    #:%get-mse-backends
-   #:%get-mse-num-backends))
+   #:%get-mse-num-backends
+   #:%ad-mse))
    
