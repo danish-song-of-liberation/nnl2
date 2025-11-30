@@ -389,7 +389,7 @@ void nnl2_init_broadcasting() {
 }     
 
 void nnl2_init_reshaping() {      
-	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));  
+	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));   
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
 }
 

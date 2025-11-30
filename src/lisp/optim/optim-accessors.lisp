@@ -70,4 +70,34 @@
           (leto* ,(rest bindings) ,@body)
           (when (typep ,var 'nnl2-optim) (free ,var)))))))  	  
 	  
+(cffi:defcfun ("nnl2_optim_gd_optim_type_getter" optim-type) :int
+  (optim nnl2.ffi:nnl2-optim))
+
+(defun (setf optim-type) (new-optim-type optim)
+  (nnl2.ffi:%nnl2-optim-gd-optim-type-setter optim new-optim-type))
+
+(cffi:defcfun ("nnl2_optim_gd_data_getter" data) :pointer
+  (optim :pointer))
+
+(defun (setf data) (new-data optim) 
+  (nnl2.ffi:%nnl2-optim-gd-data-setter optim new-data))
+
+(cffi:defcfun ("nnl2_optim_gd_lr_getter" lr) :float
+  (optim :pointer))
+
+(defun (setf lr) (new-lr optim)
+  (nnl2.ffi:%nnl2-optim-gd-lr-setter optim new-lr))
+  
+(cffi:defcfun ("nnl2_optim_tensors_getter" parameters) :pointer
+  (optim :pointer))
+
+(defun (setf parameters) (new-tensors optim)
+  (nnl2.ffi:%nnl2-optim-tensors-setter optim new-tensors))
+
+(cffi:defcfun ("nnl2_optim_num_tensors_getter" num-parameters) :size
+  (optim :pointer))
+
+(defun (setf num-tensors) (new-num-tensors optim)
+  (nnl2.ffi:%nnl2-optim-num-tensors-setter optim new-num-tensors))
+	  
 	  

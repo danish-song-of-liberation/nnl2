@@ -1208,10 +1208,34 @@
 	
 ;; -- Optimizers --  
   
+(cffi:defcstruct nnl2-optim
+  (tensors :pointer)  	;; Array of pointers to tensors to be optimized
+  (num-tensors :size))  ;; Number of tensors in the array
+  
 (cffi:defcfun ("nnl2_optim_gd_create" %optim-make-gd) :pointer
   (tensors :pointer)
   (num-tensors :long)
   (learning-rate :float))  
+
+(cffi:defcfun ("nnl2_optim_gd_optim_type_setter" %nnl2-optim-gd-optim-type-setter) :void
+  (optim :pointer)
+  (new-optim-type :int))
+
+(cffi:defcfun ("nnl2_optim_gd_data_setter" %nnl2-optim-gd-data-setter) :void
+  (optim :pointer)
+  (new-data nnl2-optim))
+
+(cffi:defcfun ("nnl2_optim_gd_lr_setter" %nnl2-optim-gd-lr-setter) :void
+  (optim :pointer)
+  (new-lr :float))
+
+(cffi:defcfun ("nnl2_optim_tensors_setter" %nnl2-optim-tensors-setter) :void
+  (optim :pointer)
+  (new-tensors :pointer))
+
+(cffi:defcfun ("nnl2_optim_num_tensors_setter" %nnl2-optim-num-tensors-setter) :void
+  (optim :pointer)
+  (new-num-tensors :size))  
   
 ;; -- Neural Networks --
 

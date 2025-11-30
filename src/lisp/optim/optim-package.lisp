@@ -17,5 +17,10 @@
 	#:free
 	#:gd
 	#:leto
-	#:leto*))
+	#:leto*
+	#:optim-type
+	#:data
+	#:lr
+	#:parameters
+	#:num-parameters))
   

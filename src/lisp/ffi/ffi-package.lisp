@@ -556,5 +556,11 @@
    #:%ad-mse
    #:%nnl2-ad-extra-correspondence-setter
    #:%nnl2-ad-extra-field-setter
-   #:%nnl2-ad-extra-free-setter))
+   #:%nnl2-ad-extra-free-setter
+   #:%nnl2-optim-gd-optim-type-setter
+   #:%nnl2-optim-gd-data-setter
+   #:%nnl2-optim-gd-lr-setter
+   #:%nnl2-optim-tensors-setter
+   #:%nnl2-optim-num-tensors-setter
+   #:nnl2-optim))
    

@@ -10,5 +10,6 @@
 #include "../optim/nnl2_optim_free.h"
 #include "../optim/nnl2_optim_step.h"
 #include "../optim/nnl2_optim_zero_grad.h"
+#include "../optim/nnl2_optim_accessors.h"
 
 #endif /** NNL2_OPTIM_INCLUDE_H **/
