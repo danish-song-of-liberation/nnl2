@@ -1098,7 +1098,7 @@
 	  (setf (cffi:mem-ref from-pntr cffi-type) coerced-from
 			(cffi:mem-ref to-pntr 	cffi-type) coerced-to)
 			
-	  (nnl2.ffi:%randn shape rank dtype from-pntr to-pntr))))
+	  (nnl2.ffi:%uniform shape rank dtype from-pntr to-pntr))))
 	  
 (defun %internal-rand-inplace (tensor from to &key type-hint)
   "Fills a tensor with random numbers
@@ -1118,7 +1118,7 @@
 	(setf (cffi:mem-ref from-pntr cffi-type) coerced-from
 		  (cffi:mem-ref to-pntr   cffi-type) coerced-to)
 		  
-	(nnl2.ffi:%randn-inplace tensor from-pntr to-pntr)))
+	(nnl2.ffi:%uniform-inplace tensor from-pntr to-pntr)))
 	  
 (defun uniform (indices &key (dtype nnl2.system:*default-tensor-type*) (from 0) (to 1))
   "Creates a tensor of the specified shape filled with random numbers from 0 to 1
@@ -1155,7 +1155,7 @@
 	(setf (cffi:mem-ref from-pntr cffi-type) coerced-from
 		  (cffi:mem-ref to-pntr cffi-type) coerced-to)
 						 
-	(nnl2.ffi:%randn-like tensor from-pntr to-pntr)))
+	(nnl2.ffi:%uniform-like tensor from-pntr to-pntr)))
   
 (defun uniform-like (tensor &key (from 0.0d0) (to 1.0d0) (dtype (dtype tensor)))
   "Сreates a tensor filled with random numbers from 0 to 1 of the same shape as the passed tensor

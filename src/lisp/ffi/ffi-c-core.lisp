@@ -281,7 +281,7 @@
   (tensor :pointer)
   (filler :pointer))
   
-(cffi:defcfun ("nnl2_randn_like" %randn-like) :pointer
+(cffi:defcfun ("nnl2_uniform_like" %uniform-like) :pointer
   (tensor :pointer)
   (from :pointer)
   (to :pointer))
@@ -315,14 +315,14 @@
   (tensorb :pointer)
   (axis :int))
 
-(cffi:defcfun ("lisp_call_randn" %randn) :pointer
+(cffi:defcfun ("lisp_call_uniform" %uniform) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type)
   (from :pointer)
   (to :pointer))  
 
-(cffi:defcfun ("lisp_call_randn_inplace" %randn-inplace) :pointer
+(cffi:defcfun ("lisp_call_uniform_inplace" %uniform-inplace) :pointer
   (tensor :pointer)
   (from :pointer)
   (to :pointer))  
@@ -583,7 +583,7 @@
   (name :string)
   (filler :pointer))
  
-(cffi:defcfun ("nnl2_ad_randn" %ad-randn) :pointer
+(cffi:defcfun ("nnl2_ad_uniform" %ad-uniform) :pointer
   (shape :pointer)
   (rank :int)
   (dtype tensor-type)
@@ -1393,10 +1393,10 @@
 (cffi:defcfun ("set_concat_backend" %set-concat-backend) :void
   (backend-name :string))  
     
-(cffi:defcfun ("set_randn_backend" %set-randn-backend) :void
+(cffi:defcfun ("set_uniform_backend" %set-uniform-backend) :void
   (backend-name :string)) 
 
-(cffi:defcfun ("set_randn_inplace_backend" %set-randn-inplace-backend) :void
+(cffi:defcfun ("set_uniform_inplace_backend" %set-uniform-inplace-backend) :void
   (backend-name :string))   
   	
 (cffi:defcfun ("set_xavier_backend" %set-xavier-backend) :void
@@ -1597,8 +1597,8 @@
 (cffi:defcfun ("get_tanhinplace_backend" %get-tanhinplace-backend) :string)  
 (cffi:defcfun ("get_tanh_backend" %get-tanh-backend) :string) 
 (cffi:defcfun ("get_concat_backend" %get-concat-backend) :string) 
-(cffi:defcfun ("get_randn_backend" %get-randn-backend) :string) 
-(cffi:defcfun ("get_randn_inplace_backend" %get-randn-inplace-backend) :string) 
+(cffi:defcfun ("get_uniform_backend" %get-uniform-backend) :string) 
+(cffi:defcfun ("get_uniform_inplace_backend" %get-uniform-inplace-backend) :string) 
 (cffi:defcfun ("get_xavier_backend" %get-xavier-backend) :string) 
 (cffi:defcfun ("get_xavier_inplace_backend" %get-xavier-inplace-backend) :string) 
 (cffi:defcfun ("get_transposeinplace_backend" %get-transposeinplace-backend) :string) 
@@ -1697,10 +1697,10 @@
 (cffi:defcfun ("get_tanh_backends" %get-tanh-backends) :pointer)
 (cffi:defcfun ("get_concat_num_backends" %get-concat-num-backends) :int)
 (cffi:defcfun ("get_concat_backends" %get-concat-backends) :pointer)
-(cffi:defcfun ("get_randn_num_backends" %get-randn-num-backends) :int)
-(cffi:defcfun ("get_randn_backends" %get-randn-backends) :pointer)
-(cffi:defcfun ("get_randn_inplace_num_backends" %get-randn-inplace-num-backends) :int)
-(cffi:defcfun ("get_randn_inplace_backends" %get-randn-inplace-backends) :pointer)
+(cffi:defcfun ("get_uniform_num_backends" %get-uniform-num-backends) :int)
+(cffi:defcfun ("get_uniform_backends" %get-uniform-backends) :pointer)
+(cffi:defcfun ("get_uniform_inplace_num_backends" %get-uniform-inplace-num-backends) :int)
+(cffi:defcfun ("get_uniform_inplace_backends" %get-uniform-inplace-backends) :pointer)
 (cffi:defcfun ("get_xavier_num_backends" %get-xavier-num-backends) :int)
 (cffi:defcfun ("get_xavier_backends" %get-xavier-backends) :pointer)
 (cffi:defcfun ("get_xavier_inplace_num_backends" %get-xavier-inplace-num-backends) :int)

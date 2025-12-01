@@ -103,8 +103,8 @@ Tensor* nnl2_full_like(Tensor* tensor, void* filler) {
  *
  ** @see nnl2_randn
  **/
-Tensor* nnl2_randn_like(Tensor* tensor, void* from, void* to) {
-	return randn(tensor->shape, tensor->rank, tensor->dtype, from, to);
+Tensor* nnl2_uniform_like(Tensor* tensor, void* from, void* to) {
+	return uniform(tensor->shape, tensor->rank, tensor->dtype, from, to);
 }
 
 /** @brief

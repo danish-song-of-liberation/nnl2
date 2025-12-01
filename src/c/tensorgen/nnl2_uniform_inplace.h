@@ -33,7 +33,7 @@
  *
  ** @see product
  **/ 
-void nnl2_naive_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
+void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE 
 		NNL2_FUNC_ENTER(); 
 	#endif
@@ -99,22 +99,22 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
  * @see nnl2_naive
  * @see nnl2_naive_randn_inplace
  */
-Implementation randn_inplace_backends[] = {
-    REGISTER_BACKEND(nnl2_naive_randn_inplace, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT OPTIMIZE
+Implementation uniform_inplace_backends[] = {
+    REGISTER_BACKEND(nnl2_naive_uniform_inplace, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT OPTIMIZE
 };
 
 /**
  * @brief Function pointer for randn_inplace operation
  * @ingroup backend_system
  */
-randninplacefn randn_inplace;
+randninplacefn uniform_inplace;
 
 /** 
  * @brief Makes the randn_inplace backend current
  * @ingroup backend_system
  * @see make_current_backend
  */
-make_current_backend(randn_inplace);
+make_current_backend(uniform_inplace);
 
 /** 
  * @brief Sets the backend for randn_inplace operation
@@ -122,8 +122,8 @@ make_current_backend(randn_inplace);
  * @param backend_name Name of the backend to activate for randn_inplace
  * @see ESET_BACKEND_BY_NAME
  */
-void set_randn_inplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(randn_inplace_backends, randn_inplace, backend_name, current_backend(randn_inplace));
+void set_uniform_inplace_backend(const char* backend_name) {
+    ESET_BACKEND_BY_NAME(uniform_inplace_backends, uniform_inplace, backend_name, current_backend(uniform_inplace));
 }
 
 /** 
@@ -131,8 +131,8 @@ void set_randn_inplace_backend(const char* backend_name) {
  * @ingroup backend_system
  * @return Name of the current backend as constant string
  */
-const char* get_randn_inplace_backend() {
-    return current_backend(randn_inplace);
+const char* get_uniform_inplace_backend() {
+    return current_backend(uniform_inplace);
 }
 
 /**
@@ -140,13 +140,13 @@ const char* get_randn_inplace_backend() {
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
-DEFINE_GET_BACKENDS_FUNCTION(randn_inplace);
+DEFINE_GET_BACKENDS_FUNCTION(uniform_inplace);
 
 /**
  * @brief Function declaration for getting the number of available randn_inplace backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
-DEFINE_GET_NUMS_BACKENDS_FUNCTION(randn_inplace);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(uniform_inplace);
 
 #endif /** NNL2_RANDN_INPLACE_H **/

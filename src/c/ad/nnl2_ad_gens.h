@@ -389,7 +389,7 @@ nnl2_ad_tensor* nnl2_ad_ones(int32_t* shape, int rank, nnl2_tensor_type dtype, b
  ** @see nnl2_ad_empty
  ** @see nnl2_ad_tensor
  **/
-nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name, void* from, void* to) {
+nnl2_ad_tensor* nnl2_ad_uniform(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name, void* from, void* to) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -411,7 +411,7 @@ nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, 
         return NULL;
     }
 	
-	randn_inplace(ad_tensor->data, from, to);
+	uniform_inplace(ad_tensor->data, from, to);
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();

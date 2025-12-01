@@ -326,8 +326,8 @@
    #:use-backend/empty-like
    #:use-backend/.abs
    #:use-backend/xavier
-   #:use-backend/randn
-   #:use-backend/randn-like
+   #:use-backend/uniform
+   #:use-backend/uniform-like
    #:use-backend/full
    #:use-backend/ones
    #:use-backend/full-like
@@ -396,8 +396,8 @@
    #:get-backend/.tanh
    #:get-backend/.tanh!
    #:get-backend/concat
-   #:get-backend/randn
-   #:get-backend/randn-like
+   #:get-backend/uniform
+   #:get-backend/uniform-like
    #:get-backend/xavier
    #:get-backend/transpose
    #:get-backend/transpose!
@@ -456,8 +456,8 @@
    #:get-backends/.tanh
    #:get-backends/.tanh!
    #:get-backends/concat
-   #:get-backends/randn
-   #:get-backends/randn-like
+   #:get-backends/uniform
+   #:get-backends/uniform-like
    #:get-backends/xavier
    #:get-backends/transpose!
    #:get-backends/transpose
@@ -512,8 +512,8 @@
    #:with-backend/.tanh
    #:with-backend/.tanh!
    #:with-backend/concat
-   #:with-backend/randn
-   #:with-backend/randn-like
+   #:with-backend/uniform
+   #:with-backend/uniform-like
    #:with-backend/xavier
    #:with-backend/transpose!
    #:with-backend/transpose
@@ -556,10 +556,10 @@
    #:get-backend/.neg
    #:with-backend/.neg
    #:use-backend/.neg
-   #:use-backend/randn!
-   #:get-backend/randn!
-   #:get-backends/randn!
-   #:with-backend/randn!
+   #:use-backend/uniform!
+   #:get-backend/uniform!
+   #:get-backends/uniform!
+   #:with-backend/uniform!
    #:xavier!
    #:use-backend/xavier!
    #:get-backend/xavier!

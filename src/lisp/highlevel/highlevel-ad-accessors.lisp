@@ -349,7 +349,7 @@
 		
 		(nnl2.ffi:%ad-full shape rank dtype requires-grad name filler-pntr)))))
 	  
-(defun %internal-randn (indices dtype requires-grad name from to)
+(defun %internal-uniform (indices dtype requires-grad name from to)
   "Internal helper for creating random AD tensors in a given range"
   
   (nnl2.hli:fastcall
@@ -365,11 +365,11 @@
 		   
      (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
 	   (declare (type integer rank))
-	   (nnl2.ffi:%ad-randn shape rank dtype requires-grad name from-pntr to-pntr)))))
+	   (nnl2.ffi:%ad-uniform shape rank dtype requires-grad name from-pntr to-pntr)))))
 	
 (defun uniform (indices &key (from 0) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
   "Creates an AD tensor with random values in the given range (default [0, 1])"
-  (%internal-randn indices dtype requires-grad name from to))
+  (%internal-uniform indices dtype requires-grad name from to))
 	 
 (defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   "Creates an AD tensor initialized with Xavier initialization
@@ -915,7 +915,7 @@
 (cffi:defcfun ("nnl2_ad_ones_like" ones-like) :pointer
   (ad-tensor :pointer))    
 
-(cffi:defcfun ("nnl2_ad_rand_like" uniform-like) :pointer
+(cffi:defcfun ("nnl2_ad_uniform_like" uniform-like) :pointer
   (ad-tensor :pointer))    
 
 (defun full-like (ad-tensor &key (filler 0))

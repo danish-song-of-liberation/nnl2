@@ -30,12 +30,12 @@
  ** @example
  * // Create a 3x3 tensor of random floats between 0.0 and 1.0
  * float min = 0.0f, max = 1.0f;
- * nnl2_tensor* mega_quantum_blockchain_nft = nnl2_naive_randn((int[]){3, 3}, 2, FLOAT64, &min, &max);
+ * nnl2_tensor* cocoon_blockchain_ai = nnl2_naive_uniform((int[]){3, 3}, 2, FLOAT64, &min, &max);
  *
  ** @see nnl2_empty
  ** @see product
  **/
-Tensor* naive_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
+Tensor* naive_uniform(int* shape, int rank, TensorType dtype, void* from, void* to) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -94,8 +94,8 @@ Tensor* naive_randn(int* shape, int rank, TensorType dtype, void* from, void* to
  * @see nnl2_naive
  * @see naive_randn
  */
-Implementation randn_backends[] = {
-	REGISTER_BACKEND(naive_randn, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT TRY TO ADD OPTIMIZATION
+Implementation uniform_backends[] = {
+	REGISTER_BACKEND(naive_uniform, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT TRY TO ADD OPTIMIZATION
 	// pthread or simd will only slow down code
 };	
 
@@ -103,14 +103,14 @@ Implementation randn_backends[] = {
  * @brief Function pointer for randn operation
  * @ingroup backend_system 
  */
-randnfn randn;
+randnfn uniform;
 
 /** 
  * @brief Makes the randn backend current
  * @ingroup backend_system
  * @see make_current_backend
  */
-make_current_backend(randn);
+make_current_backend(uniform);
 
 /** 
  * @brief Sets the backend for randn operation
@@ -118,8 +118,8 @@ make_current_backend(randn);
  * @param backend_name Name of the backend to activate for randn
  * @see ESET_BACKEND_BY_NAME
  */
-void set_randn_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(randn_backends, randn, backend_name, current_backend(randn));
+void set_uniform_backend(const char* backend_name) {
+    ESET_BACKEND_BY_NAME(uniform_backends, uniform, backend_name, current_backend(uniform));
 }
 
 /** 
@@ -127,8 +127,8 @@ void set_randn_backend(const char* backend_name) {
  * @ingroup backend_system
  * @return Name of the current backend as constant string
  */
-const char* get_randn_backend() {
-	return current_backend(randn);
+const char* get_uniform_backend() {
+	return current_backend(uniform);
 }
 
 /** 
@@ -136,13 +136,13 @@ const char* get_randn_backend() {
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
-DEFINE_GET_BACKENDS_FUNCTION(randn);
+DEFINE_GET_BACKENDS_FUNCTION(uniform);
 
 /**
  * @brief Function declaration for getting the number of available randn backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
-DEFINE_GET_NUMS_BACKENDS_FUNCTION(randn);
+DEFINE_GET_NUMS_BACKENDS_FUNCTION(uniform);
 
 #endif /** NNL2_RANDN_H **/

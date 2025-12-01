@@ -70,8 +70,8 @@
    #:%.tanh!
    #:%.tanh
    #:%concat
-   #:%randn
-   #:%randn-like
+   #:%uniform
+   #:%uniform-like
    #:%xavier
    #:%transpose!
    #:%transpose
@@ -164,7 +164,7 @@
    #:%set-tanhinplace-backend
    #:%set-tanh-backend
    #:%set-concat-backend
-   #:%set-randn-backend
+   #:%set-uniform-backend
    #:%set-xavier-backend
    #:%set-transposeinplace-backend
    #:%set-transpose-backend
@@ -253,7 +253,7 @@
    #:%get-tanh-backend
    #:%get-tanhinplace-backend
    #:%get-concat-backend
-   #:%get-randn-backend
+   #:%get-uniform-backend
    #:%get-xavier-backend
    #:%get-transpose-backend
    #:%get-transposeinplace-backend
@@ -349,8 +349,8 @@
    #:%get-tanh-backends
    #:%get-concat-num-backends
    #:%get-concat-backends
-   #:%get-randn-num-backends
-   #:%get-randn-backends
+   #:%get-uniform-num-backends
+   #:%get-uniform-backends
    #:%get-xavier-num-backends
    #:%get-xavier-backends
    #:%get-transposeinplace-num-backends
@@ -483,17 +483,17 @@
    #:%ad-step!
    #:%ad-roots
    #:%ad-roots-setter
-   #:%randn-inplace
-   #:%set-randn-inplace-backend
-   #:%get-randn-inplace-backend
-   #:%get-randn-inplace-num-backends
-   #:%get-randn-inplace-backends
+   #:%uniform-inplace
+   #:%set-uniform-inplace-backend
+   #:%get-uniform-inplace-backend
+   #:%get-uniform-inplace-num-backends
+   #:%get-uniform-inplace-backends
    #:%xavier-inplace
    #:%set-xavier-inplace-backend
    #:%get-xavier-inplace-backend
    #:%get-xavier-inplace-backends
    #:%get-xavier-inplace-num-backends
-   #:%ad-randn
+   #:%ad-uniform
    #:%ad-xavier
    #:%ad-transposition-inplace
    #:%ad-transpose-inplace

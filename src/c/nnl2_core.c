@@ -12,12 +12,12 @@
 #ifdef __SSE2__ 
 	#include <emmintrin.h> 
 #endif               
-  
+   
 #include <stdlib.h> 
 #include <time.h>        
   
 #include "nnl2_core.h"          	 
-#include "nnl2_ffi_test.h"  
+#include "nnl2_ffi_test.h"   
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"    
 #include "nnl2_foreign_log.h"  
@@ -321,10 +321,10 @@ void nnl2_init_activations() {
 }
      
 void nnl2_init_initializers() {
-    EINIT_BACKEND(randn, randn_backends, current_backend(randn));    
+    EINIT_BACKEND(uniform, uniform_backends, current_backend(uniform));    
     EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
-    EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));     
-	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	  
+    EINIT_BACKEND(uniform_inplace, uniform_inplace_backends, current_backend(uniform_inplace));     
+	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	   
 }
    
 void nnl2_init_transposition() {  
@@ -576,12 +576,12 @@ Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
 	return nnl2_concat(tensora, tensorb, axis); 
 }        
 
-Tensor* lisp_call_randn(int* shape, int rank, TensorType dtype, void* from, void* to) {
-	return randn(shape, rank, dtype, from, to);  
+Tensor* lisp_call_uniform(int* shape, int rank, TensorType dtype, void* from, void* to) {
+	return uniform(shape, rank, dtype, from, to);  
 }
 
-void lisp_call_randn_inplace(nnl2_tensor* tensor, void* from, void* to) {
-	randn_inplace(tensor, from, to);
+void lisp_call_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
+	uniform_inplace(tensor, from, to);
 }
 
 Tensor* lisp_call_xavier(int* shape, int rank, TensorType dtype, int in, int out, float gain, float distribution) {

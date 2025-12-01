@@ -187,11 +187,11 @@
 (define-backend-setter use-backend/concat
   nnl2.ffi:%set-concat-backend)
 
-(define-backend-setter use-backend/randn
-  nnl2.ffi:%set-randn-backend)
+(define-backend-setter use-backend/uniform
+  nnl2.ffi:%set-uniform-backend)
   
-(define-backend-setter use-backend/randn!
-  nnl2.ffi:%set-randn-inplace-backend)  
+(define-backend-setter use-backend/uniform!
+  nnl2.ffi:%set-uniform-inplace-backend)  
 
 (define-backend-setter use-backend/xavier
   nnl2.ffi:%set-xavier-backend)
@@ -256,7 +256,6 @@
 (defun use-backend/empty-like (name) (use-backend/empty name))  
 (defun use-backend/zeros-like (name) (use-backend/zeros name))  
 (defun use-backend/ones-like (name) (use-backend/ones name))
-(defun use-backend/randn-like (name) (use-backend/randn name))
 
 (defun use-backend (name)
   "Sets a new backend for all supported operations
@@ -269,7 +268,7 @@
                               use-backend/.- use-backend/.* use-backend/./
                               use-backend/.^ use-backend/.log use-backend/.min
                               use-backend/.max use-backend/scale use-backend/empty
-                              use-backend/.abs use-backend/xavier use-backend/randn
+                              use-backend/.abs use-backend/xavier use-backend/uniform
                               use-backend/full use-backend/zeros use-backend/sum
                               use-backend/l2norm use-backend/copy use-backend/gemm
                               use-backend/.relu use-backend/.relu! use-backend/.leaky-relu
@@ -278,7 +277,7 @@
                               use-backend/transpose! use-backend/reshape use-backend/reinterpret
 							  use-backend/cut use-backend/transposition
 							  use-backend/transposition! use-backend/.neg! use-backend/.neg
-							  use-backend/randn! use-backend/xavier! use-backend/.sqrt! 
+							  use-backend/uniform! use-backend/xavier! use-backend/.sqrt! 
 							  use-backend/.sqrt use-backend/mse))
 							  
       (funcall backend-function name)))
@@ -357,8 +356,8 @@
 (define-backend-getter-setter get-backend/.sigmoid! use-backend/.sigmoid! nnl2.ffi:%get-sigmoidinplace-backend)
 (define-backend-getter-setter get-backend/.tanh use-backend/.tanh nnl2.ffi:%get-tanh-backend)
 (define-backend-getter-setter get-backend/.tanh! use-backend/.tanh! nnl2.ffi:%get-tanhinplace-backend)
-(define-backend-getter-setter get-backend/randn use-backend/randn nnl2.ffi:%get-randn-backend)
-(define-backend-getter-setter get-backend/randn! use-backend/randn! nnl2.ffi:%get-randn-inplace-backend)
+(define-backend-getter-setter get-backend/uniform use-backend/uniform nnl2.ffi:%get-uniform-backend)
+(define-backend-getter-setter get-backend/uniform! use-backend/uniform! nnl2.ffi:%get-uniform-inplace-backend)
 (define-backend-getter-setter get-backend/randn-like use-backend/randn-like nil :like get-backend/randn)
 (define-backend-getter-setter get-backend/xavier use-backend/xavier nnl2.ffi:%get-xavier-backend)
 (define-backend-getter-setter get-backend/xavier! use-backend/xavier! nnl2.ffi:%get-xavier-inplace-backend)
@@ -588,13 +587,13 @@
   nnl2.ffi:%get-tanhinplace-num-backends 
   nnl2.ffi:%get-tanhinplace-backends)
 
-(define-backends-getter get-backends/randn 
-  nnl2.ffi:%get-randn-num-backends 
-  nnl2.ffi:%get-randn-backends)
+(define-backends-getter get-backends/uniform 
+  nnl2.ffi:%get-uniform-num-backends 
+  nnl2.ffi:%get-uniform-backends)
   
-(define-backends-getter get-backends/randn! 
-  nnl2.ffi:%get-randn-inplace-num-backends 
-  nnl2.ffi:%get-randn-inplace-backends)  
+(define-backends-getter get-backends/uniform! 
+  nnl2.ffi:%get-uniform-inplace-num-backends 
+  nnl2.ffi:%get-uniform-inplace-backends)  
 
 (define-backends-getter get-backends/randn-like :like get-backends/randn)
 
@@ -734,8 +733,8 @@
 (define-with-backend with-backend/.sigmoid! get-backend/.sigmoid!)
 (define-with-backend with-backend/.tanh get-backend/.tanh)
 (define-with-backend with-backend/.tanh! get-backend/.tanh!)
-(define-with-backend with-backend/randn get-backend/randn)
-(define-with-backend with-backend/randn! get-backend/randn!)
+(define-with-backend with-backend/uniform get-backend/uniform)
+(define-with-backend with-backend/uniform! get-backend/uniform!)
 (define-with-backend with-backend/xavier get-backend/xavier)
 (define-with-backend with-backend/xavier! get-backend/xavier!)
 (define-with-backend with-backend/transpose get-backend/transpose)
