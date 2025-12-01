@@ -1080,7 +1080,7 @@
 (defun .tanh (tensor &key (approx t))
   (%.tanh tensor approx))  
   
-(defun %internal-rand (indices dtype from to)
+(defun %internal-uniform (indices dtype from to)
   "Creates a tensor of the specified shape from random numbers
    indices: Input shape
    dtype: Type of tensor
@@ -1100,7 +1100,7 @@
 			
 	  (nnl2.ffi:%uniform shape rank dtype from-pntr to-pntr))))
 	  
-(defun %internal-rand-inplace (tensor from to &key type-hint)
+(defun %internal-uniform-inplace (tensor from to &key type-hint)
   "Fills a tensor with random numbers
    indices: Input tensor
    from: Value to fill from
@@ -1136,9 +1136,25 @@
    from (&key) (default: 0): Value to fill from
    to (&key) (default: 1): Value to fill to"
    
-  (%internal-rand-inplace tensor from to :type-hint type-hint))
+  (%internal-uniform-inplace tensor from to :type-hint type-hint))
 
-(defun %internal-randn-like (tensor from to dtype)
+(defun rand (indices &key (dtype nnl2.system:*default-tensor-type*))
+  "Creates a tensor of the specified shape filled with random numbers from 0 to 1
+   indices: Input shape
+   dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
+   
+   Returns: A new tensor with the specified shape filled with uniform random values [0, 1]
+   
+   Example:
+     (rand #(2 3)) ; Creates a 2x3 tensor with random values"
+	 
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%rand shape rank dtype)))
+	
+(cffi:defcfun ("lisp_call_rand_inplace" rand!) :pointer
+  (tensor :pointer))  	
+
+(defun %internal-uniform-like (tensor from to dtype)
   "Сreates a tensor filled with random numbers of the same shape as the passed tensor
    tensor: Input tensor
    dtype: Type of new tensor
@@ -1164,7 +1180,7 @@
    from (&key) (default: 0.0d0): Value to fill from
    to (&key) (default: 1.0d0): Value to fill to"
    
-  (%internal-randn-like tensor from to dtype))  
+  (%internal-uniform-like tensor from to dtype))  
 				 
 (defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   "Makes a tensor with the xavier distribution in the specified shape

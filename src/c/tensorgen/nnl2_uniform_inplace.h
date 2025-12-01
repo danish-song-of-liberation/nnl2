@@ -1,7 +1,7 @@
-#ifndef NNL2_RANDN_INPLACE_H
-#define NNL2_RANDN_INPLACE_H
+#ifndef NNL2_UNIFORM_INPLACE_H
+#define NNL2_UNIFORM_INPLACE_H
 
-/** @file nnl2_randn_inplace.h
+/** @file nnl2_uniform_inplace.h
  ** @date 2025
  ** @copyright MIT License
  ** @brief Contains definition of functions that fills tensor with random values in-place
@@ -40,12 +40,12 @@ void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
 	
 	// Safety checks
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "In function nnl2_naive_randn_inplace, passed tensor is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "In function nnl2_naive_uniform_inplace, passed tensor is NULL");
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
-		NNL2_CHECK_NULL_IF_ERR_RETURN(from, "In function nnl2_naive_randn_inplace, from is NULL");
-		NNL2_CHECK_NULL_IF_ERR_RETURN(to, "In function nnl2_naive_randn_inplace, to is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(from, "In function nnl2_naive_uniform_inplace, from is NULL");
+		NNL2_CHECK_NULL_IF_ERR_RETURN(to, "In function nnl2_naive_uniform_inplace, to is NULL");
 	#endif
 	
 	size_t total_elems = product(tensor->shape, tensor->rank);
@@ -90,36 +90,36 @@ void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
 
 /**
  * @ingroup backend_system
- * @brief Backend implementations for randn_inplace operation
+ * @brief Backend implementations for uniform_inplace operation
  * @details
  * Array follows the common backend registration pattern for random number 
  * generation operations (in-place version). Currently registered backends:
  *  - nnl2_naive: Basic reference implementation for random number generation (in-place)
  * 
  * @see nnl2_naive
- * @see nnl2_naive_randn_inplace
+ * @see nnl2_naive_uniform_inplace
  */
 Implementation uniform_inplace_backends[] = {
     REGISTER_BACKEND(nnl2_naive_uniform_inplace, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT OPTIMIZE
 };
 
 /**
- * @brief Function pointer for randn_inplace operation
+ * @brief Function pointer for uniform_inplace operation
  * @ingroup backend_system
  */
-randninplacefn uniform_inplace;
+uniforminplacefn uniform_inplace;
 
 /** 
- * @brief Makes the randn_inplace backend current
+ * @brief Makes the uniform_inplace backend current
  * @ingroup backend_system
  * @see make_current_backend
  */
 make_current_backend(uniform_inplace);
 
 /** 
- * @brief Sets the backend for randn_inplace operation
+ * @brief Sets the backend for uniform_inplace operation
  * @ingroup backend_system
- * @param backend_name Name of the backend to activate for randn_inplace
+ * @param backend_name Name of the backend to activate for uniform_inplace
  * @see ESET_BACKEND_BY_NAME
  */
 void set_uniform_inplace_backend(const char* backend_name) {
@@ -127,7 +127,7 @@ void set_uniform_inplace_backend(const char* backend_name) {
 }
 
 /** 
- * @brief Gets the name of the active backend for randn_inplace operation
+ * @brief Gets the name of the active backend for uniform_inplace operation
  * @ingroup backend_system
  * @return Name of the current backend as constant string
  */
@@ -136,17 +136,17 @@ const char* get_uniform_inplace_backend() {
 }
 
 /**
- * @brief Function declaration for getting all available randn_inplace backends
+ * @brief Function declaration for getting all available uniform_inplace backends
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(uniform_inplace);
 
 /**
- * @brief Function declaration for getting the number of available randn_inplace backends
+ * @brief Function declaration for getting the number of available uniform_inplace backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(uniform_inplace);
 
-#endif /** NNL2_RANDN_INPLACE_H **/
+#endif /** NNL2_UNIFORM_INPLACE_H **/

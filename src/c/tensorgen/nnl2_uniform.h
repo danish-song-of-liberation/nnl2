@@ -1,5 +1,5 @@
-#ifndef NNL2_RANDN_H
-#define NNL2_RANDN_H
+#ifndef NNL2_UNIFORM_H
+#define NNL2_UNIFORM_H
 
 /** @brief
  * Creates a tensor from random numbers in the specified range
@@ -85,14 +85,14 @@ Tensor* naive_uniform(int* shape, int rank, TensorType dtype, void* from, void* 
 
 /**
  * @ingroup backend_system
- * @brief Backend implementations for randn operation
+ * @brief Backend implementations for uniform operation
  * @details
  * Array follows the common backend registration pattern for random number 
  * generation operations. Currently registered backends:
  *  - nnl2_naive: Basic reference implementation for random number generation
  * 
  * @see nnl2_naive
- * @see naive_randn
+ * @see naive_uniform
  */
 Implementation uniform_backends[] = {
 	REGISTER_BACKEND(naive_uniform, nnl2_naive, NAIVE_BACKEND_NAME), // DO NOT TRY TO ADD OPTIMIZATION
@@ -100,22 +100,22 @@ Implementation uniform_backends[] = {
 };	
 
 /**
- * @brief Function pointer for randn operation
+ * @brief Function pointer for uniform operation
  * @ingroup backend_system 
  */
-randnfn uniform;
+uniformfn uniform;
 
 /** 
- * @brief Makes the randn backend current
+ * @brief Makes the uniform backend current
  * @ingroup backend_system
  * @see make_current_backend
  */
 make_current_backend(uniform);
 
 /** 
- * @brief Sets the backend for randn operation
+ * @brief Sets the backend for uniform operation
  * @ingroup backend_system
- * @param backend_name Name of the backend to activate for randn
+ * @param backend_name Name of the backend to activate for uniform
  * @see ESET_BACKEND_BY_NAME
  */
 void set_uniform_backend(const char* backend_name) {
@@ -123,7 +123,7 @@ void set_uniform_backend(const char* backend_name) {
 }
 
 /** 
- * @brief Gets the name of the active backend for randn operation
+ * @brief Gets the name of the active backend for uniform operation
  * @ingroup backend_system
  * @return Name of the current backend as constant string
  */
@@ -132,17 +132,17 @@ const char* get_uniform_backend() {
 }
 
 /** 
- * @brief Function declaration for getting all available randn backends
+ * @brief Function declaration for getting all available uniform backends
  * @ingroup backend_system
  * @see DEFINE_GET_BACKENDS_FUNCTION
  */
 DEFINE_GET_BACKENDS_FUNCTION(uniform);
 
 /**
- * @brief Function declaration for getting the number of available randn backends
+ * @brief Function declaration for getting the number of available uniform backends
  * @ingroup backend_system
  * @see DEFINE_GET_NUMS_BACKENDS_FUNCTION
  */
 DEFINE_GET_NUMS_BACKENDS_FUNCTION(uniform);
 
-#endif /** NNL2_RANDN_H **/
+#endif /** NNL2_UNIFORM_H **/

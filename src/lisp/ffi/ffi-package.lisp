@@ -563,5 +563,14 @@
    #:%nnl2-optim-tensors-setter
    #:%nnl2-optim-num-tensors-setter
    #:nnl2-optim
-   #:%ts-set-magic-number))
+   #:%ts-set-magic-number
+   #:%rand
+   #:%set-rand-backend
+   #:%set-rand-inplace-backend
+   #:%get-rand-backend
+   #:%get-rand-inplace-backend
+   #:%get-rand-num-backends
+   #:%get-rand-backends
+   #:%get-rand-inplace-num-backends
+   #:%get-rand-inplace-backends))
    

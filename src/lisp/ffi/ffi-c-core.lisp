@@ -327,6 +327,11 @@
   (from :pointer)
   (to :pointer))  
   
+(cffi:defcfun ("lisp_call_rand" %rand) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type))  
+  
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)
   (tensorb :pointer))    
@@ -1398,7 +1403,13 @@
 
 (cffi:defcfun ("set_uniform_inplace_backend" %set-uniform-inplace-backend) :void
   (backend-name :string))   
-  	
+ 
+(cffi:defcfun ("set_rand_backend" %set-rand-backend) :void
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_rand_inplace_backend" %set-rand-inplace-backend) :void
+  (backend-name :string)) 
+  
 (cffi:defcfun ("set_xavier_backend" %set-xavier-backend) :void
   (backend-name :string))  
  
@@ -1599,6 +1610,8 @@
 (cffi:defcfun ("get_concat_backend" %get-concat-backend) :string) 
 (cffi:defcfun ("get_uniform_backend" %get-uniform-backend) :string) 
 (cffi:defcfun ("get_uniform_inplace_backend" %get-uniform-inplace-backend) :string) 
+(cffi:defcfun ("get_rand_backend" %get-rand-backend) :string) 
+(cffi:defcfun ("get_rand_inplace_backend" %get-rand-inplace-backend) :string) 
 (cffi:defcfun ("get_xavier_backend" %get-xavier-backend) :string) 
 (cffi:defcfun ("get_xavier_inplace_backend" %get-xavier-inplace-backend) :string) 
 (cffi:defcfun ("get_transposeinplace_backend" %get-transposeinplace-backend) :string) 
@@ -1701,6 +1714,10 @@
 (cffi:defcfun ("get_uniform_backends" %get-uniform-backends) :pointer)
 (cffi:defcfun ("get_uniform_inplace_num_backends" %get-uniform-inplace-num-backends) :int)
 (cffi:defcfun ("get_uniform_inplace_backends" %get-uniform-inplace-backends) :pointer)
+(cffi:defcfun ("get_rand_num_backends" %get-rand-num-backends) :int)
+(cffi:defcfun ("get_rand_backends" %get-rand-backends) :pointer)
+(cffi:defcfun ("get_rand_inplace_num_backends" %get-rand-inplace-num-backends) :int)
+(cffi:defcfun ("get_rand_inplace_backends" %get-rand-inplace-backends) :pointer)
 (cffi:defcfun ("get_xavier_num_backends" %get-xavier-num-backends) :int)
 (cffi:defcfun ("get_xavier_backends" %get-xavier-backends) :pointer)
 (cffi:defcfun ("get_xavier_inplace_num_backends" %get-xavier-inplace-num-backends) :int)

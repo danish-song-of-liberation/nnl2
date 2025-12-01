@@ -582,5 +582,15 @@
    #:with-backend/mse
    #:uniform
    #:uniform!
-   #:uniform-like))
+   #:uniform-like
+   #:rand
+   #:rand!
+   #:with-backend/rand
+   #:with-backend/rand!
+   #:get-backends/rand
+   #:get-backends/rand!
+   #:get-backend/rand
+   #:use-backend/rand
+   #:get-backend/rand!
+   #:use-backend/rand!))
    

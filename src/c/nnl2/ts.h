@@ -9,6 +9,8 @@
 #include "../tensorgen/nnl2_zeros.h"
 #include "../tensorgen/nnl2_ones.h"
 #include "../tensorgen/nnl2_full.h"
+#include "../tensorgen/nnl2_rand.h"
+#include "../tensorgen/nnl2_rand_inplace.h"
 #include "../tensorgen/nnl2_uniform.h"
 #include "../tensorgen/nnl2_uniform_inplace.h"
 #include "../tensorgen/nnl2_xavier.h"

@@ -642,7 +642,7 @@ typedef Tensor* (*concatfn)(const Tensor* a, const Tensor* b, int axis);
  ** @param stddev_ptr Pointer to standard deviation value 
  ** @return New tensor filled with random values from normal distribution
  **/
-typedef Tensor* (*randnfn)(const int* shape, int rank, TensorType dtype, void* mean_ptr, void* stddev_ptr);
+typedef Tensor* (*uniformfn)(const int* shape, int rank, TensorType dtype, void* mean_ptr, void* stddev_ptr);
 
 /** @brief Xavier initialization function pointer (creates new tensor)
  ** @param shape Array of dimension sizes
@@ -1003,9 +1003,9 @@ typedef nnl2_tensor* (*negfn)(nnl2_tensor* tensor);
  ** @param tensor Tensor to fill with random values
  ** @param from Pointer to the lower bound of the random range
  ** @param to Pointer to the upper bound of the random range
- ** @see randnfn
+ ** @see uniformfn
  **/
-typedef void (*randninplacefn)(nnl2_tensor* tensor, void* from, void* to);
+typedef void (*uniforminplacefn)(nnl2_tensor* tensor, void* from, void* to);
 
 /** @brief Initializes the given tensor in-place using the Xavier distribution
  ** @param tensor Tensor to initialize
@@ -1044,6 +1044,23 @@ typedef void (*axpy_inplace_region_fn)(Tensor* summand, Tensor* sumend, float al
  ** @see nnl2_tensor
  */
 typedef nnl2_tensor_type (*msefn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record);
+
+/** @brief Generates tensor with random numbers from specific distribution
+ ** @param shape Array defining tensor dimensions
+ ** @param rank Number of dimensions
+ ** @param dtype Data type of elements
+ ** @return New tensor with random values
+ ** @see nnl2_tensor
+ ** @see nnl2_tensor_type
+ */
+typedef nnl2_tensor* (*randfn)(int* shape, int rank, nnl2_tensor_type dtype);
+
+/** @brief Fills existing tensor with random numbers from standard uniform distribution [0, 1]
+ ** @param tensor Tensor to fill with random values
+ ** @see nnl2_tensor
+ ** @see nnl2_tensor_type
+ */
+typedef void (*randinplacefn)(nnl2_tensor* tensor);
 
 /// @} [typedef]
 

@@ -191,7 +191,7 @@ void nnl2_init_loss();
  ** @code    
  * #include "input_here_pass_to_nnl2"
  * int main() {
- *     nnl2_init_system(); // Initialize the framefork first!
+ *     nnl2_init_system(); // Initialize the library first!
  *	   // ... use the framework ...    
  *	   return 0;
  * }	 
@@ -302,7 +302,7 @@ void nnl2_init_standard_inplace() {
                                
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
-	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack));
+	EINIT_BACKEND(vstack, vstack_backends, current_backend(vstack)); 
 	EINIT_BACKEND(nnl2_concat, concat_backends, current_backend(concat));           
 } 
 
@@ -321,8 +321,10 @@ void nnl2_init_activations() {
 }
      
 void nnl2_init_initializers() {
+    EINIT_BACKEND(nnl2_rand, rand_backends, current_backend(rand));    
     EINIT_BACKEND(uniform, uniform_backends, current_backend(uniform));    
     EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
+    EINIT_BACKEND(rand_inplace, rand_inplace_backends, current_backend(rand_inplace));     
     EINIT_BACKEND(uniform_inplace, uniform_inplace_backends, current_backend(uniform_inplace));     
 	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	   
 }
@@ -567,16 +569,16 @@ Tensor* lisp_call_sigmoid(Tensor* tensor, bool approx) {
 void lisp_call_tanhinplace(Tensor* tensor, bool approx) { 
 	tanhinplace(tensor, approx);
 }    
-
+ 
 Tensor* lisp_call_tanh(Tensor* tensor, bool approx) {   
 	return nnl2_tanh(tensor, approx); 
 }   
 
-Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) {
+Tensor* lisp_call_concat(Tensor* tensora, Tensor* tensorb, int axis) { 
 	return nnl2_concat(tensora, tensorb, axis); 
 }        
-
-Tensor* lisp_call_uniform(int* shape, int rank, TensorType dtype, void* from, void* to) {
+ 
+Tensor* lisp_call_uniform(int* shape, int rank, TensorType dtype, void* from, void* to) { 
 	return uniform(shape, rank, dtype, from, to);  
 }
 
@@ -780,7 +782,7 @@ void lisp_call_neg_inplace(nnl2_tensor* tensor) {
 	nnl2_neginplace(tensor);
 }           
            
-nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {    
+nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {     
     return nnl2_neg(tensor);   
 }
 
@@ -795,6 +797,14 @@ int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {
 
 void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {  
 	nnl2_mse(prediction, target, record);
+}
+
+nnl2_tensor* lisp_call_rand(int32_t* shape, int rank, nnl2_tensor_type dtype) {
+	return nnl2_rand(shape, rank, dtype);
+}
+
+void lisp_call_rand_inplace(nnl2_tensor* tensor) {
+	rand_inplace(tensor);
 }
 
 ///@} [lisp_wrappers]                
