@@ -562,5 +562,6 @@
    #:%nnl2-optim-gd-lr-setter
    #:%nnl2-optim-tensors-setter
    #:%nnl2-optim-num-tensors-setter
-   #:nnl2-optim))
+   #:nnl2-optim
+   #:%ts-set-magic-number))
    

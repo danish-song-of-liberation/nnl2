@@ -367,13 +367,9 @@
 	   (declare (type integer rank))
 	   (nnl2.ffi:%ad-randn shape rank dtype requires-grad name from-pntr to-pntr)))))
 	
-(defun rand (indices &key (from 0) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+(defun uniform (indices &key (from 0) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
   "Creates an AD tensor with random values in the given range (default [0, 1])"
   (%internal-randn indices dtype requires-grad name from to))
-	
-(defun randn (indices &key (from -1) (to 1) (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
-  "Creates an AD tensor with random values in the given range (default [-1, 1])"
-  (%internal-randn indices dtype requires-grad name from to)) 
 	 
 (defun xavier (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   "Creates an AD tensor initialized with Xavier initialization
@@ -919,12 +915,9 @@
 (cffi:defcfun ("nnl2_ad_ones_like" ones-like) :pointer
   (ad-tensor :pointer))    
 
-(cffi:defcfun ("nnl2_ad_rand_like" rand-like) :pointer
+(cffi:defcfun ("nnl2_ad_rand_like" uniform-like) :pointer
   (ad-tensor :pointer))    
 
-(cffi:defcfun ("nnl2_ad_randn_like" randn-like) :pointer
-  (ad-tensor :pointer))    
-  
 (defun full-like (ad-tensor &key (filler 0))
   "Creates a tensor like ad-tensor, filled with the given value"
   (let* ((dtype (dtype ad-tensor))

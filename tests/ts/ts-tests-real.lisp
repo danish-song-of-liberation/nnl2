@@ -17,7 +17,7 @@
   (nnl2.tests.utils:make-test :float64 "Simple Gradient Descent"
   
     (nnl2.hli.ts:tlet ((target (nnl2.hli.ts:make-tensor #2A((1 0 1) (0 0 1) (1 0 1))))
-					   (a (nnl2.hli.ts:randn #(3 3))) (b (nnl2.hli.ts:randn #(3 3))))
+					   (a (nnl2.hli.ts:uniform #(3 3))) (b (nnl2.hli.ts:uniform #(3 3))))
 					   
 	  (flet ((d/mse (x y) (nnl2.hli.ts:.* (nnl2.hli.ts:.- x y) 2))
 			 (forward (x y) (nnl2.hli.ts:gemm a b)))

@@ -34,7 +34,8 @@
 	#:parallel-iterate-across-tensor-data
     #:iterate-across-tensor-shape
 	#:iterate-across-tensor-strides
-	#:iatst))
+	#:iatst
+	#:magic-number))
   
 (defpackage :nnl2.lli.ad
   (:use #:cl)  

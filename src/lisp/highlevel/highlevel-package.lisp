@@ -106,8 +106,7 @@
    #:step!
    #:num-roots
    #:roots
-   #:rand
-   #:randn
+   #:uniform
    #:xavier
    #:transposition!
    #:transpose!
@@ -118,8 +117,7 @@
    #:zeros-like
    #:ones-like
    #:full-like
-   #:rand-like
-   #:randn-like
+   #:uniform-like
    #:xavier-like
    #:ncast
    #:detach!
@@ -247,8 +245,6 @@
    #:.tanh!
    #:.tanh
    #:concat
-   #:randn
-   #:randn-like
    #:xavier
    #:transpose!
    #:transpose
@@ -543,8 +539,6 @@
    #:ncols
    #:transposition
    #:transposition!
-   #:rand
-   #:rand-like
    #:fill!
    #:use-backend/axpy!
    #:use-backend/axpy
@@ -562,8 +556,6 @@
    #:get-backend/.neg
    #:with-backend/.neg
    #:use-backend/.neg
-   #:randn!
-   #:rand!
    #:use-backend/randn!
    #:get-backend/randn!
    #:get-backends/randn!
@@ -587,5 +579,8 @@
    #:get-backend/mse
    #:use-backend/mse
    #:get-backends/mse
-   #:with-backend/mse))
+   #:with-backend/mse
+   #:uniform
+   #:uniform!
+   #:uniform-like))
    

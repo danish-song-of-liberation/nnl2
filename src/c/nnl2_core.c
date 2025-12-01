@@ -332,7 +332,7 @@ void nnl2_init_transposition() {
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, current_backend(transposition_inplace)); 
 	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));           
-} 
+}  
     
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
@@ -388,7 +388,7 @@ void nnl2_init_broadcasting() {
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
 }     
 
-void nnl2_init_reshaping() {      
+void nnl2_init_reshaping() {        
 	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));   
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
 }

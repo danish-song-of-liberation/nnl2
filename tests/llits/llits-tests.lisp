@@ -11,14 +11,14 @@
 (fiveam:in-suite nnl2.lli.ts.tests-suite)
 
 (fiveam:test nnl2.lli.ts-test/flat
-  (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:rand #(5 5) :dtype :float64)))
+  (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:uniform #(5 5) :dtype :float64)))
     (let ((val     (nnl2.hli.ts:tref a 0 0))
 		  (flatval (nnl2.lli.ts:flat a 0)))
 		  
       (fiveam:is (= val flatval)))))
 
 (fiveam:test nnl2.lli.ts-test/trefw
-  (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:rand #(5 5) :dtype :float64)))
+  (nnl2.hli.ts:tlet ((a (nnl2.hli.ts:uniform #(5 5) :dtype :float64)))
     (let ((trefval  (nnl2.hli.ts:tref a 0 0))
 		  (trefwval (nnl2.lli.ts:trefw a 0 0)))
 		  

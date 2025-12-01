@@ -1285,4 +1285,24 @@ const char** get_backends(Implementation* backends, size_t count) {
 
 /// @} [backends]
 
+
+
+/// @{ [other]
+
+/** @brief 
+ * Lisp wrapper for getting nnl2_tensor.magic_number
+ */
+int8_t nnl2_ts_get_magic_number(nnl2_tensor* tensor) {
+	return tensor -> magic_number;
+}
+
+/** @brief 
+ * Lisp wrapper for setting nnl2_tensor.magic_number
+ */
+void nnl2_ts_set_magic_number(nnl2_tensor* tensor, int8_t new_magic) {
+	tensor -> magic_number = new_magic;
+}
+
+/// @} [other]
+
 #endif  /** NNL2_TENSOR_BACKEND_H **/

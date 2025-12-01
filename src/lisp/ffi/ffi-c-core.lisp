@@ -500,6 +500,10 @@
   (target :pointer)
   (record :pointer))
   
+(cffi:defcfun ("nnl2_ts_set_magic_number" %ts-set-magic-number) :void
+  (tensor :pointer)
+  (new-magic :char))
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

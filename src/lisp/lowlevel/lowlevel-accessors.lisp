@@ -180,3 +180,9 @@
   "Short name for iterate-across-tensor-strides (see docstring)"
   `(iterate-across-tensor-strides (,iterator ,tensor) ,@body))						  
   
+(cffi:defcfun ("nnl2_ts_get_magic_number" magic-number) :char
+  (tensor :pointer))  
+  
+(defun (setf magic-number) (new-magic tensor)
+  (nnl2.ffi:%ts-set-magic-number tensor))
+
