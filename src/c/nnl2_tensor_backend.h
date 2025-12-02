@@ -1062,6 +1062,23 @@ typedef nnl2_tensor* (*randfn)(int* shape, int rank, nnl2_tensor_type dtype);
  */
 typedef void (*randinplacefn)(nnl2_tensor* tensor);
 
+/** @brief Generates tensor with random numbers from standard normal distribution N(0, 1)
+ ** @param shape Array defining tensor dimensions
+ ** @param rank Number of dimensions
+ ** @param dtype Data type of elements
+ ** @return New tensor with random values from N(0, 1)
+ ** @see nnl2_tensor
+ ** @see nnl2_tensor_type
+ */
+typedef nnl2_tensor* (*randnfn)(int* shape, int rank, nnl2_tensor_type dtype);
+
+/** @brief Fills existing tensor with random numbers from standard normal distribution N(0, 1)
+ ** @param tensor Tensor to fill with random values from N(0, 1)
+ ** @see nnl2_tensor
+ ** @see nnl2_tensor_type
+ */
+typedef void (*randninplacefn)(nnl2_tensor* tensor);
+
 /// @} [typedef]
 
 

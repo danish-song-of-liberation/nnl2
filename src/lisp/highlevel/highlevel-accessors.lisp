@@ -1154,6 +1154,23 @@
 (cffi:defcfun ("lisp_call_rand_inplace" rand!) :pointer
   (tensor :pointer))  	
 
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*))
+  "Creates a tensor of the specified shape filled with random numbers from the standard normal distribution N(0, 1)
+  
+   indices: Input shape
+   dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
+   
+   Returns: A new tensor with the specified shape filled with uniform random values [0, 1]
+   
+   Example:
+     (rand #(2 3)) ; Creates a 2x3 tensor with random values"
+	 
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%rand shape rank dtype)))
+	
+(cffi:defcfun ("lisp_call_randn_inplace" randn!) :pointer
+  (tensor :pointer))  	
+  
 (defun %internal-uniform-like (tensor from to dtype)
   "Сreates a tensor filled with random numbers of the same shape as the passed tensor
    tensor: Input tensor

@@ -592,5 +592,15 @@
    #:get-backend/rand
    #:use-backend/rand
    #:get-backend/rand!
-   #:use-backend/rand!))
+   #:use-backend/rand!
+   #:randn
+   #:randn!
+   #:use-backend/randn
+   #:use-backend/randn!
+   #:get-backend/randn
+   #:get-backend/randn!
+   #:get-backends/randn
+   #:get-backends/randn!
+   #:with-backend/randn
+   #:with-backend/randn!))
    

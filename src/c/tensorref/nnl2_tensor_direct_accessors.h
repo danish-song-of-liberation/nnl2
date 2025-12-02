@@ -228,5 +228,4 @@ int get_size_in_bytes(Tensor* tensor) {
 	return product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
 }
 
-
 #endif /** NNL2_TENSOR_DIRECT_ACCESSORS_H **/

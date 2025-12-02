@@ -198,6 +198,12 @@
   
 (define-backend-setter use-backend/rand!
   nnl2.ffi:%set-rand-inplace-backend) 
+
+(define-backend-setter use-backend/randn
+  nnl2.ffi:%set-randn-backend)
+  
+(define-backend-setter use-backend/randn!
+  nnl2.ffi:%set-randn-inplace-backend) 
   
 (define-backend-setter use-backend/xavier
   nnl2.ffi:%set-xavier-backend)
@@ -284,7 +290,8 @@
 							  use-backend/cut use-backend/transposition
 							  use-backend/transposition! use-backend/.neg! use-backend/.neg
 							  use-backend/uniform! use-backend/xavier! use-backend/.sqrt! 
-							  use-backend/.sqrt use-backend/mse use-backend/rand))
+							  use-backend/.sqrt use-backend/mse use-backend/rand
+							  use-backend/rand! use-backend/randn use-backend/randn!))
 							  
       (funcall backend-function name)))
 	  
@@ -366,6 +373,8 @@
 (define-backend-getter-setter get-backend/uniform! use-backend/uniform! nnl2.ffi:%get-uniform-inplace-backend)
 (define-backend-getter-setter get-backend/rand use-backend/rand nnl2.ffi:%get-rand-backend)
 (define-backend-getter-setter get-backend/rand! use-backend/rand! nnl2.ffi:%get-rand-inplace-backend)
+(define-backend-getter-setter get-backend/randn use-backend/randn nnl2.ffi:%get-randn-backend)
+(define-backend-getter-setter get-backend/randn! use-backend/randn! nnl2.ffi:%get-randn-inplace-backend)
 (define-backend-getter-setter get-backend/randn-like use-backend/randn-like nil :like get-backend/randn)
 (define-backend-getter-setter get-backend/xavier use-backend/xavier nnl2.ffi:%get-xavier-backend)
 (define-backend-getter-setter get-backend/xavier! use-backend/xavier! nnl2.ffi:%get-xavier-inplace-backend)
@@ -604,12 +613,20 @@
   nnl2.ffi:%get-uniform-inplace-backends)  
 
 (define-backends-getter get-backends/rand
-  nnl2.ffi:%get-uniform-num-backends 
-  nnl2.ffi:%get-uniform-backends)
+  nnl2.ffi:%get-rand-num-backends 
+  nnl2.ffi:%get-rand-backends)
   
 (define-backends-getter get-backends/rand! 
-  nnl2.ffi:%get-uniform-inplace-num-backends 
-  nnl2.ffi:%get-uniform-inplace-backends)  
+  nnl2.ffi:%get-rand-inplace-num-backends 
+  nnl2.ffi:%get-rand-inplace-backends)  
+  
+(define-backends-getter get-backends/randn
+  nnl2.ffi:%get-randn-num-backends 
+  nnl2.ffi:%get-randn-backends)
+  
+(define-backends-getter get-backends/rand! 
+  nnl2.ffi:%get-randn-inplace-num-backends 
+  nnl2.ffi:%get-randn-inplace-backends)    
   
 (define-backends-getter get-backends/randn-like :like get-backends/randn)
 
@@ -753,6 +770,8 @@
 (define-with-backend with-backend/uniform! get-backend/uniform!)
 (define-with-backend with-backend/rand get-backend/rand)
 (define-with-backend with-backend/rand! get-backend/rand!)
+(define-with-backend with-backend/randn get-backend/rand)
+(define-with-backend with-backend/randn! get-backend/rand!)
 (define-with-backend with-backend/xavier get-backend/xavier)
 (define-with-backend with-backend/xavier! get-backend/xavier!)
 (define-with-backend with-backend/transpose get-backend/transpose)

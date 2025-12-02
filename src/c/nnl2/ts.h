@@ -11,6 +11,8 @@
 #include "../tensorgen/nnl2_full.h"
 #include "../tensorgen/nnl2_rand.h"
 #include "../tensorgen/nnl2_rand_inplace.h"
+#include "../tensorgen/nnl2_randn.h"
+#include "../tensorgen/nnl2_randn_inplace.h"
 #include "../tensorgen/nnl2_uniform.h"
 #include "../tensorgen/nnl2_uniform_inplace.h"
 #include "../tensorgen/nnl2_xavier.h"

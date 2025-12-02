@@ -572,5 +572,14 @@
    #:%get-rand-num-backends
    #:%get-rand-backends
    #:%get-rand-inplace-num-backends
-   #:%get-rand-inplace-backends))
+   #:%get-rand-inplace-backends
+   #:%randn
+   #:%set-randn-backend
+   #:%set-randn-inplace-backend
+   #:%get-randn-backend
+   #:%get-randn-inplace-backend
+   #:%get-randn-inplace-backends
+   #:%get-randn-inplace-num-backends
+   #:%get-randn-num-backends
+   #:%get-randn-backends))
    
