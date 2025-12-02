@@ -349,6 +349,31 @@
 		
 		(nnl2.ffi:%ad-full shape rank dtype requires-grad name filler-pntr)))))
 	  
+(defun uniform-like (tensor &key (from 0) (to 1))
+  "Creates a random tensor with uniform distribution matching another tensor's shape
+  
+   Args:
+       tensor: Reference tensor whose shape will be used
+       from (&key) (default 0): Lower bound of uniform distribution 
+       to (&key) (default 1): Upper bound of uniform distribution 
+       
+   Returns:
+       New AD tensor with same shape as input, filled with random values"
+       
+  (nnl2.hli:fastcall
+    (let* ((dtype (dtype tensor))
+		   (lisp-type    (nnl2.hli.ts:type/nnl2->lisp dtype))
+		   (cffi-type    (nnl2.hli.ts:type/nnl2->cffi dtype))
+		   (to-pntr      (cffi:foreign-alloc cffi-type))
+		   (from-pntr    (cffi:foreign-alloc cffi-type))
+		   (coerced-to   (coerce to lisp-type))
+		   (coerced-from (coerce from lisp-type)))
+		   
+	  (setf (cffi:mem-ref from-pntr cffi-type) coerced-from
+			(cffi:mem-ref to-pntr cffi-type)   coerced-to)
+			
+	  (nnl2.ffi:%ad-uniform-like tensor from-pntr to-pntr))))		
+	  
 (defun %internal-uniform (indices dtype requires-grad name from to)
   "Internal helper for creating random AD tensors in a given range"
   
@@ -396,6 +421,20 @@
 	    (declare (type integer rank))
         (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
 
+(defun rand (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%ad-rand shape rank dtype requires-grad name)))
+
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%ad-randn shape rank dtype requires-grad name)))
+
+(cffi:defcfun ("nnl2_ad_rand_like" rand-like) :pointer  
+  (ad-tensor :pointer))
+  
+(cffi:defcfun ("nnl2_ad_randn_like" randn-like) :pointer  
+  (ad-tensor :pointer))  
+  
 (defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
   "Creates an AD tensor from a Lisp array
   
@@ -913,9 +952,6 @@
   (ad-tensor :pointer))  
   
 (cffi:defcfun ("nnl2_ad_ones_like" ones-like) :pointer
-  (ad-tensor :pointer))    
-
-(cffi:defcfun ("nnl2_ad_uniform_like" uniform-like) :pointer
   (ad-tensor :pointer))    
 
 (defun full-like (ad-tensor &key (filler 0))

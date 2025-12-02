@@ -219,10 +219,16 @@ nnl2_ad_tensor* nnl2_ad_full_like(nnl2_ad_tensor* ad_tensor, void* filler) {
 }
 
 /** @brief 
- * Creates a new tensor with random values in range [0, 1] with the same characteristics as the input tensor
+ * Creates a new tensor with random values in specified range with the same characteristics as the input tensor
  *
  ** @param ad_tensor 
  * Pointer to the reference tensor used as template for the new tensor
+ *
+ ** @param from 
+ * Pointer to the lower bound of the range (must match the data type of ad_tensor)
+ *
+ ** @param to 
+ * Pointer to the upper bound of the range (must match the data type of ad_tensor)
  *
  ** @return nnl2_ad_tensor* 
  * Pointer to the newly created random tensor, or NULL if error occurred
@@ -231,7 +237,10 @@ nnl2_ad_tensor* nnl2_ad_full_like(nnl2_ad_tensor* ad_tensor, void* filler) {
  * If ad_tensor is NULL
  *
  ** @exception NNL2Error [nnl2_safety_mod_min+]
- * If result (see ```nnl2_ad_tensor* result = nnl2_ad_randn(...)```) is NULL
+ * If from or to is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If result (see ```nnl2_ad_tensor* result = nnl2_ad_uniform(...)```) is NULL
  *
  ** @exception NNL2Error [nnl2_safety_mod_moderate+]
  * If ad_tensor->shape is NULL
@@ -239,88 +248,41 @@ nnl2_ad_tensor* nnl2_ad_full_like(nnl2_ad_tensor* ad_tensor, void* filler) {
  ** @exception NNL2Error [nnl2_safety_mod_min+]
  * If unsupported data type is encountered
  *
- ** @see nnl2_ad_randn
+ ** @see nnl2_ad_uniform
  **/
-nnl2_ad_tensor* nnl2_ad_uniform_like(nnl2_ad_tensor* ad_tensor) {
-	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-		NNL2_FUNC_ENTER();
-	#endif
-	
-	// Safety checks
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_rand_like, ad_tensor is NULL", NULL);
-	#endif
-	
-	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data->shape, "In function nnl2_ad_rand_like, ad_tensor->data->shape is NULL", NULL);
-	#endif
-	
-    switch(ad_tensor->data->dtype) {
-        case FLOAT64: {
-            nnl2_float64 from = 0.0;
-            nnl2_float64 to = 1.0;
-			
-			nnl2_ad_tensor* result = nnl2_ad_uniform(ad_tensor->data->shape, ad_tensor->data->rank, ad_tensor->data->dtype, ad_tensor->requires_grad, ad_tensor->name, &from, &to);
-			
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!result) {
-					NNL2_TENSOR_ERROR("randn");
-					return NULL;
-				}
-			#endif
-	
-			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-				NNL2_FUNC_EXIT();
-			#endif
-	
-            return result;
-        }
-		
-        case FLOAT32: {
-            nnl2_float32 from = 0.0f;
-            nnl2_float32 to = 1.0f;
-			
-			nnl2_ad_tensor* result = nnl2_ad_uniform(ad_tensor->data->shape, ad_tensor->data->rank, ad_tensor->data->dtype, ad_tensor->requires_grad, ad_tensor->name, &from, &to);
-			
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!result) {
-					NNL2_TENSOR_ERROR("randn");
-					return NULL;
-				}
-			#endif
-			
-			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-				NNL2_FUNC_EXIT();
-			#endif
-			
-            return result;
-        }
-		
-        case INT32: {
-            nnl2_int32 from = 0;
-            nnl2_int32 to = 1;
-			
-			nnl2_ad_tensor* result = nnl2_ad_uniform(ad_tensor->data->shape, ad_tensor->data->rank, ad_tensor->data->dtype, ad_tensor->requires_grad, ad_tensor->name, &from, &to);
-			
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!result) {
-					NNL2_TENSOR_ERROR("randn");
-					return NULL;
-				}
-			#endif
-			
-			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-				NNL2_FUNC_EXIT();
-			#endif
-			
-            return result;
-        }
-		
-        default: {
-            NNL2_TYPE_ERROR(ad_tensor->data->dtype);
+nnl2_ad_tensor* nnl2_ad_uniform_like(nnl2_ad_tensor* ad_tensor, void* from, void* to) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_uniform_like, ad_tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(from, "In function nnl2_ad_uniform_like, from is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(to, "In function nnl2_ad_uniform_like, to is NULL", NULL);
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data->shape, "In function nnl2_ad_uniform_like, ad_tensor->data->shape is NULL", NULL);
+    #endif
+    
+    // Directly call nnl2_ad_uniform with the template tensor's parameters
+    nnl2_ad_tensor* result = nnl2_ad_uniform(ad_tensor->data->shape, ad_tensor->data->rank, 
+                                             ad_tensor->data->dtype, ad_tensor->requires_grad, 
+                                             ad_tensor->name, from, to);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!result) {
+            NNL2_TENSOR_ERROR("nnl2_ad_uniform");
             return NULL;
         }
-    }
+    #endif
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
 }
 
 /** @brief 
@@ -384,6 +346,116 @@ nnl2_ad_tensor* nnl2_ad_xavier_like(nnl2_ad_tensor* ad_tensor, int in, int out, 
 	#endif
 	
 	return result;
+}
+
+/** @brief 
+ * Creates a new tensor with uniform random values in range [0, 1] with the same characteristics as the input tensor
+ *
+ ** @param ad_tensor 
+ * Pointer to the reference tensor used as template for the new tensor
+ *
+ ** @return nnl2_ad_tensor* 
+ * Pointer to the newly created random tensor, or NULL if error occurred
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If ad_tensor is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If result (see ```nnl2_ad_tensor* empty = nnl2_ad_empty(...)```) is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_moderate+]
+ * If ad_tensor->shape is NULL
+ *
+ ** @see nnl2_ad_empty
+ ** @see rand_inplace
+ **/
+nnl2_ad_tensor* nnl2_ad_rand_like(nnl2_ad_tensor* ad_tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Safety checks
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_rand_like, ad_tensor is NULL", NULL);
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data->shape, "In function nnl2_ad_rand_like, ad_tensor->data->shape is NULL", NULL);
+	#endif
+	
+	// Create empty tensor with same characteristics
+	nnl2_ad_tensor* empty = nnl2_ad_empty(ad_tensor -> data -> shape, ad_tensor -> data -> rank, ad_tensor -> data -> dtype, ad_tensor -> requires_grad, "empty");
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(!empty) {
+			NNL2_TENSOR_ERROR("empty");
+			return NULL;
+		}
+	#endif
+	
+	// Fill with random values
+	rand_inplace(empty -> data);
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
+	return empty;
+}
+
+/** @brief 
+ * Creates a new tensor with standard normal distribution (mean=0, std=1) with the same characteristics as the input tensor
+ *
+ ** @param ad_tensor 
+ * Pointer to the reference tensor used as template for the new tensor
+ *
+ ** @return nnl2_ad_tensor* 
+ * Pointer to the newly created random tensor, or NULL if error occurred
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If ad_tensor is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If result (see ```nnl2_ad_tensor* empty = nnl2_ad_empty(...)```) is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_moderate+]
+ * If ad_tensor->shape is NULL
+ *
+ ** @see nnl2_ad_empty
+ ** @see randn_inplace
+ **/
+nnl2_ad_tensor* nnl2_ad_randn_like(nnl2_ad_tensor* ad_tensor) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	// Safety checks
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_randn_like, ad_tensor is NULL", NULL);
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data->shape, "In function nnl2_ad_randn_like, ad_tensor->data->shape is NULL", NULL);
+	#endif
+	
+	// Create empty tensor with same characteristics
+	nnl2_ad_tensor* empty = nnl2_ad_empty(ad_tensor -> data -> shape, ad_tensor -> data -> rank, ad_tensor -> data -> dtype, ad_tensor -> requires_grad, "empty");
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(!empty) {
+			NNL2_TENSOR_ERROR("empty");
+			return NULL;
+		}
+	#endif
+	
+	// Fill with normal random values
+	randn_inplace(empty -> data);
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
+	return empty;
 }
 
 #endif /** NNL2_AD_LIKE_CONSTRUCTORS **/

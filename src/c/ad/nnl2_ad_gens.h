@@ -420,6 +420,56 @@ nnl2_ad_tensor* nnl2_ad_uniform(int32_t* shape, int rank, nnl2_tensor_type dtype
     return ad_tensor;
 }
 
+nnl2_ad_tensor* nnl2_ad_rand(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape, "In function nnl2_ad_randn, int32_t* shape is NULL", NULL);
+	#endif
+    
+    // Create empty tensor
+    nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(shape, rank, dtype, requires_grad, name);
+    if(ad_tensor == NULL) {
+        NNL2_TENSOR_ERROR("empty");
+        return NULL;
+    }
+	
+	rand_inplace(ad_tensor -> data);
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return ad_tensor;
+}
+
+nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape, "In function nnl2_ad_randn, int32_t* shape is NULL", NULL);
+	#endif
+    
+    // Create empty tensor
+    nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(shape, rank, dtype, requires_grad, name);
+    if(ad_tensor == NULL) {
+        NNL2_TENSOR_ERROR("empty");
+        return NULL;
+    }
+	
+	randn_inplace(ad_tensor -> data);
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return ad_tensor;
+}
+
 /** @brief 
  * Creates a new AD tensor and initializes it using Xavier initialization
  *

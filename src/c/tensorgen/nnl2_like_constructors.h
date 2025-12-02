@@ -134,4 +134,12 @@ nnl2_tensor* nnl2_xavier_like(nnl2_tensor* tensor, int in, int out, float gain, 
 	return xavier(tensor->shape, tensor->rank, tensor->dtype, in, out, gain, dist);
 }
 
+nnl2_tensor* nnl2_rand_like(nnl2_tensor* tensor) {
+	return nnl2_rand(tensor -> shape, tensor -> rank, tensor -> dtype);
+}
+
+nnl2_tensor* nnl2_randn_like(nnl2_tensor* tensor) {
+	return nnl2_randn(tensor -> shape, tensor -> rank, tensor -> dtype);
+}
+
 #endif /** NNL2_LIKE_CONSTRUCTORS_H **/

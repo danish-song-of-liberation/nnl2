@@ -127,8 +127,11 @@
    #:strides
    #:name
    #:nrows
-   #:ncols))
-   
+   #:ncols
+   #:rand
+   #:randn
+   #:rand-like
+   #:randn-like))
    
 (defpackage :nnl2.hli.ad.r
   (:use #:cl)
@@ -602,5 +605,7 @@
    #:get-backends/randn
    #:get-backends/randn!
    #:with-backend/randn
-   #:with-backend/randn!))
+   #:with-backend/randn!
+   #:rand-like
+   #:randn-like))
    

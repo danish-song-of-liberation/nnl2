@@ -581,5 +581,8 @@
    #:%get-randn-inplace-backends
    #:%get-randn-inplace-num-backends
    #:%get-randn-num-backends
-   #:%get-randn-backends))
+   #:%get-randn-backends
+   #:%ad-rand
+   #:%ad-randn
+   #:%ad-uniform-like))
    

@@ -601,6 +601,20 @@
   (name :string)
   (from :pointer)
   (to :pointer))
+
+(cffi:defcfun ("nnl2_ad_rand" %ad-rand) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string))
+
+(cffi:defcfun ("nnl2_ad_randn" %ad-randn) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string))
   
 (cffi:defcfun ("nnl2_ad_xavier" %ad-xavier) :pointer
   (shape :pointer)
@@ -1095,6 +1109,11 @@
   (out :int)
   (gain :float)
   (dist :float))
+  
+(cffi:defcfun ("nnl2_ad_uniform_like" %ad-uniform-like) :pointer
+  (ad-tensor :pointer)
+  (from :pointer)
+  (to :pointer))  
   
 (cffi:defcfun ("nnl2_ad_internal_lisp_data_pntr_share_setter" %data-pntr-share-setter) :void
   (ad-tensor :pointer)

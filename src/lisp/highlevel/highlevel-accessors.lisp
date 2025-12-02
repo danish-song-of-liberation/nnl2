@@ -1166,7 +1166,7 @@
      (rand #(2 3)) ; Creates a 2x3 tensor with random values"
 	 
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-    (nnl2.ffi:%rand shape rank dtype)))
+    (nnl2.ffi:%randn shape rank dtype)))
 	
 (cffi:defcfun ("lisp_call_randn_inplace" randn!) :pointer
   (tensor :pointer))  	
@@ -1994,6 +1994,12 @@
   (tensor :pointer))
 
 (cffi:defcfun ("lisp_call_sqrt_inplace" .sqrt!) :void
+  (tensor :pointer))  
+  
+(cffi:defcfun ("nnl2_rand_like" rand-like) :pointer
+  (tensor :pointer))  
+  
+(cffi:defcfun ("nnl2_randn_like" randn-like) :pointer
   (tensor :pointer))  
   
 (in-package :nnl2.hli.ts.loss)

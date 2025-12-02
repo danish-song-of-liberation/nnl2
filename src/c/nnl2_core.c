@@ -322,9 +322,11 @@ void nnl2_init_activations() {
      
 void nnl2_init_initializers() {
     EINIT_BACKEND(nnl2_rand, rand_backends, current_backend(rand));    
+	EINIT_BACKEND(nnl2_randn, randn_backends, current_backend(randn));    
     EINIT_BACKEND(uniform, uniform_backends, current_backend(uniform));    
     EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
-    EINIT_BACKEND(rand_inplace, rand_inplace_backends, current_backend(rand_inplace));     
+    EINIT_BACKEND(rand_inplace, rand_inplace_backends, current_backend(rand_inplace));   
+	EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));   	
     EINIT_BACKEND(uniform_inplace, uniform_inplace_backends, current_backend(uniform_inplace));     
 	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	   
 }
@@ -784,7 +786,7 @@ void lisp_call_neg_inplace(nnl2_tensor* tensor) {
            
 nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {     
     return nnl2_neg(tensor);   
-} 
+}  
 
 void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
@@ -801,12 +803,20 @@ void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
 
 nnl2_tensor* lisp_call_rand(int32_t* shape, int rank, nnl2_tensor_type dtype) {
 	return nnl2_rand(shape, rank, dtype);
-}
+} 
 
-void lisp_call_rand_inplace(nnl2_tensor* tensor) {
+void lisp_call_rand_inplace(nnl2_tensor* tensor) {   
 	rand_inplace(tensor);
 }
 
+nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype) {
+	return nnl2_randn(shape, rank, dtype);
+}
+
+void lisp_call_randn_inplace(nnl2_tensor* tensor) {
+	randn_inplace(tensor);
+}
+  
 ///@} [lisp_wrappers]                
 		             
 #endif /** NNL2_CORE_C **/					 
