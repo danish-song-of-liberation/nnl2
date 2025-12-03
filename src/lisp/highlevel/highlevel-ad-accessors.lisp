@@ -422,18 +422,32 @@
         (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
 
 (defun rand (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+  "Creates an AD tensor of the specified shape filled with uniform random values [0, 1]"
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%ad-rand shape rank dtype requires-grad name)))
 
-(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (mean 0.0d0) (std 1.0d0))
+  "Creates an AD tensor of the specified shape filled with random numbers from normal distribution N(mean, std^2)"
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-    (nnl2.ffi:%ad-randn shape rank dtype requires-grad name)))
+    (nnl2.ffi:%ad-randn shape rank dtype requires-grad name (coerce mean 'double-float) (coerce std 'double-float))))
 
 (cffi:defcfun ("nnl2_ad_rand_like" rand-like) :pointer  
   (ad-tensor :pointer))
   
-(cffi:defcfun ("nnl2_ad_randn_like" randn-like) :pointer  
-  (ad-tensor :pointer))  
+(defun randn-like (ad-tensor &key (mean 0.0d0) (std 1.0d0))
+  "Creates a new AD tensor with the same shape as the input tensor, filled with random numbers from N(mean, std^2)
+   
+   ad-tensor: Input AD tensor to copy shape from
+   mean (&key) (default: 0.0): Mean of the normal distribution
+   std (&key) (default: 1.0): Standard deviation of the normal distribution
+   
+   Returns: A new AD tensor with the same shape as input, filled with random values from N(mean, std^2)
+   
+   Examples:
+     (randn-like my-ad-tensor) ; Creates AD tensor like my-ad-tensor with values from N(0, 1)
+     (randn-like my-ad-tensor :mean 0.0 :std 0.1) ; Creates AD tensor with values from N(0, 0.01)"
+  
+  (nnl2.ffi:%ad-randn-like ad-tensor (coerce mean 'double-float) (coerce std 'double-float)))
   
 (defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
   "Creates an AD tensor from a Lisp array

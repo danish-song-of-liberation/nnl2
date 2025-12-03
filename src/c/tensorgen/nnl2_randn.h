@@ -4,7 +4,7 @@
 #include <math.h>
 
 /** @brief
- * Creates a tensor with random numbers from standard normal distribution N(0, 1)
+ * Creates a tensor with random numbers from normal distribution N(mean, std²)
  *
  ** @param shape
  * Array of integers defining the dimensions of the tensor
@@ -15,17 +15,23 @@
  ** @param dtype
  * Float data type of the tensor elements
  *
+ ** @param mean
+ * Mean of the normal distribution
+ *
+ ** @param std
+ * Standard deviation of the normal distribution
+ *
  ** @return nnl2_tensor*
  * Pointer to the newly created tensor
  *
  ** @example
  * // Create a 2x3 tensor of random floats from N(0, 1)
- * nnl2_tensor* normal_tensor = nnl2_randn((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* normal_tensor = nnl2_randn((int[]){2, 3}, 2, FLOAT32, 0.0, 1.0);
  *
  ** @see naive_rand
  ** @see nnl2_empty
  **/
-nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype) {
+nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype, double mean, double std) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -46,17 +52,17 @@ nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype) {
                 double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
                 double z1 = sqrt(-2.0 * log(u1)) * sin(2.0 * M_PI * u2);
                 
-                data[i] = z0;
+                data[i] = mean + std * z0;
 				
                 if(i + 1 < total_elems) 
-                    data[i + 1] = z1;
+                    data[i + 1] = mean + std * z1;
             }
             
             if(total_elems % 2 == 1) {
                 double u1 = 1.0 - ((double)rand() / RAND_MAX);
                 double u2 = 1.0 - ((double)rand() / RAND_MAX);
                 double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
-                data[total_elems - 1] = z0;
+                data[total_elems - 1] = mean + std * z0;
             }
 			
             break;
@@ -64,6 +70,8 @@ nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype) {
         
         case FLOAT32: {
             float* data = (float*)result->data;
+            float mean_f = (float)mean;
+            float std_f = (float)std;
 
             for(size_t i = 0; i + 1 < total_elems; i += 2) {
                 float u1 = 1.0f - ((float)rand() / RAND_MAX);  
@@ -72,9 +80,9 @@ nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype) {
                 float z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (float)M_PI * u2);
                 float z1 = sqrtf(-2.0f * logf(u1)) * sinf(2.0f * (float)M_PI * u2);
                 
-                data[i] = z0;
+                data[i] = mean_f + std_f * z0;
                 if(i + 1 < total_elems) {
-                    data[i + 1] = z1;
+                    data[i + 1] = mean_f + std_f * z1;
                 }
             }
             
@@ -82,7 +90,7 @@ nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype) {
                 float u1 = 1.0f - ((float)rand() / RAND_MAX);
                 float u2 = 1.0f - ((float)rand() / RAND_MAX);
                 float z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (float)M_PI * u2);
-                data[total_elems - 1] = z0;
+                data[total_elems - 1] = mean_f + std_f * z0;
             }
 			
             break;

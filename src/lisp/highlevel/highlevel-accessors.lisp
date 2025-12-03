@@ -1154,11 +1154,13 @@
 (cffi:defcfun ("lisp_call_rand_inplace" rand!) :pointer
   (tensor :pointer))  	
 
-(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*))
+(defun randn (indices &key (dtype nnl2.system:*default-tensor-type*) (mean 0.0d0) (std 1.0d0))
   "Creates a tensor of the specified shape filled with random numbers from the standard normal distribution N(0, 1)
   
    indices: Input shape
    dtype (&key) (default: nnl2.system:*default-tensor-type*): Type of tensor
+   mean (&key) (default: 0.0d0): Mean of the normal distribution
+   std (&key) (default: 1.0d0): Standard deviation of the normal distribution
    
    Returns: A new tensor with the specified shape filled with uniform random values [0, 1]
    
@@ -1166,7 +1168,7 @@
      (rand #(2 3)) ; Creates a 2x3 tensor with random values"
 	 
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
-    (nnl2.ffi:%randn shape rank dtype)))
+    (nnl2.ffi:%randn shape rank dtype (coerce mean 'double-float) (coerce std 'double-float))))
 	
 (cffi:defcfun ("lisp_call_randn_inplace" randn!) :pointer
   (tensor :pointer))  	
@@ -1999,9 +2001,21 @@
 (cffi:defcfun ("nnl2_rand_like" rand-like) :pointer
   (tensor :pointer))  
   
-(cffi:defcfun ("nnl2_randn_like" randn-like) :pointer
-  (tensor :pointer))  
+(defun randn-like (tensor &key (mean 0.0d0) (std 1.0d0))
+  "Creates a new tensor with the same shape as the input tensor, filled with random numbers from N(mean, std²)
+   
+   tensor: Input tensor to copy shape from
+   mean (&key) (default: 0.0): Mean of the normal distribution
+   std (&key) (default: 1.0): Standard deviation of the normal distribution
+   
+   Returns: A new tensor with the same shape as input, filled with random values from N(mean, std²)
+   
+   Examples:
+     (randn-like my-tensor) ; Creates tensor like my-tensor with values from N(0, 1)
+     (randn-like my-tensor :mean 5.0 :std 0.5) ; Creates tensor with values from N(5, 0.25)"
   
+  (nnl2.ffi:%randn-like tensor (coerce mean 'double-float) (coerce std 'double-float)))
+
 (in-package :nnl2.hli.ts.loss)
   
 (defun mse (prediction target)

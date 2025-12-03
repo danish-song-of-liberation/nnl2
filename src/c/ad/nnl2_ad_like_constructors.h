@@ -404,10 +404,16 @@ nnl2_ad_tensor* nnl2_ad_rand_like(nnl2_ad_tensor* ad_tensor) {
 }
 
 /** @brief 
- * Creates a new tensor with standard normal distribution (mean=0, std=1) with the same characteristics as the input tensor
+ * Creates a new tensor with normal distribution N(mean, std^2) with the same characteristics as the input tensor
  *
  ** @param ad_tensor 
  * Pointer to the reference tensor used as template for the new tensor
+ *
+ ** @param mean
+ * Mean of the normal distribution
+ *
+ ** @param std
+ * Standard deviation of the normal distribution
  *
  ** @return nnl2_ad_tensor* 
  * Pointer to the newly created random tensor, or NULL if error occurred
@@ -424,7 +430,7 @@ nnl2_ad_tensor* nnl2_ad_rand_like(nnl2_ad_tensor* ad_tensor) {
  ** @see nnl2_ad_empty
  ** @see randn_inplace
  **/
-nnl2_ad_tensor* nnl2_ad_randn_like(nnl2_ad_tensor* ad_tensor) {
+nnl2_ad_tensor* nnl2_ad_randn_like(nnl2_ad_tensor* ad_tensor, double mean, double std) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -449,7 +455,7 @@ nnl2_ad_tensor* nnl2_ad_randn_like(nnl2_ad_tensor* ad_tensor) {
 	#endif
 	
 	// Fill with normal random values
-	randn_inplace(empty -> data);
+	randn_inplace(empty -> data, mean, std);
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();

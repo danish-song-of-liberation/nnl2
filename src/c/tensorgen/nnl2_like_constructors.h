@@ -134,12 +134,57 @@ nnl2_tensor* nnl2_xavier_like(nnl2_tensor* tensor, int in, int out, float gain, 
 	return xavier(tensor->shape, tensor->rank, tensor->dtype, in, out, gain, dist);
 }
 
+/** @brief
+ * Creates a new tensor of the same shape and type, filled with uniform random values [0, 1)
+ *
+ ** @param tensor
+ * The initial tensor from which shape, rank and dtype are taken
+ *
+ ** @return nnl2_tensor*
+ * Pointer to a new tensor filled with uniform random values [0, 1)
+ *
+ ** @example
+ * // Create a tensor like existing one with uniform random values
+ * nnl2_tensor* original = nnl2_ones((int[]){3, 4}, 2, FLOAT32);
+ * nnl2_tensor* random_copy = nnl2_rand_like(original);
+ *
+ ** @see nnl2_rand
+ ** @see nnl2_randn_like
+ **/
 nnl2_tensor* nnl2_rand_like(nnl2_tensor* tensor) {
 	return nnl2_rand(tensor -> shape, tensor -> rank, tensor -> dtype);
 }
 
-nnl2_tensor* nnl2_randn_like(nnl2_tensor* tensor) {
-	return nnl2_randn(tensor -> shape, tensor -> rank, tensor -> dtype);
+/** @brief
+ * Creates a new tensor of the same shape and type, filled with random values from normal distribution N(mean, std^2)
+ *
+ ** @param tensor
+ * The initial tensor from which shape, rank and dtype are taken
+ *
+ ** @param mean
+ * Mean of the normal distribution
+ *
+ ** @param std
+ * Standard deviation of the normal distribution
+ *
+ ** @return nnl2_tensor*
+ * Pointer to a new tensor filled with random values from N(mean, std^2)
+ *
+ ** @example
+ * // Create a tensor like existing one with standard normal values
+ * nnl2_tensor* original = nnl2_zeros((int[]){2, 2}, 2, FLOAT64);
+ * nnl2_tensor* normal_copy = nnl2_randn_like(original, 0.0, 1.0);
+ *
+ ** @example
+ * // Create a tensor like existing one with custom normal distribution
+ * nnl2_tensor* weights = nnl2_empty((int[]){128, 64}, 2, FLOAT32);
+ * nnl2_tensor* initialized = nnl2_randn_like(weights, 0.0, 0.02);
+ *
+ ** @see nnl2_randn
+ ** @see nnl2_rand_like
+ **/
+nnl2_tensor* nnl2_randn_like(nnl2_tensor* tensor, double mean, double std) {
+	return nnl2_randn(tensor -> shape, tensor -> rank, tensor -> dtype, mean, std);
 }
 
 #endif /** NNL2_LIKE_CONSTRUCTORS_H **/

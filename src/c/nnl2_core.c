@@ -799,7 +799,7 @@ int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {
 
 void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {  
 	nnl2_mse(prediction, target, record);
-}
+}  
 
 nnl2_tensor* lisp_call_rand(int32_t* shape, int rank, nnl2_tensor_type dtype) {
 	return nnl2_rand(shape, rank, dtype);
@@ -809,14 +809,14 @@ void lisp_call_rand_inplace(nnl2_tensor* tensor) {
 	rand_inplace(tensor);
 }
 
-nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype) {
-	return nnl2_randn(shape, rank, dtype);
+nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, double mean, double std) {
+	return nnl2_randn(shape, rank, dtype, mean, std);
+}
+ 
+void lisp_call_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
+	randn_inplace(tensor, mean, std);
 }
 
-void lisp_call_randn_inplace(nnl2_tensor* tensor) {
-	randn_inplace(tensor);
-}
-  
 ///@} [lisp_wrappers]                
 		             
 #endif /** NNL2_CORE_C **/					 

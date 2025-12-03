@@ -584,5 +584,7 @@
    #:%get-randn-backends
    #:%ad-rand
    #:%ad-randn
-   #:%ad-uniform-like))
+   #:%ad-uniform-like
+   #:%randn-like
+   #:%ad-randn-like))
    

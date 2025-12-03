@@ -10,10 +10,16 @@
  **/
 
 /** @brief
- * Fills the given tensor with random values from standard normal distribution N(0, 1) (in-place)
+ * Fills the given tensor with random values from normal distribution N(mean, std²) (in-place)
  *
  ** @param tensor 
- * Tensor to fill with random values from N(0, 1)
+ * Tensor to fill with random values from N(mean, std²)
+ *
+ ** @param mean
+ * Mean of the normal distribution
+ *
+ ** @param std
+ * Standard deviation of the normal distribution
  *
  ** @exception NNL2Error [nnl2_safety_mode_min+]
  * If tensor is NULL
@@ -24,12 +30,17 @@
  ** @example
  * // Fill a tensor with random floats from N(0, 1)
  * nnl2_tensor* tensor = nnl2_empty((int[]){2, 2}, 2, FLOAT32);
- * nnl2_naive_randn_inplace(tensor);
+ * nnl2_naive_randn_inplace(tensor, 0.0, 1.0);
+ *
+ ** @example
+ * // Fill a tensor with random floats from N(5.0, 2.0²)
+ * nnl2_tensor* tensor = nnl2_empty((int[]){3, 3}, 2, FLOAT64);
+ * nnl2_naive_randn_inplace(tensor, 5.0, 2.0);
  *
  ** @see nnl2_randn
  ** @see nnl2_rand_inplace
  **/
-void nnl2_naive_randn_inplace(nnl2_tensor* tensor) {
+void nnl2_naive_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -42,7 +53,7 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor) {
     size_t total_elems = product(tensor->shape, tensor->rank);
     if(total_elems == 0) return; // If zero elems then early return
     
-    // Filling with random values from N(0, 1)
+    // Filling with random values from N(mean, std²)
     switch(tensor->dtype) {
         case FLOAT64: {
             nnl2_float64* data = (nnl2_float64*)tensor->data;
@@ -54,17 +65,17 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor) {
                 double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
                 double z1 = sqrt(-2.0 * log(u1)) * sin(2.0 * M_PI * u2);
                 
-                data[i] = z0;
+                data[i] = mean + std * z0;
 				
                 if(i + 1 < total_elems) 
-                    data[i + 1] = z1;
+                    data[i + 1] = mean + std * z1;
             }
 
             if(total_elems % 2 == 1) {
                 double u1 = 1.0 - ((double)rand() / RAND_MAX);
                 double u2 = 1.0 - ((double)rand() / RAND_MAX);
                 double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
-                data[total_elems - 1] = z0;
+                data[total_elems - 1] = mean + std * z0;
             }
 			
             break;
@@ -72,6 +83,8 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor) {
         
         case FLOAT32: {
             nnl2_float32* data = (nnl2_float32*)tensor->data;
+            float mean_f = (float)mean;
+            float std_f = (float)std;
 
             for(size_t i = 0; i + 1 < total_elems; i += 2) {
                 float u1 = 1.0f - ((float)rand() / RAND_MAX);  
@@ -80,17 +93,17 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor) {
                 float z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (float)M_PI * u2);
                 float z1 = sqrtf(-2.0f * logf(u1)) * sinf(2.0f * (float)M_PI * u2);
                 
-                data[i] = z0;
+                data[i] = mean_f + std_f * z0;
 				
                 if(i + 1 < total_elems) 
-                    data[i + 1] = z1;
+                    data[i + 1] = mean_f + std_f * z1;
             }
             
             if(total_elems % 2 == 1) {
                 float u1 = 1.0f - ((float)rand() / RAND_MAX);
                 float u2 = 1.0f - ((float)rand() / RAND_MAX);
                 float z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (float)M_PI * u2);
-                data[total_elems - 1] = z0;
+                data[total_elems - 1] = mean_f + std_f * z0;
             }
 			
             break;

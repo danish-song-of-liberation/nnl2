@@ -335,7 +335,9 @@
 (cffi:defcfun ("lisp_call_randn" %randn) :pointer
   (shape :pointer)
   (rank :int)
-  (dtype tensor-type))  
+  (dtype tensor-type)
+  (mean :double)
+  (std :double))
   
 (cffi:defcfun ("lisp_call_maxinplace" %.max!) :void
   (tensora :pointer)
@@ -514,6 +516,11 @@
   (tensor :pointer)
   (new-magic :char))
   
+(cffi:defcfun ("nnl2_randn_like" %randn-like) :pointer
+  (tensor :pointer)
+  (mean :double)
+  (std :double))
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
@@ -614,7 +621,9 @@
   (rank :int)
   (dtype tensor-type)
   (requires-grad :bool)
-  (name :string))
+  (name :string)
+  (mean :double)
+  (std :double))
   
 (cffi:defcfun ("nnl2_ad_xavier" %ad-xavier) :pointer
   (shape :pointer)
@@ -1238,6 +1247,11 @@
   (force :bool)
   (mode ad-mode)
   (track-graph :bool))  
+  
+(cffi:defcfun ("nnl2_ad_randn_like" %ad-randn-like) :pointer  
+  (ad-tensor :pointer)
+  (mean :double)
+  (std :double))  
 	
 ;; -- Optimizers --  
   

@@ -445,7 +445,7 @@ nnl2_ad_tensor* nnl2_ad_rand(int32_t* shape, int rank, nnl2_tensor_type dtype, b
     return ad_tensor;
 }
 
-nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name) {
+nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name, double mean, double std) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -461,7 +461,7 @@ nnl2_ad_tensor* nnl2_ad_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, 
         return NULL;
     }
 	
-	randn_inplace(ad_tensor -> data);
+	randn_inplace(ad_tensor -> data, mean, std);
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();
