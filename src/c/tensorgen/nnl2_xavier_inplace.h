@@ -45,25 +45,16 @@ void nnl2_naive_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain,
     size_t total_elems = product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
 
-    float stddev = gain * sqrt(distribution / (in + out));
-
-    switch(tensor->dtype) {
-        case FLOAT64: {
-            nnl2_float64* data = (nnl2_float64*)tensor->data;
-            for(size_t i = 0; i < total_elems; i++) data[i] = -stddev + (2.0 * stddev) * ((double)rand() / RAND_MAX);
-            break;
-        }
-
-        case FLOAT32: {
-            nnl2_float32* data = (nnl2_float32*)tensor->data;
-            for(size_t i = 0; i < total_elems; i++) data[i] = -stddev + (2.0f * stddev) * ((float)rand() / RAND_MAX);
-            break;
-        }
-
-        default: {
-            NNL2_TYPE_ERROR(tensor->dtype);
-            return;
-        }
+    float scale_param = gain * sqrt(distribution / (in + out));
+    
+    if(fabsf(distribution - 6.0f) < 1e-6f) {
+        double from = (double)-scale_param;
+        double to = (double)scale_param;
+        
+        uniform_inplace(tensor, &from, &to);
+        
+    } else {
+        randn_inplace(tensor, 0.0, (double)scale_param);
     }
 
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE

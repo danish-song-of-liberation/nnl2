@@ -52,27 +52,18 @@ Tensor* naive_xavier(int* shape, int rank, TensorType dtype, int in, int out, fl
 	
 	size_t total_elems = product(shape, rank);
 	if(total_elems == 0) return result; // If tensor is empty return empty result
+
+	float scale_param = gain * sqrtf(distribution / (in + out));
 	
-	float stddev = gain * sqrt(distribution / (in + out));
-	
-	switch(dtype) {
-		case FLOAT64: {
-			double* data = (double*)result->data;
-			for(size_t i = 0; i < total_elems; i++) data[i] = -stddev + (stddev - -stddev) * ((float)rand() / RAND_MAX);
-			break;
-		}
+	if(fabsf(distribution - 6.0f) < 1e-6f) {
+		double from = (double)-scale_param;
+		double to = (double)scale_param;
 		
-		case FLOAT32: {
-			float* data = (float*)result->data;
-			for(size_t i = 0; i < total_elems; i++) data[i] = -stddev + (stddev - -stddev) * ((float)rand() / RAND_MAX);
-			break;
-		}
+        uniform_inplace(result, &from, &to);
 		
-		default: {
-			NNL2_TYPE_ERROR(dtype);
-			return NULL;
-		}
-	}
+    } else {
+        randn_inplace(result, 0.0, (double)scale_param);
+    }
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();

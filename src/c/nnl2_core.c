@@ -791,7 +791,7 @@ nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
 void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
 }        
-
+  
 int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {   
 	return tensor -> strides       
 					 [index]; 
