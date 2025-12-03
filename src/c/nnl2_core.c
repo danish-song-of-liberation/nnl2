@@ -314,7 +314,7 @@ void nnl2_init_activations_inplace() {
 } 
 
 void nnl2_init_activations() {
-	EINIT_BACKEND(relu, relu_backends, current_backend(relu));       
+	EINIT_BACKEND(relu, relu_backends, current_backend(relu));        
 	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));     
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 

@@ -1224,8 +1224,8 @@
   "Makes a tensor with the kaiming (He) distribution in the specified shape
    indices: Input shape (vector/list)
    dtype (&key): Tensor Type
-   in (&key): Number of inputs
-   out (&key): Number of outputs
+   in (&key): Number of input neurons
+   out (&key): Number of output neurons
    gain (&key): Gain factor (float, default 1.0)
    distribution (&key) (default :normal): Distribution parameter (:normal/:uniform) 
    mode (&key): Initialization mode, can be :fan-in (default), :fan-out, or :fan-avg"
@@ -1260,8 +1260,8 @@
 (defun xavier! (tensor &key (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   "Fills a tensor with the xavier distribution in the specified shape in place
    tensor: Input tensor (vector/list)
-   in (&key): Number of inputs
-   out (&key): Number of outputs
+   in (&key): Number of input neurons
+   out (&key): Number of output neurons
    gain (&key): Autologous
    distribution (&key): Available: (:normal :uniform)"
    

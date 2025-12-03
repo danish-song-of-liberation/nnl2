@@ -131,7 +131,8 @@
    #:rand
    #:randn
    #:rand-like
-   #:randn-like))
+   #:randn-like
+   #:kaiming))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)

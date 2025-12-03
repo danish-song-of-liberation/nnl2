@@ -404,8 +404,8 @@
        dtype (&key): Tensor dtype
        requires-grad (&key): Whether gradients are required
        name (&key): Optional tensor name
-       in (&key): Number of input units
-       out (&key): Number of output units
+       in (&key): Number of input neurons
+       out (&key): Number of output neurons
        gain (&key): Gain factor
        distribution (&key): :normal or :uniform
 	   
@@ -420,6 +420,34 @@
       (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
 	    (declare (type integer rank))
         (nnl2.ffi:%ad-xavier shape rank dtype requires-grad name in out gain dist))))) 
+
+(defun kaiming (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name "") (in 0) (out 0) (gain (sqrt 2.0s0)) (distribution :normal) (mode :fan-in))
+  "Creates an AD tensor initialized with Kaiming (He) initialization
+  
+   Args:
+       indices: Shape specification
+       dtype (&key): Tensor dtype
+       requires-grad (&key): Whether gradients are required
+       name (&key): Optional tensor name
+       in (&key): Number of input neurons
+       out (&key): Number of output neurons
+       gain (&key): Gain factor (usually sqrt(2.0) for ReLU)
+       distribution (&key): :normal or :uniform
+       mode (&key): :fan-in, :fan-out, or :fan-avg
+       
+   Returns:
+       AD tensor initialized using Kaiming method"
+  
+  (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to kaiming (AD)")
+  (assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to kaiming (AD)")
+  
+  (nnl2.hli:fastcall
+    (let ((dist (ecase distribution (:normal 2.0s0) (:uniform 6.0s0)))
+          (mode-val (ecase mode (:fan-in 0) (:fan-out 1) (:fan-avg 2))))
+		  
+      (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+	    (declare (type integer rank))
+        (nnl2.ffi:%ad-kaiming shape rank dtype requires-grad name in out gain dist mode-val)))))
 
 (defun rand (indices &key (dtype nnl2.system:*default-tensor-type*) requires-grad (name ""))
   "Creates an AD tensor of the specified shape filled with uniform random values [0, 1]"

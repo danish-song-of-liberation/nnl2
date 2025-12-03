@@ -654,6 +654,18 @@
   (gain :float)
   (distribution :float))
   
+(cffi:defcfun ("nnl2_ad_kaiming" %ad-kaiming) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (requires-grad :bool)
+  (name :string)
+  (fan-in :int)
+  (fan-out :int)
+  (gain :float)
+  (distribution :float)
+  (mode :int))  
+  
 (cffi:defcfun ("nnl2_ad_add" %ad-.+) :pointer
   (summand :pointer)
   (addend :pointer)

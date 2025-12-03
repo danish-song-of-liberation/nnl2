@@ -539,6 +539,89 @@ nnl2_ad_tensor* nnl2_ad_xavier(int32_t* shape, int rank, nnl2_tensor_type dtype,
     
     return ad_tensor;
 }
+
+/** @brief 
+ * Creates a new AD tensor and initializes it using Kaiming (He) initialization
+ *
+ ** @param shape 
+ * Pointer to an array specifying tensor dimensions
+ *
+ ** @param rank 
+ * Number of dimensions in the tensor
+ *
+ ** @param dtype 
+ * Data type of the tensor elements
+ *
+ ** @param requires_grad 
+ * Whether to track this tensor in the AD graph
+ *
+ ** @param name 
+ * Optional tensor name for debugging or inspection
+ *
+ ** @param fan_in 
+ * Number of input units
+ *
+ ** @param fan_out 
+ * Number of output units
+ *
+ ** @param gain 
+ * Scaling factor for the initialization (usually sqrt(2.0) for ReLU)
+ *
+ ** @param distribution 
+ * Distribution type for initialization (6 for uniform, 2 for normal)
+ *
+ ** @param mode 
+ * Mode of initialization: 
+ *  0 = "fan_in" (default), 
+ *  1 = "fan_out",
+ *  2 = "fan_avg" (average of fan_in and fan_out)
+ *
+ ** @return 
+ * Pointer to a newly created AD tensor initialized with Kaiming method
+ * Returns NULL if allocation fails or input validation fails
+ *
+ ** @exception NNL2Error [nnl2_safety_mode_moderate+]
+ * If shape is NULL
+ *
+ ** @exception NNL2Error
+ * If created empty tensor in ```nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(...)``` is NULL (failed)
+ *
+ ** @see nnl2_naive_kaiming_inplace 
+ ** @see nnl2_ad_empty
+ ** @see nnl2_ad_tensor
+ **/
+nnl2_ad_tensor* nnl2_ad_kaiming(int32_t* shape, int rank, nnl2_tensor_type dtype, bool requires_grad, char* name, int fan_in, int fan_out, float gain, float distribution, int mode) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape, "In function nnl2_ad_kaiming, int32_t* shape is NULL", NULL);
+    #endif
+    
+    // Check for integer data type
+    if(dtype == INT32) {
+        NNL2_FATAL("INT32 can't be used for Kaiming initialization");
+        return NULL;
+    }
+    
+    // Create empty tensor
+    nnl2_ad_tensor* ad_tensor = nnl2_ad_empty(shape, rank, dtype, requires_grad, name);
+    if(ad_tensor == NULL) {
+        NNL2_TENSOR_ERROR("empty");
+        return NULL;
+    }
+    
+    // Apply Kaiming initialization
+    nnl2_naive_kaiming_inplace(ad_tensor->data, fan_in, fan_out, gain, distribution, mode);
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return ad_tensor;
+}
  
 /** @brief 
  * Frees all memory associated with an automatic differentiation tensor

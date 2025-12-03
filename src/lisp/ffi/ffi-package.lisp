@@ -596,5 +596,6 @@
    #:%get-kaiming-num-backends
    #:%get-kaiming-backends
    #:%get-kaiming-inplace-num-backends
-   #:%get-kaiming-inplace-backends))
+   #:%get-kaiming-inplace-backends
+   #:%ad-kaiming))
    
