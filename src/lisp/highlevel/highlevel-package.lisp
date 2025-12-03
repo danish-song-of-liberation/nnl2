@@ -16,7 +16,7 @@
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
 
-(defpackage :nnl2.hli.nn
+(defpackage #:nnl2.hli.nn
   (:use #:cl)
   (:export
    #:fnn
@@ -42,7 +42,7 @@
    #:<-
    #:stypeof))
    
-(defpackage :nnl2.hli.ad
+(defpackage #:nnl2.hli.ad
   (:use #:cl)
   (:export
    #:empty
@@ -133,7 +133,7 @@
    #:rand-like
    #:randn-like))
    
-(defpackage :nnl2.hli.ad.r
+(defpackage #:nnl2.hli.ad.r
   (:use #:cl)
   (:export
    #:.+
@@ -169,12 +169,12 @@
    #:view
    #:tref))   
  
-(defpackage :nnl2.hli.ad.r.loss
+(defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
   (:export
    #:mse))  
  
-(defpackage :nnl2.hli.ts.loss
+(defpackage #:nnl2.hli.ts.loss
   (:use #:cl)
   (:export
    #:mse))  
@@ -182,6 +182,7 @@
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
   (:export 
+   #:kaiming
    #:empty
    #:zeros
    #:zeros-with-pntr
@@ -607,5 +608,14 @@
    #:with-backend/randn
    #:with-backend/randn!
    #:rand-like
-   #:randn-like))
+   #:randn-like
+   #:kaiming!
+   #:use-backend/kaiming
+   #:use-backend/kaiming!
+   #:get-backend/kaiming
+   #:get-backend/kaiming!
+   #:get-backends/kaiming
+   #:get-backends/kaiming!
+   #:with-backend/kaiming
+   #:with-backend/kaiming!))
    

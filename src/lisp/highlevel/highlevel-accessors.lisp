@@ -1219,7 +1219,44 @@
 	    (:normal   (nnl2.ffi:%xavier shape rank dtype in out gain 2.0s0))
 	    (:uniform  (nnl2.ffi:%xavier shape rank dtype in out gain 6.0s0))
 	    (otherwise (error "Unknown xavier distribution: ~a%" distribution))))))
-		
+	
+(defun kaiming (indices &key (dtype nnl2.system:*default-tensor-type*) (in 0) (out 0) (gain 1.0s0) (distribution :normal) (mode :fan-in))
+  "Makes a tensor with the kaiming (He) distribution in the specified shape
+   indices: Input shape (vector/list)
+   dtype (&key): Tensor Type
+   in (&key): Number of inputs
+   out (&key): Number of outputs
+   gain (&key): Gain factor (float, default 1.0)
+   distribution (&key) (default :normal): Distribution parameter (:normal/:uniform) 
+   mode (&key): Initialization mode, can be :fan-in (default), :fan-out, or :fan-avg"
+
+  (progn
+    (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to kaiming")
+    (assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to kaiming")
+    
+    (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+      (let ((mode-value (ecase mode (:fan-in 0) (:fan-out 1) (:fan-avg 2)))
+			(dist (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
+			
+        (nnl2.ffi:%kaiming shape rank dtype in out gain dist mode-value)))))
+	
+(defun kaiming! (tensor &key (in 0) (out 0) (gain (sqrt 2.0s0)) (distribution :normal) (mode :fan-in))
+  "Fills a tensor with the kaiming (He) distribution in place
+   tensor: Input tensor
+   in (&key): Number of input neurons
+   out (&key): Number of output neurons
+   gain (&key): Gain factor (float, default sqrt(2.0) for ReLU)
+   distribution (&key): Distribution parameter (:normal/:uniform, default :normal)
+   mode (&key): Initialization mode, can be :fan-in (default), :fan-out, or :fan-avg"
+
+  (assert (not (or (zerop in) (minusp in))) nil "Bad `in` was passed to kaiming!")
+  (assert (not (or (zerop out) (minusp out))) nil "Bad `out` was passed to kaiming!")
+  
+  (let ((mode-value (ecase mode (:fan-in 0) (:fan-out 1) (:fan-avg 2)))
+        (dist (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
+    
+    (nnl2.ffi:%kaiming-inplace tensor in out gain dist mode-value)))
+	
 (defun xavier! (tensor &key (in 0) (out 0) (gain 1.0s0) (distribution :normal))
   "Fills a tensor with the xavier distribution in the specified shape in place
    tensor: Input tensor (vector/list)

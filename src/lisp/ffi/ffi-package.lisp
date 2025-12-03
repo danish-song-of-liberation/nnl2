@@ -586,5 +586,15 @@
    #:%ad-randn
    #:%ad-uniform-like
    #:%randn-like
-   #:%ad-randn-like))
+   #:%ad-randn-like
+   #:%kaiming
+   #:%kaiming-inplace
+   #:%set-kaiming-backend
+   #:%set-kaiming-inplace-backend
+   #:%get-kaiming-backend
+   #:%get-kaiming-inplace-backend
+   #:%get-kaiming-num-backends
+   #:%get-kaiming-backends
+   #:%get-kaiming-inplace-num-backends
+   #:%get-kaiming-inplace-backends))
    

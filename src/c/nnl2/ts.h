@@ -17,6 +17,8 @@
 #include "../tensorgen/nnl2_uniform_inplace.h"
 #include "../tensorgen/nnl2_xavier.h"
 #include "../tensorgen/nnl2_xavier_inplace.h"
+#include "../tensorgen/nnl2_kaiming.h"
+#include "../tensorgen/nnl2_kaiming_inplace.h"
 #include "../tensorgen/nnl2_like_constructors.h"
 #include "../tensorformat/nnl2_1d.h"
 #include "../tensorformat/nnl2_2d.h"

@@ -1083,6 +1083,32 @@ typedef nnl2_tensor* (*randnfn)(int* shape, int rank, nnl2_tensor_type dtype, do
  */
 typedef void (*randninplacefn)(nnl2_tensor* tensor, double mean, double std);
 
+/** @brief Creates a new tensor initialized using Kaiming (He) distribution
+ ** @param shape Tensor shape array
+ ** @param rank Tensor rank
+ ** @param dtype Tensor data type
+ ** @param fan_in Number of input neurons
+ ** @param fan_out Number of output neurons
+ ** @param gain Gain factor
+ ** @param distribution Distribution parameter
+ ** @param mode Initialization mode (fan_in/fan_out/fan_avg)
+ ** @return New tensor with Kaiming initialization
+ ** @see nnl2_tensor
+ ** @see nnl2_tensor_type
+ */
+typedef nnl2_tensor* (*kaimingfn)(int* shape, int rank, nnl2_tensor_type dtype, int fan_in, int fan_out, float gain, float distribution, int mode);
+
+/** @brief In-place Kaiming initialization of a tensor
+ ** @param tensor Pointer to the tensor to initialize
+ ** @param fan_in Number of input neurons
+ ** @param fan_out Number of output neurons
+ ** @param gain Gain factor
+ ** @param distribution Distribution parameter
+ ** @param mode Initialization mode (fan_in/fan_out/fan_avg)
+ ** @see nnl2_tensor
+ */
+typedef void (*kaiminginplacefn)(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode);
+
 /// @} [typedef]
 
 

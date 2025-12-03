@@ -295,6 +295,24 @@
   (gain :float)
   (distribution :float))  
   
+(cffi:defcfun ("lisp_call_kaiming" %kaiming) :pointer
+  (shape :pointer)
+  (rank :int)
+  (dtype tensor-type)
+  (fan-in :int)
+  (fan-out :int)
+  (gain :float)
+  (distribution :float)
+  (mode :int))  
+  
+(cffi:defcfun ("lisp_call_kaiming_inplace" %kaiming-inplace) :void
+  (tensor :pointer)
+  (fan-in :int)
+  (fan-out :int)
+  (gain :float)
+  (distribution :float)
+  (mode :int))
+  
 (cffi:defcfun ("lisp_call_xavier_inplace" %xavier-inplace) :void
   (tensor :pointer)
   (in :int)
@@ -1459,7 +1477,13 @@
  
 (cffi:defcfun ("set_xavier_inplace_backend" %set-xavier-inplace-backend) :void
   (backend-name :string)) 
-	
+
+(cffi:defcfun ("set_kaiming_backend" %set-kaiming-backend) :void
+  (backend-name :string))  
+ 
+(cffi:defcfun ("set_kaiming_inplace_backend" %set-kaiming-inplace-backend) :void
+  (backend-name :string)) 
+  
 (cffi:defcfun ("set_transposeinplace_backend" %set-transposeinplace-backend) :void
   (backend-name :string))  
   	
@@ -1660,6 +1684,8 @@
 (cffi:defcfun ("get_randn_inplace_backend" %get-randn-inplace-backend) :string) 
 (cffi:defcfun ("get_xavier_backend" %get-xavier-backend) :string) 
 (cffi:defcfun ("get_xavier_inplace_backend" %get-xavier-inplace-backend) :string) 
+(cffi:defcfun ("get_kaiming_backend" %get-kaiming-backend) :string) 
+(cffi:defcfun ("get_kaiming_inplace_backend" %get-kaiming-inplace-backend) :string) 
 (cffi:defcfun ("get_transposeinplace_backend" %get-transposeinplace-backend) :string) 
 (cffi:defcfun ("get_transpose_backend" %get-transpose-backend) :string) 
 (cffi:defcfun ("get_sum_without_axis_backend" %get-sum-without-axis-backend) :string) 
@@ -1772,6 +1798,10 @@
 (cffi:defcfun ("get_xavier_backends" %get-xavier-backends) :pointer)
 (cffi:defcfun ("get_xavier_inplace_num_backends" %get-xavier-inplace-num-backends) :int)
 (cffi:defcfun ("get_xavier_inplace_backends" %get-xavier-inplace-backends) :pointer)
+(cffi:defcfun ("get_kaiming_num_backends" %get-kaiming-num-backends) :int)
+(cffi:defcfun ("get_kaiming_backends" %get-kaiming-backends) :pointer)
+(cffi:defcfun ("get_kaiming_inplace_num_backends" %get-kaiming-inplace-num-backends) :int)
+(cffi:defcfun ("get_kaiming_inplace_backends" %get-kaiming-inplace-backends) :pointer)
 (cffi:defcfun ("get_transposeinplace_num_backends" %get-transposeinplace-num-backends) :int)
 (cffi:defcfun ("get_transposeinplace_backends" %get-transposeinplace-backends) :pointer)
 (cffi:defcfun ("get_transpose_num_backends" %get-transpose-num-backends) :int)

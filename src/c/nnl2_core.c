@@ -329,6 +329,8 @@ void nnl2_init_initializers() {
 	EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));   	
     EINIT_BACKEND(uniform_inplace, uniform_inplace_backends, current_backend(uniform_inplace));     
 	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	   
+	EINIT_BACKEND(kaiming, kaiming_backends, current_backend(kaiming));    
+	EINIT_BACKEND(kaiming_inplace, kaiming_inplace_backends, current_backend(kaiming_inplace));    
 }
    
 void nnl2_init_transposition() {  
@@ -791,7 +793,7 @@ nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
 void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
 }        
-  
+    
 int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {   
 	return tensor -> strides       
 					 [index]; 
@@ -802,12 +804,12 @@ void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
 }  
 
 nnl2_tensor* lisp_call_rand(int32_t* shape, int rank, nnl2_tensor_type dtype) {
-	return nnl2_rand(shape, rank, dtype);
+	return nnl2_rand(shape, rank, dtype); 
 } 
 
 void lisp_call_rand_inplace(nnl2_tensor* tensor) {   
 	rand_inplace(tensor);
-}
+}   
 
 nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, double mean, double std) {
 	return nnl2_randn(shape, rank, dtype, mean, std);
@@ -815,6 +817,14 @@ nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, d
  
 void lisp_call_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
 	randn_inplace(tensor, mean, std);
+}
+
+nnl2_tensor* lisp_call_kaiming(int* shape, int rank, nnl2_tensor_type dtype, int fan_in, int fan_out, float gain, float distribution, int mode) {
+    return kaiming(shape, rank, dtype, fan_in, fan_out, gain, distribution, mode);
+}
+
+void lisp_call_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
+    kaiming_inplace(tensor, fan_in, fan_out, gain, distribution, mode);
 }
 
 ///@} [lisp_wrappers]                

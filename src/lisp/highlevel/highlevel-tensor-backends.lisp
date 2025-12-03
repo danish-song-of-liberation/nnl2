@@ -210,6 +210,12 @@
 
 (define-backend-setter use-backend/xavier!
   nnl2.ffi:%set-xavier-inplace-backend)
+
+(define-backend-setter use-backend/kaiming
+  nnl2.ffi:%set-kaiming-backend)
+
+(define-backend-setter use-backend/kaiming!
+  nnl2.ffi:%set-kaiming-inplace-backend)
   
 (define-backend-setter use-backend/transpose!
   nnl2.ffi:%set-transposeinplace-backend)
@@ -291,7 +297,8 @@
 							  use-backend/transposition! use-backend/.neg! use-backend/.neg
 							  use-backend/uniform! use-backend/xavier! use-backend/.sqrt! 
 							  use-backend/.sqrt use-backend/mse use-backend/rand
-							  use-backend/rand! use-backend/randn use-backend/randn!))
+							  use-backend/rand! use-backend/randn use-backend/randn!
+							  use-backend/kaiming use-backend/kaiming!))
 							  
       (funcall backend-function name)))
 	  
@@ -378,6 +385,8 @@
 (define-backend-getter-setter get-backend/randn-like use-backend/randn-like nil :like get-backend/randn)
 (define-backend-getter-setter get-backend/xavier use-backend/xavier nnl2.ffi:%get-xavier-backend)
 (define-backend-getter-setter get-backend/xavier! use-backend/xavier! nnl2.ffi:%get-xavier-inplace-backend)
+(define-backend-getter-setter get-backend/kaiming use-backend/kaiming nnl2.ffi:%get-kaiming-backend)
+(define-backend-getter-setter get-backend/kaiming! use-backend/kaiming! nnl2.ffi:%get-kaiming-inplace-backend)
 (define-backend-getter-setter get-backend/transpose use-backend/transpose nnl2.ffi:%get-transpose-backend)
 (define-backend-getter-setter get-backend/transpose! use-backend/transpose! nnl2.ffi:%get-transposeinplace-backend)
 (define-backend-getter-setter get-backend/reshape use-backend/reshape nnl2.ffi:%get-reshape-backend)
@@ -637,6 +646,14 @@
 (define-backends-getter get-backends/xavier!
   nnl2.ffi:%get-xavier-inplace-num-backends 
   nnl2.ffi:%get-xavier-inplace-backends)
+ 
+(define-backends-getter get-backends/kaiming
+  nnl2.ffi:%get-kaiming-num-backends 
+  nnl2.ffi:%get-kaiming-backends)
+
+(define-backends-getter get-backends/kaiming!
+  nnl2.ffi:%get-kaiming-inplace-num-backends 
+  nnl2.ffi:%get-kaiming-inplace-backends)
   
 (define-backends-getter get-backends/transpose 
   nnl2.ffi:%get-transpose-num-backends 
@@ -774,6 +791,8 @@
 (define-with-backend with-backend/randn! get-backend/rand!)
 (define-with-backend with-backend/xavier get-backend/xavier)
 (define-with-backend with-backend/xavier! get-backend/xavier!)
+(define-with-backend with-backend/kaiming get-backend/kaiming)
+(define-with-backend with-backend/kaiming! get-backend/kaiming!)
 (define-with-backend with-backend/transpose get-backend/transpose)
 (define-with-backend with-backend/transpose! get-backend/transpose!)
 (define-with-backend with-backend/reshape get-backend/reshape)
