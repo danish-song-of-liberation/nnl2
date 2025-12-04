@@ -112,7 +112,7 @@ nnl2_ad_tensor* nnl2_ad_empty(int32_t* shape, int rank, nnl2_tensor_type dtype, 
 	ad_tensor->extra_field = NULL;
 	ad_tensor->extra_free = NULL;
     
-    if(name[0] == '\0') {
+    if(name && name[0] != '\0') {
         ad_tensor->name = malloc(strlen(name) + 1);
         
         // Copy name if allocation succeeded, otherwise warn and set to NULL

@@ -79,7 +79,8 @@
 														  :serial t
 														  :components ((:file "highlevel-utils-package" :type "lisp")
 															    	   (:file "highlevel-utils-ts" :type "lisp")
-																	   (:file "highlevel-utils-ad" :type "lisp")))))
+																	   (:file "highlevel-utils-ad" :type "lisp")
+																	   (:file "highlevel-utils-nn" :type "lisp")))))
 														 
 										   (:module "lowlevel"
 											:serial t

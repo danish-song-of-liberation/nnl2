@@ -59,8 +59,8 @@ void nnl2_init_accessors();
  *
  ** @details 
  * Functions for allocating and initializing new tensors    
- */ 
-void nnl2_init_tensor_creating();
+ */  
+void nnl2_init_tensor_creating();  
 
 /** @brief 
  * Registers standard out-of-place mathematical operations
