@@ -349,6 +349,81 @@ nnl2_ad_tensor* nnl2_ad_xavier_like(nnl2_ad_tensor* ad_tensor, int in, int out, 
 }
 
 /** @brief 
+ * Creates a new tensor with Kaiming (He) initialization with the same characteristics as the input tensor
+ *
+ ** @param ad_tensor 
+ * Pointer to the reference tensor used as template for the new tensor
+ *
+ ** @param fan_in
+ * Number of input neurons for Kaiming initialization
+ *
+ ** @param fan_out
+ * Number of output neurons for Kaiming initialization
+ *
+ ** @param gain
+ * Scaling factor for the initialization (typically sqrt(2.0) for ReLU)
+ *
+ ** @param distribution
+ * Distribution parameter for initialization (6 for uniform, 2 for normal)
+ *
+ ** @param mode
+ * Mode of initialization: 
+ *  0 = "fan_in" (default), 
+ *  1 = "fan_out",
+ *  2 = "fan_avg" (average of fan_in and fan_out)
+ *
+ ** @return nnl2_ad_tensor* 
+ * Pointer to the newly created Kaiming-initialized tensor, or NULL if error occurred
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If ad_tensor is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_min+]
+ * If result (see ```nnl2_ad_tensor* result = nnl2_ad_kaiming(...)```) is NULL
+ *
+ ** @exception NNL2Error [nnl2_safety_mod_moderate+]
+ * If ad_tensor->data->shape is NULL
+ *
+ ** @see nnl2_ad_kaiming
+ **/
+nnl2_ad_tensor* nnl2_ad_kaiming_like(nnl2_ad_tensor* ad_tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor, "In function nnl2_ad_kaiming_like, ad_tensor is NULL", NULL);
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(ad_tensor->data->shape, "In function nnl2_ad_kaiming_like, ad_tensor->data->shape is NULL", NULL);
+    #endif
+    
+    // Check for integer data type
+    if(ad_tensor->data->dtype == INT32) {
+        NNL2_FATAL("INT32 can't be used for Kaiming initialization in nnl2_ad_kaiming_like");
+        return NULL;
+    }
+    
+    // Tensor allocation with Kaiming initialization
+    nnl2_ad_tensor* result = nnl2_ad_kaiming(ad_tensor->data->shape, ad_tensor->data->rank, ad_tensor->data->dtype, ad_tensor->requires_grad, ad_tensor->name, fan_in, fan_out, gain, distribution, mode);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!result) {
+            NNL2_TENSOR_ERROR("kaiming");
+            return NULL;
+        }
+    #endif
+            
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
+/** @brief 
  * Creates a new tensor with uniform random values in range [0, 1] with the same characteristics as the input tensor
  *
  ** @param ad_tensor 

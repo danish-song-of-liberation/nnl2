@@ -1014,6 +1014,13 @@
   (assert (and in out gain distribution) nil "Incorrect keys was passed in xavier-like")
   (nnl2.ffi:%ad-xavier-like ad-tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
   
+(defun kaiming-like (ad-tensor &key in out (gain (sqrt 2.0s0)) (distribution :normal) (mode :fan-in))
+  "Fills a tensor like ad-tensor using Kaiming (He) initialization"
+  (assert (and in out gain distribution mode) nil "Incorrect keys was passed in ad-kaiming-like")
+  (nnl2.ffi:%ad-kaiming-like ad-tensor in out gain 
+    (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))
+    (ecase mode (:fan-in 0) (:fan-out 1) (:fan-avg 2))))
+							
 (cffi:defcfun ("nnl2_ad_ncast" ncast) :pointer
   (ad-tensor :pointer)
   (cast-to nnl2.ffi:tensor-type)) 

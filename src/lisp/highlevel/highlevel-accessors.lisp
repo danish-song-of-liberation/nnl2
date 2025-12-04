@@ -863,13 +863,27 @@
    initialized using Xavier/Glorot initialization method
    
    tensor: The input tensor from which shape and data type are derived
-   in (&key) (default - nil): Number of input units
-   out (&key) (default - nil): Number of output units
-   gain (&key) (default - 1.0s0): Scaling factor 
-   distribution (&key) (default - :normal): Type of distribution (:normal/:uniform)"
+   in (&key) (default: nil): Number of input units
+   out (&key) (default: nil): Number of output units
+   gain (&key) (default: 1.0s0): Scaling factor 
+   distribution (&key) (default: :normal): Type of distribution (:normal/:uniform)"
    
   (assert (and in out gain distribution) nil "Incorrect keys was passed in xavier-like")
   (nnl2.ffi:%xavier-like tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0))))
+  
+(defun kaiming-like (tensor &key in out (gain (sqrt 2.0s0)) (distribution :normal) (mode :fan-in))
+  "Creates a new tensor of the same shape and type as the input tensor,
+   initialized using Kaiming (He) initialization method
+   
+   tensor: The input tensor from which shape and data type are derived
+   in (&key) (default: nil): Number of input neurons
+   out (&key) (default: nil): Number of output neurons
+   gain (&key) (default: (sqrt 2.0s0)): Scaling factor (typically sqrt(2.0) for ReLU)
+   distribution (&key) (default: :normal): Type of distribution (:normal/:uniform)
+   mode (&key) (default: :fan-in): Mode of initialization (:fan-in/:fan-out/:fan-avg)"
+   
+  (assert (and in out gain distribution mode) nil "Incorrect keys was passed in kaiming-like")
+  (nnl2.ffi:%kaiming-like tensor in out gain (ecase distribution (:normal 2.0s0) (:uniform 6.0s0)) (ecase mode (:fan-in 0) (:fan-out 1) (:fan-avg 2))))  
   
 (defun .abs! (tensor)
   "Applies the modulus of a number to a tensor in-place"

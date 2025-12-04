@@ -132,7 +132,8 @@
    #:randn
    #:rand-like
    #:randn-like
-   #:kaiming))
+   #:kaiming
+   #:kaiming-like))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -231,6 +232,7 @@
    #:.max!
    #:.min!
    #:.max
+   #:kaiming-like
    #:.min
    #:.abs!
    #:.abs

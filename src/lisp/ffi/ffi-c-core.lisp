@@ -512,6 +512,14 @@
   (gain :float)
   (dist :float))
   
+(cffi:defcfun ("nnl2_kaiming_like" %kaiming-like) :pointer
+  (tensor :pointer)
+  (fan-in :int)
+  (fan-out :int)
+  (gain :float)
+  (distribution :float)
+  (mode :int))  
+  
 (cffi:defcfun ("lisp_call_axpy_inplace_regional" %ts-regional-axpy-inplace) :void
   (summand :pointer)
   (sumend :pointer)
@@ -1148,6 +1156,14 @@
   (out :int)
   (gain :float)
   (dist :float))
+  
+(cffi:defcfun ("nnl2_ad_kaiming_like" %ad-kaiming-like) :pointer
+  (ad-tensor :pointer)
+  (fan-in :int)
+  (fan-out :int)
+  (gain :float)
+  (distribution :float)
+  (mode :int))
   
 (cffi:defcfun ("nnl2_ad_uniform_like" %ad-uniform-like) :pointer
   (ad-tensor :pointer)

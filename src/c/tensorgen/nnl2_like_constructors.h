@@ -135,6 +135,39 @@ nnl2_tensor* nnl2_xavier_like(nnl2_tensor* tensor, int in, int out, float gain, 
 }
 
 /** @brief
+ * Creates a new tensor of the same shape and type, initialized with Kaiming (He) initialization
+ *
+ ** @param tensor
+ * The initial tensor from which shape, rank and dtype are taken
+ *
+ ** @param fan_in
+ * Number of input units for the layer
+ *
+ ** @param fan_out
+ * Number of output units for the layer
+ *
+ ** @param gain
+ * Scaling factor for the initialization (optional, typically sqrt(2.0) for ReLU)
+ *
+ ** @param distribution
+ * 6 for uniform, 2 for normal distribution
+ *
+ ** @param mode
+ * Mode of initialization: 
+ *  0 = "fan_in" (default), 
+ *  1 = "fan_out",
+ *  2 = "fan_avg" (average of fan_in and fan_out)
+ *
+ ** @return nnl2_tensor* 
+ * Pointer to a new tensor filled with Kaiming-initialized values
+ *
+ ** @see kaiming
+ **/
+nnl2_tensor* nnl2_kaiming_like(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
+    return kaiming(tensor->shape, tensor->rank, tensor->dtype, fan_in, fan_out, gain, distribution, mode);
+}
+
+/** @brief
  * Creates a new tensor of the same shape and type, filled with uniform random values [0, 1)
  *
  ** @param tensor
