@@ -24,7 +24,8 @@
    #:forward
    #:nnlet
    #:nnlet*
-   #:parameters))
+   #:parameters
+   #:*nn-default-init-type*))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

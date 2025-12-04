@@ -1332,11 +1332,23 @@
   
 ;; -- Neural Networks --
 
+(cffi:defcenum nnl2-nn-init-type
+  (:identity  0)   ;; Do not perform any initialization. The weights remain untouched. Used when a user-supplied custom initializer function
+  (:zeros     1)   ;; Fill the weight tensor with zeros
+  (:rand      2)   ;; Fill tensor with values sampled from a uniform distribution in [0, 1]
+  (:randn     3)   ;; Fill tensor with values sampled from a standard normal distribution (mean=0, std=1)
+  (:xavier/normal    4)   ;; Xavier (Glorot) initialization using a normal distribution
+  (:xavier/uniform   5)   ;; Xavier (Glorot) initialization using a uniform distribution
+  (:kaiming/normal   6)   ;; Kaiming (He) initialization using a normal distribution
+  (:kaiming/uniform  7)   ;; Kaiming (He) initialization using a uniform distribution
+  (:unknown  9))	;; Undefined or unsupported initialization type
+
 (cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
   (in-features :int)
   (out-features :int)
   (use-bias :bool)
-  (dtype tensor-type))
+  (dtype tensor-type)
+  (init-type nnl2-nn-init-type))
   
 (cffi:defcfun ("nnl2_nn_fnn_forward" %nn-fnn-forward) :pointer
   (nn :pointer)

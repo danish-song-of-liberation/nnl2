@@ -17,13 +17,13 @@
 #include <time.h>        
   
 #include "nnl2_core.h"          	 
-#include "nnl2_ffi_test.h"   
+#include "nnl2_ffi_test.h"    
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"    
 #include "nnl2_foreign_log.h"  
  
 #include "backends_status/nnl2_status.h"  
-
+  
 /// NNL2
      
 /** @file nnl2_core.c
@@ -50,11 +50,11 @@
  * Registers backend implementations for tensor accessor operations
  *
  ** @details 
- * Functions for viewing, getting, and setting tensor data   
+ * Functions for viewing, getting, and setting tensor data    
  */
-void nnl2_init_accessors();
+void nnl2_init_accessors(); 
 
-/** @brief 
+/** @brief    
  * Registers backend implementations for tensor creation operations
  *
  ** @details 

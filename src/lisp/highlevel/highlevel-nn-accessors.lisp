@@ -13,13 +13,10 @@
   (defconstant +nn-type-fnn+ 0)
   (defconstant +nn-type-unknown+ 1))
 
+(defparameter *nn-default-init-type* :kaiming/normal)
+
 (cffi:defcfun ("nnl2_ann_free" free) :void
   (nn :pointer))
-  
-(defmacro fnn (in-features arrow out-features &key (bias t) (dtype nnl2.system:*default-tensor-type*))
-  (declare (ignore arrow))
-  
-  `(nnl2.ffi:%create-nn-fnn ,in-features ,out-features ,bias ,dtype))
 
 (defun forward (nn &rest args)
   (ecase (nnl2.ffi:%nn-get-type nn)
@@ -60,3 +57,13 @@
 	
 (defun parameters (nn)
   (extract-parameters (nnl2.ffi:%nn-get-parameters nn) (nnl2.ffi:%nn-get-num-parameters nn)))
+
+(defmacro fnn (in-features arrow out-features &key (bias t) (dtype nnl2.system:*default-tensor-type*) (init *nn-default-init-type*))
+  (declare (ignore arrow))
+  `(let* ((nn (nnl2.ffi:%create-nn-fnn ,in-features ,out-features ,bias ,dtype ,(if (keywordp init) init :identity))))
+     ,(when (not (keywordp init))
+        `(dotimes (i (length (parameters nn)))
+           (funcall ,init (nth i (parameters nn)))))
+		   
+     nn))
+  

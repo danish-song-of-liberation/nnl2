@@ -5,6 +5,11 @@
 #define NNL2_KAIMING_MODE_FAN_OUT 1
 #define NNL2_KAIMING_MODE_FAN_AVG 2
 
+#define NNL2_KAIMING_NO_GAIN 1.0f
+
+#define NNL2_KAIMING_NORMAL_DIST 2.0f
+#define NNL2_KAIMING_UNIFORM_DIST 6.0f
+
 /** @brief
  * Initializing a tensor using the Kaiming (He) distribution
  *
