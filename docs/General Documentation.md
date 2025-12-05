@@ -92,8 +92,7 @@ So far, there are only **3** types of tensors:
 | ```(tref a 1 4) or (view (a 1 4) or (nnl2.lli.ts:trefw a  1 4)```   | ```(tref a 1 4)``` | ```a(2,5)```   | ```a[1, 4]```                 | ```a[1, 4]``` | Get the element in the second row, fifth column of the array. |
 | ```(view a 0)``` | | | ```a[0, :] or a[0]``` | ```a[0, :] or a[0]``` | Get the first subtensor from a two-dimensional tensor (view) |
 | ```(tref a 0)``` or ```(copy (view a 0))``` | | ```a(1, :)```  | ```a[0, :].copy()``` | ```a[0, :].clone()``` | Get the first subtensor from a two-dimensional tensor (copy) |
-| ```(setf (tref a '* 0) 3)``` | | ```a(:, 1) = 3``` | ```a[:, 0] = 3``` | ```a[:, 0] = 3``` | 	Set all elements in the first column to 3
- |
+| ```(setf (tref a '* 0) 3)``` | | ```a(:, 1) = 3``` | ```a[:, 0] = 3``` | ```a[:, 0] = 3``` | 	Set all elements in the first column to 3 |
 | ```(nnl2.lli.ts:flat a 0)``` | | ```a(1)``` | ```a.flat[0]``` or ```a.ravel()[0]``` | ```a.flatten()[0]``` | Get an item by linear index |
 | ```(nrows a)``` | | ```size(a, 1)``` | ```a.shape[0]``` | 	```a.size(0)``` or ```a.shape[0]``` | Get number of rows in the tensor |
 | ```(ncols a)``` | | ```size(a, 2)``` | ```a.shape[1]``` | ```a.size(1)``` or ```a.shape[1]``` | Get number of columns in the tensor |
