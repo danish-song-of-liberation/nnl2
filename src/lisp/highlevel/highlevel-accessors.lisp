@@ -1141,7 +1141,7 @@
    from (&key) (default: 0): Value to fill from
    to (&key) (default: 1): Value to fill to"
    
-   (%internal-rand indices dtype from to))
+   (%internal-uniform indices dtype from to))
   
 (defun uniform! (tensor &key type-hint (from 0) (to 1))
   "Fills an existing tensor with random numbers from [0, 1]

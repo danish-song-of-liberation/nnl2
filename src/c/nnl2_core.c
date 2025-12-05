@@ -558,8 +558,12 @@ void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha);    
 } 
    
-Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
+Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {   
 	return leakyrelu(tensor, alpha, save_type);  
+}    
+
+Tensor* lisp_call_relu(Tensor* tensor) {
+	return relu(tensor);  
 }    
 
 void lisp_call_sigmoidinplace(Tensor* tensor, bool approx) {        

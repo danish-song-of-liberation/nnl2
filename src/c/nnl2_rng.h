@@ -21,7 +21,7 @@
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
  **/
  
- 
+#if false 
  
 ///@{ [macros]
  
@@ -349,3 +349,5 @@ void nnl2_rng_init(uint64_t seed) {
 ///@} [api]
 
 #endif /** NNL2_RNG_H **/
+
+#endif 

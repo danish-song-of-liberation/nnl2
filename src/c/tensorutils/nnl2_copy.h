@@ -239,18 +239,23 @@ Tensor* nnl2_own_copy(Tensor* tensor, TensorType copy_type) {
     
     // Fallback to naive implementation for small tensors or type conversion
     if(total_elems < NNL2_COPY_PARALLEL_THRESHOLD || dtype != copy_type) {
-        // For type conversion or small tensors, use optimized sequential approach
-        if(dtype != copy_type) {
+		// For type conversion or small tensors, use optimized sequential approach
+		if(dtype != copy_type) {
 			nnl2_free_tensor(result);          
 			return naive_copy(tensor, copy_type);  
 		}
-        
-        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-            NNL2_FUNC_EXIT();
-        #endif
-        return result;
-    }
-    
+
+		if(total_elems < NNL2_COPY_PARALLEL_THRESHOLD) {
+			nnl2_free_tensor(result);
+			return naive_copy(tensor, copy_type);
+		}
+		
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+			NNL2_FUNC_EXIT();
+		#endif
+		return result;
+	}
+
     bool src_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
     bool dst_aligned = NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned = src_aligned && dst_aligned;
