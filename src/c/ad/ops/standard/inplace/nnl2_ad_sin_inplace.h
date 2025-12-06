@@ -1,16 +1,16 @@
-#ifndef NNL2_AD_NEG_INPLACE_H
-#define NNL2_AD_NEG_INPLACE_H
+#ifndef NNL2_AD_SIN_INPLACE_H
+#define NNL2_AD_SIN_INPLACE_H
 
 // NNL2
 
-/** @file nnl2_ad_neg_inplace.h
+/** @file nnl2_ad_sin_inplace.h
  ** @date 2025
  ** @copyright MIT
- ** @brief In-place negation operation for AD tensors
+ ** @brief In-place sine operation for AD tensors
  **/
  
 /** @brief 
- * Applies in-place negation operation to an AD tensor 
+ * Applies in-place sine operation to an AD tensor 
  *
  ** @param ad_tensor 
  * Pointer to the AD tensor to modify in-place
@@ -31,20 +31,20 @@
  * NULL data pointer (depending on safety mode)
  *
  ** @see nnl2_ad_tensor
- ** @see nnl2_neginplace()
+ ** @see nnl2_sininplace()
  **
  ** @return void
  **
  ** @code
  * nnl2_ad_tensor* tensor = nnl2_ad_ones(...);
  * // ... initialize tensor with some data
- * nnl2_ad_neg_inplace(tensor, false); // No graph retention needed
+ * nnl2_ad_sin_inplace(tensor, false); // No graph retention needed
  ** @endcode
  **
  ** @see NNL2_AD_INPLACE_FATAL
  ** @see NNL2_ERROR
  **/
-void nnl2_ad_neg_inplace(nnl2_ad_tensor* ad_tensor, bool retain_graph) {
+void nnl2_ad_sin_inplace(nnl2_ad_tensor* ad_tensor, bool retain_graph) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -52,12 +52,12 @@ void nnl2_ad_neg_inplace(nnl2_ad_tensor* ad_tensor, bool retain_graph) {
 	// Safety checks
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if(!ad_tensor) {
-			NNL2_ERROR("ad_tensor is NULL (in function nnl2_ad_neg_inplace)"); 
+			NNL2_ERROR("ad_tensor is NULL (in function nnl2_ad_sin_inplace)"); 
 		}
 		
 		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 			if(!ad_tensor->data) {
-				NNL2_ERROR("ad_tensor->data is NULL (in function nnl2_ad_neg_inplace)"); 
+				NNL2_ERROR("ad_tensor->data is NULL (in function nnl2_ad_sin_inplace)"); 
 			}
 		#endif
 	#endif
@@ -65,15 +65,15 @@ void nnl2_ad_neg_inplace(nnl2_ad_tensor* ad_tensor, bool retain_graph) {
 	// Prevent in-place operations on tensors that require gradients
 	// when the computation graph needs to be preserved
 	if(ad_tensor->requires_grad && retain_graph) {
-        NNL2_AD_INPLACE_FATAL(".neg! (.neg in-place)", ad_tensor);
+        NNL2_AD_INPLACE_FATAL(".sin! (.sin in-place)", ad_tensor);
     }
 	
-	// Apply in-place negation operation to ad tensor data
-	nnl2_neginplace(ad_tensor->data);
+	// Apply in-place sine operation to ad tensor data
+	nnl2_sininplace(ad_tensor->data);
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
 	#endif
 }
 
-#endif /** NNL2_AD_NEG_INPLACE_H **/
+#endif /** NNL2_AD_SIN_INPLACE_H **/

@@ -278,6 +278,8 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  
     EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));
 	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt));
+	EINIT_BACKEND(nnl2_sin, sin_backends, current_backend(sin));
+	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));
 }
                
 void nnl2_init_standard_inplace() {               
@@ -298,7 +300,9 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, current_backend(axpy_inplace));	 
 	EINIT_BACKEND(nnl2_neginplace, neginplace_backends, current_backend(neginplace));
 	EINIT_BACKEND(nnl2_sqrtinplace, sqrtinplace_backends, current_backend(sqrtinplace));
-}                            
+	EINIT_BACKEND(nnl2_sininplace, sininplace_backends, current_backend(sininplace));
+	EINIT_BACKEND(nnl2_cosinplace, cosinplace_backends, current_backend(cosinplace));
+}                
                                
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
@@ -553,10 +557,10 @@ void lisp_call_sqrt_inplace(nnl2_tensor* tensor) {
 nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {  
     return nnl2_sqrt(tensor);
 } 
- 
+   
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {  
 	leakyreluinplace(tensor, alpha);    
-} 
+}  
    
 Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {   
 	return leakyrelu(tensor, alpha, save_type);  
@@ -815,13 +819,13 @@ void lisp_call_rand_inplace(nnl2_tensor* tensor) {
 	rand_inplace(tensor);
 }   
 
-nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, double mean, double std) {
+nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, double mean, double std) { 
 	return nnl2_randn(shape, rank, dtype, mean, std);
-}
+} 
  
 void lisp_call_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
 	randn_inplace(tensor, mean, std);
-}
+}   
 
 nnl2_tensor* lisp_call_kaiming(int* shape, int rank, nnl2_tensor_type dtype, int fan_in, int fan_out, float gain, float distribution, int mode) {
     return kaiming(shape, rank, dtype, fan_in, fan_out, gain, distribution, mode);
@@ -829,6 +833,22 @@ nnl2_tensor* lisp_call_kaiming(int* shape, int rank, nnl2_tensor_type dtype, int
 
 void lisp_call_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
     kaiming_inplace(tensor, fan_in, fan_out, gain, distribution, mode);
+}
+
+nnl2_tensor* lisp_call_sin(const nnl2_tensor* tensor) {
+    return nnl2_sin(tensor);
+}
+
+void lisp_call_sin_inplace(nnl2_tensor* tensor) {
+    nnl2_sininplace(tensor);
+}
+
+nnl2_tensor* lisp_call_cos(const nnl2_tensor* tensor) {
+    return nnl2_cos(tensor);
+}
+
+void lisp_call_cos_inplace(nnl2_tensor* tensor) {
+    nnl2_cosinplace(tensor);
 }
 
 ///@} [lisp_wrappers]                

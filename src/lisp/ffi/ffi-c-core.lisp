@@ -801,6 +801,24 @@
   (mode ad-mode)
   (track-grad :bool))    
   
+(cffi:defcfun ("nnl2_ad_sin" %ad-.sin) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode)
+  (track-grad :bool))     
+
+(cffi:defcfun ("nnl2_ad_cos" %ad-.cos) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode)
+  (track-grad :bool))   
+  
+(cffi:defcfun ("nnl2_ad_sin_inplace" %ad-.sin!) :pointer
+  (ad-pointer :pointer)
+  (track-grad :bool))    
+
+(cffi:defcfun ("nnl2_ad_cos_inplace" %ad-.cos!) :pointer
+  (ad-pointer :pointer)
+  (track-grad :bool))   
+  
 (cffi:defcfun ("nnl2_ad_inplace_abs" %ad-.abs!) :void
   (ad-pointer :pointer)
   (track-graph :bool))   
@@ -1673,6 +1691,19 @@
 
 (cffi:defcfun ("set_sqrt_backend" %set-sqrt-backend) :void
   (backend-name :string)) 
+  
+(cffi:defcfun ("set_cos_backend" %set-cos-backend) :void
+  (backend-name :string))   
+  
+(cffi:defcfun ("set_cosinplace_backend" %set-cosinplace-backend) :void
+  (backend-name :string))     
+
+(cffi:defcfun ("set_sin_backend" %set-sin-backend) :void
+  (backend-name :string))   
+  
+(cffi:defcfun ("set_sininplace_backend" %set-sininplace-backend) :void
+  (backend-name :string))     
+
 
 (cffi:defcfun ("set_mse_backend" %set-mse-backend) :void
   (backend-name :string))   
@@ -1742,6 +1773,10 @@
 (cffi:defcfun ("get_neg_backend" %get-neg-backend) :string)
 (cffi:defcfun ("get_sqrtinplace_backend" %get-sqrtinplace-backend) :string)
 (cffi:defcfun ("get_sqrt_backend" %get-sqrt-backend) :string)
+(cffi:defcfun ("get_cosinplace_backend" %get-cosinplace-backend) :string)
+(cffi:defcfun ("get_cos_backend" %get-cos-backend) :string)
+(cffi:defcfun ("get_sininplace_backend" %get-sininplace-backend) :string)
+(cffi:defcfun ("get_sin_backend" %get-sin-backend) :string)
 (cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
@@ -1874,6 +1909,14 @@
 (cffi:defcfun ("get_sqrtinplace_num_backends" %get-sqrtinplace-num-backends) :int)
 (cffi:defcfun ("get_sqrt_backends" %get-sqrt-backends) :pointer)
 (cffi:defcfun ("get_sqrt_num_backends" %get-sqrt-num-backends) :int)
+(cffi:defcfun ("get_sininplace_backends" %get-sininplace-backends) :pointer)
+(cffi:defcfun ("get_sininplace_num_backends" %get-sininplace-num-backends) :int)
+(cffi:defcfun ("get_sin_backends" %get-sin-backends) :pointer)
+(cffi:defcfun ("get_sin_num_backends" %get-sin-num-backends) :int)
+(cffi:defcfun ("get_cosinplace_backends" %get-cosinplace-backends) :pointer)
+(cffi:defcfun ("get_cosinplace_num_backends" %get-cosinplace-num-backends) :int)
+(cffi:defcfun ("get_cos_backends" %get-cos-backends) :pointer)
+(cffi:defcfun ("get_cos_num_backends" %get-cos-num-backends) :int)
 (cffi:defcfun ("get_mse_backends" %get-mse-backends) :pointer)
 (cffi:defcfun ("get_mse_num_backends" %get-mse-num-backends) :int)
 

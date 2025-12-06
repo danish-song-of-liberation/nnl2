@@ -15,7 +15,7 @@
   :license "MIT"
   :description "Common Lisp (CL) neural networks meta-library"
   :serial t
-  :version "0.0.0"
+  :version "0.0.1"
   :author "danish-song-of-liberation"
   :maintainer (:email "nnl.dev@proton.me")
   :homepage "https://github.com/danish-song-of-liberation/nnl2"

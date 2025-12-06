@@ -134,7 +134,9 @@
    #:rand-like
    #:randn-like
    #:kaiming
-   #:kaiming-like))
+   #:kaiming-like
+   #:.sin!
+   #:.cos!))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -170,7 +172,9 @@
    #:hstack
    #:concat
    #:view
-   #:tref))   
+   #:tref
+   #:.sin
+   #:.cos))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
@@ -621,5 +625,25 @@
    #:get-backends/kaiming
    #:get-backends/kaiming!
    #:with-backend/kaiming
-   #:with-backend/kaiming!))
+   #:with-backend/kaiming!
+   #:.sin!
+   #:.cos!
+   #:.sin
+   #:.cos
+   #:use-backend/.cos
+   #:use-backend/.cos!
+   #:use-backend/.sin
+   #:use-backend/.sin!
+   #:get-backend/.cos
+   #:get-backend/.sin
+   #:get-backend/.cos!
+   #:get-backend/.sin!
+   #:get-backends/.cos!
+   #:get-backends/.cos
+   #:get-backends/.sin!
+   #:get-backends/.sin
+   #:with-backend/.cos!
+   #:with-backend/.cos
+   #:with-backend/.sin!
+   #:with-backend/.sin))
    

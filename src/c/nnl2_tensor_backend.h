@@ -1109,6 +1109,32 @@ typedef nnl2_tensor* (*kaimingfn)(int* shape, int rank, nnl2_tensor_type dtype, 
  */
 typedef void (*kaiminginplacefn)(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode);
 
+/** @brief In-place sine operation on a tensor
+ ** @param tensor Pointer to the tensor to apply sine to
+ ** @see nnl2_tensor
+ */
+typedef void (*sininplacefn)(nnl2_tensor* tensor);
+
+/** @brief In-place cosine operation on a tensor
+ ** @param tensor Pointer to the tensor to apply cosine to
+ ** @see nnl2_tensor
+ */
+typedef void (*cosinplacefn)(nnl2_tensor* tensor);
+
+/** @brief Out-of-place sine operation on a tensor
+ ** @param tensor Pointer to the input tensor
+ ** @return New tensor with sine values
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor* (*sinfn)(const nnl2_tensor* tensor);
+
+/** @brief Out-of-place cosine operation on a tensor
+ ** @param tensor Pointer to the input tensor
+ ** @return New tensor with cosine values
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor* (*cosfn)(const nnl2_tensor* tensor);
+
 /// @} [typedef]
 
 

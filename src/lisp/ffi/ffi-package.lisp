@@ -599,5 +599,25 @@
    #:%get-kaiming-inplace-backends
    #:%ad-kaiming
    #:%kaiming-like
-   #:%ad-kaiming-like))
+   #:%ad-kaiming-like
+   #:%set-sin-backend
+   #:%set-sininplace-backend
+   #:%set-cos-backend
+   #:%set-cosinplace-backend
+   #:%get-cosinplace-backend
+   #:%get-cos-backend
+   #:%get-sininplace-backend
+   #:%get-sin-backend
+   #:%get-cosinplace-backends
+   #:%get-cosinplace-num-backends
+   #:%get-cos-backends
+   #:%get-cos-num-backends
+   #:%get-sininplace-backends
+   #:%get-sininplace-num-backends
+   #:%get-sin-backends
+   #:%get-sin-num-backends
+   #:%ad-.sin
+   #:%ad-.cos
+   #:%ad-.sin!
+   #:%ad-.cos!))
    

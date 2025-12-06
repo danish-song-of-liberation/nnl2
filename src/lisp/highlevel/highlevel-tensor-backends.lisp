@@ -266,6 +266,18 @@
 (define-backend-setter use-backend/.sqrt
   nnl2.ffi:%set-sqrt-backend)
 
+(define-backend-setter use-backend/.sin!
+  nnl2.ffi:%set-sininplace-backend)  
+
+(define-backend-setter use-backend/.sin
+  nnl2.ffi:%set-sin-backend)
+
+(define-backend-setter use-backend/.cos!
+  nnl2.ffi:%set-cosinplace-backend)  
+
+(define-backend-setter use-backend/.cos
+  nnl2.ffi:%set-cos-backend)
+  
 (define-backend-setter use-backend/mse
   nnl2.ffi:%set-mse-backend)  
   
@@ -298,7 +310,8 @@
 							  use-backend/uniform! use-backend/xavier! use-backend/.sqrt! 
 							  use-backend/.sqrt use-backend/mse use-backend/rand
 							  use-backend/rand! use-backend/randn use-backend/randn!
-							  use-backend/kaiming use-backend/kaiming!))
+							  use-backend/kaiming use-backend/kaiming! use-backend/.sin
+							  use-backend/.sin! use-backend/.cos use-backend/.cos!))
 							  
       (funcall backend-function name)))
 	  
@@ -399,6 +412,10 @@
 (define-backend-getter-setter get-backend/.neg use-backend/.neg nnl2.ffi:%get-neg-backend)
 (define-backend-getter-setter get-backend/.sqrt! use-backend/.sqrt! nnl2.ffi:%get-sqrtinplace-backend)
 (define-backend-getter-setter get-backend/.sqrt use-backend/.sqrt nnl2.ffi:%get-sqrt-backend)
+(define-backend-getter-setter get-backend/.cos! use-backend/.cos! nnl2.ffi:%get-cosinplace-backend)
+(define-backend-getter-setter get-backend/.sin! use-backend/.sin! nnl2.ffi:%get-sininplace-backend)
+(define-backend-getter-setter get-backend/.cos use-backend/.cos nnl2.ffi:%get-cos-backend)
+(define-backend-getter-setter get-backend/.sin use-backend/.sin nnl2.ffi:%get-sin-backend)
 (define-backend-getter-setter get-backend/mse use-backend/mse nnl2.ffi:%get-mse-backend)
 
 (defun get-backend/norm (&key (p :l2))
@@ -706,6 +723,22 @@
 (define-backends-getter get-backends/.sqrt
   nnl2.ffi:%get-sqrt-num-backends
   nnl2.ffi:%get-sqrt-backends) 
+ 
+(define-backends-getter get-backends/.cos!
+  nnl2.ffi:%get-cosinplace-num-backends
+  nnl2.ffi:%get-cosinplace-backends) 
+  
+(define-backends-getter get-backends/.cos
+  nnl2.ffi:%get-cos-num-backends
+  nnl2.ffi:%get-cos-backends)
+
+(define-backends-getter get-backends/.sin!
+  nnl2.ffi:%get-sininplace-num-backends
+  nnl2.ffi:%get-sininplace-backends) 
+  
+(define-backends-getter get-backends/.sin
+  nnl2.ffi:%get-sin-num-backends
+  nnl2.ffi:%get-sin-backends)   
   
 (define-backends-getter get-backends/mse
   nnl2.ffi:%get-mse-num-backends
@@ -806,5 +839,9 @@
 (define-with-backend with-backend/.neg get-backend/.neg)
 (define-with-backend with-backend/.sqrt! get-backend/.sqrt!)
 (define-with-backend with-backend/.sqrt get-backend/.sqrt)
+(define-with-backend with-backend/.cos! get-backend/.cos!)
+(define-with-backend with-backend/.cos get-backend/.cos)
+(define-with-backend with-backend/.sin! get-backend/.sin!)
+(define-with-backend with-backend/.sin get-backend/.sin)
 (define-with-backend with-backend/mse get-backend/mse)
 		 

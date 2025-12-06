@@ -513,7 +513,7 @@
 	
 	ad-tensor))
 	
-(defun transposition! (ad-tensor &key (track-graph t))
+(defun transposition! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "WARNING. 
   
    This function intentionally returns mathematically 
@@ -532,7 +532,7 @@
 	   
   (nnl2.ffi:%ad-transposition-inplace ad-tensor track-graph))
   
-(defun transpose! (ad-tensor &key (track-graph t) force)
+(defun transpose! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*) force)
   "WARNING. 
   
    For maximum performance, the function intentionally 
@@ -875,7 +875,7 @@
 (cffi:defcfun ("nnl2_ad_neg_inplace" .neg!) :void
   (ad-tensor :pointer))		
   
-(defun += (a b &key (track-graph t))
+(defun += (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place addition"
   
   (nnl2.hli:fastcall   
@@ -884,7 +884,7 @@
       (nnl2.ffi:%ad-+= a b track-graph)
       (nnl2.ffi:%ad-add-broadcasting-inplace a b track-graph))))  
 	  
-(defun -= (a b &key (track-graph t))
+(defun -= (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place subtraction"
   
   (nnl2.hli:fastcall   
@@ -893,7 +893,7 @@
       (nnl2.ffi:%ad--= a b track-graph)
       (nnl2.ffi:%ad-sub-broadcasting-inplace a b track-graph))))	  
   
-(defun *= (a b &key (track-graph t))
+(defun *= (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place multiplication"
   
   (nnl2.hli:fastcall   
@@ -902,7 +902,7 @@
       (nnl2.ffi:%ad-*= a b track-graph)
       (nnl2.ffi:%ad-mul-broadcasting-inplace a b track-graph))))
   
-(defun /! (a b &key (track-graph t))
+(defun /! (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place division"
   
   (nnl2.hli:fastcall   
@@ -911,7 +911,7 @@
       (nnl2.ffi:%ad-/! a b track-graph)
       (nnl2.ffi:%ad-div-broadcasting-inplace a b track-graph))))
 
-(defun ^= (a b &key (track-graph t))
+(defun ^= (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place pow"
   
   (nnl2.hli:fastcall   
@@ -920,11 +920,11 @@
       (nnl2.ffi:%ad-^= a b track-graph)
       (nnl2.ffi:%ad-pow-broadcasting-inplace a b track-graph))))	
 	  
-(defun .abs! (ad-tensor &key (track-graph t))
+(defun .abs! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place abs"
   (nnl2.ffi:%ad-.abs! ad-tensor track-graph))		  
 	  
-(defun .min! (a b &key (track-graph t))
+(defun .min! (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place min"
   
   (nnl2.hli:fastcall   
@@ -933,7 +933,7 @@
       (nnl2.ffi:%ad-.min! a b track-graph)
       (nnl2.ffi:%ad-min-broadcasting-inplace a b track-graph))))	  
 	  
-(defun .max! (a b &key (track-graph t))
+(defun .max! (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place max"
   
   (nnl2.hli:fastcall   
@@ -942,7 +942,7 @@
       (nnl2.ffi:%ad-.max! a b track-graph)
       (nnl2.ffi:%ad-max-broadcasting-inplace a b track-graph))))
 	  
-(defun axpy! (a b &key (alpha 1.0) (track-graph t))
+(defun axpy! (a b &key (alpha 1.0) (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place a+b*c"
   
   (nnl2.hli:fastcall   
@@ -951,37 +951,45 @@
       (nnl2.ffi:%ad-axpy! a b alpha track-graph)
       (nnl2.ffi:%ad-axpy-broadcasting-inplace a b alpha track-graph))))	  
 	  
-(defun scale! (a b &key (track-graph t))
+(defun scale! (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Scales tensor a by scalar b in-place"
   (nnl2.ffi:%ad-scale! a (coerce b 'single-float) track-graph))
   
-(defun .exp! (ad-tensor &key (track-graph t))
+(defun .exp! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place elementwise exponential"
   (nnl2.ffi:%ad-.exp! ad-tensor track-graph))  
 
-(defun .log! (ad-tensor &key (track-graph t))
+(defun .log! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place elementwise natural logarithm"
   (nnl2.ffi:%ad-.log! ad-tensor track-graph))    
   
-(defun .relu! (ad-tensor &key (track-graph t))
+(defun .relu! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place ReLU activation"
   (nnl2.ffi:%ad-.relu! ad-tensor track-graph))  	 
 
-(defun .leaky-relu! (ad-tensor &key (alpha nnl2.system:*leaky-relu-default-shift*) (track-graph t))
+(defun .leaky-relu! (ad-tensor &key (alpha nnl2.system:*leaky-relu-default-shift*) (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place Leaky ReLU activation with slope alpha"
   (nnl2.ffi:%ad-.leaky-relu! ad-tensor alpha track-graph))  	
   
-(defun .sigmoid! (ad-tensor &key (approx t) (track-graph t))
+(defun .sigmoid! (ad-tensor &key (approx t) (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place sigmoid activation; approx enables fast approximation"
   (nnl2.ffi:%ad-.sigmoid! ad-tensor approx track-graph))  
   
-(defun .tanh! (ad-tensor &key (approx t) (track-graph t))
+(defun .tanh! (ad-tensor &key (approx t) (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place tanh activation; approx enables fast approximation"
   (nnl2.ffi:%ad-.tanh! ad-tensor approx track-graph))    
   
-(defun .sqrt! (tensor &key (track-graph t))
+(defun .sqrt! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place elementwise square root"
   (nnl2.ffi:%ad-sqrt-inplace tensor track-graph))
+
+(defun .cos! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "In-place elementwise ad .cos"
+  (nnl2.ffi:%ad-.cos! tensor track-graph))
+  
+(defun .sin! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "In-place elementwise ad .sin"
+  (nnl2.ffi:%ad-.sin! tensor track-graph))
   
 (defun copy (tensor &key (dtype (dtype tensor)))
   "Returns a copy of the tensor, optionally casting to a different dtype"
@@ -1163,7 +1171,15 @@
 (defun .neg (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Returns a new tensor with elementwise negation"
   (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
-	
+
+(defun .sin (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with elementwise sine"
+  (nnl2.ffi:%ad-.sin ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
+  
+(defun .cos (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with elementwise sine"
+  (nnl2.ffi:%ad-.cos ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
+  
 (defun transposition (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Returns a transposed view of the tensor (O(1))"
   (nnl2.ffi:%ad-transposition ad-tensor nnl2.ffi:ad-reverse-mode track-graph))

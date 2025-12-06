@@ -2067,6 +2067,18 @@
   
   (nnl2.ffi:%randn-like tensor (coerce mean 'double-float) (coerce std 'double-float)))
 
+(cffi:defcfun ("lisp_call_sin_inplace" .sin!) :void
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_cos_inplace" .cos!) :void
+  (tensor :pointer))  
+  
+(cffi:defcfun ("lisp_call_sin" .sin) :pointer
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_cos" .cos) :pointer
+  (tensor :pointer))  
+  
 (in-package :nnl2.hli.ts.loss)
   
 (defun mse (prediction target)
