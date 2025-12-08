@@ -1,0 +1,2 @@
+Poweshell command for counting lines in src/: (Get-ChildItem -Path .\src -Recurse -Include *.c, *.h, *.lisp | Get-Content).Count
+Poweshell command for counting lines in tests/: (Get-ChildItem -Path .\tests -Recurse -Include *.c, *.h, *.lisp | Get-Content).Count
