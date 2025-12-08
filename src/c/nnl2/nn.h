@@ -3,6 +3,7 @@
 #include "../nn/ann/nnl2_ann_forward.h"
 #include "../nn/ann/fnn/nnl2_fnn_backend.h"
 #include "../nn/ann/fnn/nnl2_fnn_forward.h"
+#include "../nn/ann/fnn/nnl2_fnn_init.h"
 #include "../nn/other/nnl2_nn_sequential.h"
 #include "../nn/ann/nnl2_ann_free.h"
 #include "../nn/ann/nnl2_ann_num_parameters.h"

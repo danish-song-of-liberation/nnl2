@@ -32,6 +32,32 @@ typedef struct nnl2_nn_fnn_struct {
 
 ///@} [nnl2_nn_fnn]
 
+
+
+/** @brief Initializes FNN layer with zeros **/
+static bool fnn_init_zeros(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with uniform random values **/
+static bool fnn_init_rand(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with normal random values **/
+static bool fnn_init_randn(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with Xavier normal initialization **/
+static bool fnn_init_xavier_normal(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with Xavier uniform initialization **/
+static bool fnn_init_xavier_uniform(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with Kaiming normal initialization **/
+static bool fnn_init_kaiming_normal(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with Kaiming uniform initialization **/
+static bool fnn_init_kaiming_uniform(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype);
+
+/** @brief Initializes FNN layer with identity matrix for testing **/
+static bool fnn_init_identity(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype, bool use_bias);
+
 /** @brief 
  * Creates a Fully-Connected Neural Network (FNN) layer
  *
@@ -77,267 +103,38 @@ nnl2_nn_fnn* nnl2_nn_fnn_create(int in_features, int out_features, bool use_bias
 	nn -> metadata.nn_type = nnl2_nn_type_fnn;
 	nn -> metadata.use_bias = use_bias;
 	
-	switch(init_type) {
-		case nnl2_nn_init_zeros: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_zeros((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights");
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:zeros");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_zeros((int[]){ out_features }, 1, dtype, true, "fnn:bias");
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:zeros");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_zeros **/
-
-		case nnl2_nn_init_rand: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_rand((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights");
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:rand");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_rand((int[]){ out_features }, 1, dtype, true, "fnn:bias");
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:rand");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_rand **/
-
-		case nnl2_nn_init_randn: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_randn((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights",
-				0.0, 1.0  // mean=0, std=1
-			);
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:randn");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_randn((int[]){ out_features }, 1, dtype, true, "fnn:bias",
-					0.0, 1.0  // mean=0, std=1
-				);
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:randn");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_randn **/
-
-		case nnl2_nn_init_xavier_normal: {
-			// Matrix with [in_features, out_features] shape
-			nn -> weights = nnl2_ad_xavier((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights", in_features, out_features, NNL2_XAVIER_NO_GAIN, NNL2_XAVIER_NORMAL_DIST);
+	bool init_success = false;
+	
+    switch(init_type) {
+        case nnl2_nn_init_zeros: 			init_success = fnn_init_zeros(nn, in_features, out_features, dtype);  				break;
+        case nnl2_nn_init_rand: 			init_success = fnn_init_rand(nn, in_features, out_features, dtype); 			    break;            
+        case nnl2_nn_init_randn: 			init_success = fnn_init_randn(nn, in_features, out_features, dtype);  				break;        
+        case nnl2_nn_init_xavier_normal: 	init_success = fnn_init_xavier_normal(nn, in_features, out_features, dtype);  		break;            
+        case nnl2_nn_init_xavier_uniform: 	init_success = fnn_init_xavier_uniform(nn, in_features, out_features, dtype);  		break;        
+        case nnl2_nn_init_kaiming_normal:   init_success = fnn_init_kaiming_normal(nn, in_features, out_features, dtype); 	    break;
+        case nnl2_nn_init_kaiming_uniform: 	init_success = fnn_init_kaiming_uniform(nn, in_features, out_features, dtype); 	    break;    
+        case nnl2_nn_init_identity: 		init_success = fnn_init_identity(nn, in_features, out_features, dtype, use_bias);   break;
+            
+        case nnl2_nn_init_unknown:
+		
+        default: {
+            #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+                NNL2_ERROR("Unknown initialization type: %d", init_type);
+            #endif
 			
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn -> weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:xavier");
-					free(nn);
-					return NULL;
-				}
-			#endif
-			
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn -> bias = nnl2_ad_xavier((int[]){ out_features }, 1, dtype, true, "fnn:bias", in_features, out_features, NNL2_XAVIER_NO_GAIN, NNL2_XAVIER_NORMAL_DIST); 
-				
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:xavier");
-						nnl2_free_ad_tensor(nn -> weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn -> bias = NULL;
-			}
-			
-			break;
-		} /** nnl2_nn_init_xavier_normal **/
-		
-		case nnl2_nn_init_xavier_uniform: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_xavier((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights", in_features, out_features, NNL2_XAVIER_NO_GAIN, NNL2_XAVIER_UNIFORM_DIST);
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:xavier_uniform");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_xavier((int[]){ out_features }, 1, dtype, true, "fnn:bias", in_features, out_features, NNL2_XAVIER_NO_GAIN, NNL2_XAVIER_UNIFORM_DIST);
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:xavier_uniform");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_xavier_uniform **/
-		
-		case nnl2_nn_init_kaiming_normal: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_kaiming((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights", in_features, out_features, NNL2_KAIMING_NO_GAIN, NNL2_KAIMING_NORMAL_DIST, NNL2_KAIMING_MODE_FAN_IN);
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:kaiming_normal");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_kaiming((int[]){ out_features }, 1, dtype, true, "fnn:bias", in_features, out_features, NNL2_KAIMING_NO_GAIN, NNL2_KAIMING_NORMAL_DIST, NNL2_KAIMING_MODE_FAN_IN);
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:kaiming_normal");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_kaiming_normal **/
-		
-		case nnl2_nn_init_kaiming_uniform: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_kaiming((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights", in_features, out_features, NNL2_KAIMING_NO_GAIN, NNL2_KAIMING_UNIFORM_DIST, NNL2_KAIMING_MODE_FAN_IN);
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:kaiming_uniform");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_kaiming((int[]){ out_features }, 1, dtype, true, "fnn:bias", in_features, out_features, NNL2_KAIMING_NO_GAIN, NNL2_KAIMING_UNIFORM_DIST, NNL2_KAIMING_MODE_FAN_IN);
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:kaiming_uniform");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_kaiming_uniform **/
-		
-		case nnl2_nn_init_identity: {
-			// Matrix with [in_features, out_features] shape
-			nn->weights = nnl2_ad_empty((int[]){ in_features, out_features }, 2, dtype, true, "fnn:weights");
-
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-				if(!nn->weights) {
-					NNL2_TENSOR_ERROR("fnn:weights:identity");
-					free(nn);
-					return NULL;
-				}
-			#endif
-
-			if(use_bias) {
-				// Vector with [out_features] shape
-				nn->bias = nnl2_ad_empty((int[]){ out_features }, 1, dtype, true, "fnn:bias");
-
-				#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-					if(!nn->bias) {
-						NNL2_TENSOR_ERROR("fnn:bias:identity");
-						nnl2_free_ad_tensor(nn->weights);
-						free(nn);
-						return NULL;
-					}
-				#endif
-			} else {
-				nn->bias = NULL;
-			}
-
-			break;
-		} /** nnl2_nn_init_identity **/
-		
-		case nnl2_nn_init_unknown:
-
-		default: {
-			NNL2_ERROR("An unknown initialization type was passed to fnn (%d)", init_type);
-			free(nn);
-			return NULL;
+            free(nn);
+            return NULL;
 		}
-	}
+    }
+	
+	if(!init_success) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            NNL2_ERROR("FNN initialization failed for type: %d", init_type);
+        #endif
+		
+        free(nn);
+        return NULL;
+    }
 	
 	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_EXIT();
