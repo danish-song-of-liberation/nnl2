@@ -41,8 +41,13 @@
    Returns:
        Output of the network after applying forward propagation"
    
-  (ecase (nnl2.ffi:%nn-get-type nn)
-    (0 (apply #'nnl2.ffi:%nn-fnn-forward nn args))))
+  (let* ((len (length args))
+		 (args-pntr (cffi:foreign-alloc :pointer :count len)))
+		 
+	(dotimes (i len)
+	  (setf (cffi:mem-aref args-pntr :pointer i) (nth i args)))
+	  
+	(nnl2.ffi:%nn-forward nn args-pntr)))
   
 (defmacro nnlet ((&rest bindings) &body body)
   "Like cl:let, but automatically frees any nnl2-nn variables after the body executes"
@@ -122,4 +127,14 @@
            (funcall ,init (nth i (parameters nn)))))
 		   
      nn))
+	 
+(defun sequential (&rest layers)
+  (let* ((len (length layers))
+		 (layers-pntr (cffi:foreign-alloc :pointer :count len)))
+		 
+    (dotimes (i len)
+	  (setf (cffi:mem-aref layers-pntr :pointer i) (nth i layers)))
+	  
+	(nnl2.ffi:%create-nn-sequential len layers-pntr)))
+  
   

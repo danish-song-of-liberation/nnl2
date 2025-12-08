@@ -1368,6 +1368,14 @@
   (dtype tensor-type)
   (init-type nnl2-nn-init-type))
   
+(cffi:defcfun ("nnl2_ann_forward" %nn-forward) :pointer
+  (model :pointer)
+  (args :pointer))  
+  
+(cffi:defcfun ("nnl2_nn_sequential_create" %create-nn-sequential) :pointer
+  (num-layers :size)
+  (layers :pointer))
+  
 (cffi:defcfun ("nnl2_nn_fnn_forward" %nn-fnn-forward) :pointer
   (nn :pointer)
   (x :pointer))

@@ -24,7 +24,7 @@
  ** @see nnl2_nn_ann 
  ** @extends nnl2_nn_ann **/
 
-typedef struct {
+typedef struct nnl2_nn_fnn_struct {
 	nnl2_nn_ann metadata;		///< Base neural network metadata and type information
 	nnl2_ad_tensor* weights;    ///< Weight matrix of shape [in_features, out_features]
 	nnl2_ad_tensor* bias;		///< Bias vector of shape [out_features]. May be NULL if use_bias is set to false in metadata

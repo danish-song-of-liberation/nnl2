@@ -37,14 +37,19 @@ void nnl2_ann_free(void* nn) {
             return;
         }
     #endif
+	
+    nnl2_nn_ann* ann = (nnl2_nn_ann*)nn;
     
-    nnl2_nn_type* nn_type = (nnl2_nn_type*)nn;
-    
-    switch(*nn_type) {
+    switch(ann -> nn_type) {
         case nnl2_nn_type_fnn: {
             nnl2_nn_fnn_free(nn);
             break;
         }
+		
+		case nnl2_nn_type_sequential: {
+			nnl2_nn_sequential_free(nn);
+			break;
+		}
         
         case nnl2_nn_type_unknown:
 		

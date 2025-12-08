@@ -619,5 +619,7 @@
    #:%ad-.sin
    #:%ad-.cos
    #:%ad-.sin!
-   #:%ad-.cos!))
+   #:%ad-.cos!
+   #:%create-nn-sequential
+   #:%nn-forward))
    

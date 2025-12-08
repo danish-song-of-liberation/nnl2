@@ -26,6 +26,7 @@
  *
  ** @see nnl2_nn_type
  ** @see nnl2_nn_fnn_get_parameters
+ ** @see nnl2_nn_sequential_get_parameters
  **/
 nnl2_ad_tensor** nnl2_ann_parameters(void* nn) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -54,6 +55,16 @@ nnl2_ad_tensor** nnl2_ann_parameters(void* nn) {
             
             return parameters;	
         }
+		
+		case nnl2_nn_type_sequential: {
+			nnl2_ad_tensor** parameters = nnl2_nn_sequential_get_parameters(nn);
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                NNL2_FUNC_EXIT();
+            #endif
+			
+			return parameters;
+		}
         
         case nnl2_nn_type_unknown:
 		

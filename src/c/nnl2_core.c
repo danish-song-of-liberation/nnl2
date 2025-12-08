@@ -728,12 +728,12 @@ Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) {
 	               
 void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {     
 	return max_broadcasting_inplace(a, b);          
-}
+}       
 
-void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) {
-	return min_broadcasting_inplace(a, b);
+void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) { 
+	return min_broadcasting_inplace(a, b);       
 }
- 
+  
 Tensor* lisp_call_max_broadcasting(Tensor* a, Tensor* b) {         
 	return max_broadcasting(a, b);
 }  
@@ -813,23 +813,23 @@ void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
 
 nnl2_tensor* lisp_call_rand(int32_t* shape, int rank, nnl2_tensor_type dtype) {
 	return nnl2_rand(shape, rank, dtype); 
-} 
-
+}       
+ 
 void lisp_call_rand_inplace(nnl2_tensor* tensor) {   
-	rand_inplace(tensor);
-}   
+	rand_inplace(tensor); 
+}        
 
 nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, double mean, double std) { 
 	return nnl2_randn(shape, rank, dtype, mean, std);
 } 
- 
+    
 void lisp_call_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
 	randn_inplace(tensor, mean, std);
 }   
 
 nnl2_tensor* lisp_call_kaiming(int* shape, int rank, nnl2_tensor_type dtype, int fan_in, int fan_out, float gain, float distribution, int mode) {
     return kaiming(shape, rank, dtype, fan_in, fan_out, gain, distribution, mode);
-}
+}   
 
 void lisp_call_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
     kaiming_inplace(tensor, fan_in, fan_out, gain, distribution, mode);
@@ -838,7 +838,7 @@ void lisp_call_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, flo
 nnl2_tensor* lisp_call_sin(const nnl2_tensor* tensor) {
     return nnl2_sin(tensor);
 }
-
+ 
 void lisp_call_sin_inplace(nnl2_tensor* tensor) {
     nnl2_sininplace(tensor);
 }

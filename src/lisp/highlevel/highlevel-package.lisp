@@ -25,7 +25,8 @@
    #:nnlet
    #:nnlet*
    #:parameters
-   #:*nn-default-init-type*))
+   #:*nn-default-init-type*
+   #:sequential))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

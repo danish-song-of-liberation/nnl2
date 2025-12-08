@@ -25,6 +25,7 @@
  *
  ** @see nnl2_nn_type
  ** @see nnl2_nn_fnn_get_num_parameters
+ ** @see nnl2_nn_sequential_get_num_parameters
  **/
 size_t nnl2_ann_num_parameters(void* nn) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -46,6 +47,16 @@ size_t nnl2_ann_num_parameters(void* nn) {
     switch(*nn_type) {
         case nnl2_nn_type_fnn: {
             size_t num_params = nnl2_nn_fnn_get_num_parameters(nn);
+            
+            #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                NNL2_FUNC_EXIT();
+            #endif
+            
+            return num_params;	
+        }
+		
+		case nnl2_nn_type_sequential: {
+            size_t num_params = nnl2_nn_sequential_get_num_parameters(nn);
             
             #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
                 NNL2_FUNC_EXIT();
