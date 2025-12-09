@@ -1135,6 +1135,36 @@ typedef nnl2_tensor* (*sinfn)(const nnl2_tensor* tensor);
  */
 typedef nnl2_tensor* (*cosfn)(const nnl2_tensor* tensor);
 
+/** @brief In-place arcsine operation on a tensor
+ ** @param tensor Pointer to the tensor to apply arcsine to
+ ** @note Input values must be in the range [-1, 1] for real results
+ ** @see nnl2_tensor
+ */
+typedef void (*asininplacefn)(nnl2_tensor* tensor);
+
+/** @brief In-place arccosine operation on a tensor
+ ** @param tensor Pointer to the tensor to apply arccosine to
+ ** @note Input values must be in the range [-1, 1] for real results
+ ** @see nnl2_tensor
+ */
+typedef void (*acosinplacefn)(nnl2_tensor* tensor);
+
+/** @brief Out-of-place arcsine operation on a tensor
+ ** @param tensor Pointer to the input tensor
+ ** @return New tensor with arcsine values
+ ** @note Input values must be in the range [-1, 1] for real results
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor* (*asinfn)(const nnl2_tensor* tensor);
+
+/** @brief Out-of-place arccosine operation on a tensor
+ ** @param tensor Pointer to the input tensor
+ ** @return New tensor with arccosine values
+ ** @note Input values must be in the range [-1, 1] for real results
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor* (*acosfn)(const nnl2_tensor* tensor);
+
 /// @} [typedef]
 
 

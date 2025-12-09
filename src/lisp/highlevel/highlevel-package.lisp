@@ -650,5 +650,25 @@
    #:with-backend/.cos!
    #:with-backend/.cos
    #:with-backend/.sin!
-   #:with-backend/.sin))
+   #:with-backend/.sin
+   #:.asin!
+   #:.acos!
+   #:.asin
+   #:.acos
+   #:use-backend/.acos
+   #:use-backend/.acos!
+   #:use-backend/.asin
+   #:use-backend/.asin!
+   #:get-backend/.acos
+   #:get-backend/.asin
+   #:get-backend/.acos!
+   #:get-backend/.asin!
+   #:get-backends/.acos!
+   #:get-backends/.acos
+   #:get-backends/.asin!
+   #:get-backends/.asin
+   #:with-backend/.acos!
+   #:with-backend/.acos
+   #:with-backend/.asin!
+   #:with-backend/.asin))
    

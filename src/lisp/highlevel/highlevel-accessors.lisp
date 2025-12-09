@@ -2079,6 +2079,18 @@
 (cffi:defcfun ("lisp_call_cos" .cos) :pointer
   (tensor :pointer))  
   
+(cffi:defcfun ("lisp_call_asin_inplace" .asin!) :void
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_acos_inplace" .acos!) :void
+  (tensor :pointer))  
+  
+(cffi:defcfun ("lisp_call_asin" .asin) :pointer
+  (tensor :pointer))
+
+(cffi:defcfun ("lisp_call_acos" .acos) :pointer
+  (tensor :pointer))  
+  
 (in-package :nnl2.hli.ts.loss)
   
 (defun mse (prediction target)

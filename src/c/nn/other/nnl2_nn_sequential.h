@@ -241,19 +241,11 @@ nnl2_ad_tensor** nnl2_nn_sequential_get_parameters(nnl2_nn_sequential* seq) {
 	// Collect parameters from each layer
     for(size_t layer_idx = 0; layer_idx < seq->num_layers; layer_idx++) {
 		if(seq->layers[layer_idx] == NULL) {
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-				NNL2_WARN("Layer %zu is NULL, skipping", layer_idx);
-			#endif
-			
             continue;  // Skip NULL 
         }
 		
         nnl2_ad_tensor** layer_params = nnl2_ann_parameters(seq->layers[layer_idx]);
-		if (layer_params == NULL) {
-			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-				NNL2_WARN("Layer %zu has no parameters, skipping", layer_idx);
-			#endif
-			
+		if(layer_params == NULL) {
             continue;  // Layer has no parameters
         }
         

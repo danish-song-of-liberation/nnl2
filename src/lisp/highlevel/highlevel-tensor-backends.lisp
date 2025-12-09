@@ -277,6 +277,18 @@
 
 (define-backend-setter use-backend/.cos
   nnl2.ffi:%set-cos-backend)
+
+(define-backend-setter use-backend/.asin!
+  nnl2.ffi:%set-asininplace-backend)  
+
+(define-backend-setter use-backend/.asin
+  nnl2.ffi:%set-asin-backend)
+
+(define-backend-setter use-backend/.acos!
+  nnl2.ffi:%set-acosinplace-backend)  
+
+(define-backend-setter use-backend/.acos
+  nnl2.ffi:%set-acos-backend)
   
 (define-backend-setter use-backend/mse
   nnl2.ffi:%set-mse-backend)  
@@ -311,7 +323,9 @@
 							  use-backend/.sqrt use-backend/mse use-backend/rand
 							  use-backend/rand! use-backend/randn use-backend/randn!
 							  use-backend/kaiming use-backend/kaiming! use-backend/.sin
-							  use-backend/.sin! use-backend/.cos use-backend/.cos!))
+							  use-backend/.sin! use-backend/.cos use-backend/.cos!
+							  use-backend/.asin use-backend/.asin! use-backend/.acos 
+							  use-backend/.acos!))
 							  
       (funcall backend-function name)))
 	  
@@ -416,6 +430,10 @@
 (define-backend-getter-setter get-backend/.sin! use-backend/.sin! nnl2.ffi:%get-sininplace-backend)
 (define-backend-getter-setter get-backend/.cos use-backend/.cos nnl2.ffi:%get-cos-backend)
 (define-backend-getter-setter get-backend/.sin use-backend/.sin nnl2.ffi:%get-sin-backend)
+(define-backend-getter-setter get-backend/.acos! use-backend/.acos! nnl2.ffi:%get-acosinplace-backend)
+(define-backend-getter-setter get-backend/.asin! use-backend/.asin! nnl2.ffi:%get-asininplace-backend)
+(define-backend-getter-setter get-backend/.acos use-backend/.acos nnl2.ffi:%get-acos-backend)
+(define-backend-getter-setter get-backend/.asin use-backend/.asin nnl2.ffi:%get-asin-backend)	
 (define-backend-getter-setter get-backend/mse use-backend/mse nnl2.ffi:%get-mse-backend)
 
 (defun get-backend/norm (&key (p :l2))
@@ -738,7 +756,23 @@
   
 (define-backends-getter get-backends/.sin
   nnl2.ffi:%get-sin-num-backends
-  nnl2.ffi:%get-sin-backends)   
+  nnl2.ffi:%get-sin-backends)
+
+(define-backends-getter get-backends/.acos!
+  nnl2.ffi:%get-acosinplace-num-backends
+  nnl2.ffi:%get-acosinplace-backends) 
+  
+(define-backends-getter get-backends/.acos
+  nnl2.ffi:%get-acos-num-backends
+  nnl2.ffi:%get-acos-backends)
+
+(define-backends-getter get-backends/.asin!
+  nnl2.ffi:%get-asininplace-num-backends
+  nnl2.ffi:%get-asininplace-backends) 
+  
+(define-backends-getter get-backends/.asin
+  nnl2.ffi:%get-asin-num-backends
+  nnl2.ffi:%get-asin-backends)  
   
 (define-backends-getter get-backends/mse
   nnl2.ffi:%get-mse-num-backends
@@ -843,5 +877,9 @@
 (define-with-backend with-backend/.cos get-backend/.cos)
 (define-with-backend with-backend/.sin! get-backend/.sin!)
 (define-with-backend with-backend/.sin get-backend/.sin)
+(define-with-backend with-backend/.acos! get-backend/.acos!)
+(define-with-backend with-backend/.acos get-backend/.acos)
+(define-with-backend with-backend/.asin! get-backend/.asin!)
+(define-with-backend with-backend/.asin get-backend/.asin)
 (define-with-backend with-backend/mse get-backend/mse)
 		 

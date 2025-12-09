@@ -477,7 +477,7 @@
   
   (nnl2.ffi:%ad-randn-like ad-tensor (coerce mean 'double-float) (coerce std 'double-float)))
   
-(defun make-tensor (data &key (dtype nnl2.system:*default-tensor-type*))
+(defun make-tensor (data &key requires-grad (dtype nnl2.system:*default-tensor-type*))
   "Creates an AD tensor from a Lisp array
   
    Args:
@@ -489,7 +489,7 @@
 	   
   (let* ((shape (array-dimensions data))
 		 (ts-tensor (nnl2.hli.ts:make-tensor data :dtype dtype :shape-hint shape))
-		 (ad-tensor (empty shape :dtype dtype)))
+		 (ad-tensor (empty shape :dtype dtype :requires-grad requires-grad)))
 		 
 	(nnl2.ffi:%data-pntr-share-setter ad-tensor ts-tensor)
 	

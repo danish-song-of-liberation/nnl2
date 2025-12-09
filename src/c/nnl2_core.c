@@ -280,6 +280,8 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt));
 	EINIT_BACKEND(nnl2_sin, sin_backends, current_backend(sin));
 	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));
+	EINIT_BACKEND(nnl2_asin, asin_backends, current_backend(asin)); 
+	EINIT_BACKEND(nnl2_acos, acos_backends, current_backend(acos)); 
 }
                
 void nnl2_init_standard_inplace() {               
@@ -302,6 +304,8 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(nnl2_sqrtinplace, sqrtinplace_backends, current_backend(sqrtinplace));
 	EINIT_BACKEND(nnl2_sininplace, sininplace_backends, current_backend(sininplace));
 	EINIT_BACKEND(nnl2_cosinplace, cosinplace_backends, current_backend(cosinplace));
+	EINIT_BACKEND(nnl2_asininplace, asininplace_backends, current_backend(asininplace));  
+	EINIT_BACKEND(nnl2_acosinplace, acosinplace_backends, current_backend(acosinplace)); 
 }                
                                
 void nnl2_init_stack() {
@@ -695,10 +699,10 @@ Tensor* lisp_call_add_broadcasting(Tensor* summand, Tensor* sumend) {
 }    
   
 void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {   
-	return sub_broadcasting_inplace(summand, sumend);
+	return sub_broadcasting_inplace(summand, sumend); 
 } 
  
-Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {   
+Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {    
 	return sub_broadcasting(minuend, subtrahend); 
 }
 
@@ -849,6 +853,22 @@ nnl2_tensor* lisp_call_cos(const nnl2_tensor* tensor) {
 
 void lisp_call_cos_inplace(nnl2_tensor* tensor) {
     nnl2_cosinplace(tensor);
+}
+
+nnl2_tensor* lisp_call_asin(const nnl2_tensor* tensor) {
+    return nnl2_asin(tensor);
+}
+ 
+void lisp_call_asin_inplace(nnl2_tensor* tensor) {
+    nnl2_asininplace(tensor);
+}
+
+nnl2_tensor* lisp_call_acos(const nnl2_tensor* tensor) {
+    return nnl2_acos(tensor);
+}
+
+void lisp_call_acos_inplace(nnl2_tensor* tensor) {
+    nnl2_acosinplace(tensor);
 }
 
 ///@} [lisp_wrappers]                

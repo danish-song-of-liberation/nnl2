@@ -1721,6 +1721,17 @@
 (cffi:defcfun ("set_sininplace_backend" %set-sininplace-backend) :void
   (backend-name :string))     
 
+(cffi:defcfun ("set_acos_backend" %set-acos-backend) :void
+  (backend-name :string))   
+  
+(cffi:defcfun ("set_acosinplace_backend" %set-acosinplace-backend) :void
+  (backend-name :string))     
+
+(cffi:defcfun ("set_asin_backend" %set-asin-backend) :void
+  (backend-name :string))   
+  
+(cffi:defcfun ("set_asininplace_backend" %set-asininplace-backend) :void
+  (backend-name :string))
 
 (cffi:defcfun ("set_mse_backend" %set-mse-backend) :void
   (backend-name :string))   
@@ -1794,6 +1805,10 @@
 (cffi:defcfun ("get_cos_backend" %get-cos-backend) :string)
 (cffi:defcfun ("get_sininplace_backend" %get-sininplace-backend) :string)
 (cffi:defcfun ("get_sin_backend" %get-sin-backend) :string)
+(cffi:defcfun ("get_acosinplace_backend" %get-acosinplace-backend) :string)
+(cffi:defcfun ("get_acos_backend" %get-acos-backend) :string)
+(cffi:defcfun ("get_asininplace_backend" %get-asininplace-backend) :string)
+(cffi:defcfun ("get_asin_backend" %get-asin-backend) :string)
 (cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
@@ -1934,6 +1949,14 @@
 (cffi:defcfun ("get_cosinplace_num_backends" %get-cosinplace-num-backends) :int)
 (cffi:defcfun ("get_cos_backends" %get-cos-backends) :pointer)
 (cffi:defcfun ("get_cos_num_backends" %get-cos-num-backends) :int)
+(cffi:defcfun ("get_asininplace_backends" %get-asininplace-backends) :pointer)
+(cffi:defcfun ("get_asininplace_num_backends" %get-asininplace-num-backends) :int)
+(cffi:defcfun ("get_asin_backends" %get-asin-backends) :pointer)
+(cffi:defcfun ("get_asin_num_backends" %get-asin-num-backends) :int)
+(cffi:defcfun ("get_acosinplace_backends" %get-acosinplace-backends) :pointer)
+(cffi:defcfun ("get_acosinplace_num_backends" %get-acosinplace-num-backends) :int)
+(cffi:defcfun ("get_acos_backends" %get-acos-backends) :pointer)
+(cffi:defcfun ("get_acos_num_backends" %get-acos-num-backends) :int)
 (cffi:defcfun ("get_mse_backends" %get-mse-backends) :pointer)
 (cffi:defcfun ("get_mse_num_backends" %get-mse-num-backends) :int)
 

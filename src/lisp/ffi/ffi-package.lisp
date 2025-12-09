@@ -624,5 +624,21 @@
    #:%nn-forward
    #:%create-nn-sigmoid
    #:%create-nn-tanh
-   #:%create-leaky-relu-tanh))
+   #:%create-leaky-relu-tanh
+   #:%set-asin-backend
+   #:%set-asininplace-backend
+   #:%set-acos-backend
+   #:%set-acosinplace-backend
+   #:%get-acosinplace-backend
+   #:%get-acos-backend
+   #:%get-asininplace-backend
+   #:%get-asin-backend
+   #:%get-acosinplace-backends
+   #:%get-acosinplace-num-backends
+   #:%get-acos-backends
+   #:%get-acos-num-backends
+   #:%get-asininplace-backends
+   #:%get-asininplace-num-backends
+   #:%get-asin-backends
+   #:%get-asin-num-backends))
    
