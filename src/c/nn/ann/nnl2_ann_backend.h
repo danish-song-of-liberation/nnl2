@@ -21,6 +21,7 @@
 typedef enum {
     nnl2_nn_type_fnn,           ///< Fully Connected Neural Network 
 	nnl2_nn_type_sequential,    ///< Sequential neural network (layers in sequence)
+	nnl2_nn_type_sigmoid,		///< Autologous
     nnl2_nn_type_unknown        ///< Unknown or unsupported network type 
 } nnl2_nn_type;
 

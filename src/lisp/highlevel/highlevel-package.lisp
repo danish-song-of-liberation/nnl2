@@ -26,7 +26,8 @@
    #:nnlet*
    #:parameters
    #:*nn-default-init-type*
-   #:sequential))
+   #:sequential
+   #:.sigmoid))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

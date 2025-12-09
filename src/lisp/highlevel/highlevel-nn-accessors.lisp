@@ -137,4 +137,6 @@
 	  
 	(nnl2.ffi:%create-nn-sequential len layers-pntr)))
   
+(defun .sigmoid (&key (approx t))
+  (nnl2.ffi:%create-nn-sigmoid approx))
   

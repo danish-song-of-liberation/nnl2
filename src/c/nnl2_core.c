@@ -694,7 +694,7 @@ Tensor* lisp_call_add_broadcasting(Tensor* summand, Tensor* sumend) {
 	return add_broadcasting(summand, sumend);  
 }    
   
-void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
+void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {   
 	return sub_broadcasting_inplace(summand, sumend);
 } 
  
@@ -702,25 +702,25 @@ Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
 	return sub_broadcasting(minuend, subtrahend); 
 }
 
-void lisp_call_mul_broadcasting_inplace(Tensor* multiplicand, Tensor* multiplier) {
-	return mul_broadcasting_inplace(multiplicand, multiplier);
+void lisp_call_mul_broadcasting_inplace(Tensor* multiplicand, Tensor* multiplier) { 
+	return mul_broadcasting_inplace(multiplicand, multiplier);    
 }
 
 Tensor* lisp_call_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) { 
 	return mul_broadcasting(multiplicand, multiplier);
 }
-
+ 
 void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
 	return div_broadcasting_inplace(dividend, divisor);  
 }
 
 Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
 	return div_broadcasting(dividend, divisor);     
-}          	
+}          	 
 
 void lisp_call_pow_broadcasting_inplace(Tensor* base, Tensor* exponent) {
 	return pow_broadcasting_inplace(base, exponent);
-}      
+}        
                
 Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) { 
 	return pow_broadcasting(base, exponent);
@@ -728,7 +728,7 @@ Tensor* lisp_call_pow_broadcasting(Tensor* base, Tensor* exponent) {
 	               
 void lisp_call_max_broadcasting_inplace(Tensor* a, Tensor* b) {     
 	return max_broadcasting_inplace(a, b);          
-}       
+}        
 
 void lisp_call_min_broadcasting_inplace(Tensor* a, Tensor* b) { 
 	return min_broadcasting_inplace(a, b);       

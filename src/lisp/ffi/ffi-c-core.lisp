@@ -1361,6 +1361,9 @@
   (:kaiming/uniform  7)   ;; Kaiming (He) initialization using a uniform distribution
   (:unknown  9))	;; Undefined or unsupported initialization type
 
+(cffi:defcfun ("nnl2_nn_sigmoid_create" %create-nn-sigmoid) :pointer
+  (approx :bool))
+
 (cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
   (in-features :int)
   (out-features :int)

@@ -263,7 +263,7 @@ nnl2_ad_tensor** nnl2_nn_sequential_get_parameters(nnl2_nn_sequential* seq) {
             params[param_index++] = layer_params[i];
         }
 
-        free(layer_params);
+		if(layer_params) free(layer_params);
     }
 		
 	if(param_index != total_params) {
