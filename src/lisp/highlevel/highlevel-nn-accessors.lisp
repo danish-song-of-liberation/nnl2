@@ -140,3 +140,6 @@
 (defun .sigmoid (&key (approx t))
   (nnl2.ffi:%create-nn-sigmoid approx))
   
+(defun .tanh (&key (approx t))
+  (nnl2.ffi:%create-nn-tanh approx))  
+  

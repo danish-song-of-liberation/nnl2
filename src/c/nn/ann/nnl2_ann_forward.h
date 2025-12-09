@@ -12,10 +12,12 @@
 // Forward declarations
 typedef struct nnl2_nn_fnn_struct nnl2_nn_fnn;
 typedef struct nnl2_nn_sigmoid_struct nnl2_nn_sigmoid;
+typedef struct nnl2_nn_tanh_struct nnl2_nn_tanh;
 typedef struct nnl2_nn_sequential_struct nnl2_nn_sequential;
 
 nnl2_ad_tensor* nnl2_nn_fnn_forward(nnl2_nn_fnn* nn, nnl2_ad_tensor* x);
 nnl2_ad_tensor* nnl2_nn_sigmoid_forward(nnl2_nn_sigmoid* nn, nnl2_ad_tensor* x);
+nnl2_ad_tensor* nnl2_nn_tanh_forward(nnl2_nn_tanh* nn, nnl2_ad_tensor* x);
 nnl2_ad_tensor* nnl2_nn_sequential_forward(nnl2_nn_sequential* seq, nnl2_ad_tensor* x);
 
 /** @brief 
@@ -70,10 +72,20 @@ nnl2_ad_tensor* nnl2_ann_forward(void* model, void** args) {
 			nnl2_ad_tensor* input = (nnl2_ad_tensor*)args[0];
 			
 			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-                NNL2_DEBUG("Dispatching forward to FNN layer");
+                NNL2_DEBUG("Dispatching forward to sigmoid layer");
             #endif
 			
 			return nnl2_nn_sigmoid_forward((nnl2_nn_sigmoid*)model, input);
+		}
+		
+		case nnl2_nn_type_tanh: {
+			nnl2_ad_tensor* input = (nnl2_ad_tensor*)args[0];
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                NNL2_DEBUG("Dispatching forward to tanh layer");
+            #endif
+			
+			return nnl2_nn_tanh_forward((nnl2_nn_tanh*)model, input);
 		}
 		
 		case nnl2_nn_type_sequential: {

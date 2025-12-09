@@ -1364,6 +1364,9 @@
 (cffi:defcfun ("nnl2_nn_sigmoid_create" %create-nn-sigmoid) :pointer
   (approx :bool))
 
+(cffi:defcfun ("nnl2_nn_tanh_create" %create-nn-tanh) :pointer
+  (approx :bool))
+
 (cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
   (in-features :int)
   (out-features :int)

@@ -622,5 +622,6 @@
    #:%ad-.cos!
    #:%create-nn-sequential
    #:%nn-forward
-   #:%create-nn-sigmoid))
+   #:%create-nn-sigmoid
+   #:%create-nn-tanh))
    

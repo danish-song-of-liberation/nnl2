@@ -712,7 +712,7 @@ Tensor* lisp_call_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) {
  
 void lisp_call_div_broadcasting_inplace(Tensor* dividend, Tensor* divisor) {
 	return div_broadcasting_inplace(dividend, divisor);  
-}
+}  
 
 Tensor* lisp_call_div_broadcasting(Tensor* dividend, Tensor* divisor) { 
 	return div_broadcasting(dividend, divisor);     
