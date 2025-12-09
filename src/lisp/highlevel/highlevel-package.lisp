@@ -28,7 +28,8 @@
    #:*nn-default-init-type*
    #:sequential
    #:.sigmoid
-   #:.tanh))
+   #:.tanh
+   #:.relu))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

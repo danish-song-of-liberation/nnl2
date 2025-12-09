@@ -75,6 +75,16 @@ size_t nnl2_ann_num_parameters(void* nn) {
             return num_params;	
         }
 		
+		case nnl2_nn_type_relu: {
+            size_t num_params = nnl2_nn_relu_get_num_parameters(nn);
+            
+            #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                NNL2_FUNC_EXIT();
+            #endif
+            
+            return num_params;	
+        }
+		
 		case nnl2_nn_type_sequential: {
             size_t num_params = nnl2_nn_sequential_get_num_parameters(nn);
             

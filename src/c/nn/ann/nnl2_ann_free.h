@@ -56,6 +56,11 @@ void nnl2_ann_free(void* nn) {
 			break;
 		}
 		
+		case nnl2_nn_type_relu: {
+			nnl2_nn_relu_free(nn);
+			break;
+		}
+		
 		case nnl2_nn_type_sequential: {
 			nnl2_nn_sequential_free(nn);
 			break;

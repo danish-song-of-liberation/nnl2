@@ -141,5 +141,6 @@
   (nnl2.ffi:%create-nn-sigmoid approx))
   
 (defun .tanh (&key (approx t))
-  (nnl2.ffi:%create-nn-tanh approx))  
-  
+  (nnl2.ffi:%create-nn-tanh approx)) 
+
+(cffi:defcfun ("nnl2_nn_relu_create" .relu) :pointer)
