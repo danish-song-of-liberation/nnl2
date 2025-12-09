@@ -623,5 +623,6 @@
    #:%create-nn-sequential
    #:%nn-forward
    #:%create-nn-sigmoid
-   #:%create-nn-tanh))
+   #:%create-nn-tanh
+   #:%create-leaky-relu-tanh))
    

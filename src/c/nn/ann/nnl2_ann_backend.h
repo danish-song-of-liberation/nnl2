@@ -24,6 +24,7 @@ typedef enum {
 	nnl2_nn_type_sigmoid,		///< Sigmoid layer
 	nnl2_nn_type_tanh,			///< Tanh layer
 	nnl2_nn_type_relu,			///< ReLU layer
+	nnl2_nn_type_leaky_relu,	///< Leaky-ReLU layer
     nnl2_nn_type_unknown        ///< Unknown or unsupported network type 
 } nnl2_nn_type;
 

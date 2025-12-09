@@ -698,13 +698,13 @@ void lisp_call_sub_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
 	return sub_broadcasting_inplace(summand, sumend);
 } 
  
-Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {  
+Tensor* lisp_call_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {   
 	return sub_broadcasting(minuend, subtrahend); 
 }
 
 void lisp_call_mul_broadcasting_inplace(Tensor* multiplicand, Tensor* multiplier) { 
 	return mul_broadcasting_inplace(multiplicand, multiplier);    
-}
+}  
 
 Tensor* lisp_call_mul_broadcasting(Tensor* multiplicand, Tensor* multiplier) { 
 	return mul_broadcasting(multiplicand, multiplier);

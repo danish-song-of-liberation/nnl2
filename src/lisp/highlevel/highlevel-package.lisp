@@ -29,7 +29,8 @@
    #:sequential
    #:.sigmoid
    #:.tanh
-   #:.relu))
+   #:.relu
+   #:.leaky-relu))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

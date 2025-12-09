@@ -144,3 +144,7 @@
   (nnl2.ffi:%create-nn-tanh approx)) 
 
 (cffi:defcfun ("nnl2_nn_relu_create" .relu) :pointer)
+
+(defun .leaky-relu (&key (alpha nnl2.system:*leaky-relu-default-shift*))
+  (nnl2.ffi:%create-nn-tanh alpha)) 
+  

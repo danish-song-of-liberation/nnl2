@@ -7,6 +7,7 @@
 #include "../nn/ann/activations/nnl2_nn_sigmoid.h"
 #include "../nn/ann/activations/nnl2_nn_tanh.h"
 #include "../nn/ann/activations/nnl2_nn_relu.h"
+#include "../nn/ann/activations/nnl2_nn_leaky_relu.h"
 #include "../nn/other/nnl2_nn_sequential.h"
 #include "../nn/ann/nnl2_ann_free.h"
 #include "../nn/ann/nnl2_ann_num_parameters.h"
