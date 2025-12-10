@@ -55,17 +55,6 @@ void nnl2_naive_cos_inplace(nnl2_tensor* tensor) {
             break;
 		}
 		
-		case INT32: {
-            nnl2_int32* tensor_data = (nnl2_int32*)tensor->data;
-                
-            // Element-wise cos
-            for(size_t i = 0; i < numel; i++) {
-                tensor_data[i] = (nnl2_int32)cos((double)tensor_data[i]);
-            }
-			
-            break;
-		}
-		
 		default: {
             NNL2_TYPE_ERROR(tensor->dtype);
             return;

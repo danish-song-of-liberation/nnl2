@@ -640,5 +640,9 @@
    #:%get-asininplace-backends
    #:%get-asininplace-num-backends
    #:%get-asin-backends
-   #:%get-asin-num-backends))
+   #:%get-asin-num-backends
+   #:%ad-.asin!
+   #:%ad-.acos!
+   #:%ad-.asin
+   #:%ad-.acos))
    

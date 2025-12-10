@@ -810,12 +810,30 @@
   (ad-pointer :pointer)
   (mode ad-mode)
   (track-grad :bool))   
+
+(cffi:defcfun ("nnl2_ad_asin" %ad-.asin) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode)
+  (track-grad :bool))     
+
+(cffi:defcfun ("nnl2_ad_acos" %ad-.acos) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode)
+  (track-grad :bool))   
   
 (cffi:defcfun ("nnl2_ad_sin_inplace" %ad-.sin!) :pointer
   (ad-pointer :pointer)
   (track-grad :bool))    
 
 (cffi:defcfun ("nnl2_ad_cos_inplace" %ad-.cos!) :pointer
+  (ad-pointer :pointer)
+  (track-grad :bool))   
+
+(cffi:defcfun ("nnl2_ad_asin_inplace" %ad-.asin!) :pointer
+  (ad-pointer :pointer)
+  (track-grad :bool))    
+
+(cffi:defcfun ("nnl2_ad_acos_inplace" %ad-.acos!) :pointer
   (ad-pointer :pointer)
   (track-grad :bool))   
   

@@ -34,8 +34,19 @@ nnl2_tensor* nnl2_naive_acos(const nnl2_tensor* tensor) {
 
     size_t total_elems = product(tensor->shape, tensor->rank);
 
-    // Allocate new tensor of the same shape and dtype
-    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor_type result_dtype = tensor->dtype;
+
+    if (tensor->dtype == INT32) {
+        result_dtype = FLOAT64;
+    }
+
+    // Allocate new tensor of the same shape, but possibly different dtype
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, result_dtype);
+    if (!result) {
+        NNL2_ERROR("Failed to allocate result tensor in nnl2_naive_acos");
+        return NULL;
+    }
+    
     if (total_elems == 0) return result;
 
     void* data_in  = tensor->data;
@@ -58,8 +69,13 @@ nnl2_tensor* nnl2_naive_acos(const nnl2_tensor* tensor) {
 
         case INT32: {
             nnl2_int32* src = (nnl2_int32*)data_in;
-            nnl2_int32* dst = (nnl2_int32*)data_out;
-            for (size_t i = 0; i < total_elems; i++) dst[i] = (nnl2_int32)acos((double)src[i]);
+            nnl2_float64* dst = (nnl2_float64*)data_out;
+			
+            for (size_t i = 0; i < total_elems; i++) {
+                double value = (double)src[i];
+                dst[i] = acos(value);
+            }
+			
             break;
         }
 

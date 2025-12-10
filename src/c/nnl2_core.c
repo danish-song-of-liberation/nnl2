@@ -838,10 +838,10 @@ nnl2_tensor* lisp_call_kaiming(int* shape, int rank, nnl2_tensor_type dtype, int
 void lisp_call_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
     kaiming_inplace(tensor, fan_in, fan_out, gain, distribution, mode);
 }
-
-nnl2_tensor* lisp_call_sin(const nnl2_tensor* tensor) {
-    return nnl2_sin(tensor);
-}
+   
+nnl2_tensor* lisp_call_sin(const nnl2_tensor* tensor) { 
+    return nnl2_sin(tensor); 
+}  
  
 void lisp_call_sin_inplace(nnl2_tensor* tensor) {
     nnl2_sininplace(tensor);

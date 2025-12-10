@@ -141,7 +141,9 @@
    #:kaiming
    #:kaiming-like
    #:.sin!
-   #:.cos!))
+   #:.cos!
+   #:.asin!
+   #:.acos!))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -179,7 +181,9 @@
    #:view
    #:tref
    #:.sin
-   #:.cos))   
+   #:.cos
+   #:.asin
+   #:.acos))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
