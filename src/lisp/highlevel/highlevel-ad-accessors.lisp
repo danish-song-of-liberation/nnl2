@@ -996,8 +996,16 @@
   (nnl2.ffi:%ad-.acos! tensor track-graph))
   
 (defun .asin! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
-  "In-place elementwise ad .sin"
+  "In-place elementwise ad .asin"
   (nnl2.ffi:%ad-.asin! tensor track-graph))
+  
+(defun .atan! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "In-place elementwise ad .atan"
+  (nnl2.ffi:%ad-.atan! tensor track-graph))
+  
+(defun .tan! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "In-place elementwise ad .tan"
+  (nnl2.ffi:%ad-.tan! tensor track-graph))  
   
 (defun copy (tensor &key (dtype (dtype tensor)))
   "Returns a copy of the tensor, optionally casting to a different dtype"
@@ -1188,6 +1196,10 @@
   "Returns a new tensor with elementwise cos"
   (nnl2.ffi:%ad-.cos ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
 
+(defun .tan (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with elementwise tan"
+  (nnl2.ffi:%ad-.cos ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
+  
 (defun .asin (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Returns a new tensor with elementwise arcsine"
   (nnl2.ffi:%ad-.asin ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
@@ -1195,6 +1207,10 @@
 (defun .acos (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Returns a new tensor with elementwise arccos"
   (nnl2.ffi:%ad-.acos ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
+
+(defun .atan (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with elementwise arctan"
+  (nnl2.ffi:%ad-.atan ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun transposition (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Returns a transposed view of the tensor (O(1))"

@@ -1165,6 +1165,33 @@ typedef nnl2_tensor* (*asinfn)(const nnl2_tensor* tensor);
  */
 typedef nnl2_tensor* (*acosfn)(const nnl2_tensor* tensor);
 
+/** @brief In-place tangent operation on a tensor
+ ** @param tensor Pointer to the tensor to apply tangent to
+ ** @see nnl2_tensor
+ */
+typedef void (*taninplacefn)(nnl2_tensor* tensor);
+
+/** @brief In-place arctangent operation on a tensor
+ ** @param tensor Pointer to the tensor to apply arctangent to
+ ** @see nnl2_tensor
+ */
+typedef void (*ataninplacefn)(nnl2_tensor* tensor);
+
+/** @brief Out-of-place tangent operation on a tensor
+ ** @param tensor Pointer to the input tensor
+ ** @return New tensor with tangent values
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor* (*tanfn)(const nnl2_tensor* tensor);
+
+/** @brief Out-of-place arctangent operation on a tensor
+ ** @param tensor Pointer to the input tensor
+ ** @return New tensor with arctangent values (in radians)
+ ** @note Returns values in the range [-π/2, π/2]
+ ** @see nnl2_tensor
+ */
+typedef nnl2_tensor* (*atanfn)(const nnl2_tensor* tensor);
+
 /// @} [typedef]
 
 

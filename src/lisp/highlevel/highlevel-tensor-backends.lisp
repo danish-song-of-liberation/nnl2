@@ -290,6 +290,18 @@
 (define-backend-setter use-backend/.acos
   nnl2.ffi:%set-acos-backend)
   
+(define-backend-setter use-backend/.tan!
+  nnl2.ffi:%set-taninplace-backend)  
+
+(define-backend-setter use-backend/.tan
+  nnl2.ffi:%set-tan-backend)
+
+(define-backend-setter use-backend/.atan!
+  nnl2.ffi:%set-ataninplace-backend)  
+
+(define-backend-setter use-backend/.atan
+  nnl2.ffi:%set-atan-backend)  
+  
 (define-backend-setter use-backend/mse
   nnl2.ffi:%set-mse-backend)  
   
@@ -325,7 +337,8 @@
 							  use-backend/kaiming use-backend/kaiming! use-backend/.sin
 							  use-backend/.sin! use-backend/.cos use-backend/.cos!
 							  use-backend/.asin use-backend/.asin! use-backend/.acos 
-							  use-backend/.acos!))
+							  use-backend/.acos! use-backend/.tan! use-backend/.tan
+							  use-backend/.atan! use-backend/.atan))
 							  
       (funcall backend-function name)))
 	  
@@ -434,6 +447,10 @@
 (define-backend-getter-setter get-backend/.asin! use-backend/.asin! nnl2.ffi:%get-asininplace-backend)
 (define-backend-getter-setter get-backend/.acos use-backend/.acos nnl2.ffi:%get-acos-backend)
 (define-backend-getter-setter get-backend/.asin use-backend/.asin nnl2.ffi:%get-asin-backend)	
+(define-backend-getter-setter get-backend/.atan! use-backend/.atan! nnl2.ffi:%get-ataninplace-backend)
+(define-backend-getter-setter get-backend/.tan! use-backend/.tan! nnl2.ffi:%get-taninplace-backend)
+(define-backend-getter-setter get-backend/.atan use-backend/.atan nnl2.ffi:%get-atan-backend)
+(define-backend-getter-setter get-backend/.tan use-backend/.tan nnl2.ffi:%get-tan-backend)
 (define-backend-getter-setter get-backend/mse use-backend/mse nnl2.ffi:%get-mse-backend)
 
 (defun get-backend/norm (&key (p :l2))
@@ -774,6 +791,22 @@
   nnl2.ffi:%get-asin-num-backends
   nnl2.ffi:%get-asin-backends)  
   
+(define-backends-getter get-backends/.atan!
+  nnl2.ffi:%get-ataninplace-num-backends
+  nnl2.ffi:%get-ataninplace-backends) 
+  
+(define-backends-getter get-backends/.atan
+  nnl2.ffi:%get-atan-num-backends
+  nnl2.ffi:%get-atan-backends)
+
+(define-backends-getter get-backends/.tan!
+  nnl2.ffi:%get-taninplace-num-backends
+  nnl2.ffi:%get-taninplace-backends) 
+  
+(define-backends-getter get-backends/.tan
+  nnl2.ffi:%get-tan-num-backends
+  nnl2.ffi:%get-tan-backends)    
+  
 (define-backends-getter get-backends/mse
   nnl2.ffi:%get-mse-num-backends
   nnl2.ffi:%get-mse-backends)   
@@ -881,5 +914,9 @@
 (define-with-backend with-backend/.acos get-backend/.acos)
 (define-with-backend with-backend/.asin! get-backend/.asin!)
 (define-with-backend with-backend/.asin get-backend/.asin)
+(define-with-backend with-backend/.atan! get-backend/.atan!)
+(define-with-backend with-backend/.atan get-backend/.atan)
+(define-with-backend with-backend/.tan! get-backend/.tan!)
+(define-with-backend with-backend/.tan get-backend/.tan)
 (define-with-backend with-backend/mse get-backend/mse)
 		 

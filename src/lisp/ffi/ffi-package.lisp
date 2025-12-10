@@ -644,5 +644,25 @@
    #:%ad-.asin!
    #:%ad-.acos!
    #:%ad-.asin
-   #:%ad-.acos))
+   #:%ad-.acos
+   #:%set-tan-backend
+   #:%set-taninplace-backend
+   #:%set-atan-backend
+   #:%set-ataninplace-backend
+   #:%get-taninplace-backend
+   #:%get-tan-backend
+   #:%get-ataninplace-backend
+   #:%get-atan-backend
+   #:%get-taninplace-backends
+   #:%get-taninplace-num-backends
+   #:%get-tan-backends
+   #:%get-tan-num-backends
+   #:%get-ataninplace-backends
+   #:%get-ataninplace-num-backends
+   #:%get-atan-backends
+   #:%get-atan-num-backends
+   #:%ad-.tan!
+   #:%ad-.atan!
+   #:%ad-.tan
+   #:%ad-.atan))
    

@@ -143,7 +143,9 @@
    #:.sin!
    #:.cos!
    #:.asin!
-   #:.acos!))
+   #:.acos!
+   #:.atan!
+   #:.tan!))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -183,7 +185,9 @@
    #:.sin
    #:.cos
    #:.asin
-   #:.acos))   
+   #:.acos
+   #:.atan
+   #:.tan))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
@@ -674,5 +678,25 @@
    #:with-backend/.acos!
    #:with-backend/.acos
    #:with-backend/.asin!
-   #:with-backend/.asin))
+   #:with-backend/.asin
+   #:.atan!
+   #:.tan!
+   #:.atan
+   #:.tan
+   #:use-backend/.tan!
+   #:use-backend/.tan
+   #:use-backend/.atan!
+   #:use-backend/.atan
+   #:get-backend/.tan!
+   #:get-backend/.tan
+   #:get-backend/.atan!
+   #:get-backend/.atan
+   #:get-backends/.atan!
+   #:get-backends/.atan
+   #:get-backends/.tan!
+   #:get-backends/.tan
+   #:with-backend/.atan!
+   #:with-backend/.atan
+   #:with-backend/.tan!
+   #:with-backend/.tan))
    

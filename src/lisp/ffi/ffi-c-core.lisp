@@ -821,6 +821,16 @@
   (mode ad-mode)
   (track-grad :bool))   
   
+(cffi:defcfun ("nnl2_ad_atan" %ad-.atan) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode)
+  (track-grad :bool))     
+
+(cffi:defcfun ("nnl2_ad_tan" %ad-.tan) :pointer
+  (ad-pointer :pointer)
+  (mode ad-mode)
+  (track-grad :bool)) 
+  
 (cffi:defcfun ("nnl2_ad_sin_inplace" %ad-.sin!) :pointer
   (ad-pointer :pointer)
   (track-grad :bool))    
@@ -836,6 +846,14 @@
 (cffi:defcfun ("nnl2_ad_acos_inplace" %ad-.acos!) :pointer
   (ad-pointer :pointer)
   (track-grad :bool))   
+  
+(cffi:defcfun ("nnl2_ad_tan_inplace" %ad-.tan!) :pointer
+  (ad-pointer :pointer)
+  (track-grad :bool))    
+
+(cffi:defcfun ("nnl2_ad_atan_inplace" %ad-.atan!) :pointer
+  (ad-pointer :pointer)
+  (track-grad :bool))     
   
 (cffi:defcfun ("nnl2_ad_inplace_abs" %ad-.abs!) :void
   (ad-pointer :pointer)
@@ -1750,6 +1768,18 @@
   
 (cffi:defcfun ("set_asininplace_backend" %set-asininplace-backend) :void
   (backend-name :string))
+  
+(cffi:defcfun ("set_tan_backend" %set-tan-backend) :void
+  (backend-name :string))   
+  
+(cffi:defcfun ("set_taninplace_backend" %set-taninplace-backend) :void
+  (backend-name :string))     
+
+(cffi:defcfun ("set_atan_backend" %set-atan-backend) :void
+  (backend-name :string))   
+  
+(cffi:defcfun ("set_ataninplace_backend" %set-ataninplace-backend) :void
+  (backend-name :string))  
 
 (cffi:defcfun ("set_mse_backend" %set-mse-backend) :void
   (backend-name :string))   
@@ -1827,6 +1857,10 @@
 (cffi:defcfun ("get_acos_backend" %get-acos-backend) :string)
 (cffi:defcfun ("get_asininplace_backend" %get-asininplace-backend) :string)
 (cffi:defcfun ("get_asin_backend" %get-asin-backend) :string)
+(cffi:defcfun ("get_taninplace_backend" %get-taninplace-backend) :string)
+(cffi:defcfun ("get_tan_backend" %get-tan-backend) :string)
+(cffi:defcfun ("get_ataninplace_backend" %get-ataninplace-backend) :string)
+(cffi:defcfun ("get_atan_backend" %get-atan-backend) :string)
 (cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
@@ -1975,6 +2009,14 @@
 (cffi:defcfun ("get_acosinplace_num_backends" %get-acosinplace-num-backends) :int)
 (cffi:defcfun ("get_acos_backends" %get-acos-backends) :pointer)
 (cffi:defcfun ("get_acos_num_backends" %get-acos-num-backends) :int)
+(cffi:defcfun ("get_taninplace_backends" %get-taninplace-backends) :pointer)
+(cffi:defcfun ("get_taninplace_num_backends" %get-taninplace-num-backends) :int)
+(cffi:defcfun ("get_tan_backends" %get-tan-backends) :pointer)
+(cffi:defcfun ("get_tan_num_backends" %get-tan-num-backends) :int)
+(cffi:defcfun ("get_ataninplace_backends" %get-ataninplace-backends) :pointer)
+(cffi:defcfun ("get_ataninplace_num_backends" %get-ataninplace-num-backends) :int)
+(cffi:defcfun ("get_atan_backends" %get-atan-backends) :pointer)
+(cffi:defcfun ("get_atan_num_backends" %get-atan-num-backends) :int)
 (cffi:defcfun ("get_mse_backends" %get-mse-backends) :pointer)
 (cffi:defcfun ("get_mse_num_backends" %get-mse-num-backends) :int)
 

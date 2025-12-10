@@ -280,8 +280,10 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt));
 	EINIT_BACKEND(nnl2_sin, sin_backends, current_backend(sin));
 	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));
+	EINIT_BACKEND(nnl2_tan, tan_backends, current_backend(tan));           
 	EINIT_BACKEND(nnl2_asin, asin_backends, current_backend(asin)); 
 	EINIT_BACKEND(nnl2_acos, acos_backends, current_backend(acos)); 
+	EINIT_BACKEND(nnl2_atan, atan_backends, current_backend(atan));     
 }
                
 void nnl2_init_standard_inplace() {               
@@ -304,9 +306,11 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(nnl2_sqrtinplace, sqrtinplace_backends, current_backend(sqrtinplace));
 	EINIT_BACKEND(nnl2_sininplace, sininplace_backends, current_backend(sininplace));
 	EINIT_BACKEND(nnl2_cosinplace, cosinplace_backends, current_backend(cosinplace));
+	EINIT_BACKEND(nnl2_taninplace, taninplace_backends, current_backend(taninplace));  
 	EINIT_BACKEND(nnl2_asininplace, asininplace_backends, current_backend(asininplace));  
 	EINIT_BACKEND(nnl2_acosinplace, acosinplace_backends, current_backend(acosinplace)); 
-}                
+	EINIT_BACKEND(nnl2_ataninplace, ataninplace_backends, current_backend(ataninplace)); 
+}               
                                
 void nnl2_init_stack() {
 	EINIT_BACKEND(hstack, hstack_backends, current_backend(hstack));        
@@ -804,7 +808,7 @@ nnl2_tensor* lisp_call_neg(nnl2_tensor* tensor) {
 
 void lisp_call_axpy_inplace_regional(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to) {
 	nnl2_naive_axpy_inplace_region(summand, sumend, alpha, from, to);
-}        
+}         
     
 int32_t nnl2_strides_at(nnl2_tensor* tensor, int index) {   
 	return tensor -> strides       
@@ -869,6 +873,22 @@ nnl2_tensor* lisp_call_acos(const nnl2_tensor* tensor) {
 
 void lisp_call_acos_inplace(nnl2_tensor* tensor) {
     nnl2_acosinplace(tensor);
+}
+
+nnl2_tensor* lisp_call_tan(const nnl2_tensor* tensor) {
+    return nnl2_tan(tensor);
+}
+
+void lisp_call_tan_inplace(nnl2_tensor* tensor) {
+    nnl2_taninplace(tensor);
+}
+
+nnl2_tensor* lisp_call_atan(const nnl2_tensor* tensor) {
+    return nnl2_atan(tensor);
+}
+
+void lisp_call_atan_inplace(nnl2_tensor* tensor) {
+    nnl2_ataninplace(tensor);
 }
 
 ///@} [lisp_wrappers]                
