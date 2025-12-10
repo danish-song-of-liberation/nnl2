@@ -30,7 +30,8 @@
    #:.sigmoid
    #:.tanh
    #:.relu
-   #:.leaky-relu))
+   #:.leaky-relu
+   #:print-model))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

@@ -624,7 +624,7 @@
    #:%nn-forward
    #:%create-nn-sigmoid
    #:%create-nn-tanh
-   #:%create-leaky-relu-tanh
+   #:%create-nn-leaky-relu
    #:%set-asin-backend
    #:%set-asininplace-backend
    #:%set-acos-backend
@@ -664,5 +664,6 @@
    #:%ad-.tan!
    #:%ad-.atan!
    #:%ad-.tan
-   #:%ad-.atan))
+   #:%ad-.atan
+   #:%print-model))
    

@@ -188,4 +188,22 @@ nnl2_ad_tensor* nnl2_nn_sigmoid_forward(nnl2_nn_sigmoid* nn, nnl2_ad_tensor* x) 
     return forward_pass;
 }
 
+/** @brief 
+ * Print sigmoid activation layer information
+ *
+ ** @param nn 
+ * Pointer to the sigmoid layer structure
+ *
+ ** @param terpri 
+ * If true, print a newline after the output. Needs for sequential
+ */
+void nnl2_nn_sigmoid_print(nnl2_nn_sigmoid* nn, bool terpri) {
+    if(!nn) {
+        printf("(.sigmoid NULL)%s", terpri ? "\n" : "");
+        return;
+    }
+    
+    printf("(.sigmoid :approx %s)%s", nn->approx ? "t" : "nil", terpri ? "\n" : "");
+}
+
 #endif /** NNL2_NN_SIGMOID_H **/

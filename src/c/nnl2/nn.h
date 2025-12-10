@@ -13,3 +13,4 @@
 #include "../nn/ann/nnl2_ann_num_parameters.h"
 #include "../nn/ann/nnl2_ann_parameters.h"
 #include "../nn/ann/nnl2_ann_parameters_free.h"
+#include "../nn/ann/nnl2_ann_print.h"

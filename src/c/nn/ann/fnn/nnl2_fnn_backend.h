@@ -256,4 +256,48 @@ size_t nnl2_nn_fnn_get_num_parameters(nnl2_nn_fnn* nn) {
 	return num_parameters;
 }
 
+/** @brief 
+ * Get the number of input features for a fully-connected layer
+ *
+ ** @param nn 
+ * Pointer to the fully-connected layer structure
+ *
+ ** @return int
+ * Number of input features (first dimension of weight matrix)
+ */
+int nnl2_nn_fnn_get_in_features(nnl2_nn_fnn* nn) {
+	return nn -> weights -> data -> shape[0];
+}
+
+/** @brief 
+ * Get the number of output features for a fully-connected layer
+ *
+ ** @param nn 
+ * Pointer to the fully-connected layer structure
+ *
+ ** @return int 
+ * Number of output features (second dimension of weight matrix)
+ */
+int nnl2_nn_fnn_get_out_features(nnl2_nn_fnn* nn) {
+	return nn -> weights -> data -> shape[1];
+}
+
+/** @brief 
+ * Print fully-connected layer information
+ *
+ ** @param nn 
+ * Pointer to the fully-connected layer structure
+ *
+ ** @param terpri 
+ * If true, print a newline after the output
+ */
+void nnl2_nn_fnn_print(nnl2_nn_fnn* nn, bool terpri) {
+	if(!nn) {
+        printf("(fnn NULL)%s", terpri ? "\n" : "");
+        return;
+    }
+	
+	printf("(fnn %d -> %d :bias %s)%s", nnl2_nn_fnn_get_in_features(nn), nnl2_nn_fnn_get_out_features(nn), nn -> metadata.use_bias ? "t" : "nil", terpri ? "\n" : "");
+}
+
 #endif /** NNL2_FNN_BACKEND_H **/

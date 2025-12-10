@@ -188,4 +188,21 @@ nnl2_ad_tensor* nnl2_nn_tanh_forward(nnl2_nn_tanh* nn, nnl2_ad_tensor* x) {
     return forward_pass;
 }
 
+/** @brief 
+ * Print hyperbolic tangent activation layer information
+ *
+ ** @param nn 
+ * Pointer to the tanh layer structure
+ ** @param terpri 
+ * If true, print a newline after the output. Needs for sequential
+ */
+void nnl2_nn_tanh_print(nnl2_nn_tanh* nn, bool terpri) {
+    if (!nn) {
+        printf("(.tanh NULL)%s", terpri ? "\n" : "");
+        return;
+    }
+    
+    printf("(.tanh :approx %s)%s", nn->approx ? "t" : "nil", terpri ? "\n" : "");
+}
+
 #endif /** NNL2_NN_TANH_H **/

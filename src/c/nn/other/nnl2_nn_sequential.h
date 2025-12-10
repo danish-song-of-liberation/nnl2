@@ -269,4 +269,45 @@ nnl2_ad_tensor** nnl2_nn_sequential_get_parameters(nnl2_nn_sequential* seq) {
 	return params;
 }
 
+/** @brief Prints an ANN model of any supported type **/
+void nnl2_ann_print(void* nn, bool terpri, int depth);
+
+/** @brief 
+ * Print sequential neural network in a formatted tree structure
+ *
+ ** @param nn 
+ * Pointer to sequential network structure
+ *
+ ** @param depth 
+ * Indentation depth for pretty printing
+ */
+void nnl2_nn_sequential_print(nnl2_nn_sequential* nn, int depth) {
+    if(!nn) {
+        printf("(sequential NULL)\n");
+        return;
+    }
+    
+    if(depth < 0) depth = 0;
+    
+    printf("(sequential\n");
+    
+    size_t last_idx = nn->num_layers - 1;
+    
+    for(size_t layer_idx = 0; layer_idx < nn->num_layers; layer_idx++) {
+        // Indentation
+        for(int i = 0; i < depth; i++) 
+            printf("  ");
+        
+        // Layer index
+        printf("%zu=", layer_idx);
+        
+        // Print layer (add newline for all but last)
+        bool add_newline = (layer_idx != last_idx);
+        nnl2_ann_print(nn->layers[layer_idx], add_newline, depth + 1);
+    }
+    
+    // Final closing bracket with newlines
+    printf(")\n\n");
+}
+
 #endif /** NNL2_NN_SEQUENTIAL_H **/

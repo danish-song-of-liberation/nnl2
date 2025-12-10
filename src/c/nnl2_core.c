@@ -7,14 +7,14 @@
     
 #ifdef NNL2_AVX256_AVAILABLE  
 	#include <immintrin.h> 
-#endif  	
+#endif  	 
 
 #ifdef __SSE2__ 
 	#include <emmintrin.h> 
 #endif               
    
-#include <stdlib.h> 
-#include <time.h>        
+#include <stdlib.h>    
+#include <time.h>         
   
 #include "nnl2_core.h"          	 
 #include "nnl2_ffi_test.h"    
@@ -51,13 +51,13 @@
  *
  ** @details 
  * Functions for viewing, getting, and setting tensor data    
- */
+ */ 
 void nnl2_init_accessors(); 
-
+  
 /** @brief    
  * Registers backend implementations for tensor creation operations
  *
- ** @details 
+ ** @details    
  * Functions for allocating and initializing new tensors    
  */  
 void nnl2_init_tensor_creating();  
@@ -69,7 +69,7 @@ void nnl2_init_tensor_creating();
  * These operations (e.g., add, sub, mul) take input tensors and return a new result tensor
  */
 void nnl2_init_standard();    
-
+ 
 /** @brief 
  * Registers standard in-place mathematical operations
  *
@@ -272,20 +272,20 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log));   
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
-	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));         
+	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));          
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
-	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));          
+	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));           
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  
     EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));
-	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt));
+	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt)); 
 	EINIT_BACKEND(nnl2_sin, sin_backends, current_backend(sin));
-	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));
-	EINIT_BACKEND(nnl2_tan, tan_backends, current_backend(tan));           
+	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));  
+	EINIT_BACKEND(nnl2_tan, tan_backends, current_backend(tan));              
 	EINIT_BACKEND(nnl2_asin, asin_backends, current_backend(asin)); 
 	EINIT_BACKEND(nnl2_acos, acos_backends, current_backend(acos)); 
 	EINIT_BACKEND(nnl2_atan, atan_backends, current_backend(atan));     
 }
-               
+                
 void nnl2_init_standard_inplace() {               
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
 	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);         

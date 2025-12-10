@@ -1403,7 +1403,7 @@
 (cffi:defcfun ("nnl2_nn_tanh_create" %create-nn-tanh) :pointer
   (approx :bool))
   
-(cffi:defcfun ("nnl2_nn_leaky_relu_create" %create-leaky-relu-tanh) :pointer
+(cffi:defcfun ("nnl2_nn_leaky_relu_create" %create-nn-leaky-relu) :pointer
   (alpha :float))  
 
 (cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
@@ -1436,6 +1436,11 @@
   
 (cffi:defcfun ("nnl2_ann_free_parameters" %nn-free-parameters) :void
   (parameters :pointer))
+  
+(cffi:defcfun ("nnl2_ann_print" %print-model) :pointer
+  (model :pointer)
+  (terpri :bool)
+  (depth :int))  
   
 ;; -- Backends --  
  

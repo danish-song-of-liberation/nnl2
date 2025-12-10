@@ -180,4 +180,14 @@ nnl2_ad_tensor* nnl2_nn_relu_forward(nnl2_nn_relu* nn, nnl2_ad_tensor* x) {
     return forward_pass;
 }
 
+/** @brief 
+ * Print ReLU activation layer information
+ *
+ ** @param terpri 
+ * If true, print a newline after the output. Needs for sequential
+ */
+void nnl2_nn_relu_print(bool terpri) {
+	printf("(.relu)%s", terpri ? "\n" : "");
+}
+
 #endif /** NNL2_NN_RELU_H **/

@@ -187,4 +187,22 @@ nnl2_ad_tensor* nnl2_nn_leaky_relu_forward(nnl2_nn_leaky_relu* nn, nnl2_ad_tenso
     return forward_pass;
 }
 
+/** @brief 
+ * Print Leaky ReLU activation layer information
+ *
+ ** @param nn 
+ * Pointer to the Leaky ReLU layer structure
+ *
+ ** @param terpri 
+ * If true, print a newline after the output. Needs for sequential
+ */
+void nnl2_nn_leaky_relu_print(nnl2_nn_leaky_relu* nn, bool terpri) {
+    if(!nn) {
+        printf("(.leaky-relu NULL)%s", terpri ? "\n" : "");
+        return;
+    }
+    
+    printf("(.leaky-relu :alpha %.2f)%s", nn->alpha, terpri ? "\n" : "");
+}
+
 #endif /** NNL2_NN_LEAKY_RELU_H **/
