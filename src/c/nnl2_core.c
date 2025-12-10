@@ -840,7 +840,7 @@ void lisp_call_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, flo
 }
    
 nnl2_tensor* lisp_call_sin(const nnl2_tensor* tensor) { 
-    return nnl2_sin(tensor); 
+    return nnl2_sin(tensor);  
 }  
  
 void lisp_call_sin_inplace(nnl2_tensor* tensor) {
