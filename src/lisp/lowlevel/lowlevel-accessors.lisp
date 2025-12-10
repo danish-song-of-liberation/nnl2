@@ -127,7 +127,7 @@
    tensor: Tensor object
    body: Forms to execute for each element"
    
-  `(loop for i from 0 below (nnl2.hli.ts:size ,tensor)
+  `(loop for i from 0 below (nnl2.hli.ts:numel ,tensor)
 	     do (let ((,iterator (flat ,tensor i)))
 		      (progn ,@body))))
 			  
@@ -142,7 +142,7 @@
    tensor: Tensor object
    body: Forms to execute for each element"
    
-  `(nnl2.threading:pdotimes (i (nnl2.hli.ts:size ,tensor))
+  `(nnl2.threading:pdotimes (i (nnl2.hli.ts:numel ,tensor))
 	 (let ((,iterator (flat ,tensor i)))
 	   (progn ,@body))))  
 	   

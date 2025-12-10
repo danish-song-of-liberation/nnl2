@@ -735,7 +735,7 @@
    
   (nnl2.ffi:%.log tensor save-type))    
     
-(cffi:defcfun ("get_size" size) :int
+(cffi:defcfun ("get_size" numel) :int
   (tensor :pointer))  
 
 (cffi:defcfun ("get_size_in_bytes" size-in-bytes) :int

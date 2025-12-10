@@ -42,7 +42,7 @@
   (fiveam:is (typep tensor +default-backend-tensor-type+) "Tensor must be of type SB-SYS:SYSTEM-AREA-POINTE")
   (fiveam:is (equal (nnl2.hli.ts:shape tensor :as :list) expected-shape) (format nil "The tensor shape should be ~a" expected-shape))  
   (fiveam:is (eql (nnl2.hli.ts:dtype tensor) expected-dtype) (format nil "The tensor data type must be ~a" expected-dtype))
-  (fiveam:is (= (nnl2.hli.ts:size tensor) expected-size) (format nil "The size of the tensor should be ~a" expected-size)))
+  (fiveam:is (= (nnl2.hli.ts:numel tensor) expected-size) (format nil "The size of the tensor should be ~a" expected-size)))
   
 (defun check-tensor-data (&key tensor shape (expected-value 0.0d0) (tolerance 0.0))
   "The function recursively traverses the tensor data and checks, using fiveam:is, for similarity to the expected-value"

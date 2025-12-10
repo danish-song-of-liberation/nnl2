@@ -27,7 +27,7 @@
   
   (let* ((raw-data (nnl2.lli.ts:data nnl2-tensor))
          (dims (nnl2.hli.ts:shape nnl2-tensor :as :list))  
-         (total-size (nnl2.hli.ts:size nnl2-tensor))
+         (total-size (nnl2.hli.ts:numel nnl2-tensor))
          (nnl2-type (the keyword (nnl2.hli.ts:dtype nnl2-tensor)))
          (element-type (the symbol (nnl2.hli.ts:type/nnl2->lisp nnl2-type)))
          (flat-array (the simple-array (make-array total-size :element-type element-type))))

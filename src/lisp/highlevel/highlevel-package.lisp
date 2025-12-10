@@ -228,7 +228,7 @@
    #:gemm!
    #:+=
    #:-=
-   #:size
+   #:numel
    #:size-in-bytes
    #:process-to-indices
    #:.+
