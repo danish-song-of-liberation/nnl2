@@ -1,13 +1,13 @@
-#ifndef NNL2_UNIRNNCELL_FORWARD_H
-#define NNL2_UNIRNNCELL_FORWARD_H
+#ifndef NNL2_RNNCELL_FORWARD_H
+#define NNL2_RNNCELL_FORWARD_H
 
 // NNL2
 
 /** @brief 
- * Performs forward pass of a Unidirectional RNN cell using weights and bias
+ * Performs forward pass of a RNN cell using weights and bias
  * 
  ** @param cell 
- * Pointer to the unidirectional RNN cell structure containing weights and biases
+ * Pointer to the RNN cell structure containing weights and biases
  *
  ** @param input 
  * Input tensor for the current time step
@@ -21,7 +21,7 @@
  ** @note 
  * Caller is responsible for freeing the returned tensor
  */
-nnl2_ad_tensor* nnl2_nn_unirnn_cell_forward_with_bias(nnl2_nn_unirnn_cell* cell, nnl2_ad_tensor* input, nnl2_ad_tensor* hidden) {
+nnl2_ad_tensor* nnl2_nn_rnn_cell_forward_with_bias(nnl2_nn_rnn_cell* cell, nnl2_ad_tensor* input, nnl2_ad_tensor* hidden) {
 	nnl2_ad_tensor* hidden_safe = hidden;
 	bool tmp_hidden_created = false;
 	
@@ -49,10 +49,10 @@ nnl2_ad_tensor* nnl2_nn_unirnn_cell_forward_with_bias(nnl2_nn_unirnn_cell* cell,
 }
 
 /** @brief 
- * Performs forward pass of a Unidirectional RNN cell using weights only (no bias)
+ * Performs forward pass of a RNN cell using weights only (no bias)
  * 
  ** @param cell 
- * Pointer to the unidirectional RNN cell structure containing weights
+ * Pointer to the RNN cell structure containing weights
  *
  ** @param input 
  * Input tensor for the current time step
@@ -66,7 +66,7 @@ nnl2_ad_tensor* nnl2_nn_unirnn_cell_forward_with_bias(nnl2_nn_unirnn_cell* cell,
  ** @note 
  * Caller is responsible for freeing the returned tensor
  */
-nnl2_ad_tensor* nnl2_nn_unirnn_cell_forward_no_bias(nnl2_nn_unirnn_cell* cell, nnl2_ad_tensor* input, nnl2_ad_tensor* hidden) {
+nnl2_ad_tensor* nnl2_nn_rnn_cell_forward_no_bias(nnl2_nn_rnn_cell* cell, nnl2_ad_tensor* input, nnl2_ad_tensor* hidden) {
     nnl2_ad_tensor* hidden_safe = hidden;
     bool tmp_hidden_created = false;
 
@@ -92,4 +92,4 @@ nnl2_ad_tensor* nnl2_nn_unirnn_cell_forward_no_bias(nnl2_nn_unirnn_cell* cell, n
     return new_hidden;
 }
 
-#endif /** NNL2_UNIRNNCELL_FORWARD_H **/
+#endif /** NNL2_RNNCELL_FORWARD_H **/

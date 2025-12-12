@@ -130,11 +130,9 @@
 		   
      nn))
 	 
-(defmacro rnncell (in-features arrow hidden &key (bias t) (dtype nnl2.system:*default-tensor-type*) (init *nn-default-init-type*) bidirectional)
+(defmacro rnncell (in-features arrow hidden &key (bias t) (dtype nnl2.system:*default-tensor-type*) (init *nn-default-init-type*))
   (declare (ignore arrow))
-  `(let* ((nn (if ,bidirectional
-				(error "Not supported yet")
-				(nnl2.ffi:%create-nn-unirnncell ,in-features ,hidden ,bias ,dtype ,(if (keywordp init) init :identity)))))
+  `(let* ((nn (nnl2.ffi:%create-nn-rnncell ,in-features ,hidden ,bias ,dtype ,(if (keywordp init) init :identity))))
 				
      ,(when (not (keywordp init))
         `(dotimes (i (length (parameters nn)))

@@ -55,8 +55,8 @@ size_t nnl2_ann_num_parameters(void* nn) {
             return num_params;	
         }
 		
-		case nnl2_nn_type_unirnn_cell: {
-            size_t num_params = nnl2_nn_unirnn_cell_get_num_parameters(nn);
+		case nnl2_nn_type_rnn_cell: {
+            size_t num_params = nnl2_nn_rnn_cell_get_num_parameters(nn);
             
             #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
                 NNL2_FUNC_EXIT();

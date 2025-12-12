@@ -56,8 +56,8 @@ nnl2_ad_tensor** nnl2_ann_parameters(void* nn) {
             return parameters;	
         }
 		
-		case nnl2_nn_type_unirnn_cell: {
-            nnl2_ad_tensor** parameters = nnl2_nn_unirnn_cell_get_parameters(nn);
+		case nnl2_nn_type_rnn_cell: {
+            nnl2_ad_tensor** parameters = nnl2_nn_rnn_cell_get_parameters(nn);
             
             #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
                 NNL2_FUNC_EXIT();

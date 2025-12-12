@@ -382,7 +382,7 @@ void nnl2_init_correspondence() {
 	INIT_BACKEND(max_maxf, max_maxf_backends);      
 	INIT_BACKEND(min_minf, min_minf_backends); 
 	INIT_BACKEND(axpf, axpf_backends);     	    
-}      
+}       
 
 void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
@@ -394,11 +394,11 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends); 
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
 }    
-         
+          
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
 	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);
-	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends);
+	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends); 
 	INIT_BACKEND(div_broadcasting, div_broadcasting_backends); 
 	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	 
     INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
@@ -642,7 +642,7 @@ void lisp_call_add_incf_inplace(Tensor* tensor, void* inc) {
 	add_incf_inplace(tensor, inc);            
 }                     
     
-Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {  
+Tensor* lisp_call_add_incf(Tensor* tensor, void* inc) {   
 	return add_incf(tensor, inc);     
 }        
  

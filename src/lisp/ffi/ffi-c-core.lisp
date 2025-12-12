@@ -1399,7 +1399,7 @@
 
 (cffi:defcenum nnl2-nn-type 
   (:fnn 0)  	    ;; Fully Connected Neural Network 
-  (:unirnncell 1)   ;; Unidirectional Recurrent Neural Network Cell
+  (:rnncell 1)      ;; Vanilla Recurrent Neural Network Cell
   (:sequential 2)   ;; Sequential neural network (layers in sequence)
   (:sigmoid 3)		;; Sigmoid layer
   (:tanh 4)			;; Tanh layer
@@ -1426,7 +1426,7 @@
   (dtype tensor-type)
   (init-type nnl2-nn-init-type))
   
-(cffi:defcfun ("nnl2_nn_unirnn_cell_create" %create-nn-unirnncell) :pointer
+(cffi:defcfun ("nnl2_nn_rnn_cell_create" %create-nn-rnncell) :pointer
   (in-features :int)
   (hidden-size :int)
   (use-bias :bool)

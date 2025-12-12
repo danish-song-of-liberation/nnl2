@@ -666,6 +666,6 @@
    #:%ad-.tan
    #:%ad-.atan
    #:%print-model
-   #:%create-nn-unirnncell
-   #:%unirnncell-hidden))
+   #:%create-nn-rnncell
+   #:%rnncell-hidden))
    

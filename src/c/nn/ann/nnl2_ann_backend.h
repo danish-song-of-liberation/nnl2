@@ -20,7 +20,7 @@
 
 typedef enum {
     nnl2_nn_type_fnn,           ///< Fully Connected Neural Network 
-	nnl2_nn_type_unirnn_cell,   ///< Unidirectional Recurrent Neural Network Cell
+	nnl2_nn_type_rnn_cell,      ///< Vanilla Recurrent Neural Network Cell
 	nnl2_nn_type_sequential,    ///< Sequential neural network (layers in sequence)
 	nnl2_nn_type_sigmoid,		///< Sigmoid layer
 	nnl2_nn_type_tanh,			///< Tanh layer
