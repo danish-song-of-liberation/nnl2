@@ -33,8 +33,6 @@ nnl2_ad_tensor* nnl2_nn_rnn_cell_forward_with_bias(nnl2_nn_rnn_cell* cell, nnl2_
     nnl2_ad_tensor* input_part  = nnl2_ad_gemmvp(input, cell->wxh, cell->bxh, nnl2_ad_reverse_mode, true);
     nnl2_ad_tensor* hidden_part = nnl2_ad_gemmvp(hidden_safe, cell->whh, cell->bhh, nnl2_ad_reverse_mode, true);
 
-    nnl2_quick_print_tensor(hidden->data);
-
     nnl2_ad_tensor* combined = nnl2_ad_add(input_part, hidden_part, nnl2_ad_reverse_mode, true);
 
     nnl2_ad_tensor* new_hidden = nnl2_ad_sigmoid(combined, true, nnl2_ad_reverse_mode);
@@ -77,8 +75,6 @@ nnl2_ad_tensor* nnl2_nn_rnn_cell_forward_no_bias(nnl2_nn_rnn_cell* cell, nnl2_ad
 
     nnl2_ad_tensor* input_part = nnl2_ad_gemm(input, cell->wxh, nnl2_ad_reverse_mode, true);
     nnl2_ad_tensor* hidden_part = nnl2_ad_gemm(hidden_safe, cell->whh, nnl2_ad_reverse_mode, true);
-
-    nnl2_quick_print_tensor(hidden_safe->data);
 
     nnl2_ad_tensor* combined = nnl2_ad_add(input_part, hidden_part, nnl2_ad_reverse_mode, true);
     nnl2_ad_tensor* new_hidden = nnl2_ad_sigmoid(combined, true, nnl2_ad_reverse_mode);
