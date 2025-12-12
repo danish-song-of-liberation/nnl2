@@ -47,7 +47,9 @@
 	(dotimes (i len)
 	  (setf (cffi:mem-aref args-pntr :pointer i) (nth i args)))
 	  
-	(nnl2.ffi:%nn-forward nn args-pntr)))
+	(let ((result (nnl2.ffi:%nn-forward nn args-pntr)))
+	  (cffi:foreign-free args-pntr)
+	  result)))
   
 (defmacro nnlet ((&rest bindings) &body body)
   "Like cl:let, but automatically frees any nnl2-nn variables after the body executes"
@@ -127,6 +129,18 @@
            (funcall ,init (nth i (parameters nn)))))
 		   
      nn))
+	 
+(defmacro rnncell (in-features arrow hidden &key (bias t) (dtype nnl2.system:*default-tensor-type*) (init *nn-default-init-type*) bidirectional)
+  (declare (ignore arrow))
+  `(let* ((nn (if ,bidirectional
+				(error "Not supported yet")
+				(nnl2.ffi:%create-nn-unirnncell ,in-features ,hidden ,bias ,dtype ,(if (keywordp init) init :identity)))))
+				
+     ,(when (not (keywordp init))
+        `(dotimes (i (length (parameters nn)))
+           (funcall ,init (nth i (parameters nn)))))
+		   
+     nn))	 
 	 
 (defun sequential (&rest layers)
   (let* ((len (length layers))

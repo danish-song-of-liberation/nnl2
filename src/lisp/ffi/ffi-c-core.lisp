@@ -1397,6 +1397,19 @@
   (:kaiming/uniform  7)   ;; Kaiming (He) initialization using a uniform distribution
   (:unknown  9))	;; Undefined or unsupported initialization type
 
+(cffi:defcenum nnl2-nn-type 
+  (:fnn 0)  	    ;; Fully Connected Neural Network 
+  (:unirnncell 1)   ;; Unidirectional Recurrent Neural Network Cell
+  (:sequential 2)   ;; Sequential neural network (layers in sequence)
+  (:sigmoid 3)		;; Sigmoid layer
+  (:tanh 4)			;; Tanh layer
+  (:relu 5)			;; ReLU layer
+  (:leaky-relu 6)   ;; Leaky-ReLU layer
+  (:unknown 7))     ;; Unknown or unsupported network type 
+
+(cffi:defcfun ("nnl2_nn_unirnn_cell_get_hidden_size" %unirnncell-hidden) :int 
+  (cell :pointer))
+
 (cffi:defcfun ("nnl2_nn_sigmoid_create" %create-nn-sigmoid) :pointer
   (approx :bool))
 
@@ -1413,6 +1426,13 @@
   (dtype tensor-type)
   (init-type nnl2-nn-init-type))
   
+(cffi:defcfun ("nnl2_nn_unirnn_cell_create" %create-nn-unirnncell) :pointer
+  (in-features :int)
+  (hidden-size :int)
+  (use-bias :bool)
+  (dtype tensor-type)
+  (init-type nnl2-nn-init-type))  
+  
 (cffi:defcfun ("nnl2_ann_forward" %nn-forward) :pointer
   (model :pointer)
   (args :pointer))  
@@ -1425,7 +1445,7 @@
   (nn :pointer)
   (x :pointer))
   
-(cffi:defcfun ("nnl2_nn_get_type" %nn-get-type) :int
+(cffi:defcfun ("nnl2_nn_get_type" %nn-get-type) nnl2-nn-type
   (nn :pointer))
   
 (cffi:defcfun ("nnl2_ann_num_parameters" %nn-get-num-parameters) :long

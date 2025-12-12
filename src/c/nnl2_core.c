@@ -7,13 +7,13 @@
     
 #ifdef NNL2_AVX256_AVAILABLE  
 	#include <immintrin.h> 
-#endif  	 
-
+#endif  	  
+ 
 #ifdef __SSE2__ 
 	#include <emmintrin.h> 
 #endif               
-   
-#include <stdlib.h>    
+    
+#include <stdlib.h>     
 #include <time.h>         
   
 #include "nnl2_core.h"          	 
@@ -33,10 +33,10 @@
  *
  * File contains the full system initialization 
  * declaration as well as all lisp wrappers 
- * for cffi (or sb-alien) 
+ * for cffi (or sb-alien)  
  *
  ** Filepath: nnl2/src/c/nnl2_core.c
- ** File: nnl2_core.c   
+ ** File: nnl2_core.c    
  **           
  ** In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
  ** nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2	
@@ -45,37 +45,37 @@
 ///@{ [initilizing]   
  
 ///@{ [subinitializers_declaration]            
-
+ 
 /** @brief
  * Registers backend implementations for tensor accessor operations
  *
  ** @details 
- * Functions for viewing, getting, and setting tensor data    
- */ 
-void nnl2_init_accessors(); 
-  
+ * Functions for viewing, getting, and setting tensor data     
+ */   
+void nnl2_init_accessors();  
+     
 /** @brief    
  * Registers backend implementations for tensor creation operations
  *
  ** @details    
  * Functions for allocating and initializing new tensors    
- */  
+ */   
 void nnl2_init_tensor_creating();  
 
-/** @brief 
+/** @brief  
  * Registers standard out-of-place mathematical operations
  *
- ** @details 
- * These operations (e.g., add, sub, mul) take input tensors and return a new result tensor
+ ** @details   
+ * These operations (e.g., add, sub, mul) take input tensors and return a new result tensor  
  */
-void nnl2_init_standard();    
- 
+void nnl2_init_standard();       
+  
 /** @brief 
  * Registers standard in-place mathematical operations
  *
  ** @details 
  * These operations (e.g., addinplace, subinplace) modify the target tensor directly
- */ 
+ */   
 void nnl2_init_standard_inplace();
 
 /** @brief 
@@ -213,18 +213,18 @@ void nnl2_init_loss();
  ** @see nnl2_init_correspondence_inplace
  ** @see nnl2_init_correspondence 
  ** @see nnl2_init_broadcasting_inplace   
- ** @see nnl2_init_broadcasting
- ** @see nnl2_init_reshaping 
+ ** @see nnl2_init_broadcasting 
+ ** @see nnl2_init_reshaping    
  ** @see nnl2_init_loss 
- **/   
-void nnl2_init_system() {       
-	// Initialization of random number generator
-	srand(time(NULL));               
-	                                      
-	// Initialization of logger            
-	nnl2_log_init(                
+ **/     
+void nnl2_init_system() {         
+	// Initialization of random number generator 
+	srand(time(NULL));                
+	                                        
+	// Initialization of logger             
+	nnl2_log_init(                 
 		NNL2_LOG_DEFAULT_COLOR,       
-		NNL2_LOG_DEFAULT_TIMESTAMPS,                  
+		NNL2_LOG_DEFAULT_TIMESTAMPS,                   
 		NNL2_LOG_DEFAULT_DEBUG_INFO,              
 		NNL2_LOG_LEVEL_DEBUG   
 	);    
@@ -232,13 +232,13 @@ void nnl2_init_system() {
 	// Initialization of all functions having several implementations
 	nnl2_init_accessors();	  
 	nnl2_init_tensor_creating();
-	nnl2_init_standard();     
-	nnl2_init_standard_inplace();          
+	nnl2_init_standard();      
+	nnl2_init_standard_inplace();           
 	nnl2_init_stack();    
 	nnl2_init_activations_inplace();        
 	nnl2_init_activations();        
 	nnl2_init_auxiliary();
-	nnl2_init_initializers();
+	nnl2_init_initializers(); 
 	nnl2_init_transposition();   
 	nnl2_init_correspondence_inplace();    
 	nnl2_init_correspondence();   

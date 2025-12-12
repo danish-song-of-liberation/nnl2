@@ -28,6 +28,11 @@ typedef struct nnl2_nn_fnn_struct {
 	nnl2_nn_ann metadata;		///< Base neural network metadata and type information
 	nnl2_ad_tensor* weights;    ///< Weight matrix of shape [in_features, out_features]
 	nnl2_ad_tensor* bias;		///< Bias vector of shape [out_features]. May be NULL if use_bias is set to false in metadata
+	
+	nnl2_ad_tensor* (*forward)( 		///< Forward propagation function pointer (for with_bias/no_bias)
+        struct nnl2_nn_fnn_struct* nn,
+        nnl2_ad_tensor* x
+    );   
 } nnl2_nn_fnn;
 
 ///@} [nnl2_nn_fnn]
@@ -57,6 +62,12 @@ static bool fnn_init_kaiming_uniform(nnl2_nn_fnn* nn, int in_features, int out_f
 
 /** @brief Initializes FNN layer with identity matrix for testing **/
 static bool fnn_init_identity(nnl2_nn_fnn* nn, int in_features, int out_features, nnl2_tensor_type dtype, bool use_bias);
+
+/** @brief Performs forward pass of FNN layer using weights and bias */
+static nnl2_ad_tensor* fnn_forward_with_bias(nnl2_nn_fnn* nn, nnl2_ad_tensor* x);
+
+/** @brief Performs forward pass of FNN layer using weights only (no bias) */
+static nnl2_ad_tensor* fnn_forward_no_bias(nnl2_nn_fnn* nn, nnl2_ad_tensor* x);
 
 /** @brief 
  * Creates a Fully-Connected Neural Network (FNN) layer
@@ -102,6 +113,8 @@ nnl2_nn_fnn* nnl2_nn_fnn_create(int in_features, int out_features, bool use_bias
 	
 	nn -> metadata.nn_type = nnl2_nn_type_fnn;
 	nn -> metadata.use_bias = use_bias;
+	
+	nn->forward = use_bias ? fnn_forward_with_bias : fnn_forward_no_bias;
 	
 	bool init_success = false;
 	

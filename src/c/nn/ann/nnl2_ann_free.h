@@ -46,6 +46,11 @@ void nnl2_ann_free(void* nn) {
             break;
         }
 		
+		case nnl2_nn_type_unirnn_cell: {
+			nnl2_nn_unirnn_cell_free(nn);
+			break;
+		}
+		
 		case nnl2_nn_type_sigmoid: {
 			nnl2_nn_sigmoid_free(nn);
 			break;

@@ -35,12 +35,13 @@ void nnl2_ann_print(void* nn, bool terpri, int depth) {
     nnl2_nn_ann* ann = (nnl2_nn_ann*)nn;
     
     switch(ann -> nn_type) {
-        case nnl2_nn_type_fnn:		   nnl2_nn_fnn_print(nn, terpri);             break;
-		case nnl2_nn_type_sigmoid: 	   nnl2_nn_sigmoid_print(nn, terpri);         break;	
-		case nnl2_nn_type_tanh: 	   nnl2_nn_tanh_print(nn, terpri);            break;
-		case nnl2_nn_type_relu: 	   nnl2_nn_relu_print(terpri); 	              break;	
-		case nnl2_nn_type_leaky_relu:  nnl2_nn_leaky_relu_print(nn, terpri);      break;	
-		case nnl2_nn_type_sequential:  nnl2_nn_sequential_print(nn, depth + 1);   break;
+        case nnl2_nn_type_fnn:		    nnl2_nn_fnn_print(nn, terpri);             break;
+		case nnl2_nn_type_unirnn_cell:  nnl2_nn_unirnn_cell_print(nn, terpri);     break;
+		case nnl2_nn_type_sigmoid: 	    nnl2_nn_sigmoid_print(nn, terpri);         break;	
+		case nnl2_nn_type_tanh: 	    nnl2_nn_tanh_print(nn, terpri);            break;
+		case nnl2_nn_type_relu: 	    nnl2_nn_relu_print(terpri); 	           break;	
+		case nnl2_nn_type_leaky_relu:   nnl2_nn_leaky_relu_print(nn, terpri);      break;	
+		case nnl2_nn_type_sequential:   nnl2_nn_sequential_print(nn, depth + 1);   break;
   
         case nnl2_nn_type_unknown:
 		

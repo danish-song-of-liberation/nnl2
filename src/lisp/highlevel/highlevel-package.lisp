@@ -20,6 +20,7 @@
   (:use #:cl)
   (:export
    #:fnn
+   #:rnncell
    #:free
    #:forward
    #:nnlet
@@ -59,6 +60,7 @@
    #:rank
    #:shape
    #:full
+   #:free
    #:is-leaf
    #:requires-grad
    #:grad
