@@ -669,5 +669,7 @@
    #:%create-nn-rnncell
    #:%rnncell-hidden
    #:%nn-manual-fnn
-   #:%nn-manual-rnn-cell))
+   #:%nn-manual-rnn-cell
+   #:%vector-concat
+   #:%ad-vector-concat))
    

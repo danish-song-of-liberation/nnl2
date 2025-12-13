@@ -360,6 +360,7 @@ void nnl2_init_auxiliary() {
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends); 
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
 	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);
+	INIT_BACKEND(nnl2_vector_concat, vector_concat_backends);
 }  
 
 void nnl2_init_correspondence_inplace() {    
@@ -632,7 +633,7 @@ void lisp_call_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
        
 void lisp_call_l2norm(Tensor* tensor, void* record) {
 	l2norm(tensor, record);  
-}          
+}           
  
 Tensor* lisp_call_copy(Tensor* tensor, TensorType copy_type) {   
 	return nnl2_copy(tensor, copy_type);    
@@ -877,7 +878,7 @@ void lisp_call_acos_inplace(nnl2_tensor* tensor) {
 
 nnl2_tensor* lisp_call_tan(const nnl2_tensor* tensor) {
     return nnl2_tan(tensor);
-}
+}    
 
 void lisp_call_tan_inplace(nnl2_tensor* tensor) {
     nnl2_taninplace(tensor);
@@ -889,6 +890,10 @@ nnl2_tensor* lisp_call_atan(const nnl2_tensor* tensor) {
 
 void lisp_call_atan_inplace(nnl2_tensor* tensor) {
     nnl2_ataninplace(tensor);
+}
+
+nnl2_tensor* lisp_call_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype) {
+    return nnl2_vector_concat(tensors, count, dtype);
 }
 
 ///@} [lisp_wrappers]                

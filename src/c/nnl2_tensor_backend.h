@@ -1192,6 +1192,17 @@ typedef nnl2_tensor* (*tanfn)(const nnl2_tensor* tensor);
  */
 typedef nnl2_tensor* (*atanfn)(const nnl2_tensor* tensor);
 
+/** @brief Concatenates multiple tensors into a single vector
+ ** @param tensors Array of pointers to input tensors
+ ** @param count Number of tensors in the array
+ ** @param dtype Data type for the resulting tensor
+ ** @return New tensor containing concatenated data as a vector
+ ** @note All input tensors are flattened and concatenated sequentially
+ ** @see nnl2_tensor
+ ** @see nnl2_tensor_type
+ */
+typedef nnl2_tensor* (*vectorconcatfn)(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype);
+
 /// @} [typedef]
 
 

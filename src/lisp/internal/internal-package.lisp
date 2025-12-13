@@ -12,6 +12,8 @@
   (:use #:cl)
   (:export
     #:ts-axpy-regional!
-	#:ad-share-data))
+	#:ad-share-data
+	#:ts-concat-vectors
+	#:ad-concat-vectors))
   
   

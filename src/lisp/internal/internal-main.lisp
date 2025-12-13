@@ -23,4 +23,28 @@
 (cffi:defcfun ("nnl2_ad_tensor_share_data" ad-share-data) :pointer
   (ad-tensor :pointer))  
 	
+(defun ts-concat-vectors (&rest vectors)
+  (let* ((len (length vectors))
+		 (dtype (nnl2.hli.ts:dtype (car vectors)))
+		 (vectors-pntr (cffi:foreign-alloc :pointer :count len)))
+		 
+    (dotimes (i len)
+	  (setf (cffi:mem-aref vectors-pntr :pointer i) (nth i vectors)))
+	  
+	(let ((result (nnl2.ffi:%vector-concat vectors-pntr len dtype)))
+	  (cffi:foreign-free vectors-pntr)
+	  result)))
+	
+(defun ad-concat-vectors (&rest vectors)
+  (let* ((len (length vectors))
+		 (dtype (nnl2.hli.ad:dtype (car vectors)))
+		 (vectors-pntr (cffi:foreign-alloc :pointer :count len)))
+		 
+    (dotimes (i len)
+	  (setf (cffi:mem-aref vectors-pntr :pointer i) (nth i vectors)))
+	  
+	(let ((result (nnl2.ffi:%ad-vector-concat vectors-pntr len dtype)))
+	  (cffi:foreign-free vectors-pntr)
+	  result)))	
+	
 	

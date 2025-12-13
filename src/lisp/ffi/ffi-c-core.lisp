@@ -526,7 +526,12 @@
   (alpha :float)
   (from :pointer)
   (to :pointer))  
-  
+ 
+(cffi:defcfun ("lisp_call_vector_concat" %vector-concat) :pointer
+  (tensors :pointer)      
+  (count :size)  
+  (dtype tensor-type))    
+ 
 (cffi:defcfun ("nnl2_narrow" %narrow) :pointer
   (tensor :pointer)
   (dim :unsigned-char)
@@ -1168,6 +1173,11 @@
   (force :bool)
   (ad-mode ad-mode)
   (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_vector_concat" %ad-vector-concat) :pointer
+  (tensors :pointer)      
+  (count :size)  
+  (dtype tensor-type))   
   
 (cffi:defcfun ("nnl2_ad_sqrt" %ad-sqrt) :pointer
   (tensor :pointer)
