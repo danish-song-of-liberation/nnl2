@@ -629,7 +629,7 @@ void lisp_call_sum_without_axis(Tensor* tensor, void* filler) {
 void lisp_call_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
 	nnl2_sum_with_axis(tensor, axis, keepdim); 
 }
-
+       
 void lisp_call_l2norm(Tensor* tensor, void* record) {
 	l2norm(tensor, record);  
 }          

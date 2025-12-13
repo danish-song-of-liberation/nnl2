@@ -10,6 +10,9 @@
 ;; UPD: Added :nnl2.lli.ad package where ad stays
 ;; for automatic differentiation
 
+;; UPD 2: Added :nnl2.lli.nn package where nn stays
+;; for neural nerworks
+
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
 
@@ -19,6 +22,12 @@
     #:fast-mem-aref-setter
 	#:fast-mem-aref-getter
     #:alignment))
+ 
+(defpackage :nnl2.lli.nn
+  (:use #:cl)
+  (:export
+    #:fnn
+	#:rnncell))  
   
 (defpackage :nnl2.lli.ts
   (:use #:cl)

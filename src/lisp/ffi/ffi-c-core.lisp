@@ -1407,6 +1407,10 @@
   (:leaky-relu 6)   ;; Leaky-ReLU layer
   (:unknown 7))     ;; Unknown or unsupported network type 
 
+(cffi:defcenum nnl2-nn-handle-as
+  (:copy 0)    ;; Make a copy of the passed tensors
+  (:view 1))   ;; Take tensor pointers and work with them directly
+
 (cffi:defcfun ("nnl2_nn_unirnn_cell_get_hidden_size" %unirnncell-hidden) :int 
   (cell :pointer))
 
@@ -1461,6 +1465,26 @@
   (model :pointer)
   (terpri :bool)
   (depth :int))  
+  
+(cffi:defcfun ("nnl2_nn_fnn_manual_create" %nn-manual-fnn) :pointer 
+  (in-features :int)
+  (out-features :int)
+  (use-bias :bool)
+  (dtype tensor-type)
+  (w :pointer)
+  (b :pointer)
+  (handle-as nnl2-nn-handle-as))
+  
+(cffi:defcfun ("nnl2_nn_rnn_cell_manual_create" %nn-manual-rnn-cell) :pointer
+  (input-size :int)
+  (hidden-size :int)
+  (bias :bool)
+  (dtype tensor-type)
+  (wxh :pointer)
+  (whh :pointer)
+  (bxh :pointer)
+  (bhh :pointer)
+  (handle-as nnl2-nn-handle-as))  
   
 ;; -- Backends --  
  

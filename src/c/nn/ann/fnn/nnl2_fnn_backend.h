@@ -157,6 +157,122 @@ nnl2_nn_fnn* nnl2_nn_fnn_create(int in_features, int out_features, bool use_bias
 }
 
 /** @brief 
+ * Creates a Fully-Connected Neural Network (FNN) layer with user-provided tensors
+ *
+ ** @param in_features 
+ * The number of input units/features
+ *
+ ** @param out_features 
+ * The number of output units/features
+ *
+ ** @param use_bias 
+ * If true, a bias vector is used and must be provided
+ *
+ ** @param dtype 
+ * The data type for the layer's tensors
+ *
+ ** @param w
+ * Pointer to a user-provided weights tensor. Must have shape [in_features, out_features]
+ *
+ ** @param b
+ * Pointer to a user-provided bias tensor. Must have shape [out_features] if use_bias is true
+ *
+ ** @param handle_as
+ * Enum specifying how the layer handles the provided tensors
+ * 
+ * Details: 
+ *     nnl2_nn_handle_as_copy: make a copy of the provided tensors (safe)
+ *     nnl2_nn_handle_as_view: use the provided tensors directly (lifetime managed by the caller)
+ *
+ ** @return nnl2_nn_fnn*
+ * A pointer to the newly created FNN layer
+ *
+ ** @retval NULL 
+ * if memory allocation fails or if tensor shapes are incorrect
+ *
+ ** @see nnl2_nn_fnn_create
+ ** @see nnl2_nn_handle_as
+ ** @see nnl2_ann_free
+ **/
+nnl2_nn_fnn* nnl2_nn_fnn_manual_create(int in_features, int out_features, bool use_bias, 
+									   nnl2_tensor_type dtype, nnl2_ad_tensor* w, nnl2_ad_tensor* b, 
+									   nnl2_nn_handle_as handle_as) {
+										   
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif			
+
+    nnl2_nn_fnn* nn = malloc(sizeof(nnl2_nn_fnn));
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(!nn) {
+			NNL2_MALLOC_ERROR();
+			return NULL;
+		}	
+	#endif	
+	
+	bool w_initialized_correctly;
+	
+	{ // w must be [in_features, out_features]
+		if(w -> data -> shape[0] != in_features) 	    { w_initialized_correctly = false; }
+		else if(w -> data -> shape[1] != out_features)  { w_initialized_correctly = false; }
+		else 											{ w_initialized_correctly = true;  }
+	}
+
+	if(!w_initialized_correctly) {
+		NNL2_ERROR("In function nnl2_nn_fnn_manual_create, transfered nnl2_ad_tensor* w shape is NOT CORRECT. Expected shape: [%d, %d] (Explicit: [in_features, out_features]), Got: [%d, %d]", 
+				   in_features, out_features, w -> data -> shape[0], w -> data -> shape[1]);
+		
+		free(nn);
+		return NULL;
+	}
+	
+	if(use_bias) { // b must be [out_features]
+		if(b -> data -> shape[0] != out_features) {
+			NNL2_ERROR("In function nnl2_nn_fnn_manual_create, transfered nnl2_ad_tensor* b shape is NOT CORRECT. Expected shape: [%d] (Explicit: [out_features]), Got: [%d]",
+					   out_features, b -> data -> shape[0]);
+					   
+			free(nn);
+			return NULL;
+		}
+	}
+	
+	nn -> metadata.nn_type = nnl2_nn_type_fnn;
+	nn -> metadata.use_bias = use_bias;
+	
+	nn->forward = use_bias ? fnn_forward_with_bias : fnn_forward_no_bias;
+	
+	switch(handle_as) {
+		case nnl2_nn_handle_as_copy: {
+			nn -> weights = nnl2_ad_copy(w, dtype);
+			if(use_bias) nn -> bias = nnl2_ad_copy(b, dtype);
+			break;
+		}
+		
+		case nnl2_nn_handle_as_view: {
+			nn -> weights = w;
+			if(use_bias) nn -> bias = b;
+			break;
+		}
+		
+		default: {
+			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+				NNL2_ERROR("Unknown handle method in function nnl2_nn_fnn_manual_create. Handle enum type numbering: %d", handle_as);
+			#endif 
+			
+			free(nn);
+			return NULL;
+		}
+	}
+	
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+	
+	return nn;
+}
+
+/** @brief 
  * Destroys a Fully-Connected Neural Network (FNN) layer and releases its memory
  *
  ** @param nn 

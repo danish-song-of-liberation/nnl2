@@ -667,5 +667,7 @@
    #:%ad-.atan
    #:%print-model
    #:%create-nn-rnncell
-   #:%rnncell-hidden))
+   #:%rnncell-hidden
+   #:%nn-manual-fnn
+   #:%nn-manual-rnn-cell))
    

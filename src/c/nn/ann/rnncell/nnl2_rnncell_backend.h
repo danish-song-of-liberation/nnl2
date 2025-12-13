@@ -163,6 +163,171 @@ nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_create(int input_size, int hidden_size, bool 
 }
 
 /** @brief 
+ * Creates a RNN cell (rnncell) with user-provided tensors
+ *
+ ** @param input_size
+ * Number of input features
+ *
+ ** @param hidden_size
+ * Number of hidden units in the cell
+ *
+ ** @param bias
+ * If true, bias tensors (bxh and bhh) are used and must be provided
+ *
+ ** @param dtype
+ * Data type for the cell's tensors
+ *
+ ** @param wxh
+ * Pointer to a user-provided weights tensor for input-to-hidden connections.
+ * Must have shape [input_size, hidden_size]
+ *
+ ** @param whh
+ * Pointer to a user-provided weights tensor for hidden-to-hidden connections.
+ * Must have shape [hidden_size, hidden_size]
+ *
+ ** @param bxh
+ * Pointer to a user-provided bias tensor for input-to-hidden connections.
+ * Must have shape [hidden_size] if bias is true
+ *
+ ** @param bhh
+ * Pointer to a user-provided bias tensor for hidden-to-hidden connections.
+ * Must have shape [hidden_size] if bias is true
+ *
+ ** @param handle_as
+ * Enum specifying how the cell handles the provided tensors
+ * 
+ * Details: 
+ *     nnl2_nn_handle_as_copy: make a copy of the provided tensors (safe)
+ *     nnl2_nn_handle_as_view: use the provided tensors directly (lifetime managed by the caller)
+ *
+ ** @return nnl2_nn_rnn_cell*
+ * A pointer to the newly created RNN cell
+ *
+ ** @retval NULL 
+ * if memory allocation fails or if tensor shapes are incorrect
+ *
+ ** @see nnl2_nn_rnn_cell_create
+ ** @see nnl2_nn_handle_as
+ ** @see nnl2_nn_rnn_cell_free
+ **/
+nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_manual_create(int input_size, int hidden_size, bool bias,
+                                                nnl2_tensor_type dtype,
+                                                nnl2_ad_tensor* wxh, nnl2_ad_tensor* whh,
+                                                nnl2_ad_tensor* bxh, nnl2_ad_tensor* bhh,
+                                                nnl2_nn_handle_as handle_as) {
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    nnl2_nn_rnn_cell* cell = malloc(sizeof(nnl2_nn_rnn_cell));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!cell) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+    // wxh must be [input_size, hidden_size]
+    if(wxh->data->shape[0] != input_size || wxh->data->shape[1] != hidden_size) {
+        NNL2_ERROR("In function nnl2_nn_rnn_cell_manual_create, wxh tensor shape is NOT CORRECT. "
+                   "Expected shape: [%d, %d] (input_size, hidden_size), Got: [%d, %d]",
+                   input_size, hidden_size, wxh->data->shape[0], wxh->data->shape[1]);
+				   
+        free(cell);
+        return NULL;
+    }
+    
+    //  whh must be [hidden_size, hidden_size]
+    if(whh->data->shape[0] != hidden_size || whh->data->shape[1] != hidden_size) {
+        NNL2_ERROR("In function nnl2_nn_rnn_cell_manual_create, whh tensor shape is NOT CORRECT. "
+                   "Expected shape: [%d, %d] (hidden_size, hidden_size), Got: [%d, %d]",
+                   hidden_size, hidden_size, whh->data->shape[0], whh->data->shape[1]);
+				   
+        free(cell);
+        return NULL;
+    }
+
+    if(bias) {
+        if(!bxh || !bhh) {
+            NNL2_ERROR("In function nnl2_nn_rnn_cell_manual_create, bias is enabled but bxh or bhh tensor is NULL");
+            free(cell);
+            return NULL;
+        }
+        
+        // bxh must be [hidden_size]
+        if(bxh->data->shape[0] != hidden_size) {
+            NNL2_ERROR("In function nnl2_nn_rnn_cell_manual_create, bxh tensor shape is NOT CORRECT. "
+                       "Expected shape: [%d] (hidden_size), Got: [%d]",
+                       hidden_size, bxh->data->shape[0]);
+					   
+            free(cell);
+            return NULL;
+        }
+        
+        // bhh must be [hidden_size]
+        if(bhh->data->shape[0] != hidden_size) {
+            NNL2_ERROR("In function nnl2_nn_rnn_cell_manual_create, bhh tensor shape is NOT CORRECT. "
+                       "Expected shape: [%d] (hidden_size), Got: [%d]",
+                       hidden_size, bhh->data->shape[0]);
+					   
+            free(cell);
+            return NULL;
+        }
+    }
+    
+    // metadata
+    cell->metadata.nn_type = nnl2_nn_type_rnn_cell;
+    cell->metadata.use_bias = bias;
+    cell->hidden_size = hidden_size;
+    
+    switch(handle_as) {
+        case nnl2_nn_handle_as_copy: {
+            cell->wxh = nnl2_ad_copy(wxh, dtype);
+            cell->whh = nnl2_ad_copy(whh, dtype);
+            
+            if(bias) {
+                cell->bxh = nnl2_ad_copy(bxh, dtype);
+                cell->bhh = nnl2_ad_copy(bhh, dtype);
+            }
+			
+            break;
+        }
+        
+        case nnl2_nn_handle_as_view: {
+            cell->wxh = wxh;
+            cell->whh = whh;
+            
+            if(bias) {
+                cell->bxh = bxh;
+                cell->bhh = bhh;
+            }
+			
+            break;
+        }
+        
+        default: {
+            #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+                NNL2_ERROR("Unknown handle method in function nnl2_nn_rnn_cell_manual_create. "
+                           "Handle enum type numbering: %d", handle_as);
+            #endif
+            
+            free(cell);
+            return NULL;
+        }
+    }
+    
+    cell->forward = bias ? nnl2_nn_rnn_cell_forward_with_bias : nnl2_nn_rnn_cell_forward_no_bias;
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return cell;
+}
+
+/** @brief 
  * Frees memory used by a rnncell layer
  *
  ** @param cell

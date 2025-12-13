@@ -33,6 +33,24 @@ typedef enum {
 
 
 
+///@{ [nnl2_nn_handle_as]
+
+/** @enum nnl2_nn_handle_as
+ ** @brief 
+ * Enums for processing manual tensor transfers in neural networks
+ * This means that you can pass your own tensors to fnn, for example, 
+ * to initialize them instead of writing :init :kaiming/uniform or 
+ * something similar
+ */
+typedef enum {
+	nnl2_nn_handle_as_copy = 0,  ///< Make a copy of the passed tensors
+    nnl2_nn_handle_as_view = 1   ///< Take tensor pointers and work with them directly
+} nnl2_nn_handle_as;
+
+///@} [nnl2_nn_handle_as]
+
+
+
 ///@{ [nnl2_nn_ann]
 
 typedef struct {

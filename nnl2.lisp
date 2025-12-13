@@ -86,7 +86,8 @@
 											:serial t
 											:components ((:file "lowlevel-package" :type "lisp")
 														 (:file "lowlevel-accessors" :type "lisp")
-														 (:file "lowlevel-ad-accessors" :type "lisp")))
+														 (:file "lowlevel-ad-accessors" :type "lisp")
+														 (:file "lowlevel-nn-accessors" :type "lisp")))
 														 
 										   (:module "convert"
 										    :serial t
