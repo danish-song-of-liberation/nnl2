@@ -205,4 +205,51 @@ void nnl2_nn_leaky_relu_print(nnl2_nn_leaky_relu* nn, bool terpri) {
     printf("(.leaky-relu :alpha %.2f)%s", nn->alpha, terpri ? "\n" : "");
 }
 
+/** @brief 
+ * Encodes Leaky ReLU layer information in nnlrepr format
+ * 
+ ** @param nn 
+ * Pointer to Leaky ReLU layer structure
+ * 
+ ** @return nnl2_nnlrepr_template* 
+ * Pointer to created template or NULL on error
+ */
+static nnl2_nnlrepr_template* nnl2_nn_leaky_relu_nnlrepr_template(nnl2_nn_leaky_relu* nn) {
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(nn == NULL) {
+            NNL2_ERROR("In function nnl2_nn_leaky_relu_nnlrepr_template, Leaky ReLU layer pointer is NULL");
+            return NULL;
+        }
+    #endif
+	
+    nnl2_nnlrepr_template* result = malloc(sizeof(nnl2_nnlrepr_template));
+	
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (result == NULL) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+	// Common metadata
+    result->nn_type = nnl2_nn_type_leaky_relu;
+    result->num_shapes = 0;
+    result->vector_size = 0;
+    result->num_childrens = 0;
+    result->childrens = NULL;
+    result->shapes = NULL;
+	result->additional_data = &(nn -> alpha);
+    
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Created Leaky ReLU nnlrepr template with alpha = %.2f", nn->alpha);
+        NNL2_FUNC_EXIT();
+    #endif
+	
+    return result;
+}
+
 #endif /** NNL2_NN_LEAKY_RELU_H **/

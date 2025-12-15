@@ -14,6 +14,6 @@
     #:ts-axpy-regional!
 	#:ad-share-data
 	#:ts-concat-vectors
-	#:ad-concat-vectors))
-  
+	#:ad-concat-vectors
+	#:ts-vector-as-parameter))
   

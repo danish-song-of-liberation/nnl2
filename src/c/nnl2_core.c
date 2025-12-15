@@ -756,26 +756,26 @@ void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 }
  
 Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
-	return axpy(summand, sumend, alpha);    
+	return axpy(summand, sumend, alpha);      	 
 }     
 
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) { 
-	axpf_inplace(summand, sumend, alpha);  
+	axpf_inplace(summand, sumend, alpha);       
 } 
                 
 Tensor* lisp_call_axpf(Tensor* summand, void* sumend, float alpha) {
 	return axpf(summand, sumend, alpha);  
-}       
+}              
                  
 void lisp_call_axpy_broadcasting_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 	axpy_broadcasting_inplace(summand, sumend, alpha); 
 }       
-
+   
 Tensor* lisp_call_axpy_broadcasting(Tensor* summand, void* sumend, float alpha) {
 	return axpy_broadcasting(summand, sumend, alpha);      
 } 
 
-Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {  
+Tensor* lisp_call_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {     
 	return nnl2_reshape(tensor, new_shape, new_shape_len, force); 
 }
 
@@ -853,43 +853,43 @@ void lisp_call_sin_inplace(nnl2_tensor* tensor) {
 }
 
 nnl2_tensor* lisp_call_cos(const nnl2_tensor* tensor) {
-    return nnl2_cos(tensor);
+    return nnl2_cos(tensor);     
 }
 
 void lisp_call_cos_inplace(nnl2_tensor* tensor) {
-    nnl2_cosinplace(tensor);
-}
-
+    nnl2_cosinplace(tensor);     
+}           
+  
 nnl2_tensor* lisp_call_asin(const nnl2_tensor* tensor) {
-    return nnl2_asin(tensor);
+    return nnl2_asin(tensor);  
 }
  
 void lisp_call_asin_inplace(nnl2_tensor* tensor) {
-    nnl2_asininplace(tensor);
-}
-
-nnl2_tensor* lisp_call_acos(const nnl2_tensor* tensor) {
+    nnl2_asininplace(tensor);         	          
+}   
+  
+nnl2_tensor* lisp_call_acos(const nnl2_tensor* tensor) {     
     return nnl2_acos(tensor);
-}
+}   
 
-void lisp_call_acos_inplace(nnl2_tensor* tensor) {
-    nnl2_acosinplace(tensor);
+void lisp_call_acos_inplace(nnl2_tensor* tensor) {   
+    nnl2_acosinplace(tensor);             
 }
-
-nnl2_tensor* lisp_call_tan(const nnl2_tensor* tensor) {
+       
+nnl2_tensor* lisp_call_tan(const nnl2_tensor* tensor) {   
     return nnl2_tan(tensor);
-}    
+}         
 
-void lisp_call_tan_inplace(nnl2_tensor* tensor) {
+void lisp_call_tan_inplace(nnl2_tensor* tensor) { 
     nnl2_taninplace(tensor);
 }
 
 nnl2_tensor* lisp_call_atan(const nnl2_tensor* tensor) {
-    return nnl2_atan(tensor);
+    return nnl2_atan(tensor); 
 }
-
+ 
 void lisp_call_atan_inplace(nnl2_tensor* tensor) {
-    nnl2_ataninplace(tensor);
+    nnl2_ataninplace(tensor);   
 }
 
 nnl2_tensor* lisp_call_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype) {

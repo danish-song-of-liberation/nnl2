@@ -2,4 +2,5 @@
 #include "nnl2/ts.h"
 #include "nnl2/ad.h"
 #include "nnl2/optim.h"
+#include "nnl2/postcore.h"
 #include "nnl2/nn.h"

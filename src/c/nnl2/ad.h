@@ -144,6 +144,7 @@
 #include "../ad/ops/trans/nnl2_ad_transposition.h"
 #include "../ad/ops/trans/nnl2_ad_transposition_inplace.h"
 #include "../ad/ops/other/nnl2_ad_vector_concat.h"
+#include "../ad/ops/other/nnl2_ad_vector_as_parameter.h"
 #include "../ad/ops/other/nnl2_ad_reshape_backward.h"
 #include "../ad/ops/other/nnl2_ad_reshape.h"
 #include "../ad/ops/other/nnl2_ad_reinterpret_backward.h"

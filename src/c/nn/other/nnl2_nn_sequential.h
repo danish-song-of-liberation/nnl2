@@ -83,31 +83,42 @@ nnl2_nn_sequential* nnl2_nn_sequential_create(size_t num_layers, void** layers) 
 	return seq;
 }
 
-/**
- * @brief Frees all resources associated with a sequential neural network
+/** @brief 
+ * Frees all resources associated with a sequential neural network
  * 
- * @param seq Pointer to sequential container to free
- * 
- * @note This function safely handles NULL pointers
- * @note Each layer is freed using the generic nnl2_ann_free function
+ ** @param seq 
+ * Pointer to sequential container to free
+ *
+ ** @note 
+ * Each layer is freed using the generic nnl2_ann_free function
  */
 void nnl2_nn_sequential_free(nnl2_nn_sequential* seq) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
+		NNL2_INFO("Freeing sequential network: %p", seq);
     #endif
 	
 	if (seq == NULL) return;
 	
 	for(size_t layer_idx = 0; layer_idx < seq->num_layers; layer_idx++) {
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+			NNL2_INFO("(Sequential) Freeing %zu layer: %p (nn_type: %d)", layer_idx, seq -> layers[layer_idx], *((nnl2_nn_type*)(seq -> layers[layer_idx]))); 
+		#endif 
+		
         if(seq->layers[layer_idx] != NULL) {
             nnl2_ann_free(seq->layers[layer_idx]);
         }
+		
+		#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+			NNL2_INFO("(Sequential) %zu layer succesfully freed"); 
+		#endif 
     }
 	
 	free(seq->layers);
 	free(seq);
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+		NNL2_INFO("Succesfully freed sequential network");
         NNL2_FUNC_EXIT();
     #endif
 }
@@ -308,6 +319,108 @@ void nnl2_nn_sequential_print(nnl2_nn_sequential* nn, int depth) {
     
     // Final closing bracket with newlines
     printf(")\n\n");
+}
+
+nnl2_nnlrepr_template* nnl2_nn_sequential_nnlrepr_template(nnl2_nn_sequential* nn) {
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(nn == NULL) {
+            NNL2_ERROR("In function nnl2_nn_sequential_nnlrepr_template, sequential pointer is NULL");
+            return NULL;
+        }
+    #endif 
+	
+	nnl2_nnlrepr_template* result = malloc(sizeof(nnl2_nnlrepr_template));
+	
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(result == NULL) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+	
+	// Common metadata
+    result->nn_type = nnl2_nn_type_sequential;
+    result->num_shapes = 0;
+    result->vector_size = 0;
+    result->num_childrens = nn->num_layers;
+    result->shapes = NULL;
+    result->additional_data = NULL;
+    result->childrens = NULL;
+	
+	if(result->num_childrens == 0) {
+        result->childrens = NULL;
+		
+        #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+            NNL2_INFO("Created empty sequential nnlrepr template");
+            NNL2_FUNC_EXIT();
+        #endif
+		
+        return result;
+    }
+	
+	result->childrens = malloc(sizeof(nnl2_nnlrepr_template*) * result->num_childrens);
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(result->childrens == NULL) {
+            NNL2_MALLOC_ERROR();
+            free(result);
+            return NULL;
+        }
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+            for(size_t i = 0; i < result->num_childrens; i++) {
+                result->childrens[i] = NULL;
+            }
+        #endif
+    #endif
+	
+	// Create templates for each layer
+    bool allocation_failed = false;
+    
+    for(size_t it = 0; it < result->num_childrens; it++) {
+        result->childrens[it] = nnl2_ann_nnlrepr_template(nn->layers[it]);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(result->childrens[it] == NULL) {
+                NNL2_ERROR("Failed to create template for layer %zu", it);
+                allocation_failed = true;
+                break;
+            }
+        #endif
+    }
+
+    if(allocation_failed) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            for(size_t i = 0; i < result->num_childrens; i++) {
+                if(result->childrens[i] != NULL) {
+                    nnl2_nnlrepr_template_free(result->childrens[i]);
+                }
+            }
+			
+            free(result->childrens);
+            free(result);
+        #endif
+		
+        return NULL;
+    } 
+	
+	result->vector_size = 0;
+    for(size_t i = 0; i < result->num_childrens; i++) {
+        result->vector_size += result->childrens[i]->vector_size;
+    }
+	
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Created sequential nnlrepr template with %zu layers, total vector size: %zu", 
+                  result->num_childrens, result->vector_size);
+				  
+        NNL2_FUNC_EXIT();
+    #endif
+	
+	return result;
 }
 
 #endif /** NNL2_NN_SEQUENTIAL_H **/

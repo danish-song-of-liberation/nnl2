@@ -552,6 +552,12 @@
   (mean :double)
   (std :double))
   
+(cffi:defcfun ("nnl2_vector_as_parameter" %vector-as-parameter) :pointer
+  (shape :pointer)
+  (rank :int)
+  (start :size)
+  (vector :pointer))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
@@ -1495,6 +1501,25 @@
   (bxh :pointer)
   (bhh :pointer)
   (handle-as nnl2-nn-handle-as))  
+  
+;; -- Other --  
+  
+(cffi:defcfun ("nnl2_nn_encode" %nnlrepr-encode) :pointer 
+  (nn :pointer))
+  
+(cffi:defcfun ("nnl2_nn_print_encoder" %nnlrepr-print-encoder) :void 
+  (encoder :pointer)
+  (terpri :bool)
+  (depth :int))
+
+(cffi:defcfun ("nnl2_nn_decode" %nnlrepr-decode) :pointer
+  (encoder :pointer))
+  
+(cffi:defcfun ("nnl2_nnlrepr_free" %nnlrepr-free) :void 
+  (nnlrepr :pointer))
+
+(cffi:defcfun ("nnl2_nnlrepr_template_free" %nnlrepr-template-free) :void 
+  (nnlrepr-template :pointer))
   
 ;; -- Backends --  
  

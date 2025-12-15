@@ -671,5 +671,11 @@
    #:%nn-manual-fnn
    #:%nn-manual-rnn-cell
    #:%vector-concat
-   #:%ad-vector-concat))
+   #:%ad-vector-concat
+   #:%nnlrepr-encode
+   #:%nnlrepr-decode
+   #:%vector-as-parameter
+   #:%nnlrepr-print-encoder
+   #:%nnlrepr-free
+   #:%nnlrepr-template-free))
    

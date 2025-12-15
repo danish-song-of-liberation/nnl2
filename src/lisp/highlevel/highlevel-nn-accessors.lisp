@@ -163,3 +163,22 @@
 (defun print-model (nn)
   (nnl2.ffi:%print-model nn t 0))
   
+(in-package :nnl2.hli.nn.ga)
+
+(defmacro encode (nn (vector nnlrepr) &body body)
+  `(let* ((,nnlrepr (nnl2.ffi:%nnlrepr-encode ,nn))
+		  (,vector (cffi:mem-aref ,nnlrepr :pointer 0)))
+		 
+	 ,@body
+	 
+	 (nnl2.ffi:%nnlrepr-free ,nnlrepr)))	
+	
+(defmacro free-encoder (encoder)
+  `(nnl2.ffi:%nnlrepr-free ,encoder))	
+	
+(defun print-encoder (encoder)
+  (nnl2.ffi:%nnlrepr-print-encoder (cffi:mem-aref encoder :pointer 1) t 0))
+  
+(defun decode (encoder)
+  (nnl2.ffi:%nnlrepr-decode encoder))    
+  

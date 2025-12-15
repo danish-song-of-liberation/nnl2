@@ -656,22 +656,22 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
 	ad_tensor->magic_number = TENSOR_MAGIC_FREED;
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
-        NNL2_DEBUG("Freeing %p tensor (name: %s)", ad_tensor, ad_tensor -> name);
+        NNL2_DEBUG("(AD) Freeing %p tensor (name: %s)", ad_tensor, ad_tensor -> name);
     #endif
     
     // Free the main data tensor
     if (ad_tensor->data) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-            NNL2_DEBUG("Freeing AD-tensor data at %x", ad_tensor->data);
+            NNL2_DEBUG("(AD) Freeing AD-tensor data at %x", ad_tensor->data);
         #endif
-    
+
         nnl2_free_tensor(ad_tensor->data);
     }
     
     // Free the gradient tensor
     if (ad_tensor->grad) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-            NNL2_DEBUG("Freeing AD-tensor gradient at %x", ad_tensor->grad);
+            NNL2_DEBUG("(AD) Freeing AD-tensor gradient at %x", ad_tensor->grad);
         #endif
         
         nnl2_free_tensor(ad_tensor->grad);
@@ -680,7 +680,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
     // Free the name string
     if (ad_tensor->name) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-            NNL2_DEBUG("Freeing AD-tensor name at %x", ad_tensor->name);
+            NNL2_DEBUG("(AD) Freeing AD-tensor name at %x", ad_tensor->name);
         #endif
         
         free(ad_tensor->name);
@@ -689,7 +689,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
     // Free the roots array
     if (ad_tensor->roots) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-            NNL2_DEBUG("Freeing AD-tensor roots at %x", ad_tensor->roots);
+            NNL2_DEBUG("(AD) Freeing AD-tensor roots at %x", ad_tensor->roots);
         #endif
         
         free(ad_tensor->roots);
@@ -698,7 +698,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
 	// Free extra_field if there's a cleanup function
     if (ad_tensor->extra_free && ad_tensor->extra_field) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-            NNL2_DEBUG("Freeing AD-tensor extra_field at %x with custom free function", ad_tensor->extra_field);
+            NNL2_DEBUG("(AD) Freeing AD-tensor extra_field at %x with custom free function", ad_tensor->extra_field);
         #endif
         
         ad_tensor->extra_free(ad_tensor->extra_field);
@@ -708,9 +708,9 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
     }
     
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
-        NNL2_DEBUG("Freeing AD-tensor at %x", ad_tensor);
+        NNL2_DEBUG("(AD) Freeing AD-tensor at %x", ad_tensor);
     #endif
-        
+       	
     // Free the main AD tensor structure
     free(ad_tensor);
     

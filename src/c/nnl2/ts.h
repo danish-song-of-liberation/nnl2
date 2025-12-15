@@ -33,6 +33,7 @@
 #include "../tensorutils/nnl2_narrow.h"
 #include "../tensorutils/internal/nnl2_regional_axpy_inplace.h"
 #include "../tensorutils/internal/nnl2_vector_concat.h"
+#include "../tensorutils/internal/nnl2_vector_as_parameter.h"
 #include "../tensornorm/nnl2_l2.h"
 #include "../tensorops/gemm/nnl2_sgemm_inplace.h"
 #include "../tensorops/gemm/nnl2_dgemm_inplace.h"

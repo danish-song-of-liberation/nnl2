@@ -47,4 +47,7 @@
 	  (cffi:foreign-free vectors-pntr)
 	  result)))	
 	
+(defun ts-vector-as-parameter (vector indices &key (start 0))
+  (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
+    (nnl2.ffi:%vector-as-parameter shape rank start vector)))
 	

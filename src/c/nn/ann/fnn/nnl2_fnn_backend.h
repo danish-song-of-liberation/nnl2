@@ -429,4 +429,189 @@ void nnl2_nn_fnn_print(nnl2_nn_fnn* nn, bool terpri) {
 	printf("(fnn %d -> %d :bias %s)%s", nnl2_nn_fnn_get_in_features(nn), nnl2_nn_fnn_get_out_features(nn), nn -> metadata.use_bias ? "t" : "nil", terpri ? "\n" : "");
 }
 
+/** @brief 
+ * Encodes FNN information in nnlrepr format
+ *
+ ** @param nn 
+ * Input FNN
+ */
+static nnl2_nnlrepr_template* nnl2_nn_fnn_nnlrepr_template(nnl2_nn_fnn* nn) {
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+        if(!nn || !nn->weights || !nn->weights->data) {
+            NNL2_ERROR("In function nnl2_nn_fnn_nnlrepr_template, failed assertion ```!nn || !nn->weights || !nn->weights->data```");
+            return NULL;
+        }
+    #endif
+	
+    nnl2_nnlrepr_template* result = malloc(sizeof(nnl2_nnlrepr_template));
+    
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+		if(!result) {
+			NNL2_MALLOC_ERROR();
+			return NULL;
+		}
+	#endif 
+    
+	// Common metadata
+    result -> nn_type = nnl2_nn_type_fnn;
+	result -> dtype = nn -> weights -> data -> dtype;
+    result -> num_shapes = (nn -> metadata.use_bias ? 2 : 1);   // 2 - weights + bias : 1 - weights only
+    result -> vector_size = product(nn -> weights -> data -> shape, 2); // 2 dimensions
+    result -> num_childrens = 0;
+    result -> childrens = NULL;
+    result -> additional_data = NULL;
+
+    result -> shapes = malloc(sizeof(int32_t*) * result -> num_shapes);
+	
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+		if(!result->shapes) {
+			NNL2_MALLOC_ERROR();
+			free(result);
+			return NULL;
+		}
+		
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+			for(size_t i = 0; i < result->num_shapes; i++) {
+				result->shapes[i] = NULL;
+			}
+		#endif 
+	#endif
+
+    result -> shapes[0] = malloc(sizeof(int32_t) * 2); // 2 dimensions
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+        if(!result->shapes[0]) {
+            NNL2_MALLOC_ERROR();
+            nnl2_nnlrepr_template_free(result);
+            return NULL;
+        }
+    #endif
+
+    result -> shapes[0][0] = nn -> weights -> data -> shape[0];  
+    result -> shapes[0][1] = nn -> weights -> data -> shape[1];
+    
+    if(nn->metadata.use_bias) {
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            if(!nn->bias || !nn->bias->data) {
+                NNL2_ERROR("In function nnl2_nn_fnn_nnlrepr_template, bias is enabled but bias data is invalid");				
+                nnl2_nnlrepr_template_free(result);
+                return NULL;
+            }
+        #endif
+		
+        result->shapes[1] = malloc(sizeof(int32_t)); // 1 dimensions so malloc(sizeof(int32_t) * 1) not needed
+		
+		#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            if(!result->shapes[1]) {
+                NNL2_MALLOC_ERROR();
+                nnl2_nnlrepr_template_free(result);
+                return NULL;
+            }
+        #endif
+		
+        result -> shapes[1][0] = nn -> bias -> data -> shape[0];
+		result -> vector_size += nn -> bias -> data -> shape[0];
+    }
+	
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_EXIT();
+	#endif
+    
+    return result;
+}
+
+/** @brief 
+ * Decodes FNN information in nnlrepr format
+ *
+ ** @param vector 
+ * Encoded 1D nnlrepr vector 
+ *
+ ** @param offset
+ * Encoded vector shift to nnl2_ad_vector_as_parameter(..., ..., offset, ...);
+ * 
+ ** @param num_shapes
+ * Number of shapes of all parameters 
+ *
+ ** @param shape_w 
+ * fnn -> weights Parameter
+ *
+ ** @param shape_b 
+ * fnn -> bias Parameter (If bias needed)
+ *
+ ** @param dtype 
+ * Encoder data type. Needs for nnl2_nn_fnn_manual_create(..., ......, dtype, ..., ......)
+ *
+ ** @return nnl2_nn_fnn* 
+ * Pointer to created FNN or NULL on error
+ */
+static nnl2_nn_fnn* nnl2_nn_fnn_nnlrepr_decode(nnl2_ad_tensor* vector, size_t offset, int num_shapes, int32_t* shape_w, int32_t* shape_b, nnl2_tensor_type dtype) {
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+		NNL2_FUNC_ENTER();
+	#endif
+
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(vector, "In function nnl2_nn_fnn_nnlrepr_decode, nnl2_ad_tensor* vector is NULL. returning NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape_w, "In function nnl2_nn_fnn_nnlrepr_decode, int32_t* shape_w is NULL. returning NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape_b, "In function nnl2_nn_fnn_nnlrepr_decode, int32_t* shape_b is NULL. returning NULL", NULL);
+	#endif
+	
+	nnl2_ad_tensor* w_view = nnl2_ad_vector_as_parameter(shape_w, 2, offset, vector); // 2 is a two dimensions
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(w_view == NULL) {
+            NNL2_ERROR("In function nnl2_nn_fnn_nnlrepr_decode, failed to create weights view. returning NULL");
+            return NULL;
+        }
+    #endif
+	
+	offset += product(shape_w, 2); // 2 dimensions
+	
+	nnl2_ad_tensor* b_view = NULL;
+	if(num_shapes == 2) {
+        b_view = nnl2_ad_vector_as_parameter(shape_b, 1, offset, vector); // 1 is a one dimension
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(b_view == NULL) {
+                NNL2_ERROR("In function nnl2_nn_fnn_nnlrepr_decode, failed to create bias view. returning NULL");
+                nnl2_free_ad_tensor(w_view);
+                return NULL;
+            }
+        #endif
+
+        offset += shape_b[0];
+    }
+	
+	nnl2_nn_fnn* result = nnl2_nn_fnn_manual_create(
+        shape_w[0],                // input_size
+        shape_w[1],                // output_size
+        (num_shapes == 2),         // use_bias
+        dtype,                     // data type
+        w_view,                    // weights tensor
+        b_view,                    // bias tensor (may be NULLL)
+        nnl2_nn_handle_as_view     // handle as view
+    );
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(result == NULL) {
+            NNL2_ERROR("Failed to create FNN from decoded parameters. returning NULL");
+            nnl2_free_ad_tensor(w_view);
+            if (b_view != NULL) nnl2_free_ad_tensor(b_view);
+            return NULL;
+        }
+    #endif
+	
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+		NNL2_INFO("Successfully decoded FNN: input_size=%d, output_size=%d, use_bias=%s",
+                  shape_w[0], shape_w[1], (num_shapes == 2) ? "true" : "false");
+				  
+		NNL2_FUNC_EXIT();
+	#endif
+	
+	return result;
+}
+
 #endif /** NNL2_FNN_BACKEND_H **/

@@ -205,4 +205,52 @@ void nnl2_nn_tanh_print(nnl2_nn_tanh* nn, bool terpri) {
     printf("(.tanh :approx %s)%s", nn->approx ? "t" : "nil", terpri ? "\n" : "");
 }
 
+/**
+ * @brief 
+ * Encodes Tanh layer information in nnlrepr format
+ * 
+ * @param nn 
+ * Pointer to Tanh layer structure
+ * 
+ * @return nnl2_nnlrepr_template* 
+ * Pointer to created template or NULL on error
+ */
+static nnl2_nnlrepr_template* nnl2_nn_tanh_nnlrepr_template(nnl2_nn_tanh* nn) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (nn == NULL) {
+            NNL2_ERROR("In function nnl2_nn_tanh_nnlrepr_template, Tanh layer pointer is NULL");
+            return NULL;
+        }
+    #endif
+	
+    nnl2_nnlrepr_template* result = malloc(sizeof(nnl2_nnlrepr_template));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (result == NULL) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+	
+	// Common metadata
+    result->nn_type = nnl2_nn_type_tanh;
+    result->num_shapes = 0;
+    result->vector_size = 0;
+    result->num_childrens = 0;
+    result->childrens = NULL;
+    result->shapes = NULL;
+	result->additional_data = &(nn->approx);
+	
+	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Created tanh nnlrepr template with approx = %d", nn->approx);
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
 #endif /** NNL2_NN_TANH_H **/

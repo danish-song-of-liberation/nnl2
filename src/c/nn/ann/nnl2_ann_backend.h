@@ -16,6 +16,9 @@
 
 
 
+#ifndef NNL2_NN_TYPE_DEFINED
+#define NNL2_NN_TYPE_DEFINED
+
 ///@{ [nnl2_nn_type]
 
 typedef enum {
@@ -31,6 +34,36 @@ typedef enum {
 
 ///@} [nnl2_nn_type]
 
+#endif /** NNL2_NN_TYPE_DEFINED **/
+
+
+
+#ifndef NNL2_NNLREPR_TEMPLATE_DEFINED
+#define NNL2_NNLREPR_TEMPLATE_DEFINED
+
+///@{ [nnl2_nnlrepl_template]
+
+/** @struct nnl2_nnlrepr_template_item
+ ** @brief 
+ * nnlrepr is a nnl2 nn own data format
+ * for representing neural network as a
+ * 1D tensor and back. Needs for GA 
+ * algorithms
+ */
+typedef struct nnl2_nnlrepr_template_item {
+    nnl2_nn_type nn_type;		///< Type of the neural network layer
+	nnl2_tensor_type dtype;		///< Data type used for tensors in current layer
+	int** shapes; 				///< Array of shape definitions for the layer
+    size_t vector_size;         ///< Encoded 1d vector size
+    size_t num_shapes;          ///< Number of shape definitions
+    size_t num_childrens;       ///< Number of child layers in this template
+	void* additional_data;      ///< Additional layer-specific data
+    struct nnl2_nnlrepr_template_item** childrens;      ///< Array of child layer templates
+} nnl2_nnlrepr_template;
+
+///@} [nnl2_nnlrepl_template]
+
+#endif /** NNL2_NNLREPR_TEMPLATE_DEFINED **/
 
 
 ///@{ [nnl2_nn_handle_as]

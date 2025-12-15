@@ -190,4 +190,41 @@ void nnl2_nn_relu_print(bool terpri) {
 	printf("(.relu)%s", terpri ? "\n" : "");
 }
 
+/** @brief 
+ * Encodes ReLU layer information in nnlrepr format
+ * 
+ ** @return nnl2_nnlrepr_template* 
+ * Pointer to created template or NULL on error
+ */
+static nnl2_nnlrepr_template* nnl2_nn_relu_nnlrepr_template() {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+    nnl2_nnlrepr_template* result = malloc(sizeof(nnl2_nnlrepr_template));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (result == NULL) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+    // Common metadata
+    result->nn_type = nnl2_nn_type_relu;
+    result->num_shapes = 0;
+    result->vector_size = 0;
+    result->num_childrens = 0;
+    result->childrens = NULL;
+    result->shapes = NULL;
+    result->additional_data = NULL;  
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Created ReLU nnlrepr template");
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
 #endif /** NNL2_NN_RELU_H **/

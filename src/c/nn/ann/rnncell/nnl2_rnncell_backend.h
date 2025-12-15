@@ -517,5 +517,352 @@ void nnl2_nn_rnn_cell_print(nnl2_nn_rnn_cell* nn, bool terpri) {
         NNL2_FUNC_EXIT();
     #endif
 }
+
+/**
+ * @brief 
+ * Encodes RNN cell information in nnlrepr format
+ * 
+ * @param cell 
+ * Pointer to RNN cell structure
+ * 
+ * @return nnl2_nnlrepr_template* 
+ * Pointer to created template or NULL on error
+ */
+static nnl2_nnlrepr_template* nnl2_nn_rnn_cell_nnlrepr_template(nnl2_nn_rnn_cell* cell) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+        if (!cell || !cell->whh || !cell->whh->data) {
+            NNL2_ERROR("In function nnl2_nn_rnn_cell_nnlrepr_template, failed assertion ```!cell || !cell->whh || !cell->whh->data```. returning NULL");
+            return NULL;
+        }
+    #endif
+	
+    nnl2_nnlrepr_template* result = malloc(sizeof(nnl2_nnlrepr_template));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+        if (!result) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+    // Common metadata
+    result->nn_type = nnl2_nn_type_rnn_cell;
+    result->num_shapes = 0;
+    result->vector_size = 0;
+    result->num_childrens = 0;
+    result->childrens = NULL;
+    result->shapes = NULL;
+    result->additional_data = NULL;
+    result->dtype = cell->whh->data->dtype;
+	
+    int num_tensors = 0;
+	
+    // Count available tensors
+    if (cell->wxh && cell->wxh->data)  num_tensors++;
+    if (cell->whh && cell->whh->data)  num_tensors++;
+    if (cell->bxh && cell->bxh->data)  num_tensors++;
+    if (cell->bhh && cell->bhh->data)  num_tensors++;
+    
+    if(num_tensors == 0) { // if ((bar == 1) == true) { return true; } else { return false; }
+        #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+            NNL2_WARN("RNN cell has no tensor data. Returning early");
+            NNL2_FUNC_EXIT();
+        #endif
+		
+        return result; 
+    }
+    
+    result->num_shapes = num_tensors;
+    result->shapes = malloc(sizeof(int32_t*) * result->num_shapes);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+        if (!result->shapes) {
+            NNL2_MALLOC_ERROR();
+            free(result);
+            return NULL;
+        }
+		
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+            for (size_t i = 0; i < result->num_shapes; i++) {
+                result->shapes[i] = NULL;
+            }
+        #endif 
+    #endif
+    
+    int shape_index = 0;
+    int allocation_failed = 0;
+    
+    // wxh
+    if (cell->wxh && cell->wxh->data && !allocation_failed) {
+        int dims = 2; 
+        result->shapes[shape_index] = malloc(sizeof(int32_t) * dims);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            if (!result->shapes[shape_index]) {
+                NNL2_MALLOC_ERROR();
+                allocation_failed = 1;
+            }
+        #endif
+        
+        if (!allocation_failed) {
+            result->shapes[shape_index][0] = cell->wxh->data->shape[0];
+            result->shapes[shape_index][1] = cell->wxh->data->shape[1];
+            result->vector_size += product(cell->wxh->data->shape, dims);
+            
+            #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+                NNL2_INFO("Added wxh shape: [%d, %d]", 
+                          cell->wxh->data->shape[0], 
+                          cell->wxh->data->shape[1]);
+            #endif
+        }
+		
+        shape_index++;
+    }
+    
+    // whh 
+    if(cell->whh && cell->whh->data && !allocation_failed) {
+        int dims = 2;
+        result->shapes[shape_index] = malloc(sizeof(int32_t) * dims);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            if(!result->shapes[shape_index]) {
+                NNL2_MALLOC_ERROR();
+                allocation_failed = 1;
+            }
+        #endif
+        
+        if(!allocation_failed) {
+            result->shapes[shape_index][0] = cell->whh->data->shape[0];
+            result->shapes[shape_index][1] = cell->whh->data->shape[1];
+            result->vector_size += product(cell->whh->data->shape, dims);
+            
+            #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+                NNL2_INFO("Added whh shape: [%d, %d]", 
+                          cell->whh->data->shape[0], 
+                          cell->whh->data->shape[1]);
+            #endif
+        }
+		
+        shape_index++;
+    }
+    
+    // bxh
+    if(cell->bxh && cell->bxh->data && !allocation_failed) {
+        int dims = 1; 
+        result->shapes[shape_index] = malloc(sizeof(int32_t) * dims);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            if(!result->shapes[shape_index]) {
+                NNL2_MALLOC_ERROR();
+                allocation_failed = 1;
+            }
+        #endif
+        
+        if(!allocation_failed) {
+            result->shapes[shape_index][0] = cell->bxh->data->shape[0];
+            result->vector_size += cell->bxh->data->shape[0];
+            
+            #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+                NNL2_INFO("Added bxh shape: [%d]", cell->bxh->data->shape[0]);
+            #endif
+        }
+		
+        shape_index++;
+    }
+
+    // bhh 
+    if (cell->bhh && cell->bhh->data && !allocation_failed) {
+        int dims = 1;
+        result->shapes[shape_index] = malloc(sizeof(int32_t) * dims);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            if (!result->shapes[shape_index]) {
+                NNL2_MALLOC_ERROR();
+                allocation_failed = 1;
+            }
+        #endif
+        
+        if (!allocation_failed) {
+            result->shapes[shape_index][0] = cell->bhh->data->shape[0];
+            result->vector_size += cell->bhh->data->shape[0];
+            
+            #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+                NNL2_INFO("Added bhh shape: [%d]", cell->bhh->data->shape[0]);
+            #endif
+        }
+		
+        shape_index++;
+    }
+    
+    // Cleanup on allocation failure
+    if(allocation_failed) {
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+            for (int i = 0; i < shape_index; i++) {
+                if (result->shapes[i]) {
+                    free(result->shapes[i]);
+                }
+            }
+			
+            free(result->shapes);
+            free(result);
+        #endif
+		
+        return NULL;
+    }
+	
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Created RNN cell nnlrepr template with %d tensors, total vector size: %d", num_tensors, result->vector_size);
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
+/** @brief 
+ * Decodes RNN cell information from nnlrepr format
+ *
+ ** @param vector 
+ * Encoded 1D nnlrepr vector 
+ *
+ ** @param offset
+ * Encoded vector shift to nnl2_ad_vector_as_parameter(..., ..., offset, ...);
+ * 
+ ** @param num_shapes
+ * Number of shapes of all parameters (2 or 4)
+ *
+ ** @param shape_wxh 
+ * wxh parameter shape [hidden_size, input_size]
+ *
+ ** @param shape_whh 
+ * whh parameter shape [hidden_size, hidden_size]
+ *
+ ** @param shape_bhh 
+ * bhh parameter shape [hidden_size]
+ *
+ ** @param shape_bxh 
+ * bxh parameter shape [hidden_size]
+ *
+ ** @param dtype 
+ * Encoder data type
+ *
+ ** @return nnl2_nn_rnn_cell* 
+ * Pointer to created RNN cell or NULL on error
+ */
+static nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_nnlrepr_decode(nnl2_ad_tensor* vector, size_t offset, int num_shapes, 
+                                                  int32_t* shape_wxh, int32_t* shape_whh, 
+                                                  int32_t* shape_bhh, int32_t* shape_bxh, 
+                                                  nnl2_tensor_type dtype) {
+													  
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(vector, "In function nnl2_nn_rnn_cell_nnlrepr_decode, nnl2_ad_tensor* vector is NULL. returning NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape_wxh, "In function nnl2_nn_rnn_cell_nnlrepr_decode, shape_wxh is NULL. returning NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape_whh, "In function nnl2_nn_rnn_cell_nnlrepr_decode, shape_whh is NULL. returning NULL", NULL);
+        
+        if(num_shapes > 2) {
+            NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape_bhh, "In function nnl2_nn_rnn_cell_nnlrepr_decode, shape_bhh is NULL but bias expected. returning NULL", NULL);
+            NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(shape_bxh, "In function nnl2_nn_rnn_cell_nnlrepr_decode, shape_bxh is NULL but bias expected. returning NULL", NULL);
+        }
+    #endif
+    
+    // Extract wxh (input-hidden weights)
+    nnl2_ad_tensor* wxh_view = nnl2_ad_vector_as_parameter(shape_wxh, 2, offset, vector);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (wxh_view == NULL) {
+            NNL2_ERROR("Failed to create wxh view. returning NULL");
+            return NULL;
+        }
+    #endif
+    
+    offset += product(shape_wxh, 2);
+    
+    // Extract whh (hidden-hidden weights)
+    nnl2_ad_tensor* whh_view = nnl2_ad_vector_as_parameter(shape_whh, 2, offset, vector);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(whh_view == NULL) {
+            NNL2_ERROR("Failed to create whh view. returning NULL");
+            nnl2_free_ad_tensor(wxh_view);
+            return NULL;
+        }
+    #endif
+    
+    offset += product(shape_whh, 2);
+    
+    // Extract biases if present
+    nnl2_ad_tensor* bxh_view = NULL;
+    nnl2_ad_tensor* bhh_view = NULL;
+    
+    if (num_shapes > 2) {
+        // Extract bxh (input bias)
+        bxh_view = nnl2_ad_vector_as_parameter(shape_bxh, 1, offset, vector);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if (bxh_view == NULL) {
+                NNL2_ERROR("Failed to create bxh view. returning NULL");
+                nnl2_free_ad_tensor(wxh_view);
+                nnl2_free_ad_tensor(whh_view);
+                return NULL;
+            }
+        #endif
+        
+        offset += shape_bxh[0];
+        
+        // Extract bhh (hidden bias)
+        bhh_view = nnl2_ad_vector_as_parameter(shape_bhh, 1, offset, vector);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if (bhh_view == NULL) {
+                NNL2_ERROR("Failed to create bhh view. returning NULL");
+                nnl2_free_ad_tensor(wxh_view);
+                nnl2_free_ad_tensor(whh_view);
+                nnl2_free_ad_tensor(bxh_view);
+                return NULL;
+            }
+        #endif
+    }
+    
+    int input_size = shape_wxh[1];      // wxh shape [hidden_size, input_size]
+    int hidden_size = shape_whh[0];     // whh shape [hidden_size, hidden_size]
+    bool has_bias = (num_shapes > 2);
+    
+    nnl2_nn_rnn_cell* result = nnl2_nn_rnn_cell_manual_create(
+        input_size, 
+        hidden_size, 
+        has_bias, 
+        dtype, 
+        wxh_view, 
+        whh_view, 
+        bxh_view, 
+        bhh_view, 
+        nnl2_nn_handle_as_view
+    );
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (result == NULL) {
+            NNL2_ERROR("Failed to create RNN cell from decoded parameters. returning NULL");
+            nnl2_free_ad_tensor(wxh_view);
+            nnl2_free_ad_tensor(whh_view);
+            if (bxh_view != NULL) nnl2_free_ad_tensor(bxh_view);
+            if (bhh_view != NULL) nnl2_free_ad_tensor(bhh_view);
+            return NULL;
+        }
+    #endif
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Successfully decoded RNN cell: input_size=%d, hidden_size=%d, has_bias=%s", input_size, hidden_size, has_bias ? "true" : "false");
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
 	
 #endif /** NNL2_RNNCELL_BACKEND_H **/
