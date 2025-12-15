@@ -218,15 +218,13 @@ void nnl2_nnlrepr_free(nnl2_nnlrepr* nnlrepr) {
         NNL2_INFO("(nnlrepr) Freeing nnlrepr at %p", nnlrepr);
     #endif
 	
-	/*
+	/* see nnl2_nnlrepr_template_free doxygen
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_INFO("nnl2_nnlrepr_free: shapes[0][0]: %d", nnlrepr -> template -> shapes[1][0]);
 		NNL2_INFO("nnl2_nnlrepr_free: shapes[0][1]: %d", nnlrepr -> template -> shapes[1][1]);
 		NNL2_INFO("nnl2_nnlrepr_free: shapes[1][0]: %d", nnlrepr -> template -> shapes[2][0]);
 	#endif
 	*/
-	
-	nnl2_nn_print_encoder(nnlrepr -> template, true, 0); 
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
 		if(nnlrepr == NULL) {

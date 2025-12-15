@@ -756,7 +756,7 @@ void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 }
  
 Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
-	return axpy(summand, sumend, alpha);      	 
+	return axpy(summand, sumend, alpha);      	  
 }     
 
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) { 
