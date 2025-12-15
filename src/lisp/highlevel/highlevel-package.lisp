@@ -11,10 +11,16 @@
 ;; UPD: also definition of :nnl2.hli.nn package
 ;; where nn i think is autologous
 
-;; UPD: also added definition of :nnl2.hli.ts.loss, :nnl2.hli.ad.r.loss, :nnl2.hli.nn.ga packages
+;; UPD: also added definition of ```:nnl2.hli.ts.loss, :nnl2.hli.ad.r.loss, 
+;; :nnl2.hli.nn.ga, :nnl2.hli.nn.ga.fitness``` packages
 
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
+(defpackage #:nnl2.hli.nn.ga.fitness
+  (:use #:cl)
+  (:export
+    #:mse))
 
 (defpackage #:nnl2.hli.nn.ga
   (:use #:cl)

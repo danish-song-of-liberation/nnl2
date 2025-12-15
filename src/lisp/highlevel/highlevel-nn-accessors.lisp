@@ -166,6 +166,32 @@
 (in-package :nnl2.hli.nn.ga)
 
 (defmacro encode (nn (vector nnlrepr) &body body)
+  "Encodes a neural network model into a single flat vector
+   Needed for GA 
+   
+   Args:
+       nn: Input neural network 
+	   
+	   (vector nnlrepr):
+	       vector: Name for result vector 
+		   nnlrepr: Name for result encoder (may be decoded back to nn)
+		   
+	   body (&body): User code
+
+   Example:
+       (nnl2.hli.nn:nnlet ((corge (nnl2.hli.nn:fnn 2 -> 1)))
+         (nnl2.hli.nn.ga:encode corge (nn-vector nn-encoder)
+		   ;; nn-vector Is a flat vector with concatted corge parameters 
+		   ;; nn-encoder Is a pointer to nnlrepr hard encoder structure
+		   
+		   (nnl2.hli.nn.ga:print-encoder nn-encoder) 
+		   
+		   ;; ... Your code
+		   
+		   ;; Decoding back to nn
+		   (nnl2.hli.nn:nnlet ((garple (nnl2.hli.nn.ga:decode nn-encoder)))
+		     (nnl2.hli.nn:print-model garple))))"
+			 
   `(let* ((,nnlrepr (nnl2.ffi:%nnlrepr-encode ,nn))
 		  (,vector (cffi:mem-aref ,nnlrepr :pointer 0)))
 		 
@@ -174,11 +200,41 @@
 	 (nnl2.ffi:%nnlrepr-free ,nnlrepr)))	
 	
 (defmacro free-encoder (encoder)
+  "Frees nnlrepr encoder"
   `(nnl2.ffi:%nnlrepr-free ,encoder))	
 	
 (defun print-encoder (encoder)
+  "Prints nnlrepr encoder"
   (nnl2.ffi:%nnlrepr-print-encoder (cffi:mem-aref encoder :pointer 1) t 0))
   
 (defun decode (encoder)
+  "Decodes nnlrepr encoder"
   (nnl2.ffi:%nnlrepr-decode encoder))    
+  
+(in-package :nnl2.hli.nn.ga.fitness)
+  
+(defun mse (x y)
+  "Computes a modified inverse mean squared error (MSE) between two tensors
+   
+   Args:
+       x: AD-tensor with input data 
+       y: AD-tensor with target data 
+	   
+   Return:
+	   Scalar with fitness-mse (/ 1 (+ 1 (sum (^ (- x y) 2))))
+	   
+	   (^ (- x y) 2) is ELEMENT-WISE
+	   
+	   (/ 1 (+ 1 (sum ...))) is NOT ELEMENT-WISE
+	   
+   Example:
+       (nnl2.hli.ad:tlet ((x (nnl2.hli.ad:ones #(5 5)))
+						  (y (nnl2.hli.ad:zeros #(5 5))))
+						  
+		 (print (nnl2.hli.nn.ga.fitness:mse x y))) ;; (/ 1 (+ 1 (mse x y))) = (/ 1 2) = 0.5
+		 
+   Needed for GA
+   The higher the result, the smaller the error" 	   
+
+  (/ 1.0 (+ 1.0 (nnl2.hli.ad.r.loss:mse x y :track-graph nil :force t))))  
   
