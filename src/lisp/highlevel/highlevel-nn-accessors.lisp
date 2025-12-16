@@ -256,3 +256,30 @@
 (defun uniform (tensor &key (rate 0.1s0) (delta 1.0s0))
   (nnl2.ffi:%ga-mutation-uniform tensor rate delta))  
   
+(in-package :nnl2.hli.nn.ga.selection)
+
+(defun tournament (population fintess-fn &key (k 3) (num-selected 1) (test #'>))
+  "Tournament selection for lists and vectors
+
+   Args:
+       population: List or vector of individuals
+       fitness-fn: Autologous
+	   k (&key) (default: 3): Tournament size
+       num-selected (&key) (default: 1): Number of individuals to select
+       
+   Return:
+       List of selected individuals"
+  
+  (let ((pop-size (length population)))
+    (loop repeat num-selected
+          collect (let ((best nil) (best-fitness most-negative-fixnum))
+					(loop repeat k 
+						  for idx = (random pop-size)
+						  for ind = (elt population idx)
+						  for fun = (funcall fintess-fn ind)
+						  do (when (funcall test fun best-fitness)
+						       (setf best ind
+									 best-fitness fun)))
+									 
+				    best))))
+  
