@@ -186,6 +186,7 @@
 #include "../ad/utils/nnl2_ad_ncast.h"
 #include "../ad/utils/nnl2_ad_detach_inplace.h"
 #include "../ad/utils/nnl2_ad_detach.h"
+#include "../nn/ga/nnl2_ad_ga_crossover_uniform.h"
 #include "../nnl2_config_part_2.h"
 
 #endif /** NNL2_AD_INCLUDE_H **/

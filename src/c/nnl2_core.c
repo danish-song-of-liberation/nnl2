@@ -160,7 +160,6 @@ void nnl2_init_broadcasting();
  */
 void nnl2_init_reshaping();
 
-
 /** @brief 
  * Registers backend implementations for loss functions 
  *           
@@ -168,7 +167,15 @@ void nnl2_init_reshaping();
  * Functions to compute various loss metrics between predicted and target values like MSE, BCE, e.t.c
  */
 void nnl2_init_loss();
-           
+   
+/** @brief 
+ * Registers backend implementations for GA functions 
+ *           
+ ** @details 
+ * Functions to genethic algorithms support
+ */
+void nnl2_init_ga();
+   
 ///@} [subinitializers_declaration]		
 		 
 /** @brief
@@ -216,6 +223,7 @@ void nnl2_init_loss();
  ** @see nnl2_init_broadcasting 
  ** @see nnl2_init_reshaping    
  ** @see nnl2_init_loss 
+ ** @see nnl2_init_ga  
  **/     
 void nnl2_init_system() {         
 	// Initialization of random number generator 
@@ -246,6 +254,7 @@ void nnl2_init_system() {
 	nnl2_init_broadcasting();    
 	nnl2_init_reshaping();  
     nnl2_init_loss();  	
+	nnl2_init_ga();
 }                                               
   
 ///@{ [subinitializers]     
@@ -401,7 +410,7 @@ void nnl2_init_broadcasting() {
 	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);
 	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends); 
 	INIT_BACKEND(div_broadcasting, div_broadcasting_backends); 
-	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	 
+	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	    
     INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 	
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
@@ -416,6 +425,10 @@ void nnl2_init_loss() {
 	EINIT_BACKEND(nnl2_mse, mse_backends, CURRENT_BACKEND(mse));
 }
      
+void nnl2_init_ga() {
+	INIT_BACKEND(nn_ga_crossover_uniform, nn_ga_crossover_uniform_backends); 
+}	
+	 
 ///@} [subinitializers]   
      
 ///@} [initilizing]
@@ -758,7 +771,7 @@ void lisp_call_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
 Tensor* lisp_call_axpy(Tensor* summand, Tensor* sumend, float alpha) {
 	return axpy(summand, sumend, alpha);      	  
 }     
-
+ 
 void lisp_call_axpf_inplace(Tensor* summand, void* sumend, float alpha) { 
 	axpf_inplace(summand, sumend, alpha);       
 } 

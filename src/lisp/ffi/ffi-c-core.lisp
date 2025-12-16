@@ -1369,6 +1369,11 @@
   (mean :double)
   (std :double))  
 	
+(cffi:defcfun ("nnl2_ad_nn_ga_crossover_uniform" %ga-crossover-uniform) :pointer 
+  (x-parent :pointer)
+  (y-parent :pointer)
+  (crossrate :float))  
+	
 ;; -- Optimizers --  
   
 (cffi:defcstruct nnl2-optim

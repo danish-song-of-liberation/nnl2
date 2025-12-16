@@ -677,5 +677,6 @@
    #:%vector-as-parameter
    #:%nnlrepr-print-encoder
    #:%nnlrepr-free
-   #:%nnlrepr-template-free))
+   #:%nnlrepr-template-free
+   #:%ga-crossover-uniform))
    

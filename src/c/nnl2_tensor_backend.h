@@ -1203,6 +1203,12 @@ typedef nnl2_tensor* (*atanfn)(const nnl2_tensor* tensor);
  */
 typedef nnl2_tensor* (*vectorconcatfn)(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype);
 
+/**
+ * @brief Function pointer type for uniform crossover operation
+ * @ingroup nn_ga_backend_system
+ */
+typedef nnl2_tensor* (*nn_ga_crossover_uniform_fn)(nnl2_tensor*, nnl2_tensor*, float);
+
 /// @} [typedef]
 
 

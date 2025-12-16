@@ -236,5 +236,18 @@
    Needed for GA
    The higher the result, the smaller the error" 	   
 
-  (/ 1.0 (+ 1.0 (nnl2.hli.ad.r.loss:mse x y :track-graph nil :force t))))  
+  (/ 1.0 (+ 1.0 (nnl2.hli.ad.r.loss:mse x y :track-graph nil :force t))))    
+  
+(in-package :nnl2.hli.nn.ga.crossover)
+
+(defun uniform (parent-x parent-y &key (rate 0.5s0))
+  "Returns a mixture of the first and second tensor
+   Needed for GA 
+   
+   Args:
+      parent-x: First AD tensor 
+	  parent-y: Second AD tensor 
+	  rate (&key): Crossover rate (default: 0.5s0)"
+	  
+  (nnl2.ffi:%ga-crossover-uniform parent-x parent-y rate))
   
