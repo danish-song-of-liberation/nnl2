@@ -25,6 +25,14 @@ nnl2_tensor* nnl2_nn_ga_naive_crossover_uniform(nnl2_tensor* parent_x, nnl2_tens
     #endif
 	
 	nnl2_tensor* child = nnl2_empty_like(parent_x);
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(child == NULL) {
+			NNL2_ERROR("In function nnl2_nn_ga_naive_crossover_uniform, failed to allocate child tensor. returning NULL");
+			return NULL;
+		}
+	#endif 
+	
 	size_t numel = product(parent_x -> shape, parent_x -> rank);
 	
 	switch(child -> dtype) {

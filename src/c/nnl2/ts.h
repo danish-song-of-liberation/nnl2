@@ -144,5 +144,6 @@
 #include "../tensorshape/nnl2_reinterpret.h"
 #include "../tensorloss/nnl2_mse.h"
 #include "../nn/ga/nnl2_ts_ga_crossover_uniform.h"
+#include "../nn/ga/nnl2_ts_ga_mutation_uniform.h"
 
 #endif /** NNL2_TS_INCLUDE_H **/

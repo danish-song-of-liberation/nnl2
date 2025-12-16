@@ -678,5 +678,6 @@
    #:%nnlrepr-print-encoder
    #:%nnlrepr-free
    #:%nnlrepr-template-free
-   #:%ga-crossover-uniform))
+   #:%ga-crossover-uniform
+   #:%ga-mutation-uniform))
    

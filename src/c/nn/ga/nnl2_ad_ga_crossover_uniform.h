@@ -58,10 +58,10 @@ nnl2_ad_tensor* nnl2_ad_nn_ga_crossover_uniform(nnl2_ad_tensor* parent_x, nnl2_a
     #endif
 
     // Perform crossover using the base function
-    nnl2_tensor* child_tensor = nnl2_nn_ga_naive_crossover_uniform(parent_x->data, parent_y->data, crossover_rate);
+    nnl2_tensor* child_tensor = nn_ga_crossover_uniform(parent_x->data, parent_y->data, crossover_rate);
     
     if(!child_tensor) {
-        NNL2_ERROR("In nnl2_ad_nn_ga_naive_crossover_uniform, nnl2_nn_ga_naive_crossover_uniform returned NULL");
+        NNL2_ERROR("In nnl2_ad_nn_ga_naive_crossover_uniform, nn_ga_crossover_uniform returned NULL");
         return NULL;
     }
 

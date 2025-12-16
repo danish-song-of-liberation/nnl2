@@ -407,17 +407,17 @@ void nnl2_init_broadcasting_inplace() {
           
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
-	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);
+	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends); 
 	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends); 
 	INIT_BACKEND(div_broadcasting, div_broadcasting_backends); 
-	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	    
+	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	      
     INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 	
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
 }     
-
+  
 void nnl2_init_reshaping() {        
-	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));   
+	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));    
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 
 }
 
@@ -427,6 +427,7 @@ void nnl2_init_loss() {
      
 void nnl2_init_ga() {
 	INIT_BACKEND(nn_ga_crossover_uniform, nn_ga_crossover_uniform_backends); 
+	INIT_BACKEND(nn_ga_mutation_uniform, nn_ga_mutation_uniform_backends);
 }	
 	 
 ///@} [subinitializers]   

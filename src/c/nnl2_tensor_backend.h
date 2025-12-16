@@ -1209,6 +1209,14 @@ typedef nnl2_tensor* (*vectorconcatfn)(nnl2_tensor** tensors, size_t count, nnl2
  */
 typedef nnl2_tensor* (*nn_ga_crossover_uniform_fn)(nnl2_tensor*, nnl2_tensor*, float);
 
+/** @brief Function pointer type for a uniform mutation operation
+ ** @param tensor Pointer to the input tensor (parent individual)
+ ** @param mutate_rate Probability of mutating each element [0.0 – 1.0]
+ ** @param delta Range of uniform mutation 
+ ** @return nnl2_tensor* Pointer to a new tensor (child) after mutation
+ */
+typedef nnl2_tensor* (*nn_ga_mutation_uniform_fn)(nnl2_tensor* tensor, float mutate_rate, float delta);
+
 /// @} [typedef]
 
 

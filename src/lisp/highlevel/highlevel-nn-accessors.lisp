@@ -251,3 +251,8 @@
 	  
   (nnl2.ffi:%ga-crossover-uniform parent-x parent-y rate))
   
+(in-package :nnl2.hli.nn.ga.mutation)
+  
+(defun uniform (tensor &key (rate 0.1s0) (delta 1.0s0))
+  (nnl2.ffi:%ga-mutation-uniform tensor rate delta))  
+  

@@ -1374,6 +1374,11 @@
   (y-parent :pointer)
   (crossrate :float))  
 	
+(cffi:defcfun ("nnl2_ad_nn_ga_mutation_uniform" %ga-mutation-uniform) :pointer
+  (tensor :pointer)
+  (mutate-rate :float)
+  (delta :float))	
+	
 ;; -- Optimizers --  
   
 (cffi:defcstruct nnl2-optim

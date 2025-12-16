@@ -12,10 +12,16 @@
 ;; where nn i think is autologous
 
 ;; UPD: also added definition of ```:nnl2.hli.ts.loss, :nnl2.hli.ad.r.loss, 
-;; :nnl2.hli.nn.ga, :nnl2.hli.nn.ga.fitness, :nnl2.hli.nn.ga.crossover``` packages
+;; :nnl2.hli.nn.ga, :nnl2.hli.nn.ga.fitness, :nnl2.hli.nn.ga.crossover,
+;; :nnl2.hli.nn.ga.mutation``` packages
 
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
+
+(defpackage #:nnl2.hli.nn.ga.mutation
+  (:use #:cl)
+  (:export
+    #:uniform))
 
 (defpackage #:nnl2.hli.nn.ga.crossover
   (:use #:cl)
