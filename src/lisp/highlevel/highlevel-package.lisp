@@ -742,5 +742,15 @@
    #:with-backend/mae
    #:get-backends/mae
    #:get-backend/mae
-   #:use-backend/mae))
+   #:use-backend/mae
+   #:.atan2
+   #:.atan2!
+   #:use-backend/.atan2
+   #:use-backend/.atan2!
+   #:get-backend/.atan2
+   #:get-backend/.atan2!
+   #:get-backends/.atan2
+   #:get-backends/.atan2!
+   #:with-backend/.atan2
+   #:with-backend/.atan2!))
    

@@ -562,6 +562,30 @@
   (rank :int)
   (start :size)
   (vector :pointer))  
+ 
+(cffi:defcfun ("lisp_call_atan2" %atan2) :pointer
+  (y :pointer)
+  (x :pointer))
+
+(cffi:defcfun ("lisp_call_atan2_inplace" %atan2-inplace) :void
+  (y :pointer)
+  (x :pointer))
+
+(cffi:defcfun ("lisp_call_atan2_broadcasting" %atan2-broadcasting) :pointer
+  (y :pointer)
+  (x :pointer))
+
+(cffi:defcfun ("lisp_call_atan2_broadcasting_inplace" %atan2-broadcasting-inplace) :void
+  (y :pointer)
+  (x :pointer))
+
+(cffi:defcfun ("lisp_call_atan2_correspondence" %atan2-correspondence) :pointer
+  (y :pointer)
+  (x :pointer))
+
+(cffi:defcfun ("lisp_call_atan2_correspondence_inplace" %atan2-correspondence-inplace) :void
+  (y :pointer)
+  (x :pointer)) 
   
 ;; -- AD --
 
@@ -1656,6 +1680,24 @@
 (cffi:defcfun ("set_min_backend" %set-min-backend) :void
   (backend-name :string))  	 
   
+(cffi:defcfun ("set_atan2inplace_backend" %set-atan2inplace-backend) :void
+  (backend-name :string))  
+  	 
+(cffi:defcfun ("set_atan2_backend" %set-atan2-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_atan2inplace_correspondence_backend" %set-atan2inplace-correspondence-backend) :void
+  (backend-name :string))  
+  	 
+(cffi:defcfun ("set_atan2_correspondence_backend" %set-atan2-correspondence-backend) :void
+  (backend-name :string))  
+
+(cffi:defcfun ("set_atan2inplace_broadcasting_backend" %set-atan2inplace-broadcasting-backend) :void
+  (backend-name :string))  
+  	 
+(cffi:defcfun ("set_atan2_broadcasting_backend" %set-atan2-broadcasting-backend) :void
+  (backend-name :string))  
+    
 (cffi:defcfun ("set_abs_backend" %set-abs-backend) :void
   (backend-name :string))  
   
@@ -1943,6 +1985,8 @@
 (cffi:defcfun ("get_mininplace_backend" %get-mininplace-backend) :string)  
 (cffi:defcfun ("get_max_backend" %get-max-backend) :string)   
 (cffi:defcfun ("get_min_backend" %get-min-backend) :string)  
+(cffi:defcfun ("get_atan2inplace_backend" %get-atan2inplace-backend) :string)  
+(cffi:defcfun ("get_atan2_backend" %get-atan2-backend) :string)   
 (cffi:defcfun ("get_absinplace_backend" %get-absinplace-backend) :string) 
 (cffi:defcfun ("get_abs_backend" %get-abs-backend) :string)   
 (cffi:defcfun ("get_hstack_backend" %get-hstack-backend) :string)   
@@ -2049,6 +2093,10 @@
 (cffi:defcfun ("get_max_backends" %get-max-backends) :pointer)
 (cffi:defcfun ("get_min_num_backends" %get-min-num-backends) :int)
 (cffi:defcfun ("get_min_backends" %get-min-backends) :pointer)
+(cffi:defcfun ("get_atan2inplace_num_backends" %get-atan2inplace-num-backends) :int)
+(cffi:defcfun ("get_atan2inplace_backends" %get-atan2inplace-backends) :pointer)
+(cffi:defcfun ("get_atan2_num_backends" %get-atan2-num-backends) :int)
+(cffi:defcfun ("get_atan2_backends" %get-atan2-backends) :pointer)
 (cffi:defcfun ("get_absinplace_num_backends" %get-absinplace-num-backends) :int)
 (cffi:defcfun ("get_absinplace_backends" %get-absinplace-backends) :pointer)
 (cffi:defcfun ("get_abs_num_backends" %get-abs-num-backends) :int)

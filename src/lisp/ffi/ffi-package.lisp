@@ -691,5 +691,23 @@
    #:%get-mae-backend
    #:%get-mae-backends
    #:%get-mae-num-backends
-   #:%ad-mae))
+   #:%ad-mae
+   #:%atan2
+   #:%atan2-inplace
+   #:%atan2-broadcasting
+   #:%atan2-broadcasting-inplace
+   #:%atan2-correspondence
+   #:%atan2-correspondence-inplace
+   #:%set-atan2inplace-backend
+   #:%set-atan2-backend
+   #:%get-atan2inplace-backend
+   #:%get-atan2-backend
+   #:%get-atan2inplace-num-backends
+   #:%get-atan2inplace-backends
+   #:%get-atan2-num-backends
+   #:%get-atan2-backends
+   #:%set-atan2inplace-broadcasting-backend
+   #:%set-atan2-broadcasting-backend 
+   #:%set-atan2inplace-correspondence-backend
+   #:%set-atan2-correspondence-backend))
    

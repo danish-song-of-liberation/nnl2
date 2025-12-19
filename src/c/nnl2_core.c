@@ -7,23 +7,23 @@
     
 #ifdef NNL2_AVX256_AVAILABLE  
 	#include <immintrin.h> 
-#endif  	  
+#endif  	     
  
-#ifdef __SSE2__ 
-	#include <emmintrin.h> 
+#ifdef __SSE2__    
+	#include <emmintrin.h>  
 #endif               
-    
+     
 #include <stdlib.h>     
 #include <time.h>         
   
 #include "nnl2_core.h"          	 
 #include "nnl2_ffi_test.h"    
 #include "nnl2_tensor_core.h"
-#include "nnl2_log.h"    
+#include "nnl2_log.h"      
 #include "nnl2_foreign_log.h"  
  
 #include "backends_status/nnl2_status.h"  
-  
+   
 /// NNL2
      
 /** @file nnl2_core.c
@@ -293,6 +293,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_asin, asin_backends, current_backend(asin)); 
 	EINIT_BACKEND(nnl2_acos, acos_backends, current_backend(acos)); 
 	EINIT_BACKEND(nnl2_atan, atan_backends, current_backend(atan));     
+	EINIT_BACKEND(nnl2_atan2, atan2_backends, current_backend(atan2));     
 }
                 
 void nnl2_init_standard_inplace() {               
@@ -319,6 +320,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(nnl2_asininplace, asininplace_backends, current_backend(asininplace));  
 	EINIT_BACKEND(nnl2_acosinplace, acosinplace_backends, current_backend(acosinplace)); 
 	EINIT_BACKEND(nnl2_ataninplace, ataninplace_backends, current_backend(ataninplace)); 
+	EINIT_BACKEND(nnl2_atan2inplace, atan2inplace_backends, current_backend(atan2inplace)); 
 }               
                                
 void nnl2_init_stack() {
@@ -352,7 +354,7 @@ void nnl2_init_initializers() {
 	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	    
 	EINIT_BACKEND(kaiming, kaiming_backends, current_backend(kaiming));    
 	EINIT_BACKEND(kaiming_inplace, kaiming_inplace_backends, current_backend(kaiming_inplace));    
-}
+} 
    
 void nnl2_init_transposition() {     
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace));    
@@ -381,6 +383,7 @@ void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(max_maxf_inplace, max_maxf_inplace_backends);       
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);      
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);  
+	INIT_BACKEND(nnl2_atan2_correspondence_inplace, atan2_correspondence_inplace_backends);  
 }
  
 void nnl2_init_correspondence() {  
@@ -391,7 +394,8 @@ void nnl2_init_correspondence() {
 	INIT_BACKEND(pow_powf, pow_powf_backends);          
 	INIT_BACKEND(max_maxf, max_maxf_backends);      
 	INIT_BACKEND(min_minf, min_minf_backends); 
-	INIT_BACKEND(axpf, axpf_backends);     	    
+	INIT_BACKEND(axpf, axpf_backends);     
+	INIT_BACKEND(nnl2_atan2_correspondence, atan2_correspondence_backends); 	
 }       
 
 void nnl2_init_broadcasting_inplace() {
@@ -403,6 +407,8 @@ void nnl2_init_broadcasting_inplace() {
 	INIT_BACKEND(max_broadcasting_inplace, max_broadcasting_inplace_backends);
 	INIT_BACKEND(min_broadcasting_inplace, min_broadcasting_inplace_backends); 
 	INIT_BACKEND(axpy_broadcasting_inplace, axpy_broadcasting_inplace_backends);
+	INIT_BACKEND(add_broadcasting_inplace, add_broadcasting_inplace_backends);
+	INIT_BACKEND(nnl2_atan2_broadcasting_inplace, atan2_broadcasting_inplace_backends);
 }    
           
 void nnl2_init_broadcasting() {
@@ -414,6 +420,7 @@ void nnl2_init_broadcasting() {
     INIT_BACKEND(max_broadcasting, max_broadcasting_backends);
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 	
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
+	INIT_BACKEND(nnl2_atan2_broadcasting, atan2_broadcasting_backends);
 }     
     
 void nnl2_init_reshaping() {        
@@ -913,6 +920,30 @@ void lisp_call_atan_inplace(nnl2_tensor* tensor) {
 
 nnl2_tensor* lisp_call_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype) {
     return nnl2_vector_concat(tensors, count, dtype);
+}
+
+nnl2_tensor* lisp_call_atan2(nnl2_tensor* y, nnl2_tensor* x) {
+    return nnl2_atan2(y, x);
+}
+
+void lisp_call_atan2_inplace(nnl2_tensor* y, nnl2_tensor* x) {
+    nnl2_atan2inplace(y, x);
+}
+
+nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
+    return nnl2_atan2_broadcasting(y, x);
+}
+
+void lisp_call_atan2_broadcasting_inplace(nnl2_tensor* y, nnl2_tensor* x) {
+    nnl2_atan2_broadcasting_inplace(y, x);
+}
+
+nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {
+    return nnl2_atan2_correspondence(y, x);
+}
+
+void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) {
+    nnl2_atan2_correspondence_inplace(y, x);
 }
 
 ///@} [lisp_wrappers]                

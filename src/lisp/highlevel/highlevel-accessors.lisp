@@ -1581,6 +1581,34 @@
 	
 	(nnl2.ffi:%axpy/axpf summand sumend-pntr alpha)))
 	
+(defun .atan2/atan2f! (y x-scalar)
+  "Applies in-place atan2 operation to y tensor with scalar x
+   y: Input y-coordinate tensor (modified in place)
+   x-scalar: Scalar x-coordinate value"
+   
+  (let* ((dtype (dtype y))
+         (cffi-dtype (type/nnl2->cffi dtype))
+         (lisp-dtype (type/nnl2->lisp dtype))
+         (x-pntr (cffi:foreign-alloc cffi-dtype)))
+         
+    (setf (cffi:mem-ref x-pntr cffi-dtype) (coerce x-scalar lisp-dtype))
+    
+    (nnl2.ffi:%atan2-correspondence-inplace y x-pntr)))
+
+(defun .atan2/atan2f (y x-scalar)
+  "Applies atan2 operation to y tensor with scalar x, returning a new tensor
+   y: Input y-coordinate tensor
+   x-scalar: Scalar x-coordinate value"
+   
+  (let* ((dtype (dtype y))
+         (cffi-dtype (type/nnl2->cffi dtype))
+         (lisp-dtype (type/nnl2->lisp dtype))
+         (x-pntr (cffi:foreign-alloc cffi-dtype)))
+         
+    (setf (cffi:mem-ref x-pntr cffi-dtype) (coerce x-scalar lisp-dtype))
+    
+    (nnl2.ffi:%atan2-correspondence y x-pntr)))
+	
 (cffi:defcfun ("lisp_call_add_broadcasting_inplace" .+/broadcasting!) :void  
   (summand :pointer)
   (sumend :pointer))
@@ -1934,6 +1962,26 @@
 (defun .min! (&rest args)
   "Reduce tensors with in-place element-wise minimum"
   (reduce #'.min!/internal args))
+  
+(defun .atan2 (y x)
+  "Element-wise atan2(y/x)"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (y x)
+      (atan y x) 
+      (.atan2/atan2f y x)
+      (nnl2.ffi:%atan2 y x) 
+      (nnl2.ffi:%atan2-broadcasting y x)))) 
+
+(defun .atan2! (y x)
+  "Element-wise atan2! (y/x)"
+  
+  (nnl2.hli:fastcall   
+    (with-tensor-dispatch (y x)
+      (setq y (atan y x)) 
+      (.atan2/atan2f! y x)
+      (nnl2.ffi:%atan2-inplace y x) 
+      (nnl2.ffi:%atan2-broadcasting-inplace y x)))) 	  
   
 (declaim (ftype (function (&rest (or nnl2-tensor real)) nnl2-tensor) .+ .- .* ./ .^ .min .max += -= *= /! ^= .min! .max!)
 		 (inline .+ .- .* ./ .^ .min .max += -= *= /! ^= .min! .max!))

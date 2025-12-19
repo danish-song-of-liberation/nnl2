@@ -1223,6 +1223,45 @@ typedef nnl2_tensor* (*nn_ga_mutation_uniform_fn)(nnl2_tensor* tensor, float mut
  */
 typedef void (*maefn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record);
 
+/** @brief Function pointer type for atan2 operation
+ ** @param y Pointer to y-coordinate tensor (numerator)
+ ** @param x Pointer to x-coordinate tensor (denominator)
+ ** @return Pointer to new tensor with atan2(y/x) values
+ */
+typedef Tensor* (*atan2fn)(Tensor* y, Tensor* x);
+
+/** @brief Function pointer type for atan2 in-place operation
+ ** @param y Tensor to modify
+ ** @param x Const tensor as denominator
+ */
+typedef void (*atan2inplacefn)(Tensor* y, const Tensor* x);
+
+/** @brief Function pointer type for atan2 operation with broadcasting
+ ** @param y y-coordinate tensor
+ ** @param x x-coordinate tensor
+ ** @return Result tensor
+ */
+typedef Tensor* (*atan2broadcastingfn)(Tensor* y, Tensor* x);
+
+/** @brief Function pointer type for atan2 operation with broadcasting (in place)
+ ** @param y y-coordinate tensor (modified in place)
+ ** @param x x-coordinate tensor
+ */
+typedef void (*atan2broadcastinginplacefn)(Tensor* y, const Tensor* x);
+
+/** @brief Function pointer type for atan2 operation with scalar x
+ ** @param y y-coordinate tensor
+ ** @param x Pointer to scalar x-coordinate value
+ ** @return Result tensor
+ */
+typedef Tensor* (*atan2correspondencefn)(const Tensor* y, void* x);
+
+/** @brief Function pointer type for in-place atan2 operation with scalar x
+ ** @param y y-coordinate tensor (modified in place)
+ ** @param x Pointer to scalar x-coordinate value
+ */
+typedef void (*atan2correspondenceinplacefn)(Tensor* y, void* x);
+
 /// @} [typedef]
 
 

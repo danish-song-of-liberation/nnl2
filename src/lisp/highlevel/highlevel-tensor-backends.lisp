@@ -113,6 +113,16 @@
   nnl2.ffi:%set-max-maxf-inplace-backend
   nnl2.ffi:%set-max-broadcasting-inplace-backend)
 
+(define-backend-setter use-backend/.atan2
+  nnl2.ffi:%set-atan2-backend
+  nnl2.ffi:%set-atan2-correspondence-backend
+  nnl2.ffi:%set-atan2-broadcasting-backend)
+
+(define-backend-setter use-backend/.atan2!
+  nnl2.ffi:%set-atan2inplace-backend
+  nnl2.ffi:%set-atan2inplace-correspondence-backend
+  nnl2.ffi:%set-atan2inplace-broadcasting-backend)
+
 (define-backend-setter use-backend/.+
   nnl2.ffi:%set-add-backend
   nnl2.ffi:%set-add-incf-backend
@@ -341,7 +351,8 @@
 							  use-backend/.sin! use-backend/.cos use-backend/.cos!
 							  use-backend/.asin use-backend/.asin! use-backend/.acos 
 							  use-backend/.acos! use-backend/.tan! use-backend/.tan
-							  use-backend/.atan! use-backend/.atan use-backend/mae))
+							  use-backend/.atan! use-backend/.atan use-backend/mae
+							  use-backend/.atan2! use-backend/.atan2))
 							  
       (funcall backend-function name)))
 	  
@@ -406,6 +417,8 @@
 (define-backend-getter-setter get-backend/.min! use-backend/.min! nnl2.ffi:%get-mininplace-backend)
 (define-backend-getter-setter get-backend/.max use-backend/.max nnl2.ffi:%get-max-backend)
 (define-backend-getter-setter get-backend/.max! use-backend/.max! nnl2.ffi:%get-maxinplace-backend)
+(define-backend-getter-setter get-backend/.atan2 use-backend/.atan2 nnl2.ffi:%get-atan2-backend)
+(define-backend-getter-setter get-backend/.atan2! use-backend/.atan2! nnl2.ffi:%get-atan2inplace-backend)
 (define-backend-getter-setter get-backend/.abs use-backend/.abs nnl2.ffi:%get-abs-backend)
 (define-backend-getter-setter get-backend/.abs! use-backend/.abs! nnl2.ffi:%get-absinplace-backend)
 (define-backend-getter-setter get-backend/hstack use-backend/hstack nnl2.ffi:%get-hstack-backend)
@@ -616,6 +629,14 @@
 (define-backends-getter get-backends/.max! 
   nnl2.ffi:%get-maxinplace-num-backends 
   nnl2.ffi:%get-maxinplace-backends)
+
+(define-backends-getter get-backends/.atan2  
+  nnl2.ffi:%get-atan2-num-backends 
+  nnl2.ffi:%get-atan2-backends)
+
+(define-backends-getter get-backends/.atan2! 
+  nnl2.ffi:%get-atan2inplace-num-backends 
+  nnl2.ffi:%get-atan2inplace-backends)
 
 (define-backends-getter get-backends/.abs 
   nnl2.ffi:%get-abs-num-backends 
@@ -874,6 +895,8 @@
 (define-with-backend with-backend/.log! get-backend/.log!)
 (define-with-backend with-backend/scale get-backend/scale)
 (define-with-backend with-backend/scale! get-backend/scale!)
+(define-with-backend with-backend/.atan2 get-backend/.atan2)
+(define-with-backend with-backend/.atan2! get-backend/.atan2!)
 (define-with-backend with-backend/.min get-backend/.min)
 (define-with-backend with-backend/.min! get-backend/.min!)
 (define-with-backend with-backend/.max get-backend/.max)
