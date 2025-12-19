@@ -163,6 +163,15 @@
 (defun print-model (nn)
   (nnl2.ffi:%print-model nn t 0))
   
+(defun copy (nn)
+  (nnl2.ffi:%nn-deep-copy nn))
+
+(defun nnp (nn)
+  (unless (typep nn 'nnl2-nn) (return-from nnp nil))
+  (nnl2.ffi:%nn-checktype nn))
+
+(declaim (inline copy nnp))  
+  
 (in-package :nnl2.hli.nn.ga)
 
 (defmacro encode (nn (vector nnlrepr) &body body)
@@ -199,17 +208,31 @@
 	 
 	 (nnl2.ffi:%nnlrepr-free ,nnlrepr)))	
 	
-(defmacro free-encoder (encoder)
+(defun encode-cons (network)
+  (let* ((nnlrepr (nnl2.ffi:%nnlrepr-encode network))
+		 (vector (cffi:mem-aref nnlrepr :pointer 0)))
+
+	(cons vector nnlrepr))) 	
+	
+(defun encoder-with-vector (vector)
+  "Make empty encoder from user vector"
+  (nnl2.ffi:%nnlrepr-empty-from-vector vector))	
+	
+(defun free-encoder (encoder)
   "Frees nnlrepr encoder"
-  `(nnl2.ffi:%nnlrepr-free ,encoder))	
+  (nnl2.ffi:%nnlrepr-free encoder))	
 	
 (defun print-encoder (encoder)
   "Prints nnlrepr encoder"
   (nnl2.ffi:%nnlrepr-print-encoder (cffi:mem-aref encoder :pointer 1) t 0))
   
-(defun decode (encoder)
+(defun decode (encoder &optional vector)
   "Decodes nnlrepr encoder"
-  (nnl2.ffi:%nnlrepr-decode encoder))    
+  (if vector 
+    (nnl2.ffi:%nnlrepr-decode-internal (cffi:mem-aref encoder :pointer 1) vector 0)
+	(nnl2.ffi:%nnlrepr-decode encoder)))
+  
+(declaim (inline free-encoder print-encoder decode encoder-with-vector))  
   
 (in-package :nnl2.hli.nn.ga.fitness)
   
@@ -249,12 +272,20 @@
 	  parent-y: Second AD tensor 
 	  rate (&key): Crossover rate (default: 0.5s0)"
 	  
-  (nnl2.ffi:%ga-crossover-uniform parent-x parent-y rate))
+  (if (nnl2.hli.nn:nnp parent-x)
+    (nnl2.ffi:%nn-crossover-uniform parent-x parent-y rate)
+	(nnl2.ffi:%ga-crossover-uniform parent-x parent-y rate)))
+	
+(declaim (inline uniform))
   
 (in-package :nnl2.hli.nn.ga.mutation)
   
 (defun uniform (tensor &key (rate 0.1s0) (delta 1.0s0))
-  (nnl2.ffi:%ga-mutation-uniform tensor rate delta))  
+  (if (nnl2.hli.nn:nnp tensor)
+    (nnl2.ffi:%nn-mutation-uniform tensor rate delta)
+    (nnl2.ffi:%ga-mutation-uniform tensor rate delta)))
+
+(declaim (inline uniform))	
   
 (in-package :nnl2.hli.nn.ga.selection)
 
@@ -282,4 +313,23 @@
 									 best-fitness fun)))
 									 
 				    best))))
-  
+
+(defun elitist (population fitness-fn &key (elite-count 1) (test #'>))
+  "Select the best individuals directly
+
+   Args:
+       population: List or vector of individuals
+       fitness-fn: Function to evaluate fitness of an individual
+       elite-count (&key) (default: 1): Number of elite individuals to select
+       test (&key) (default: #'>): Comparison function for sorting
+       
+   Return:
+       List of selected elite individuals"
+	   
+  (let* ((individuals (loop for ind in population collect (cons ind (funcall fitness-fn ind))))
+         (sorted (sort individuals test :key #'cdr)))
+    
+    (mapcar #'car (subseq sorted 0 (min elite-count (length sorted))))))
+	
+(declaim (ftype (function ((or list vector) function &key (:k integer) (:num-selected integer) (:test function)) list) tournament))
+(declaim (ftype (function ((or list vector) function &key (:elite-count integer) (:test function)) list) elitist))

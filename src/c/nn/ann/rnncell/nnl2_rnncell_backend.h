@@ -117,7 +117,8 @@ nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_create(int input_size, int hidden_size, bool 
 	
 	cell->metadata.nn_type = nnl2_nn_type_rnn_cell;
     cell->metadata.use_bias = bias;
-	
+	cell->metadata.nn_magic = NNL2_NN_MAGIC;
+
 	cell->hidden_size = hidden_size;
     
     bool init_success = false;
@@ -281,6 +282,7 @@ nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_manual_create(int input_size, int hidden_size
     cell->metadata.nn_type = nnl2_nn_type_rnn_cell;
     cell->metadata.use_bias = bias;
     cell->hidden_size = hidden_size;
+	cell->metadata.nn_magic = NNL2_NN_MAGIC;
     
     switch(handle_as) {
         case nnl2_nn_handle_as_copy: {
@@ -863,6 +865,408 @@ static nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_nnlrepr_decode(nnl2_ad_tensor* vector,
     #endif
     
     return result;
+}
+
+/** @brief
+ * Performs uniform crossover between two RNN Cell layers to create a child layer
+ *
+ ** @param parent_x
+ * Pointer to the first parent RNN Cell layer
+ *
+ ** @param parent_y
+ * Pointer to the second parent RNN Cell layer
+ *
+ ** @param crossover_rate
+ * Probability (0.0 to 1.0) of selecting elements from parent_x
+ *
+ ** @return nnl2_nn_rnn_cell*
+ * Pointer to the newly created child RNN Cell layer
+ *
+ ** @retval NULL
+ * if memory allocation fails, parents are incompatible, or crossover fails
+ */
+nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_crossover_uniform(nnl2_nn_rnn_cell* parent_x, nnl2_nn_rnn_cell* parent_y, float crossover_rate) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (!parent_x || !parent_y) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, parent layers cannot be NULL");
+            return NULL;
+        }
+        
+        if (parent_x->metadata.nn_type != nnl2_nn_type_rnn_cell || parent_y->metadata.nn_type != nnl2_nn_type_rnn_cell) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, both parents must be RNN Cell layers");
+            return NULL;
+        }
+        
+        if (crossover_rate < 0.0f || crossover_rate > 1.0f) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, crossover_rate must be between 0.0 and 1.0");
+            return NULL;
+        }
+    #endif
+
+    bool use_bias = parent_x->metadata.use_bias;
+    if (parent_y->metadata.use_bias != use_bias) {
+        NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, parents must have same use_bias setting");
+        return NULL;
+    }
+
+    // Get tensor dimensions from parent_x
+    int input_size = parent_x->wxh->data->shape[0];
+    int hidden_size = parent_x->wxh->data->shape[1];
+    
+    // Verify parent_y has same dimensions
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        // wxh dimensions
+        if (parent_y->wxh->data->shape[0] != input_size || parent_y->wxh->data->shape[1] != hidden_size) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, parents wxh dimensions mismatch");
+            return NULL;
+        }
+        
+        // whh dimensions
+        if (parent_y->whh->data->shape[0] != hidden_size || parent_y->whh->data->shape[1] != hidden_size) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, parents whh dimensions mismatch");
+            return NULL;
+        }
+        
+        if (use_bias) {
+            // bxh dimensions
+            if (parent_y->bxh->data->shape[0] != hidden_size) {
+                NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, parent bxh dimensions mismatch");
+                return NULL;
+            }
+            
+            // bhh dimensions
+            if (parent_y->bhh->data->shape[0] != hidden_size) {
+                NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, parent bhh dimensions mismatch");
+                return NULL;
+            }
+        }
+    #endif
+
+    // Allocate memory for child layer
+    nnl2_nn_rnn_cell* cell = malloc(sizeof(nnl2_nn_rnn_cell));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!cell) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+
+    // metadata
+    cell->metadata.nn_type = nnl2_nn_type_rnn_cell;
+    cell->metadata.use_bias = use_bias;
+    cell->metadata.nn_magic = NNL2_NN_MAGIC;
+    cell->hidden_size = hidden_size;
+    cell->forward = parent_x->forward;
+
+    // Crossover for wxh weights
+    nnl2_ad_tensor* child_wxh = nnl2_ad_nn_ga_crossover_uniform(parent_x->wxh, parent_y->wxh, crossover_rate);
+    if (!child_wxh) {
+        NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, wxh crossover failed");
+        free(cell);
+        return NULL;
+    }
+    
+    cell->wxh = child_wxh;
+
+    // Crossover for whh weights
+    nnl2_ad_tensor* child_whh = nnl2_ad_nn_ga_crossover_uniform(parent_x->whh, parent_y->whh, crossover_rate);
+    if (!child_whh) {
+        NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, whh crossover failed");
+        nnl2_free_ad_tensor(child_wxh);
+        free(cell);
+        return NULL;
+    }
+    
+    cell->whh = child_whh;
+
+    // Crossover for biases if needed
+    if (use_bias) {
+        // Crossover for bxh bias
+        nnl2_ad_tensor* child_bxh = nnl2_ad_nn_ga_crossover_uniform(parent_x->bxh, parent_y->bxh, crossover_rate);
+        if (!child_bxh) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, bxh crossover failed");
+            nnl2_free_ad_tensor(child_wxh);
+            nnl2_free_ad_tensor(child_whh);
+            free(cell);
+            return NULL;
+        }
+        
+        cell->bxh = child_bxh;
+
+        // Crossover for bhh bias
+        nnl2_ad_tensor* child_bhh = nnl2_ad_nn_ga_crossover_uniform(parent_x->bhh, parent_y->bhh, crossover_rate);
+        if (!child_bhh) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_crossover_uniform, bhh crossover failed");
+            nnl2_free_ad_tensor(child_wxh);
+            nnl2_free_ad_tensor(child_whh);
+            nnl2_free_ad_tensor(child_bxh);
+            free(cell);
+            return NULL;
+        }
+        
+        cell->bhh = child_bhh;
+    } else {
+        cell->bxh = NULL;
+        cell->bhh = NULL;
+    }
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+
+    return cell;
+}
+
+/** @brief
+ * Performs uniform mutation on an RNN Cell layer to create a mutated child layer
+ * Creates a new RNN Cell layer where weights (and optionally biases) are mutated
+ * by adding random values within [-delta, delta] based on mutation rate
+ *
+ ** @param parent
+ * Pointer to the parent RNN Cell layer
+ *
+ ** @param mutate_rate
+ * Probability (0.0 to 1.0) of mutating each element
+ *
+ ** @param delta
+ * Maximum absolute value of mutation to be added to elements
+ *
+ ** @return nnl2_nn_rnn_cell*
+ * Pointer to the newly created mutated RNN Cell layer
+ *
+ ** @retval NULL
+ * if memory allocation fails or mutation fails
+ */
+nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_mutation_uniform(nnl2_nn_rnn_cell* parent, float mutate_rate, float delta) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (!parent) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, parent layer cannot be NULL");
+            return NULL;
+        }
+        
+        if (parent->metadata.nn_type != nnl2_nn_type_rnn_cell) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, parent must be an RNN Cell layer");
+            return NULL;
+        }
+        
+        if (mutate_rate < 0.0f || mutate_rate > 1.0f) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, mutate_rate must be between 0.0 and 1.0");
+            return NULL;
+        }
+        
+        if (delta < 0.0f) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, delta must be non-negative");
+            return NULL;
+        }
+    #endif
+
+    bool use_bias = parent->metadata.use_bias;
+
+    nnl2_nn_rnn_cell* cell = malloc(sizeof(nnl2_nn_rnn_cell));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!cell) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+
+    // metadata
+    cell->metadata.nn_type = nnl2_nn_type_rnn_cell;
+    cell->metadata.use_bias = use_bias;
+    cell->metadata.nn_magic = NNL2_NN_MAGIC;
+    cell->hidden_size = parent->hidden_size;
+    
+    cell->forward = parent->forward;
+
+    // mutation for wxh weights (input-to-hidden)
+    nnl2_ad_tensor* mutated_wxh = nnl2_ad_nn_ga_mutation_uniform(parent->wxh, mutate_rate, delta);
+    if (!mutated_wxh) {
+        NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, wxh weight mutation failed");
+        free(cell);
+        return NULL;
+    }
+    
+    cell->wxh = mutated_wxh;
+
+    // mutation for whh weights (hidden-to-hidden)
+    nnl2_ad_tensor* mutated_whh = nnl2_ad_nn_ga_mutation_uniform(parent->whh, mutate_rate, delta);
+    if (!mutated_whh) {
+        NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, whh weight mutation failed");
+        nnl2_free_ad_tensor(mutated_wxh);  // Clean up
+        free(cell);
+        return NULL;
+    }
+    
+    cell->whh = mutated_whh;
+
+    // mutation for biases if needed
+    if (use_bias) {
+        // mutation for bxh bias (input-to-hidden)
+        nnl2_ad_tensor* mutated_bxh = nnl2_ad_nn_ga_mutation_uniform(parent->bxh, mutate_rate, delta);
+        if (!mutated_bxh) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, bxh bias mutation failed");
+            nnl2_free_ad_tensor(mutated_wxh);
+            nnl2_free_ad_tensor(mutated_whh);
+            free(cell);
+            return NULL;
+        }
+        
+        cell->bxh = mutated_bxh;
+
+        // mutation for bhh bias (hidden-to-hidden)
+        nnl2_ad_tensor* mutated_bhh = nnl2_ad_nn_ga_mutation_uniform(parent->bhh, mutate_rate, delta);
+        if (!mutated_bhh) {
+            NNL2_ERROR("In nnl2_nn_rnn_cell_mutation_uniform, bhh bias mutation failed");
+            nnl2_free_ad_tensor(mutated_wxh);
+            nnl2_free_ad_tensor(mutated_whh);
+            nnl2_free_ad_tensor(mutated_bxh);
+            free(cell);
+            return NULL;
+        }
+        
+        cell->bhh = mutated_bhh;
+    } else {
+        cell->bxh = NULL;
+        cell->bhh = NULL;
+    }
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+
+    return cell;
+}
+
+/** @brief 
+ * Creates a deep copy of a RNN Cell (rnncell) layer
+ *
+ ** @param src 
+ * Pointer to the source RNN Cell layer to be copied
+ *
+ ** @return
+ * A pointer to the newly created deep copy of the RNN Cell layer
+ *
+ ** @retval NULL 
+ * if memory allocation or tensor copying fails
+ *
+ ** @warning 
+ * The caller is responsible for freeing the memory by calling
+ * `void nnl2_nn_rnn_cell_free(nnl2_nn_rnn_cell* cell)` on the returned pointer
+ *
+ ** @see nnl2_nn_rnn_cell_free
+ ** @see nnl2_nn_rnn_cell_create
+ ** @see nnl2_nn_rnn_cell_manual_create
+ **/
+nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_deep_copy(const nnl2_nn_rnn_cell* src) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src, "In function nnl2_nn_rnn_cell_deep_copy, const nnl2_nn_rnn_cell* src is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src->wxh, "In function nnl2_nn_rnn_cell_deep_copy, src->wxh is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src->whh, "In function nnl2_nn_rnn_cell_deep_copy, src->whh is NULL", NULL);
+    #endif
+    
+    nnl2_nn_rnn_cell* dst = malloc(sizeof(nnl2_nn_rnn_cell));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+    // Copy metadata and basic fields
+    dst->metadata = src->metadata;
+    dst->hidden_size = src->hidden_size;
+    dst->forward = src->forward;
+    
+    // Deep copy wxh tensor (input-to-hidden weights)
+    dst->wxh = nnl2_ad_copy(src->wxh, src->wxh->data->dtype);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst->wxh) {
+            NNL2_ERROR("Failed to copy wxh tensor in nnl2_nn_rnn_cell_deep_copy");
+            free(dst);
+            return NULL;
+        }
+    #endif
+    
+    // Deep copy whh tensor (hidden-to-hidden weights)
+    dst->whh = nnl2_ad_copy(src->whh, src->whh->data->dtype);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst->whh) {
+            NNL2_ERROR("Failed to copy whh tensor in nnl2_nn_rnn_cell_deep_copy");
+            nnl2_free_ad_tensor(dst->wxh);
+            free(dst);
+            return NULL;
+        }
+    #endif
+    
+    // Deep copy bias tensors if they exist
+    if(src->metadata.use_bias && src->bxh && src->bhh) {
+        dst->bxh = nnl2_ad_copy(src->bxh, src->bxh->data->dtype);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(!dst->bxh) {
+                NNL2_ERROR("Failed to copy bxh tensor in nnl2_nn_rnn_cell_deep_copy");
+                nnl2_free_ad_tensor(dst->wxh);
+                nnl2_free_ad_tensor(dst->whh);
+                free(dst);
+                return NULL;
+            }
+        #endif
+        
+        dst->bhh = nnl2_ad_copy(src->bhh, src->bhh->data->dtype);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(!dst->bhh) {
+                NNL2_ERROR("Failed to copy bhh tensor in nnl2_nn_rnn_cell_deep_copy");
+                nnl2_free_ad_tensor(dst->wxh);
+                nnl2_free_ad_tensor(dst->whh);
+                nnl2_free_ad_tensor(dst->bxh);
+                free(dst);
+                return NULL;
+            }
+        #endif
+    } else {
+        dst->bxh = NULL;
+        dst->bhh = NULL;
+    }
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Successfully created deep copy of RNN Cell layer");
+        NNL2_DEBUG("Copied wxh shape: [%d, %d], whh shape: [%d, %d]", 
+                   dst->wxh->data->shape[0], dst->wxh->data->shape[1],
+                   dst->whh->data->shape[0], dst->whh->data->shape[1]);
+        if(dst->metadata.use_bias) {
+            NNL2_DEBUG("Copied bxh shape: [%d], bhh shape: [%d]", 
+                       dst->bxh->data->shape[0],
+                       dst->bhh->data->shape[0]);
+        } else {
+            NNL2_DEBUG("No bias tensors");
+        }
+    #endif
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return dst;
 }
 	
 #endif /** NNL2_RNNCELL_BACKEND_H **/

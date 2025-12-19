@@ -274,4 +274,28 @@ void nnl2_nnlrepr_free(nnl2_nnlrepr* nnlrepr) {
 	return;
 }
 
+nnl2_nnlrepr* nnl2_nnlrepr_empty_from_vector(nnl2_ad_tensor* self_vector) {
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	nnl2_nnlrepr* encoder = malloc(sizeof(nnl2_nnlrepr));
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+		if(encoder == NULL) {
+			NNL2_MALLOC_ERROR();
+			return NULL;
+		}
+	#endif 
+	
+	encoder -> vector = self_vector;
+	encoder -> template = NULL;
+	
+	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+	
+	return encoder;
+}
+
 #endif /** NNL2_NNLREPR_BACKEND_H **/

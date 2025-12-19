@@ -60,6 +60,11 @@ nnl2_ad_tensor* nnl2_ad_copy(nnl2_ad_tensor* restrict ad_tensor, nnl2_tensor_typ
     tensor_copy->backward_fn = ad_tensor->backward_fn; 
     tensor_copy->magic_number = TENSOR_MAGIC_ALIVE;
 	
+	// Hello, whoever is reading this code
+	// I was catching a segfault here
+	tensor_copy->extra_field = ad_tensor->extra_field;
+	tensor_copy->extra_free  = ad_tensor->extra_free;
+	
 	// Shallow copy of graph structure
     if(ad_tensor->num_roots > 0 && ad_tensor->roots) {
         tensor_copy->num_roots = ad_tensor->num_roots;

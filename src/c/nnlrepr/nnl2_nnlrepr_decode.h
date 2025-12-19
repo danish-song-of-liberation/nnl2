@@ -9,7 +9,7 @@ typedef struct nnl2_nn_relu_struct nnl2_nn_relu;
 typedef struct nnl2_nn_tanh_struct nnl2_nn_tanh;
 typedef struct nnl2_nn_fnn_struct nnl2_nn_fnn;
 
-/** @brief Decodes RNN cell from nnlrepr format **/
+/** @brief Decodes RNN cell from nnlrepr format **/	
 static nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_nnlrepr_decode(nnl2_ad_tensor* vector, size_t offset, int num_shapes, int32_t* shape_wxh, int32_t* shape_whh, 
 														 int32_t* shape_bhh, int32_t* shape_bxh, nnl2_tensor_type dtype);
 
@@ -24,7 +24,7 @@ nnl2_nn_tanh* nnl2_nn_tanh_create(bool approx);
 nnl2_nn_relu* nnl2_nn_relu_create(void);
 
 /** @brief Internal recursive decode function **/
-static void* nnl2_nn_decode_internal(nnl2_nnlrepr_template* encoder, nnl2_ad_tensor* vector, size_t offset) {
+void* nnl2_nn_decode_internal(nnl2_nnlrepr_template* encoder, nnl2_ad_tensor* vector, size_t offset) {
 	#if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
         NNL2_INFO("Decoding layer type: %d at offset: %zu", encoder->nn_type, offset);
@@ -155,7 +155,7 @@ static void* nnl2_nn_decode_internal(nnl2_nnlrepr_template* encoder, nnl2_ad_ten
         }
 		
 		default: {
-			NNL2_ERROR("In function nnl2_nn_decode, unknown nn type (numbering: %d). returning NULL", encoder -> nn_type);
+			NNL2_ERROR("In function nnl2_nn_decode_internal, unknown nn type (numbering: %d). returning NULL", encoder -> nn_type);
 			return NULL;
 		}
 	}

@@ -53,6 +53,7 @@ nnl2_nn_relu* nnl2_nn_relu_create(void) {
     // Metadata
     nn -> metadata.nn_type = nnl2_nn_type_relu;
     nn -> metadata.use_bias = false; 
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
     
     #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();

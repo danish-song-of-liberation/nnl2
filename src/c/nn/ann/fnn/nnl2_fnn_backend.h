@@ -113,6 +113,7 @@ nnl2_nn_fnn* nnl2_nn_fnn_create(int in_features, int out_features, bool use_bias
 	
 	nn -> metadata.nn_type = nnl2_nn_type_fnn;
 	nn -> metadata.use_bias = use_bias;
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
 	
 	nn->forward = use_bias ? fnn_forward_with_bias : fnn_forward_no_bias;
 	
@@ -239,8 +240,9 @@ nnl2_nn_fnn* nnl2_nn_fnn_manual_create(int in_features, int out_features, bool u
 	
 	nn -> metadata.nn_type = nnl2_nn_type_fnn;
 	nn -> metadata.use_bias = use_bias;
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
 	
-	nn->forward = use_bias ? fnn_forward_with_bias : fnn_forward_no_bias;
+	nn -> forward = use_bias ? fnn_forward_with_bias : fnn_forward_no_bias;
 	
 	switch(handle_as) {
 		case nnl2_nn_handle_as_copy: {
@@ -612,6 +614,308 @@ static nnl2_nn_fnn* nnl2_nn_fnn_nnlrepr_decode(nnl2_ad_tensor* vector, size_t of
 	#endif
 	
 	return result;
+}
+
+/** @brief
+ * Performs uniform crossover between two FNN layers to create a child layer
+ *
+ ** @param parent_x
+ * Pointer to the first parent FNN layer
+ *
+ ** @param parent_y
+ * Pointer to the second parent FNN layer
+ *
+ ** @param crossover_rate
+ * Probability (0.0 to 1.0) of selecting elements from parent_x
+ *
+ ** @return nnl2_nn_fnn*
+ * Pointer to the newly created child FNN layer
+ *
+ ** @retval NULL
+ * if memory allocation fails, parents are incompatible, or crossover fails
+ */
+nnl2_nn_fnn* nnl2_nn_fnn_crossover_uniform(nnl2_nn_fnn* parent_x, nnl2_nn_fnn* parent_y, float crossover_rate) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (!parent_x || !parent_y) {
+            NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, parent layers cannot be NULL");
+            return NULL;
+        }
+        
+        if (parent_x->metadata.nn_type != nnl2_nn_type_fnn || parent_y->metadata.nn_type != nnl2_nn_type_fnn) {
+            NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, both parents must be FNN layers");
+            return NULL;
+        }
+        
+        if (crossover_rate < 0.0f || crossover_rate > 1.0f) {
+            NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, crossover_rate must be between 0.0 and 1.0");
+            return NULL;
+        }
+    #endif
+
+    // Check if parents have compatible architecture
+    bool use_bias = parent_x->metadata.use_bias;
+    if (parent_y->metadata.use_bias != use_bias) {
+        NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, parents must have same use_bias setting");
+        return NULL;
+    }
+
+    // Get tensor dimensions from parent_x (assuming both have same dimensions)
+    int in_features = parent_x->weights->data->shape[0];
+    int out_features = parent_x->weights->data->shape[1];
+    
+    // Verify parent_y has same dimensions
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (parent_y->weights->data->shape[0] != in_features || parent_y->weights->data->shape[1] != out_features) {
+            NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, parents must have same weight dimensions");
+            return NULL;
+        }
+        
+        if (use_bias && parent_y->bias->data->shape[0] != out_features) {
+            NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, parent bias dimensions mismatch");
+            return NULL;
+        }
+    #endif
+
+    // Allocate memory for child layer
+    nnl2_nn_fnn* nn = malloc(sizeof(nnl2_nn_fnn));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!nn) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+
+    // metadata
+    nn -> metadata.nn_type = nnl2_nn_type_fnn;
+    nn -> metadata.use_bias = use_bias;
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
+	
+
+    nn -> forward = parent_x -> forward;
+
+    nnl2_ad_tensor* child_weights = nnl2_ad_nn_ga_crossover_uniform(parent_x->weights, parent_y->weights, crossover_rate);
+    if (!child_weights) {
+        NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, weight crossover failed");
+        free(nn);
+        return NULL;
+    }
+    
+    nn->weights = child_weights;
+
+    if (use_bias) {
+        nnl2_ad_tensor* child_bias = nnl2_ad_nn_ga_crossover_uniform(parent_x->bias, parent_y->bias, crossover_rate);
+        if (!child_bias) {
+            NNL2_ERROR("In nnl2_nn_fnn_crossover_uniform, bias crossover failed");
+            nnl2_free_ad_tensor(child_weights); 
+            free(nn);
+            return NULL;
+        }
+        
+        nn->bias = child_bias;
+    } else {
+        nn->bias = NULL;
+    }
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+
+    return nn;
+}
+
+/** @brief
+ * Performs uniform mutation on an FNN layer to create a mutated child layer
+ * Creates a new FNN layer where weights (and optionally bias) are mutated
+ * by adding random values within [-delta, delta] based on mutation rate
+ *
+ ** @param parent
+ * Pointer to the parent FNN layer
+ *
+ ** @param mutate_rate
+ * Probability (0.0 to 1.0) of mutating each element
+ *
+ ** @param delta
+ * Maximum absolute value of mutation to be added to elements
+ *
+ ** @return nnl2_nn_fnn*
+ * Pointer to the newly created mutated FNN layer
+ *
+ ** @retval NULL
+ * if memory allocation fails or mutation fails
+ *
+ ** @note
+ * The child layer will have the same metadata as the parent
+ * Gradient tracking is disabled for the resulting layer's tensors
+ */
+nnl2_nn_fnn* nnl2_nn_fnn_mutation_uniform(nnl2_nn_fnn* parent, float mutate_rate, float delta) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (!parent) {
+            NNL2_ERROR("In nnl2_nn_fnn_mutation_uniform, parent layer cannot be NULL");
+            return NULL;
+        }
+        
+        if (parent->metadata.nn_type != nnl2_nn_type_fnn) {
+            NNL2_ERROR("In nnl2_nn_fnn_mutation_uniform, parent must be an FNN layer");
+            return NULL;
+        }
+        
+        if (mutate_rate < 0.0f || mutate_rate > 1.0f) {
+            NNL2_ERROR("In nnl2_nn_fnn_mutation_uniform, mutate_rate must be between 0.0 and 1.0");
+            return NULL;
+        }
+        
+        if (delta < 0.0f) {
+            NNL2_ERROR("In nnl2_nn_fnn_mutation_uniform, delta must be non-negative");
+            return NULL;
+        }
+    #endif
+
+    bool use_bias = parent->metadata.use_bias;
+
+    nnl2_nn_fnn* nn = malloc(sizeof(nnl2_nn_fnn));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!nn) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+
+    // metadata
+    nn -> metadata.nn_type = nnl2_nn_type_fnn;
+    nn -> metadata.use_bias = use_bias;
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
+    
+    nn -> forward = parent -> forward;
+
+    // mutation for weights
+    nnl2_ad_tensor* mutated_weights = nnl2_ad_nn_ga_mutation_uniform(parent->weights, mutate_rate, delta);
+    if (!mutated_weights) {
+        NNL2_ERROR("In nnl2_nn_fnn_mutation_uniform, weight mutation failed");
+        free(nn);
+        return NULL;
+    }
+    
+    nn->weights = mutated_weights;
+
+    //mutation for bias if needed
+    if (use_bias) {
+        nnl2_ad_tensor* mutated_bias = nnl2_ad_nn_ga_mutation_uniform(parent->bias, mutate_rate, delta);
+        if (!mutated_bias) {
+            NNL2_ERROR("In nnl2_nn_fnn_mutation_uniform, bias mutation failed");
+            nnl2_free_ad_tensor(mutated_weights);  // Clean up
+            free(nn);
+            return NULL;
+        }
+        
+        nn->bias = mutated_bias;
+    } else {
+        nn->bias = NULL;
+    }
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+
+    return nn;
+}
+
+/** @brief 
+ * Creates a deep copy of a Fully-Connected Neural Network (FNN) layer
+ *
+ ** @param src 
+ * Pointer to the source FNN layer to be copied
+ *
+ ** @return
+ * A pointer to the newly created deep copy of the FNN layer
+ *
+ ** @retval NULL 
+ * if memory allocation or tensor copying fails
+ *
+ ** @warning 
+ * The caller is responsible for freeing the memory by calling
+ * `void nnl2_nn_fnn_free(nnl2_nn_fnn* nn)` on the returned pointer
+ *
+ ** @see nnl2_nn_fnn_free
+ ** @see nnl2_nn_fnn_create
+ ** @see nnl2_nn_fnn_manual_create
+ **/
+nnl2_nn_fnn* nnl2_nn_fnn_deep_copy(const nnl2_nn_fnn* src) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src, "In function nnl2_nn_fnn_deep_copy, const nnl2_nn_fnn* src is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src->weights, "In function nnl2_nn_fnn_deep_copy, src->weights is NULL", NULL);
+    #endif
+    
+    nnl2_nn_fnn* dst = malloc(sizeof(nnl2_nn_fnn));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+    dst->metadata = src->metadata;
+    dst->forward = src->forward;
+    
+    // Deep copy 
+    dst->weights = nnl2_ad_copy(src->weights, src->weights->data->dtype);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst->weights) {
+            NNL2_ERROR("Failed to copy weights tensor in nnl2_nn_fnn_deep_copy");
+            free(dst);
+            return NULL;
+        }
+    #endif
+
+    if(src->metadata.use_bias && src->bias) {
+        dst->bias = nnl2_ad_copy(src->bias, src->bias->data->dtype);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(!dst->bias) {
+                NNL2_ERROR("Failed to copy bias tensor in nnl2_nn_fnn_deep_copy");
+                nnl2_free_ad_tensor(dst->weights);
+                free(dst);
+                return NULL;
+            }
+        #endif
+    } else {
+        dst->bias = NULL;
+    }
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_INFO("Successfully created deep copy of FNN layer");
+        if(dst->metadata.use_bias) {
+            NNL2_DEBUG("Copied weights shape: [%d, %d], bias shape: [%d]", 
+                      dst->weights->data->shape[0], dst->weights->data->shape[1],
+                      dst->bias->data->shape[0]);
+        } else {
+            NNL2_DEBUG("Copied weights shape: [%d, %d], no bias", 
+                      dst->weights->data->shape[0], dst->weights->data->shape[1]);
+        }
+    #endif
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return dst;
 }
 
 #endif /** NNL2_FNN_BACKEND_H **/

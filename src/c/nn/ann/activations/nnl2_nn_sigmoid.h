@@ -58,6 +58,7 @@ nnl2_nn_sigmoid* nnl2_nn_sigmoid_create(bool approx) {
     // Metadata
     nn -> metadata.nn_type = nnl2_nn_type_sigmoid;
     nn -> metadata.use_bias = false; 
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
 	
 	// Common data
 	nn -> approx = approx;
@@ -216,7 +217,7 @@ void nnl2_nn_sigmoid_print(nnl2_nn_sigmoid* nn, bool terpri) {
  * @return nnl2_nnlrepr_template* 
  * Pointer to created template or NULL on error
  */
-nnl2_nnlrepr_template* nnl2_nn_sigmoid_nnlrepr_template(nnl2_nn_sigmoid* nn) {
+static nnl2_nnlrepr_template* nnl2_nn_sigmoid_nnlrepr_template(nnl2_nn_sigmoid* nn) {
     #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -252,6 +253,50 @@ nnl2_nnlrepr_template* nnl2_nn_sigmoid_nnlrepr_template(nnl2_nn_sigmoid* nn) {
     #endif
     
     return result;
+}
+
+/** @brief 
+ * Creates a deep copy of a Sigmoid activation layer
+ *
+ ** @param src 
+ * Pointer to the source Sigmoid layer to be copied
+ *
+ ** @return
+ * A pointer to the newly created deep copy of the Sigmoid layer
+ *
+ ** @retval NULL 
+ * if memory allocation fails
+ *
+ ** @warning 
+ * The caller is responsible for freeing the memory by calling
+ * `void nnl2_nn_sigmoid_free(nnl2_nn_sigmoid* nn)` on the returned pointer
+ *
+ ** @see nnl2_nn_sigmoid_free
+ ** @see nnl2_nn_sigmoid_create
+ **/
+nnl2_nn_sigmoid* nnl2_nn_sigmoid_deep_copy(const nnl2_nn_sigmoid* src) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src, "In function nnl2_nn_sigmoid_deep_copy, const nnl2_nn_sigmoid* src is NULL", NULL);
+    #endif
+    
+    nnl2_nn_sigmoid* dst = nnl2_nn_sigmoid_create(src -> approx);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst) {
+            NNL2_TENSOR_ERROR("sigmoid");
+            return NULL;
+        }
+    #endif
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return dst;
 }
 
 #endif /** NNL2_NN_SIGMOID_H **/

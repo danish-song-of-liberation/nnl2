@@ -86,20 +86,20 @@ void nnl2_init_stack();
 /** @brief 
  * Registers in-place activation function operations
  *
- ** @details 
- * These functions (e.g., ReLU, Sigmoid) modify the target tensor directly
+ ** @details      
+ * These functions (e.g., ReLU, Sigmoid) modify the target tensor directly  
  */ 
-void nnl2_init_activations_inplace();
+void nnl2_init_activations_inplace();     
  
-/** @brief 
+/** @brief   
  * Registers out-of-place activation function operations
  *
  ** @details 
  * These functions (e.g., ReLU, Sigmoid) return a new result tensor
  */
-void nnl2_init_activations(); 
+void nnl2_init_activations();     
 
-/** @brief 
+/** @brief   
  * Registers backend implementations for tensor weight initializers
  *
  ** @details 
@@ -212,21 +212,21 @@ void nnl2_init_ga();
  ** @see nnl2_init_standard   
  ** @see nnl2_init_standard_inplace
  ** @see nnl2_init_stack
- ** @see nnl2_init_activations_inplace
- ** @see nnl2_init_activations
+ ** @see nnl2_init_activations_inplace 
+ ** @see nnl2_init_activations 
  ** @see nnl2_init_initializers
- ** @see nnl2_init_transposition
- ** @see nnl2_init_auxiliary
- ** @see nnl2_init_correspondence_inplace
+ ** @see nnl2_init_transposition 
+ ** @see nnl2_init_auxiliary 
+ ** @see nnl2_init_correspondence_inplace 
  ** @see nnl2_init_correspondence 
  ** @see nnl2_init_broadcasting_inplace   
  ** @see nnl2_init_broadcasting 
  ** @see nnl2_init_reshaping    
- ** @see nnl2_init_loss 
+ ** @see nnl2_init_loss       
  ** @see nnl2_init_ga  
  **/     
 void nnl2_init_system() {         
-	// Initialization of random number generator 
+	// Initialization of random number generator  
 	srand(time(NULL));                
 	                                        
 	// Initialization of logger             
@@ -338,40 +338,40 @@ void nnl2_init_activations() {
 	EINIT_BACKEND(relu, relu_backends, current_backend(relu));          
 	EINIT_BACKEND(leakyrelu, leakyrelu_backends, current_backend(leakyrelu));     
 	EINIT_BACKEND(sigmoid, sigmoid_backends, current_backend(sigmoid)); 
-	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh)); 
-}
+	EINIT_BACKEND(nnl2_tanh, tanh_backends, current_backend(tanh));  
+} 
      
 void nnl2_init_initializers() {
-    EINIT_BACKEND(nnl2_rand, rand_backends, current_backend(rand));    
+    EINIT_BACKEND(nnl2_rand, rand_backends, current_backend(rand));     
 	EINIT_BACKEND(nnl2_randn, randn_backends, current_backend(randn));    
     EINIT_BACKEND(uniform, uniform_backends, current_backend(uniform));    
-    EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));    
-    EINIT_BACKEND(rand_inplace, rand_inplace_backends, current_backend(rand_inplace));   
+    EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));     
+    EINIT_BACKEND(rand_inplace, rand_inplace_backends, current_backend(rand_inplace));       
 	EINIT_BACKEND(randn_inplace, randn_inplace_backends, current_backend(randn_inplace));   	
     EINIT_BACKEND(uniform_inplace, uniform_inplace_backends, current_backend(uniform_inplace));     
-	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	   
+	EINIT_BACKEND(xavier_inplace, xavier_inplace_backends, current_backend(xavier_inplace));  	    
 	EINIT_BACKEND(kaiming, kaiming_backends, current_backend(kaiming));    
 	EINIT_BACKEND(kaiming_inplace, kaiming_inplace_backends, current_backend(kaiming_inplace));    
 }
    
-void nnl2_init_transposition() {  
+void nnl2_init_transposition() {     
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace));    
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, current_backend(transposition_inplace)); 
 	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));           
-}  
+}   
     
 void nnl2_init_auxiliary() {
-	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));  
-	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);     
-	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));      
+	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));   
+	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);        
+	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));          
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
-	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends); 
-	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));
-	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);
+	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);  
+	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice)); 
+	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);  
 	INIT_BACKEND(nnl2_vector_concat, vector_concat_backends);
-}  
-
+}       
+ 
 void nnl2_init_correspondence_inplace() {    
 	INIT_BACKEND(add_incf_inplace, add_incf_inplace_backends); 
 	INIT_BACKEND(sub_decf_inplace, sub_decf_inplace_backends);  
@@ -382,8 +382,8 @@ void nnl2_init_correspondence_inplace() {
 	INIT_BACKEND(min_minf_inplace, min_minf_inplace_backends);      
 	INIT_BACKEND(axpf_inplace, axpf_inplace_backends);  
 }
-
-void nnl2_init_correspondence() { 
+ 
+void nnl2_init_correspondence() {  
 	INIT_BACKEND(add_incf, add_incf_backends);    
 	INIT_BACKEND(sub_decf, sub_decf_backends);     
 	INIT_BACKEND(mul_mulf, mul_mulf_backends);          
@@ -407,7 +407,7 @@ void nnl2_init_broadcasting_inplace() {
           
 void nnl2_init_broadcasting() {
 	INIT_BACKEND(add_broadcasting, add_broadcasting_backends);
-	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends); 
+	INIT_BACKEND(sub_broadcasting, sub_broadcasting_backends);  
 	INIT_BACKEND(mul_broadcasting, mul_broadcasting_backends); 
 	INIT_BACKEND(div_broadcasting, div_broadcasting_backends); 
 	INIT_BACKEND(pow_broadcasting, pow_broadcasting_backends);	      
@@ -415,7 +415,7 @@ void nnl2_init_broadcasting() {
 	INIT_BACKEND(min_broadcasting, min_broadcasting_backends); 	
 	INIT_BACKEND(axpy_broadcasting, axpy_broadcasting_backends); 
 }     
-  
+    
 void nnl2_init_reshaping() {        
 	EINIT_BACKEND(nnl2_reshape, reshape_backends, CURRENT_BACKEND(reshape));    
 	EINIT_BACKEND(nnl2_reinterpret, reinterpret_backends, CURRENT_BACKEND(reinterpret)); 

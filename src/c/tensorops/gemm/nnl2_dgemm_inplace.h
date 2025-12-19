@@ -272,8 +272,11 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
 						   
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
-	#endif						   
+	#endif						
 
+	// NNL2_INFO("Calling cblas_dgemm with order=%d, transa=%d, transb=%d, m=%d, n=%d, k=%d, alpha=%lf, a=%p, lda=%d, b=%p, ldb=%d, beta=%lf, c=%p, ldc=%d. a shape = [%d, %d], b shape = [%d, %d], c shape = [%d, %d]",
+	// 		     order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, a -> shape [0], a -> shape [1], b -> shape [0], b -> shape [1], c -> shape [0], c -> shape [1]);
+    
 	// Cast data from void* to double*
 	double* a_data = (double*)a->data;
 	double* b_data = (double*)b->data;

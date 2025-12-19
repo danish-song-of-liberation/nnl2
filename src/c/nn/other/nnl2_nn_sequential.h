@@ -71,6 +71,7 @@ nnl2_nn_sequential* nnl2_nn_sequential_create(size_t num_layers, void** layers) 
 	
     // Initialize metadata
 	seq -> metadata.nn_type = nnl2_nn_type_sequential;
+    seq -> metadata.nn_magic = NNL2_NN_MAGIC;
 	
     // Store layers
 	seq -> layers = layers;
@@ -421,6 +422,357 @@ nnl2_nnlrepr_template* nnl2_nn_sequential_nnlrepr_template(nnl2_nn_sequential* n
     #endif
 	
 	return result;
+}
+
+void* nnl2_ann_deep_copy(const void* src);
+
+/** @brief 
+ * Creates a deep copy of a Sequential neural network container
+ *	
+ ** @param src 
+ * Pointer to the source Sequential container to be copied
+ *
+ ** @return nnl2_nn_sequential*
+ * A pointer to the newly created deep copy of the Sequential container
+ *
+ ** @retval NULL 
+ * if memory allocation or layer copying fails
+ *
+ ** @warning 
+ * The caller is responsible for freeing the memory by calling
+ * `nnl2_nn_sequential_free()` on the returned pointer
+ */
+nnl2_nn_sequential* nnl2_nn_sequential_deep_copy(const nnl2_nn_sequential* src) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src, "In function nnl2_nn_sequential_deep_copy, const nnl2_nn_sequential* src is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src->layers, "In function nnl2_nn_sequential_deep_copy, src->layers is NULL", NULL);
+    #endif
+    
+    nnl2_nn_sequential* dst = malloc(sizeof(nnl2_nn_sequential));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+    
+    // Copy metadata
+    dst->metadata = src->metadata;
+    dst->num_layers = src->num_layers;
+    
+    // Allocate memory for layers array
+    dst->layers = malloc(sizeof(void*) * src->num_layers);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst->layers) {
+            NNL2_MALLOC_ERROR();
+            free(dst);
+            return NULL;
+        }
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+            for(size_t i = 0; i < src->num_layers; i++) {
+                dst->layers[i] = NULL;
+            }
+        #endif
+    #endif
+    
+    // Deep copy each layer
+    bool copy_failed = false;
+    
+    for(size_t i = 0; i < src->num_layers; i++) {
+        if(!src->layers[i]) {
+            dst->layers[i] = NULL;
+            continue;
+        }
+        
+        dst->layers[i] = nnl2_ann_deep_copy(src->layers[i]);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if(!dst->layers[i]) {
+                NNL2_ERROR("Failed to copy layer %zu in nnl2_nn_sequential_deep_copy", i);
+                copy_failed = true;
+                break;
+            }
+        #endif
+    }
+    
+    if(copy_failed) {
+        // Clean up 
+        for(size_t i = 0; i < src->num_layers; i++) {
+            if(dst->layers[i]) {
+                nnl2_ann_free(dst->layers[i]);
+            }
+        }
+		
+        free(dst->layers);
+        free(dst);
+        
+        #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+            NNL2_DEBUG("Failed to create deep copy of Sequential container");
+        #endif
+        
+        return NULL;
+    }
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_DEBUG("Successfully created deep copy of Sequential container with %zu layers", dst->num_layers);
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return dst;
+}
+
+void* nnl2_nn_mutation_uniform(void* parent, float mutate_rate, float delta);
+
+/** @brief
+ * Performs uniform mutation on a Sequential neural network container
+ * Creates a new Sequential container where each layer is mutated independently
+ *
+ ** @param parent
+ * Pointer to the parent Sequential container
+ *
+ ** @param mutate_rate
+ * Probability (0.0 to 1.0) of mutating each element in each layer
+ *
+ ** @param delta
+ * Maximum absolute value of mutation to be added to elements
+ *
+ ** @return nnl2_nn_sequential*
+ * Pointer to the newly created mutated Sequential container
+ *
+ ** @retval NULL
+ * if memory allocation fails or any layer mutation fails
+ */
+nnl2_nn_sequential* nnl2_nn_sequential_mutation_uniform(nnl2_nn_sequential* parent, float mutate_rate, float delta) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+	
+	if(parent -> num_layers == 0) {
+		NNL2_WARN("Sequential container has 0 layers, cannot mutate");
+		return NULL;
+	}
+
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (!parent) {
+            NNL2_ERROR("In nnl2_nn_sequential_mutation_uniform, parent container cannot be NULL");
+            return NULL;
+        }
+        
+        if (parent->metadata.nn_type != nnl2_nn_type_sequential) {
+            NNL2_ERROR("In nnl2_nn_sequential_mutation_uniform, parent must be a Sequential container");
+            return NULL;
+        }
+        
+        if (mutate_rate < 0.0f || mutate_rate > 1.0f) {
+            NNL2_ERROR("In nnl2_nn_sequential_mutation_uniform, mutate_rate must be between 0.0 and 1.0");
+            return NULL;
+        }
+        
+        if (delta < 0.0f) {
+            NNL2_ERROR("In nnl2_nn_sequential_mutation_uniform, delta must be non-negative");
+            return NULL;
+        }
+    #endif
+
+    // Allocate memory for child container
+    nnl2_nn_sequential* seq = malloc(sizeof(nnl2_nn_sequential));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!seq) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+
+    // Copy metadata
+    seq->metadata.nn_type = nnl2_nn_type_sequential;
+    seq->metadata.nn_magic = NNL2_NN_MAGIC;
+    seq->num_layers = parent->num_layers;
+    
+    // Allocate memory for layers array
+    seq->layers = malloc(sizeof(void*) * parent->num_layers);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!seq->layers) {
+            NNL2_MALLOC_ERROR();
+            free(seq);
+            return NULL;
+        }
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+            for(size_t i = 0; i < parent->num_layers; i++) {
+                seq->layers[i] = NULL;
+            }
+        #endif
+    #endif
+
+    bool mutation_failed = false;
+    
+    for(size_t i = 0; i < parent->num_layers; i++) {
+        if(!parent->layers[i]) {
+            seq->layers[i] = NULL;
+            continue;
+        }
+		
+        seq->layers[i] = nnl2_nn_mutation_uniform(parent->layers[i], mutate_rate, delta);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if (!seq->layers[i]) {
+                NNL2_ERROR("In nnl2_nn_sequential_mutation_uniform, mutation of layer %zu failed", i);
+                mutation_failed = true;
+                break;
+            }
+        #endif
+    }
+    
+    if(mutation_failed) {
+        for(size_t i = 0; i < parent->num_layers; i++) {
+            if(seq->layers[i]) {
+                nnl2_ann_free(seq->layers[i]);
+            }
+        }
+		
+        free(seq->layers);
+        free(seq);
+        
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+            NNL2_DEBUG("In nnl2_nn_sequential_mutation_uniform, mutation failed");
+        #endif
+        
+        return NULL;
+    }
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+
+    return seq;
+}
+
+void* nnl2_nn_crossover_uniform(void* parent_x, void* parent_y, float crossover_rate);
+
+/** @brief
+ * Performs uniform crossover between two Sequential neural network containers
+ * Creates a new Sequential container where each layer is crossed independently
+ *
+ ** @param parent_x
+ * Pointer to the first parent Sequential container
+ *
+ ** @param parent_y
+ * Pointer to the second parent Sequential container
+ *
+ ** @param crossover_rate
+ * Probability (0.0 to 1.0) of selecting elements from parent_x
+ *
+ ** @return nnl2_nn_sequential*
+ * Pointer to the newly created child Sequential container
+ *
+ ** @retval NULL
+ * if memory allocation fails, parents are incompatible, or any layer crossover fails
+ */
+nnl2_nn_sequential* nnl2_nn_sequential_crossover_uniform(nnl2_nn_sequential* parent_x, nnl2_nn_sequential* parent_y, float crossover_rate) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+
+    // Safety checks
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (!parent_x || !parent_y) {
+            NNL2_ERROR("In nnl2_nn_sequential_crossover_uniform, parent containers cannot be NULL");
+            return NULL;
+        }
+        
+        if (parent_x->metadata.nn_type != nnl2_nn_type_sequential || parent_y->metadata.nn_type != nnl2_nn_type_sequential) {
+            NNL2_ERROR("In nnl2_nn_sequential_crossover_uniform, both parents must be Sequential containers");
+            return NULL;
+        }
+        
+        if (crossover_rate < 0.0f || crossover_rate > 1.0f) {
+            NNL2_ERROR("In nnl2_nn_sequential_crossover_uniform, crossover_rate must be between 0.0 and 1.0");
+            return NULL;
+        }
+    #endif
+
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+        if (parent_x->num_layers != parent_y->num_layers) {
+            NNL2_ERROR("In nnl2_nn_sequential_crossover_uniform, parents must have same number of layers");
+            return NULL;
+        }
+    #endif
+
+    nnl2_nn_sequential* seq = malloc(sizeof(nnl2_nn_sequential));
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!seq) {
+            NNL2_MALLOC_ERROR();
+            return NULL;
+        }
+    #endif
+
+    seq->metadata.nn_type = nnl2_nn_type_sequential;
+    seq->metadata.nn_magic = NNL2_NN_MAGIC;
+    seq->num_layers = parent_x->num_layers;
+    
+    seq->layers = malloc(sizeof(void*) * parent_x->num_layers);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if (!seq->layers) {
+            NNL2_MALLOC_ERROR();
+            free(seq);
+            return NULL;
+        }
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MODERATE
+            for(size_t i = 0; i < parent_x->num_layers; i++) {
+                seq->layers[i] = NULL;
+            }
+        #endif
+    #endif
+
+    bool crossover_failed = false;
+    
+    for(size_t i = 0; i < parent_x->num_layers; i++) {
+        seq->layers[i] = nnl2_nn_crossover_uniform(parent_x->layers[i], parent_y->layers[i], crossover_rate);
+        
+        #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+            if (!seq->layers[i]) {
+                NNL2_ERROR("In nnl2_nn_sequential_crossover_uniform, crossover of layer %zu failed", i);
+                crossover_failed = true;
+                break;
+            }
+        #endif
+    }
+    
+    if(crossover_failed) {
+        for(size_t i = 0; i < parent_x->num_layers; i++) {
+            if(seq->layers[i]) {
+                nnl2_ann_free(seq->layers[i]);
+            }
+        }
+		
+        free(seq->layers);
+        free(seq);
+        
+        #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_MINIMAL
+            NNL2_DEBUG("In nnl2_nn_sequential_crossover_uniform, crossover failed");
+        #endif
+        
+        return NULL;
+    }
+
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+
+    return seq;
 }
 
 #endif /** NNL2_NN_SEQUENTIAL_H **/

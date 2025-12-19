@@ -1512,7 +1512,28 @@
   (bhh :pointer)
   (handle-as nnl2-nn-handle-as))  
   
+(cffi:defcfun ("nnl2_nn_crossover_uniform" %nn-crossover-uniform) :pointer 
+  (parent-x :pointer)
+  (parent-y :pointer)
+  (crossover-rate :float))
+  
+(cffi:defcfun ("nnl2_nn_mutation_uniform" %nn-mutation-uniform) :pointer 
+  (parent :pointer)
+  (mutation-rate :float)
+  (delta :float))
+  
+(cffi:defcfun ("nnl2_ann_deep_copy" %nn-deep-copy) :pointer 
+  (nn :pointer))
+
+(cffi:defcfun ("nnl2_nn_checktype" %nn-checktype) :bool 
+  (nn :pointer))  
+  
 ;; -- Other --  
+  
+(cffi:defcfun ("nnl2_nn_decode_internal" %nnlrepr-decode-internal) :pointer
+  (encoder :pointer)
+  (vector :pointer)
+  (offset :size))
   
 (cffi:defcfun ("nnl2_nn_encode" %nnlrepr-encode) :pointer 
   (nn :pointer))
@@ -1530,6 +1551,9 @@
 
 (cffi:defcfun ("nnl2_nnlrepr_template_free" %nnlrepr-template-free) :void 
   (nnlrepr-template :pointer))
+  
+(cffi:defcfun ("nnl2_nnlrepr_empty_from_vector" %nnlrepr-empty-from-vector) :pointer 
+  (vector :pointer))
   
 ;; -- Backends --  
  

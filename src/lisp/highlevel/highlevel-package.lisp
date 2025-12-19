@@ -21,7 +21,8 @@
 (defpackage #:nnl2.hli.nn.ga.selection
   (:use #:cl)
   (:export 
-    #:tournament))
+    #:tournament
+	#:elitist))
 
 (defpackage #:nnl2.hli.nn.ga.mutation
   (:use #:cl)
@@ -41,7 +42,9 @@
 (defpackage #:nnl2.hli.nn.ga
   (:use #:cl)
   (:export
+    #:encode-cons
     #:encode
+	#:encoder-with-vector
 	#:decode
 	#:print-encoder
 	#:free-encoder))
@@ -62,7 +65,9 @@
    #:.tanh
    #:.relu
    #:.leaky-relu
-   #:print-model))
+   #:print-model
+   #:copy
+   #:nnp))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

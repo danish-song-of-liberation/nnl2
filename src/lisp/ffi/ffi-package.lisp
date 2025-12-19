@@ -679,5 +679,11 @@
    #:%nnlrepr-free
    #:%nnlrepr-template-free
    #:%ga-crossover-uniform
-   #:%ga-mutation-uniform))
+   #:%ga-mutation-uniform
+   #:%nnlrepr-decode-internal
+   #:%nnlrepr-empty-from-vector
+   #:%nn-crossover-uniform
+   #:%nn-mutation-uniform
+   #:%nn-deep-copy
+   #:%nn-checktype))
    

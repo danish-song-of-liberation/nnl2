@@ -17,4 +17,7 @@
 #include "../nn/ann/nnl2_ann_parameters.h"
 #include "../nn/ann/nnl2_ann_parameters_free.h"
 #include "../nn/ann/nnl2_ann_print.h"
+#include "../nn/ann/nnl2_ann_copy.h"
 #include "../nn/ann/nnl2_ann_nnlrepr_template.h"
+#include "../nn/ann/nnl2_ann_crossover.h"
+#include "../nn/ann/nnl2_ann_mutation.h"

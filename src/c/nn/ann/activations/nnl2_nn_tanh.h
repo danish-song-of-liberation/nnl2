@@ -58,7 +58,8 @@ nnl2_nn_tanh* nnl2_nn_tanh_create(bool approx) {
     // Metadata
     nn -> metadata.nn_type = nnl2_nn_type_tanh;
     nn -> metadata.use_bias = false; 
-    
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;    
+	
     // Common data
     nn -> approx = approx;
     
@@ -251,6 +252,50 @@ static nnl2_nnlrepr_template* nnl2_nn_tanh_nnlrepr_template(nnl2_nn_tanh* nn) {
     #endif
     
     return result;
+}
+
+/** @brief 
+ * Creates a deep copy of a Tanh activation layer
+ *
+ ** @param src 
+ * Pointer to the source Tanh layer to be copied
+ *
+ ** @return
+ * A pointer to the newly created deep copy of the Tanh layer
+ *
+ ** @retval NULL 
+ * if memory allocation fails
+ *
+ ** @warning 
+ * The caller is responsible for freeing the memory by calling
+ * `void nnl2_nn_tanh_free(nnl2_nn_tanh* nn)` on the returned pointer
+ *
+ ** @see nnl2_nn_tanh_free
+ ** @see nnl2_nn_tanh_create
+ **/
+nnl2_nn_tanh* nnl2_nn_tanh_deep_copy(nnl2_nn_tanh* src) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src, "In function nnl2_nn_tanh_deep_copy, const nnl2_nn_tanh* src is NULL", NULL);
+    #endif
+    
+    nnl2_nn_tanh* dst = nnl2_nn_tanh_create(src -> approx);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst) {
+            NNL2_TENSOR_ERROR("tanh");
+            return NULL;
+        }
+    #endif
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return dst;
 }
 
 #endif /** NNL2_NN_TANH_H **/

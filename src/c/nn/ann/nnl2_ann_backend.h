@@ -88,12 +88,33 @@ typedef enum {
 
 typedef struct {
     nnl2_nn_type nn_type;  ///< Type of the neural network 
+	uint32_t nn_magic; 	   ///< To check if the pointer is a nn structure
     bool use_bias;         ///< Whether the network uses bias terms 
 } nnl2_nn_ann;
 
 ///@} [nnl2_nn_ann]
 
 
+
+/** @brief Magic number to check if the pointer is a nn structure (nnl2_nn_ann->nn_magic) **/
+#define NNL2_NN_MAGIC 0XABCDFDCB
+
+/** @brief If ann returns true false otherwise **/
+bool nnl2_nn_checktype(void* obj) {
+	bool result;
+	
+    if(!obj) result = false;
+    
+    nnl2_nn_ann* ann = (nnl2_nn_ann*)obj;
+    
+    if(ann->nn_magic != NNL2_NN_MAGIC) result = false;
+    
+    if(ann->nn_type >= nnl2_nn_type_fnn && ann->nn_type <= nnl2_nn_type_unknown) {
+        result = true;
+    }
+	
+	return result;
+}
 
 /** @brief 
  * Retrieves the type of a neural network

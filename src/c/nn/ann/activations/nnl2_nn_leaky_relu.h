@@ -57,6 +57,7 @@ nnl2_nn_leaky_relu* nnl2_nn_leaky_relu_create(float alpha) {
     // Metadata
     nn -> metadata.nn_type = nnl2_nn_type_leaky_relu;
     nn -> metadata.use_bias = false; 
+	nn -> metadata.nn_magic = NNL2_NN_MAGIC;
     
     // Common data
     nn -> alpha = alpha;
@@ -250,6 +251,52 @@ static nnl2_nnlrepr_template* nnl2_nn_leaky_relu_nnlrepr_template(nnl2_nn_leaky_
     #endif
 	
     return result;
+}
+
+/** @brief 
+ * Creates a deep copy of a Leaky ReLU activation layer
+ *
+ ** @param src 
+ * Pointer to the source Leaky ReLU layer to be copied
+ *
+ ** @return
+ * A pointer to the newly created deep copy of the Leaky ReLU layer
+ *
+ ** @retval NULL 
+ * if memory allocation fails
+ *
+ ** @warning 
+ * The caller is responsible for freeing the memory by calling
+ * `void nnl2_nn_leaky_relu_free(nnl2_nn_leaky_relu* nn)` on the returned pointer
+ *
+ ** @see nnl2_nn_leaky_relu_free
+ ** @see nnl2_nn_leaky_relu_create
+ **/
+nnl2_nn_leaky_relu* nnl2_nn_leaky_relu_deep_copy(nnl2_nn_leaky_relu* src) {
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(src, "In function nnl2_nn_leaky_relu_deep_copy, const nnl2_nn_leaky_relu* src is NULL", NULL);
+    #endif
+    
+    // Create new layer with copied alpha value
+    nnl2_nn_leaky_relu* dst = nnl2_nn_leaky_relu_create(src->alpha);
+    
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+        if(!dst) {
+            NNL2_ERROR("Failed to create Leaky ReLU layer copy in nnl2_nn_leaky_relu_deep_copy");
+            return NULL;
+        }
+    #endif
+    
+    #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_FULL
+        NNL2_INFO("Successfully created deep copy of Leaky ReLU layer with alpha = %.4f", dst->alpha);
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return dst;
 }
 
 #endif /** NNL2_NN_LEAKY_RELU_H **/
