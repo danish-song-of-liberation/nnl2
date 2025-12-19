@@ -112,7 +112,7 @@ void nnl2_init_initializers();
  */
 void nnl2_init_transposition();
 
-/** @brief 
+/** @brief  
  * Registers backend implementations for auxiliary/utility operations
  *   
  ** @details
@@ -422,7 +422,8 @@ void nnl2_init_reshaping() {
 }
 
 void nnl2_init_loss() {
-	EINIT_BACKEND(nnl2_mse, mse_backends, CURRENT_BACKEND(mse));
+    EINIT_BACKEND(nnl2_mse, mse_backends, CURRENT_BACKEND(mse));
+    EINIT_BACKEND(nnl2_mae, mae_backends, CURRENT_BACKEND(mae));
 }
      
 void nnl2_init_ga() {
@@ -834,13 +835,17 @@ void lisp_call_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
 	nnl2_mse(prediction, target, record);
 }  
 
+void lisp_call_mae(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
+    nnl2_mae(prediction, target, record);
+} 
+
 nnl2_tensor* lisp_call_rand(int32_t* shape, int rank, nnl2_tensor_type dtype) {
 	return nnl2_rand(shape, rank, dtype); 
 }       
  
 void lisp_call_rand_inplace(nnl2_tensor* tensor) {   
 	rand_inplace(tensor); 
-}        
+}         
 
 nnl2_tensor* lisp_call_randn(int32_t* shape, int rank, nnl2_tensor_type dtype, double mean, double std) { 
 	return nnl2_randn(shape, rank, dtype, mean, std);

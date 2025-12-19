@@ -543,6 +543,11 @@
   (target :pointer)
   (record :pointer))
   
+(cffi:defcfun ("lisp_call_mae" %mae) :void
+  (prediction :pointer)
+  (target :pointer)
+  (record :pointer))  
+  
 (cffi:defcfun ("nnl2_ts_set_magic_number" %ts-set-magic-number) :void
   (tensor :pointer)
   (new-magic :char))
@@ -1364,6 +1369,13 @@
   (mode ad-mode)
   (track-graph :bool))  
   
+(cffi:defcfun ("nnl2_ad_mae" %ad-mae) :pointer
+  (prediction :pointer)
+  (target :pointer)
+  (force :bool)
+  (mode ad-mode)
+  (track-graph :bool))    
+  
 (cffi:defcfun ("nnl2_ad_randn_like" %ad-randn-like) :pointer  
   (ad-tensor :pointer)
   (mean :double)
@@ -1902,6 +1914,9 @@
 (cffi:defcfun ("set_mse_backend" %set-mse-backend) :void
   (backend-name :string))   
   
+(cffi:defcfun ("set_mae_backend" %set-mae-backend) :void
+  (backend-name :string))     
+  
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
 (cffi:defcfun ("nnl2_get_empty_backend" %get-empty-backend) :string)  
@@ -1980,6 +1995,7 @@
 (cffi:defcfun ("get_ataninplace_backend" %get-ataninplace-backend) :string)
 (cffi:defcfun ("get_atan_backend" %get-atan-backend) :string)
 (cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
+(cffi:defcfun ("get_mae_backend" %get-mae-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -2137,6 +2153,8 @@
 (cffi:defcfun ("get_atan_num_backends" %get-atan-num-backends) :int)
 (cffi:defcfun ("get_mse_backends" %get-mse-backends) :pointer)
 (cffi:defcfun ("get_mse_num_backends" %get-mse-num-backends) :int)
+(cffi:defcfun ("get_mae_backends" %get-mae-backends) :pointer)
+(cffi:defcfun ("get_mae_num_backends" %get-mae-num-backends) :int)
 
 ;; -- mem-aref setters/getters --
 

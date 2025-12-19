@@ -143,6 +143,7 @@
 #include "../tensorshape/nnl2_reshape.h"
 #include "../tensorshape/nnl2_reinterpret.h"
 #include "../tensorloss/nnl2_mse.h"
+#include "../tensorloss/nnl2_mae.h"
 #include "../nn/ga/nnl2_ts_ga_crossover_uniform.h"
 #include "../nn/ga/nnl2_ts_ga_mutation_uniform.h"
 

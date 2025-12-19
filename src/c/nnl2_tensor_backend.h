@@ -1217,6 +1217,12 @@ typedef nnl2_tensor* (*nn_ga_crossover_uniform_fn)(nnl2_tensor*, nnl2_tensor*, f
  */
 typedef nnl2_tensor* (*nn_ga_mutation_uniform_fn)(nnl2_tensor* tensor, float mutate_rate, float delta);
 
+/** @param prediction Pointer to prediction tensor
+ ** @param target Pointer to target tensor
+ ** @param record Pointer to memory where result will be stored
+ */
+typedef void (*maefn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record);
+
 /// @} [typedef]
 
 

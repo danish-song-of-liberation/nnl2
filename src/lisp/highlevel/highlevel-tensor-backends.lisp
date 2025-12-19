@@ -303,7 +303,10 @@
   nnl2.ffi:%set-atan-backend)  
   
 (define-backend-setter use-backend/mse
-  nnl2.ffi:%set-mse-backend)  
+  nnl2.ffi:%set-mse-backend) 
+
+(define-backend-setter use-backend/mae
+  nnl2.ffi:%set-mae-backend)   
   
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  
@@ -338,7 +341,7 @@
 							  use-backend/.sin! use-backend/.cos use-backend/.cos!
 							  use-backend/.asin use-backend/.asin! use-backend/.acos 
 							  use-backend/.acos! use-backend/.tan! use-backend/.tan
-							  use-backend/.atan! use-backend/.atan))
+							  use-backend/.atan! use-backend/.atan use-backend/mae))
 							  
       (funcall backend-function name)))
 	  
@@ -452,6 +455,7 @@
 (define-backend-getter-setter get-backend/.atan use-backend/.atan nnl2.ffi:%get-atan-backend)
 (define-backend-getter-setter get-backend/.tan use-backend/.tan nnl2.ffi:%get-tan-backend)
 (define-backend-getter-setter get-backend/mse use-backend/mse nnl2.ffi:%get-mse-backend)
+(define-backend-getter-setter get-backend/mae use-backend/mae nnl2.ffi:%get-mae-backend)
 
 (defun get-backend/norm (&key (p :l2))
   "Gets current backend for norm operation. P: Norm type (:l2 supported)"
@@ -811,6 +815,10 @@
   nnl2.ffi:%get-mse-num-backends
   nnl2.ffi:%get-mse-backends)   
   
+(define-backends-getter get-backends/mae
+  nnl2.ffi:%get-mae-num-backends
+  nnl2.ffi:%get-mae-backends)     
+  
 (defun get-backends/norm (&key (p :l2))
   "Returns list of available backends for norm operation. 
    P: Norm type (:l2 supported)"
@@ -919,4 +927,5 @@
 (define-with-backend with-backend/.tan! get-backend/.tan!)
 (define-with-backend with-backend/.tan get-backend/.tan)
 (define-with-backend with-backend/mse get-backend/mse)
+(define-with-backend with-backend/mae get-backend/mae)
 		 

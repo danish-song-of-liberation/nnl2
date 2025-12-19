@@ -685,5 +685,11 @@
    #:%nn-crossover-uniform
    #:%nn-mutation-uniform
    #:%nn-deep-copy
-   #:%nn-checktype))
+   #:%nn-checktype
+   #:%mae
+   #:%set-mae-backend
+   #:%get-mae-backend
+   #:%get-mae-backends
+   #:%get-mae-num-backends
+   #:%ad-mae))
    

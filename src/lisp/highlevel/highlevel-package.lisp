@@ -230,12 +230,14 @@
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
   (:export
-   #:mse))  
+   #:mse
+   #:mae))  
  
 (defpackage #:nnl2.hli.ts.loss
   (:use #:cl)
   (:export
-   #:mse))  
+   #:mse
+   #:mae))  
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -736,5 +738,9 @@
    #:with-backend/.atan!
    #:with-backend/.atan
    #:with-backend/.tan!
-   #:with-backend/.tan))
+   #:with-backend/.tan
+   #:with-backend/mae
+   #:get-backends/mae
+   #:get-backend/mae
+   #:use-backend/mae))
    

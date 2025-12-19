@@ -1320,4 +1320,16 @@
     (if force 
 	  (cffi:mem-ref out :double)
 	  out)))  
+
+(defun mae (prediction target &key force (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes Mean-Absolute error
+  
+   Example:
+       (nnl2.hli.ts.loss:mae prediction target) -> loss (scalar)"
+   
+  (let ((out (nnl2.ffi:%ad-mse prediction target force nnl2.ffi:ad-reverse-mode track-graph)))
+    (if force 
+	  (cffi:mem-ref out :double)
+	  out)))  
+  
   
