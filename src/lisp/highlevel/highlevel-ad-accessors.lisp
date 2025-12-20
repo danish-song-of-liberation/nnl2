@@ -1019,6 +1019,10 @@
   "In-place elementwise natural logarithm"
   (nnl2.ffi:%ad-.log! ad-tensor track-graph))    
   
+(defun .log10! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "In-place elementwise base-10 logarithm"
+  (nnl2.ffi:%ad-.log10! ad-tensor track-graph))      
+  
 (defun .relu! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place ReLU activation"
   (nnl2.ffi:%ad-.relu! ad-tensor track-graph))  	 
@@ -1219,6 +1223,10 @@
 (defun .log (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   "Computes elementwise natural logarithm with AD tracking, returns a new tensor"
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
+  
+(defun .log10 (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes elementwise base-10 logarithm with AD tracking, returns a new tensor"
+  (nnl2.ffi:%ad-.log10 ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun .exp (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   "Computes elementwise exponential with AD tracking, returns a new tensor"

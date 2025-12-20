@@ -715,5 +715,17 @@
    #:%ad-atan2-broadcasting
    #:%ad-atan2-broadcasting-inplace
    #:%ad-atan2
-   #:%ad-atan2-inplace))
+   #:%ad-atan2-inplace
+   #:%.log10!
+   #:%.log10
+   #:%set-log10inplace-backend
+   #:%set-log10-backend
+   #:%get-log10inplace-backend
+   #:%get-log10-backend
+   #:%get-log10inplace-num-backends
+   #:%get-log10inplace-backends
+   #:%get-log10-num-backends
+   #:%get-log10-backends
+   #:%ad-.log10
+   #:%ad-.log10!))
    

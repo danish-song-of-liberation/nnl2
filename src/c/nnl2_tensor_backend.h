@@ -1262,6 +1262,18 @@ typedef Tensor* (*atan2correspondencefn)(const Tensor* y, void* x);
  */
 typedef void (*atan2correspondenceinplacefn)(Tensor* y, void* x);
 
+/** @brief Function pointer type for base-10 logarithm operation
+ ** @param tensor Input tensor
+ ** @param save_type Flag to save data type for special case (all elements = 1)
+ ** @return Result tensor
+ */
+typedef Tensor* (*log10fn)(const Tensor* tensor, bool save_type);
+
+/** @brief Function pointer type for in-place base-10 logarithm operation
+ ** @param tensor Tensor to be modified in place
+ */
+typedef void (*log10inplacefn)(Tensor* tensor);
+
 /// @} [typedef]
 
 

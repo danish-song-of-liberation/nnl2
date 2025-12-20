@@ -280,6 +280,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));             
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log));   
+	EINIT_BACKEND(nnl2_log10, log10_backends, current_backend(log10));   
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
 	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));          
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
@@ -305,6 +306,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));    
 	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));     	
+	EINIT_BACKEND(log10inplace, log10inplace_backends, current_backend(log10inplace));     	
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace));    
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));     
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace));   	
@@ -362,10 +364,10 @@ void nnl2_init_transposition() {
 	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, current_backend(transposition_inplace)); 
 	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));            
 }   
-       
+        
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));   
-	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);        
+	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);         
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));          
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);  
@@ -509,7 +511,7 @@ void lisp_call_divinplace(Tensor* dividend, Tensor* divisor) {
 	divinplace(dividend, divisor);
 }
    
-Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) {
+Tensor* lisp_call_mul(Tensor* multiplicand, Tensor* multiplier) { 
 	return mul(multiplicand, multiplier);    
 }
         
@@ -530,7 +532,7 @@ Tensor* lisp_call_pow(Tensor* base, Tensor* exponent) {
 }   
           
 Tensor* lisp_call_exp(Tensor* tensor, bool save_type) {  
-	return nnl2_exp(tensor, save_type); 
+	return nnl2_exp(tensor, save_type);  
 }
   
 void lisp_call_loginplace(Tensor* tensor) { 
@@ -540,7 +542,15 @@ void lisp_call_loginplace(Tensor* tensor) {
 Tensor* lisp_call_log(Tensor* tensor, bool save_type) {     
 	return nnl2_logarithm(tensor, save_type);
 } 
+    
+void lisp_call_log10inplace(Tensor* tensor) { 
+	log10inplace(tensor);       
+}    
    
+Tensor* lisp_call_log10(Tensor* tensor, bool save_type) {     
+	return nnl2_log10(tensor, save_type);
+} 
+ 
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
 	scaleinplace(tensor, multiplier);     
 }
