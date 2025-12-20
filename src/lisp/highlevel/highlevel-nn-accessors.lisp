@@ -138,7 +138,17 @@
         `(dotimes (i (length (parameters nn)))
            (funcall ,init (nth i (parameters nn)))))
 		   
-     nn))	 
+     nn))
+
+(defmacro rnn (in-features arrow hidden &key (bias t) (dtype nnl2.system:*default-tensor-type*) (init *nn-default-init-type*) (num-layers 1))
+  (declare (ignore arrow))
+  `(let* ((nn (nnl2.ffi:%create-nn-rnn ,in-features ,hidden ,bias ,num-layers ,dtype ,(if (keywordp init) init :identity))))
+				
+     ,(when (not (keywordp init))
+        `(dotimes (i (length (parameters nn)))
+           (funcall ,init (nth i (parameters nn)))))
+		   
+     nn))		 
 	 
 (defun sequential (&rest layers)
   (let* ((len (length layers))

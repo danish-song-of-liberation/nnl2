@@ -753,5 +753,8 @@
    #:%get-log1pinplace-num-backends
    #:%get-log1pinplace-backends
    #:%get-log1p-num-backends
-   #:%get-log1p-backends))
+   #:%get-log1p-backends
+   #:%create-nn-rnn
+   #:%internal-assign-row
+   #:%ad-internal-assign-row))
    

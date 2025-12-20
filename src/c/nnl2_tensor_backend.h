@@ -1298,6 +1298,13 @@ typedef Tensor* (*log1pfn)(const Tensor* tensor, bool save_type);
  */
 typedef void (*log1pinplacefn)(Tensor* tensor);
 
+/** @brief Function pointer type for row assignment operation
+ ** @param dst Destination 3D tensor [batch, seq, features]
+ ** @param seq_index Sequence index to assign to (0..seq_length-1)
+ ** @param src Source 2D tensor [batch, features]
+ */
+typedef int (*assignrowfn)(nnl2_tensor* dst, int seq_index, nnl2_tensor* src);
+
 /// @} [typedef]
 
 

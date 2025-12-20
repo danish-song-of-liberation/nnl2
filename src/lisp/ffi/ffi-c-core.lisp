@@ -606,8 +606,19 @@
 
 (cffi:defcfun ("lisp_call_atan2_correspondence_inplace" %atan2-correspondence-inplace) :void
   (y :pointer)
-  (x :pointer)) 
+  (x :pointer))
   
+(cffi:defcfun ("lisp_call_assign_row" %internal-assign-row) :void 
+  (dst :pointer)
+  (seq-index :int)
+  (src :pointer))
+
+(cffi:defcfun ("nnl2_ad_assign_row" %ad-internal-assign-row) :void 
+  (dst :pointer)
+  (seq-index :int)
+  (src :pointer)
+  (retain-graph :bool))
+    
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor
@@ -1546,12 +1557,13 @@
 (cffi:defcenum nnl2-nn-type 
   (:fnn 0)  	    ;; Fully Connected Neural Network 
   (:rnncell 1)      ;; Vanilla Recurrent Neural Network Cell
-  (:sequential 2)   ;; Sequential neural network (layers in sequence)
-  (:sigmoid 3)		;; Sigmoid layer
-  (:tanh 4)			;; Tanh layer
-  (:relu 5)			;; ReLU layer
-  (:leaky-relu 6)   ;; Leaky-ReLU layer
-  (:unknown 7))     ;; Unknown or unsupported network type 
+  (:rnn 2)		    ;; Vanilla Recurrent Neural Network
+  (:sequential 3)   ;; Sequential neural network (layers in sequence)
+  (:sigmoid 4)		;; Sigmoid layer
+  (:tanh 5)			;; Tanh layer
+  (:relu 6)			;; ReLU layer
+  (:leaky-relu 7)   ;; Leaky-ReLU layer
+  (:unknown 8))     ;; Unknown or unsupported network type 
 
 (cffi:defcenum nnl2-nn-handle-as
   (:copy 0)    ;; Make a copy of the passed tensors
@@ -1582,6 +1594,14 @@
   (use-bias :bool)
   (dtype tensor-type)
   (init-type nnl2-nn-init-type))  
+  
+(cffi:defcfun ("nnl2_nn_rnn_create" %create-nn-rnn) :pointer
+  (in-features :int)
+  (hidden-size :int)
+  (use-bias :bool)
+  (num-layers :int)
+  (dtype tensor-type)
+  (init-type nnl2-nn-init-type))    
   
 (cffi:defcfun ("nnl2_ann_forward" %nn-forward) :pointer
   (model :pointer)

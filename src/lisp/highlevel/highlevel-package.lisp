@@ -67,7 +67,8 @@
    #:.leaky-relu
    #:print-model
    #:copy
-   #:nnp))
+   #:nnp
+   #:rnn))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

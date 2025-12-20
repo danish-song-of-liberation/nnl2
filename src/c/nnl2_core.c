@@ -291,7 +291,7 @@ void nnl2_init_standard() {
     EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));
 	EINIT_BACKEND(nnl2_sqrt, sqrt_backends, current_backend(sqrt)); 
 	EINIT_BACKEND(nnl2_sin, sin_backends, current_backend(sin));
-	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));  
+	EINIT_BACKEND(nnl2_cos, cos_backends, current_backend(cos));          
 	EINIT_BACKEND(nnl2_tan, tan_backends, current_backend(tan));              
 	EINIT_BACKEND(nnl2_asin, asin_backends, current_backend(asin)); 
 	EINIT_BACKEND(nnl2_acos, acos_backends, current_backend(acos)); 
@@ -378,6 +378,7 @@ void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));  
 	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);  
 	INIT_BACKEND(nnl2_vector_concat, vector_concat_backends); 
+	INIT_BACKEND(nnl2_assign_row, assign_row_backends);
 }       
  
 void nnl2_init_correspondence_inplace() {    
@@ -974,6 +975,10 @@ nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {
 
 void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) {
     nnl2_atan2_correspondence_inplace(y, x);
+} 
+
+void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
+	nnl2_assign_row(dst, seq_index, src);
 }
 
 ///@} [lisp_wrappers]                

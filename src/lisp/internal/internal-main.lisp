@@ -51,3 +51,9 @@
   (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
     (nnl2.ffi:%vector-as-parameter shape rank start vector)))
 	
+(defun ts-assign-row (dst src &key (seq-index 0))
+  (nnl2.ffi:%internal-assign-row dst seq-index src))	
+  
+(defun ad-assign-row (dst src &key (seq-index 0))
+  (nnl2.ffi:%ad-internal-assign-row dst seq-index src nil))	  
+	

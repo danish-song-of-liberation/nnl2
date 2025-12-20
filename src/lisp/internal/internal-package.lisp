@@ -15,5 +15,7 @@
 	#:ad-share-data
 	#:ts-concat-vectors
 	#:ad-concat-vectors
-	#:ts-vector-as-parameter))
+	#:ts-vector-as-parameter
+	#:ts-assign-row
+	#:ad-assign-row))
   

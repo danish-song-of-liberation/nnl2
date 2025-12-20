@@ -6,6 +6,7 @@
 #include "../nn/ann/rnncell/nnl2_rnncell_backend.h"
 #include "../nn/ann/rnncell/nnl2_rnncell_forward.h"
 #include "../nn/ann/rnncell/nnl2_rnncell_init.h"
+#include "../nn/ann/rnn/nnl2_rnn_backend.h"
 #include "../nn/ann/activations/nnl2_nn_sigmoid.h"
 #include "../nn/ann/activations/nnl2_nn_tanh.h"
 #include "../nn/ann/activations/nnl2_nn_relu.h"
