@@ -129,6 +129,8 @@
    #:.max!/ad/maxf!
    #:axpy/ad/axpf!
    #:axpy!/ad/axpf!
+   #:.atan2/ad/correspondence
+   #:.atan2/ad/correspondence!
    #:.neg!
    #:+=
    #:-=
@@ -183,7 +185,8 @@
    #:.asin!
    #:.acos!
    #:.atan!
-   #:.tan!))
+   #:.tan!
+   #:.atan2!))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -225,7 +228,8 @@
    #:.asin
    #:.acos
    #:.atan
-   #:.tan))   
+   #:.tan
+   #:.atan2))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)

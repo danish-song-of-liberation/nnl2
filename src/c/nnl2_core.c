@@ -344,7 +344,7 @@ void nnl2_init_activations() {
 } 
      
 void nnl2_init_initializers() {
-    EINIT_BACKEND(nnl2_rand, rand_backends, current_backend(rand));     
+    EINIT_BACKEND(nnl2_rand, rand_backends, current_backend(rand));       
 	EINIT_BACKEND(nnl2_randn, randn_backends, current_backend(randn));    
     EINIT_BACKEND(uniform, uniform_backends, current_backend(uniform));    
     EINIT_BACKEND(xavier, xavier_backends, current_backend(xavier));     
@@ -360,18 +360,18 @@ void nnl2_init_transposition() {
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, current_backend(transposeinplace));    
 	EINIT_BACKEND(transpose, transpose_backends, current_backend(transpose));  
 	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, current_backend(transposition_inplace)); 
-	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));           
+	EINIT_BACKEND(nnl2_transposition, transposition_backends, current_backend(transposition));            
 }   
-    
+       
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, current_backend(sum_without_axis));   
 	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);        
 	EINIT_BACKEND(l2norm, l2norm_backends, current_backend(l2norm));          
 	EINIT_BACKEND(nnl2_copy, copy_backends, current_backend(copy)); 	
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);  
-	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice)); 
+	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));  
 	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);  
-	INIT_BACKEND(nnl2_vector_concat, vector_concat_backends);
+	INIT_BACKEND(nnl2_vector_concat, vector_concat_backends); 
 }       
  
 void nnl2_init_correspondence_inplace() {    

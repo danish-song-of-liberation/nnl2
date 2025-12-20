@@ -1414,7 +1414,40 @@
   (tensor :pointer)
   (mutate-rate :float)
   (delta :float))	
+  
+(cffi:defcfun ("nnl2_ad_atan2_correspondence" %ad-atan2-correspondence) :pointer 
+  (y :pointer)
+  (threshold :pointer)
+  (mode ad-mode)
+  (track-graph :bool))
 	
+(cffi:defcfun ("nnl2_ad_atan2_correspondence_inplace" %ad-atan2-correspondence-inplace) :pointer 
+  (y :pointer)
+  (threshold :pointer)
+  (retain-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_atan2_broadcasting" %ad-atan2-broadcasting) :pointer 
+  (y :pointer)
+  (x :pointer)
+  (mode ad-mode)
+  (track-graph :bool))  
+  
+(cffi:defcfun ("nnl2_ad_atan2_broadcasting_inplace" %ad-atan2-broadcasting-inplace) :pointer 
+  (y :pointer)
+  (x :pointer)
+  (retain-graph :bool))
+	
+(cffi:defcfun ("nnl2_ad_atan2" %ad-atan2) :pointer 
+  (x :pointer)
+  (y :pointer)
+  (mode ad-mode)
+  (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_atan2_inplace" %ad-atan2-inplace) :pointer 
+  (result :pointer)
+  (x :pointer)
+  (retain-graph :bool))
+
 ;; -- Optimizers --  
   
 (cffi:defcstruct nnl2-optim

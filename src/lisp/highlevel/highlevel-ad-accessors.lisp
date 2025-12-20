@@ -866,6 +866,39 @@
     
     (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float) track-graph)))	
 	
+(defun .atan2/ad/correspondence! (tensor other alpha mode track-graph)
+  "Performs elementwise atan2 in place(internal realization)"
+  (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
+         (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
+         (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
+         (other-pntr (cffi:foreign-alloc cffi-dtype)))
+         
+    (setf (cffi:mem-ref other-pntr cffi-dtype) (coerce other lisp-dtype))
+    
+    (nnl2.ffi:%ad-atan2-correspondence-inplace tensor other-pntr (coerce alpha 'single-float) mode track-graph)))	
+	
+(defun .atan2/ad/correspondence (tensor other alpha mode track-graph)
+  "Performs elementwise atan2 (internal realization)"
+  (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
+         (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
+         (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
+         (other-pntr (cffi:foreign-alloc cffi-dtype)))
+         
+    (setf (cffi:mem-ref other-pntr cffi-dtype) (coerce other lisp-dtype))
+    
+    (nnl2.ffi:%ad-atan2-correspondence tensor other-pntr (coerce alpha 'single-float) mode track-graph)))		
+	
+(defun axpy!/ad/axpf! (tensor other alpha track-graph)
+  "Performs axpy in-place: tensor += alpha * other"
+  (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
+         (cffi-dtype (nnl2.hli.ts:type/nnl2->cffi dtype))
+         (lisp-dtype (nnl2.hli.ts:type/nnl2->lisp dtype))
+         (other-pntr (cffi:foreign-alloc cffi-dtype)))
+         
+    (setf (cffi:mem-ref other-pntr cffi-dtype) (coerce other lisp-dtype))
+    
+    (nnl2.ffi:%ad-axpf-inplace tensor other-pntr (coerce alpha 'single-float) track-graph)))		
+	
 (defmacro with-notrack (&body body)
   "Temporarily disables autograd graph tracking for the enclosed body"
   `(progn
@@ -931,7 +964,16 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       (nnl2.hli.ad:.min!/ad/minf! a b track-graph)
       (nnl2.ffi:%ad-.min! a b track-graph)
-      (nnl2.ffi:%ad-min-broadcasting-inplace a b track-graph))))	  
+      (nnl2.ffi:%ad-min-broadcasting-inplace a b track-graph))))	 
+
+(defun .atan2! (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "In-place atan2"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (nnl2.hli.ad:.atan2/ad/correspondence! a b track-graph)
+      (nnl2.ffi:%ad-atan2-inplace a b track-graph)
+      (nnl2.ffi:%ad-atan2-broadcasting-inplace a b track-graph))))	 	  
 	  
 (defun .max! (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place max"
@@ -1137,6 +1179,15 @@
       (nnl2.hli.ad:.min/ad/minf! a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-.min a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-min-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))	  	  
+	
+(defun .atan2 (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Element-wise atan2"
+  
+  (nnl2.hli:fastcall   
+    (nnl2.hli.ad:with-tensor-dispatch (a b)
+      (nnl2.hli.ad:.atan2/ad/correspondence a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-atan2 a b nnl2.ffi:ad-reverse-mode track-graph)
+      (nnl2.ffi:%ad-atan2-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))		
 	
 (defun .max (a b &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Element-wise max"

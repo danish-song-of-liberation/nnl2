@@ -709,5 +709,11 @@
    #:%set-atan2inplace-broadcasting-backend
    #:%set-atan2-broadcasting-backend 
    #:%set-atan2inplace-correspondence-backend
-   #:%set-atan2-correspondence-backend))
+   #:%set-atan2-correspondence-backend
+   #:%ad-atan2-correspondence
+   #:%ad-atan2-correspondence-inplace
+   #:%ad-atan2-broadcasting
+   #:%ad-atan2-broadcasting-inplace
+   #:%ad-atan2
+   #:%ad-atan2-inplace))
    

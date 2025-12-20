@@ -1,5 +1,6 @@
-#ifndef NNL2_AD_MIN_MINF_INPLACE_H
-#define NNL2_AD_MIN_MINF_INPLACE_H
+#ifndef NNL2_AD_MIN_MINF_INPLACE_H // wait 
+#define NNL2_AD_MIN_MINF_INPLACE_H // Isn't he here yet?
+// I'll fix it in 0.1!
 
 // NNL2
 
