@@ -727,5 +727,19 @@
    #:%get-log10-num-backends
    #:%get-log10-backends
    #:%ad-.log10
-   #:%ad-.log10!))
+   #:%ad-.log10!
+   #:%.log2!
+   #:%.log2
+   #:%set-log2inplace-backend
+   #:%set-log2-backend
+   #:%get-log2inplace-backend
+   #:%get-log2-backend
+   #:%get-log2inplace-num-backends
+   #:%get-log2inplace-backends
+   #:%get-log2-num-backends
+   #:%get-log2-backends
+   #:get-backend/.log2
+   #:get-backend/.log2!
+   #:%ad-.log2!
+   #:%ad-.log2))
    

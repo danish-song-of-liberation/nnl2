@@ -102,6 +102,9 @@
   
 (define-backend-setter use-backend/.log10!
   nnl2.ffi:%set-log10inplace-backend)  
+  
+(define-backend-setter use-backend/.log2!
+  nnl2.ffi:%set-log2inplace-backend)    
 
 (define-backend-setter use-backend/scale!
   nnl2.ffi:%set-scaleinplace-backend)
@@ -156,6 +159,9 @@
 
 (define-backend-setter use-backend/.log10
   nnl2.ffi:%set-log10-backend)
+  
+(define-backend-setter use-backend/.log2
+  nnl2.ffi:%set-log2-backend)  
 
 (define-backend-setter use-backend/scale
   nnl2.ffi:%set-scale-backend)
@@ -359,7 +365,7 @@
 							  use-backend/.acos! use-backend/.tan! use-backend/.tan
 							  use-backend/.atan! use-backend/.atan use-backend/mae
 							  use-backend/.atan2! use-backend/.atan2 use-backend/.log10!
-							  use-backend/.log10))
+							  use-backend/.log10 use-backend/.log2 use-backend/.log2!))
 							  
       (funcall backend-function name)))
 	  
@@ -420,6 +426,8 @@
 (define-backend-getter-setter get-backend/.log! use-backend/.log! nnl2.ffi:%get-loginplace-backend)
 (define-backend-getter-setter get-backend/.log10 use-backend/.log10 nnl2.ffi:%get-log10-backend)
 (define-backend-getter-setter get-backend/.log10! use-backend/.log10! nnl2.ffi:%get-log10inplace-backend)
+(define-backend-getter-setter get-backend/.log2 use-backend/.log2 nnl2.ffi:%get-log2-backend)
+(define-backend-getter-setter get-backend/.log2! use-backend/.log2! nnl2.ffi:%get-log2inplace-backend)
 (define-backend-getter-setter get-backend/scale use-backend/scale nnl2.ffi:%get-scale-backend)
 (define-backend-getter-setter get-backend/scale! use-backend/scale! nnl2.ffi:%get-scaleinplace-backend)
 (define-backend-getter-setter get-backend/.min use-backend/.min nnl2.ffi:%get-min-backend)
@@ -622,6 +630,14 @@
 (define-backends-getter get-backends/.log10! 
   nnl2.ffi:%get-log10inplace-num-backends 
   nnl2.ffi:%get-log10inplace-backends)  
+
+(define-backends-getter get-backends/.log2 
+  nnl2.ffi:%get-log2-num-backends 
+  nnl2.ffi:%get-log2-backends)
+
+(define-backends-getter get-backends/.log2! 
+  nnl2.ffi:%get-log2inplace-num-backends 
+  nnl2.ffi:%get-log2inplace-backends)  
 
 (define-backends-getter get-backends/scale 
   nnl2.ffi:%get-scale-num-backends 
@@ -912,6 +928,8 @@
 (define-with-backend with-backend/.log! get-backend/.log!)
 (define-with-backend with-backend/.log10 get-backend/.log10)
 (define-with-backend with-backend/.log10! get-backend/.log10!)
+(define-with-backend with-backend/.log2 get-backend/.log2)
+(define-with-backend with-backend/.log2! get-backend/.log2!)
 (define-with-backend with-backend/scale get-backend/scale)
 (define-with-backend with-backend/scale! get-backend/scale!)
 (define-with-backend with-backend/.atan2 get-backend/.atan2)

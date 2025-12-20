@@ -1274,6 +1274,18 @@ typedef Tensor* (*log10fn)(const Tensor* tensor, bool save_type);
  */
 typedef void (*log10inplacefn)(Tensor* tensor);
 
+/** @brief Function pointer type for base-2 logarithm operation
+ ** @param tensor Input tensor
+ ** @param save_type Flag to save data type for special case (all elements are powers of two)
+ ** @return Result tensor
+ */
+typedef Tensor* (*log2fn)(const Tensor* tensor, bool save_type);
+
+/** @brief Function pointer type for in-place base-2 logarithm operation
+ ** @param tensor Tensor to be modified in place
+ */
+typedef void (*log2inplacefn)(Tensor* tensor);
+
 /// @} [typedef]
 
 

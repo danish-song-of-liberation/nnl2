@@ -739,15 +739,28 @@
   "Applies the base-10 logarithm to the tensor in place
    tensor: Input tensor"
   
-  (nnl2.ffi:%.log! tensor))  
+  (nnl2.ffi:%.log10! tensor))  
   
 (defun .log10 (tensor &key save-type)
   "Applies the base-10 logarithm to the tensor
    tensor: Input tensor
    save-type (key): Try to preserve the type as much as possible (for example, for int32)"
    
-  (nnl2.ffi:%.log tensor save-type))      
+  (nnl2.ffi:%.log10 tensor save-type))      
     
+(defun .log2! (tensor)
+  "Applies the base-2 logarithm to the tensor in place
+   tensor: Input tensor"
+  
+  (nnl2.ffi:%.log2! tensor))  
+  
+(defun .log2 (tensor &key save-type)
+  "Applies the base-2 logarithm to the tensor
+   tensor: Input tensor
+   save-type (key): Try to preserve the type as much as possible (for example, for int32)"
+   
+  (nnl2.ffi:%.log2 tensor save-type))      	
+	
 (cffi:defcfun ("get_size" numel) :int
   (tensor :pointer))  
 

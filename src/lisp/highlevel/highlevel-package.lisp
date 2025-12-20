@@ -189,7 +189,8 @@
    #:.atan2!
    #:.square!
    #:.cube!
-   #:.log10!))
+   #:.log10!
+   #:.log2!))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -236,7 +237,8 @@
    #:.square
    #:.cube
    #:.log
-   #:.log10))   
+   #:.log10
+   #:.log2))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
@@ -777,5 +779,13 @@
    #:get-backends/.log10!
    #:get-backends/.log10
    #:with-backend/.log10!
-   #:with-backend/.log10))
+   #:with-backend/.log10
+   #:.log2
+   #:.log2!
+   #:with-backend/.log2
+   #:with-backend/.log2!
+   #:get-backends/.log2 
+   #:get-backends/.log2!
+   #:use-backend/.log2
+   #:use-backend/.log2!))
    

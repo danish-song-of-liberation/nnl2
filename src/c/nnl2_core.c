@@ -281,6 +281,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log));   
 	EINIT_BACKEND(nnl2_log10, log10_backends, current_backend(log10));   
+	EINIT_BACKEND(nnl2_log2, log2_backends, current_backend(log2));   
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
 	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));          
 	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
@@ -307,6 +308,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));    
 	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));     	
 	EINIT_BACKEND(log10inplace, log10inplace_backends, current_backend(log10inplace));     	
+	EINIT_BACKEND(log2inplace, log2inplace_backends, current_backend(log2inplace));     	
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace));    
 	EINIT_BACKEND(maxinplace, maxinplace_backends, current_backend(maxinplace));     
 	EINIT_BACKEND(mininplace, mininplace_backends, current_backend(mininplace));   	
@@ -503,7 +505,7 @@ Tensor* lisp_call_sub(Tensor* summand, Tensor* addend) {
 	return sub(summand, addend);  
 }             	                      
                
-void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) {
+void lisp_call_mulinplace(Tensor* multiplicand, Tensor* multiplier) { 
 	mulinplace(multiplicand, multiplier);
 }
 	
@@ -538,7 +540,7 @@ Tensor* lisp_call_exp(Tensor* tensor, bool save_type) {
 void lisp_call_loginplace(Tensor* tensor) { 
 	loginplace(tensor);       
 }    
-   
+      
 Tensor* lisp_call_log(Tensor* tensor, bool save_type) {     
 	return nnl2_logarithm(tensor, save_type);
 } 
@@ -549,6 +551,14 @@ void lisp_call_log10inplace(Tensor* tensor) {
    
 Tensor* lisp_call_log10(Tensor* tensor, bool save_type) {     
 	return nnl2_log10(tensor, save_type);
+} 
+
+void lisp_call_log2inplace(Tensor* tensor) { 
+	log2inplace(tensor);       
+}    
+   
+Tensor* lisp_call_log2(Tensor* tensor, bool save_type) {     
+	return nnl2_log2(tensor, save_type);
 } 
  
 void lisp_call_scaleinplace(Tensor* tensor, float multiplier) {
