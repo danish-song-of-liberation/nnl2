@@ -741,5 +741,17 @@
    #:get-backend/.log2
    #:get-backend/.log2!
    #:%ad-.log2!
-   #:%ad-.log2))
+   #:%ad-.log2
+   #:%.log1p!
+   #:%.log1p
+   #:%ad-.log1p
+   #:%ad-.log1p!
+   #:%set-log1pinplace-backend
+   #:%set-log1p-backend
+   #:%get-log1pinplace-backend
+   #:%get-log1p-backend
+   #:%get-log1pinplace-num-backends
+   #:%get-log1pinplace-backends
+   #:%get-log1p-num-backends
+   #:%get-log1p-backends))
    

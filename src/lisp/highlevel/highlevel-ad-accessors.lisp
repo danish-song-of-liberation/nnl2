@@ -1018,6 +1018,10 @@
 (defun .log! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place elementwise natural logarithm"
   (nnl2.ffi:%ad-.log! ad-tensor track-graph))    
+
+(defun .log1p! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Applies the natural logarithm of (1 + x) to the tensor in place"
+  (nnl2.ffi:%ad-.log1p! ad-tensor track-graph))      
   
 (defun .log10! (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "In-place elementwise base-10 logarithm"
@@ -1227,6 +1231,10 @@
 (defun .log (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   "Computes elementwise natural logarithm with AD tracking, returns a new tensor"
   (nnl2.ffi:%ad-.log ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
+  
+(defun .log1p (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
+  "Applies the natural logarithm of (1 + x) to the tensor with AD tracking, returns a new tensor"
+  (nnl2.ffi:%ad-.log1p ad-tensor save-type nnl2.ffi:ad-reverse-mode track-graph))
   
 (defun .log10 (ad-tensor &key save-type (track-graph nnl2.system:*ad-default-track-graph*))
   "Computes elementwise base-10 logarithm with AD tracking, returns a new tensor"

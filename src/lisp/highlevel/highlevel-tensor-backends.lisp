@@ -99,7 +99,10 @@
 
 (define-backend-setter use-backend/.log!
   nnl2.ffi:%set-loginplace-backend)
-  
+
+(define-backend-setter use-backend/.log1p!
+  nnl2.ffi:%set-log1pinplace-backend)
+    
 (define-backend-setter use-backend/.log10!
   nnl2.ffi:%set-log10inplace-backend)  
   
@@ -156,6 +159,9 @@
 
 (define-backend-setter use-backend/.log
   nnl2.ffi:%set-log-backend)
+  
+(define-backend-setter use-backend/.log1p
+  nnl2.ffi:%set-log1p-backend)  
 
 (define-backend-setter use-backend/.log10
   nnl2.ffi:%set-log10-backend)
@@ -365,7 +371,8 @@
 							  use-backend/.acos! use-backend/.tan! use-backend/.tan
 							  use-backend/.atan! use-backend/.atan use-backend/mae
 							  use-backend/.atan2! use-backend/.atan2 use-backend/.log10!
-							  use-backend/.log10 use-backend/.log2 use-backend/.log2!))
+							  use-backend/.log10 use-backend/.log2 use-backend/.log2!
+							  use-backend/.log1p use-backend/.log1p!))
 							  
       (funcall backend-function name)))
 	  
@@ -424,6 +431,8 @@
 (define-backend-getter-setter get-backend/.exp! use-backend/.exp! nnl2.ffi:%get-expinplace-backend)
 (define-backend-getter-setter get-backend/.log use-backend/.log nnl2.ffi:%get-log-backend)
 (define-backend-getter-setter get-backend/.log! use-backend/.log! nnl2.ffi:%get-loginplace-backend)
+(define-backend-getter-setter get-backend/.log1p use-backend/.log1p nnl2.ffi:%get-log1p-backend)
+(define-backend-getter-setter get-backend/.log1p! use-backend/.log1p! nnl2.ffi:%get-log1pinplace-backend)
 (define-backend-getter-setter get-backend/.log10 use-backend/.log10 nnl2.ffi:%get-log10-backend)
 (define-backend-getter-setter get-backend/.log10! use-backend/.log10! nnl2.ffi:%get-log10inplace-backend)
 (define-backend-getter-setter get-backend/.log2 use-backend/.log2 nnl2.ffi:%get-log2-backend)
@@ -622,6 +631,14 @@
 (define-backends-getter get-backends/.log! 
   nnl2.ffi:%get-loginplace-num-backends 
   nnl2.ffi:%get-loginplace-backends)
+  
+(define-backends-getter get-backends/.log1p
+  nnl2.ffi:%get-log1p-num-backends 
+  nnl2.ffi:%get-log1p-backends)
+
+(define-backends-getter get-backends/.log1p! 
+  nnl2.ffi:%get-log1pinplace-num-backends 
+  nnl2.ffi:%get-log1pinplace-backends)  
   
 (define-backends-getter get-backends/.log10 
   nnl2.ffi:%get-log10-num-backends 
@@ -926,6 +943,8 @@
 (define-with-backend with-backend/.exp! get-backend/.exp!)
 (define-with-backend with-backend/.log get-backend/.log)
 (define-with-backend with-backend/.log! get-backend/.log!)
+(define-with-backend with-backend/.log1p get-backend/.log1p)
+(define-with-backend with-backend/.log1p! get-backend/.log1p!)
 (define-with-backend with-backend/.log10 get-backend/.log10)
 (define-with-backend with-backend/.log10! get-backend/.log10!)
 (define-with-backend with-backend/.log2 get-backend/.log2)

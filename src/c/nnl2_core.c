@@ -280,11 +280,12 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_pow, pow_backends, current_backend(pow));             
 	EINIT_BACKEND(nnl2_exp, exp_backends, current_backend(exp));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, current_backend(log));   
+	EINIT_BACKEND(nnl2_log1p, log1p_backends, current_backend(log1p));   
 	EINIT_BACKEND(nnl2_log10, log10_backends, current_backend(log10));   
 	EINIT_BACKEND(nnl2_log2, log2_backends, current_backend(log2));   
 	EINIT_BACKEND(scale, scale_backends, current_backend(scale));   
-	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));          
-	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	 
+	EINIT_BACKEND(nnl2_max, max_backends, current_backend(max));           
+	EINIT_BACKEND(nnl2_min, min_backends, current_backend(min));     	   
 	EINIT_BACKEND(nnl2_abs, abs_backends, current_backend(abs));           
 	EINIT_BACKEND(axpy, axpy_backends, current_backend(axpy)); 	  
     EINIT_BACKEND(nnl2_neg, neg_backends, current_backend(neg));
@@ -307,6 +308,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(powinplace, powinplace_backends, current_backend(powinplace));     
 	EINIT_BACKEND(expinplace, expinplace_backends, current_backend(expinplace));    
 	EINIT_BACKEND(loginplace, loginplace_backends, current_backend(loginplace));     	
+	EINIT_BACKEND(log1pinplace, log1pinplace_backends, current_backend(log1pinplace));     	
 	EINIT_BACKEND(log10inplace, log10inplace_backends, current_backend(log10inplace));     	
 	EINIT_BACKEND(log2inplace, log2inplace_backends, current_backend(log2inplace));     	
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, current_backend(scaleinplace));    
@@ -537,10 +539,10 @@ Tensor* lisp_call_exp(Tensor* tensor, bool save_type) {
 	return nnl2_exp(tensor, save_type);  
 }
   
-void lisp_call_loginplace(Tensor* tensor) { 
+void lisp_call_loginplace(Tensor* tensor) {   
 	loginplace(tensor);       
 }    
-      
+        
 Tensor* lisp_call_log(Tensor* tensor, bool save_type) {     
 	return nnl2_logarithm(tensor, save_type);
 } 
@@ -549,6 +551,14 @@ void lisp_call_log10inplace(Tensor* tensor) {
 	log10inplace(tensor);       
 }    
    
+void lisp_call_log1pinplace(Tensor* tensor) { 
+	log1pinplace(tensor);       
+}    
+   
+Tensor* lisp_call_log1p(Tensor* tensor, bool save_type) {     
+	return nnl2_log1p(tensor, save_type);
+} 
+    
 Tensor* lisp_call_log10(Tensor* tensor, bool save_type) {     
 	return nnl2_log10(tensor, save_type);
 } 

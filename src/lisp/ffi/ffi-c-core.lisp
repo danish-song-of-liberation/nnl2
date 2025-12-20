@@ -270,6 +270,13 @@
 (cffi:defcfun ("lisp_call_log2" %.log2) :pointer
   (tensor :pointer)
   (save-type :bool))  
+ 
+(cffi:defcfun ("lisp_call_log1pinplace" %.log1p!) :void
+  (tensor :pointer))  
+
+(cffi:defcfun ("lisp_call_log1p" %.log1p) :pointer
+  (tensor :pointer)
+  (save-type :bool))  
   
 (cffi:defcfun ("lisp_call_axpy_inplace" %axpy!) :void
   (summand :pointer)
@@ -787,6 +794,12 @@
   (ad-tensor :pointer)
   (save-type :bool)
   (mode ad-mode)
+  (track-grad :bool))  
+
+(cffi:defcfun ("nnl2_ad_log1p" %ad-.log1p) :pointer
+  (ad-tensor :pointer)
+  (save-type :bool)
+  (mode ad-mode)
   (track-grad :bool))    
   
 (cffi:defcfun ("nnl2_ad_log10" %ad-.log10) :pointer
@@ -804,6 +817,10 @@
 (cffi:defcfun ("nnl2_ad_inplace_log" %ad-.log!) :void
   (ad-tensor :pointer)
   (track-graph :bool))
+  
+(cffi:defcfun ("nnl2_ad_inplace_log1p" %ad-.log1p!) :void
+  (ad-tensor :pointer)
+  (track-graph :bool))  
   
 (cffi:defcfun ("nnl2_ad_inplace_log10" %ad-.log10!) :void
   (ad-tensor :pointer)
@@ -1729,6 +1746,12 @@
 (cffi:defcfun ("set_log_backend" %set-log-backend) :void
   (backend-name :string))  
   
+(cffi:defcfun ("set_log1pinplace_backend" %set-log1pinplace-backend) :void
+  (backend-name :string))  
+    
+(cffi:defcfun ("set_log1p_backend" %set-log1p-backend) :void
+  (backend-name :string))    
+  
 (cffi:defcfun ("set_log10inplace_backend" %set-log10inplace-backend) :void
   (backend-name :string))  
     
@@ -2058,6 +2081,8 @@
 (cffi:defcfun ("get_exp_backend" %get-exp-backend) :string)
 (cffi:defcfun ("get_loginplace_backend" %get-loginplace-backend) :string)
 (cffi:defcfun ("get_log_backend" %get-log-backend) :string)
+(cffi:defcfun ("get_log1pinplace_backend" %get-log1pinplace-backend) :string)
+(cffi:defcfun ("get_log1p_backend" %get-log1p-backend) :string)
 (cffi:defcfun ("get_log10inplace_backend" %get-log10inplace-backend) :string)
 (cffi:defcfun ("get_log10_backend" %get-log10-backend) :string)
 (cffi:defcfun ("get_log2inplace_backend" %get-log2inplace-backend) :string)
@@ -2164,6 +2189,10 @@
 (cffi:defcfun ("get_loginplace_backends" %get-loginplace-backends) :pointer)
 (cffi:defcfun ("get_log_num_backends" %get-log-num-backends) :int)
 (cffi:defcfun ("get_log_backends" %get-log-backends) :pointer)
+(cffi:defcfun ("get_log1pinplace_num_backends" %get-log1pinplace-num-backends) :int)
+(cffi:defcfun ("get_log1pinplace_backends" %get-log1pinplace-backends) :pointer)
+(cffi:defcfun ("get_log1p_num_backends" %get-log1p-num-backends) :int)
+(cffi:defcfun ("get_log1p_backends" %get-log1p-backends) :pointer)
 (cffi:defcfun ("get_log10inplace_num_backends" %get-log10inplace-num-backends) :int)
 (cffi:defcfun ("get_log10inplace_backends" %get-log10inplace-backends) :pointer)
 (cffi:defcfun ("get_log10_num_backends" %get-log10-num-backends) :int)

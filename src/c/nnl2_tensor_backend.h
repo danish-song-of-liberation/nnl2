@@ -1286,6 +1286,18 @@ typedef Tensor* (*log2fn)(const Tensor* tensor, bool save_type);
  */
 typedef void (*log2inplacefn)(Tensor* tensor);
 
+/** @brief Function pointer type for log1p (log(1+x)) operation
+ ** @param tensor Input tensor
+ ** @param save_type Flag to save data type for special case (all elements = 0)
+ ** @return Result tensor
+ */
+typedef Tensor* (*log1pfn)(const Tensor* tensor, bool save_type);
+
+/** @brief Function pointer type for in-place log1p (log(1+x)) operation
+ ** @param tensor Tensor to be modified in place
+ */
+typedef void (*log1pinplacefn)(Tensor* tensor);
+
 /// @} [typedef]
 
 

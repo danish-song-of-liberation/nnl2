@@ -760,7 +760,20 @@
    save-type (key): Try to preserve the type as much as possible (for example, for int32)"
    
   (nnl2.ffi:%.log2 tensor save-type))      	
-	
+
+(defun .log1p! (tensor)
+  "Applies the natural logarithm of (1 + x) to the tensor in place
+   tensor: Input tensor"
+  
+  (nnl2.ffi:%.log1p! tensor))  
+  
+(defun .log1p (tensor &key save-type)
+  "Applies the natural logarithm of (1 + x) to the tensor
+   tensor: Input tensor
+   save-type (key): Try to preserve the type as much as possible (for example, for int32)"
+   
+  (nnl2.ffi:%.log1p tensor save-type))    
+  
 (cffi:defcfun ("get_size" numel) :int
   (tensor :pointer))  
 
