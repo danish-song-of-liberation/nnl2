@@ -1479,7 +1479,7 @@
 		 
 	(setf (cffi:mem-ref powf-pntr cffi-dtype) (coerce powf lisp-dtype))
 	
-	(nnl2.ffi:%.^/powf! tensor powf-pntr)))
+	(nnl2.ffi:%.^/powf! tensor powf-pntr)))   	
 
 (defun .^/powf (tensor powf)
   "Applies exponentiation to a tensor with a scalar, returning a new tensor
@@ -1608,6 +1608,30 @@
     (setf (cffi:mem-ref x-pntr cffi-dtype) (coerce x-scalar lisp-dtype))
     
     (nnl2.ffi:%atan2-correspondence y x-pntr)))
+	
+(defmacro .square! (tensor)
+  "Raises the tensor to the power of 2 in-place
+   tensor: Input tensor to be modified in-place"
+   
+  `(.^/powf! ,tensor 2.0s0))  
+  
+(defmacro .cube! (tensor)
+  "Raises the tensor to the power of 3 in-place
+   tensor: Input tensor to be modified in-place"
+   
+  `(.^/powf! ,tensor 3.0s0))    
+  
+(defmacro .square (tensor)
+  "Returns a new tensor with each element raised to the power of 2
+   tensor: Input tensor"
+   
+  `(.^/powf ,tensor 2.0s0))  
+  
+(defmacro .cube (tensor)
+  "Returns a new tensor with each element raised to the power of 3
+   tensor: Input tensor"
+
+  `(.^/powf ,tensor 3.0s0))  	
 	
 (cffi:defcfun ("lisp_call_add_broadcasting_inplace" .+/broadcasting!) :void  
   (summand :pointer)

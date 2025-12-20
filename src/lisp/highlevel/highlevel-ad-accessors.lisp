@@ -789,6 +789,20 @@
     
     (nnl2.ffi:%ad-pow-correspondence tensor powf-pntr mode track-graph)))	
 
+(defmacro .square! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Raises the tensor to the power of 2 in-place with automatic differentiation support
+   tensor: Input tensor to be modified in-place
+   track-graph: Controls whether the operation is recorded in the AD graph"
+   
+  `(nnl2.hli.ad:^=/ad/powf! ,tensor 2.0s0 ,track-graph))  
+  
+(defmacro .cube! (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Raises the tensor to the power of 3 in-place with automatic differentiation support
+   tensor: Input tensor to be modified in-place
+   track-graph: Controls whether the operation is recorded in the AD graph"
+   
+  `(nnl2.hli.ad:^=/ad/powf! ,tensor 3.0s0 ,track-graph))  	
+		  
 (defun ^=/ad/powf! (tensor exponent track-graph)
   "Raises tensor to exponent in-place"
   (let* ((dtype (nnl2.ffi:%ad-dtype-as-data tensor))
@@ -1165,8 +1179,8 @@
     (nnl2.hli.ad:with-tensor-dispatch (a b)
       (nnl2.hli.ad:.^/ad/powf! a b nnl2.ffi:ad-reverse-mode track-graph)
       (nnl2.ffi:%ad-.^ a b nnl2.ffi:ad-reverse-mode track-graph)
-      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))    
-	  
+      (nnl2.ffi:%ad-pow-broadcasting a b nnl2.ffi:ad-reverse-mode track-graph))))
+  
 (defun .abs (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Computes elementwise absolute value with AD tracking"
   (nnl2.ffi:%ad-.abs ad-tensor nnl2.ffi:ad-reverse-mode track-graph))	  
@@ -1358,6 +1372,20 @@
 (defun (setf tref) (change-to tensor &rest shape)
   "Sets the values at the specified tref indices to `change-to`"
   (setf (apply #'nnl2.hli.ts:tref (nnl2.hli.ad:data tensor) shape) change-to))		  
+  
+(defmacro .square (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with each element raised to the power of 2 with automatic differentiation support
+   tensor: Input tensor
+   track-graph: Controls whether the operation is recorded in the AD graph"
+   
+  `(nnl2.hli.ad:.^/ad/powf! ,tensor 2.0s0 nnl2.ffi:ad-reverse-mode ,track-graph))  
+  
+(defmacro .cube (tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with each element raised to the power of 3 with automatic differentiation support
+   tensor: Input tensor
+   track-graph: Controls whether the operation is recorded in the AD graph"
+
+  `(nnl2.hli.ad:.^/ad/powf! ,tensor 3.0s0 nnl2.ffi:ad-reverse-mode ,track-graph))  	  
   
 (in-package :nnl2.hli.ad.r.loss)  
   

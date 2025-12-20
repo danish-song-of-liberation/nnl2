@@ -186,7 +186,9 @@
    #:.acos!
    #:.atan!
    #:.tan!
-   #:.atan2!))
+   #:.atan2!
+   #:.square!
+   #:.cube!))
    
 (defpackage #:nnl2.hli.ad.r
   (:use #:cl)
@@ -229,7 +231,9 @@
    #:.acos
    #:.atan
    #:.tan
-   #:.atan2))   
+   #:.atan2
+   #:.square
+   #:.cube))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
@@ -756,5 +760,9 @@
    #:get-backends/.atan2
    #:get-backends/.atan2!
    #:with-backend/.atan2
-   #:with-backend/.atan2!))
+   #:with-backend/.atan2!
+   #:.square
+   #:.square!
+   #:.cube
+   #:.cube!))
    
