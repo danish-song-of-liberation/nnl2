@@ -800,5 +800,7 @@
    #:get-backends/.log1p
    #:get-backends/.log1p!
    #:with-backend/.log1p
-   #:with-backend/.log1p!))
+   #:with-backend/.log1p!
+   #:save-tensor
+   #:load-tensor))
    

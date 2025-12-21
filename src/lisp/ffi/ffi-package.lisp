@@ -756,5 +756,7 @@
    #:%get-log1p-backends
    #:%create-nn-rnn
    #:%internal-assign-row
-   #:%ad-internal-assign-row))
+   #:%ad-internal-assign-row
+   #:%ts-serialize-tensor
+   #:%ts-deserialize-tensor))
    

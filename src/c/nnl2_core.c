@@ -968,14 +968,14 @@ nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
 void lisp_call_atan2_broadcasting_inplace(nnl2_tensor* y, nnl2_tensor* x) {
     nnl2_atan2_broadcasting_inplace(y, x);
 }
-
+     
 nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {
     return nnl2_atan2_correspondence(y, x);
 }
 
 void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) {
     nnl2_atan2_correspondence_inplace(y, x);
-} 
+}     
 
 void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 	nnl2_assign_row(dst, seq_index, src);

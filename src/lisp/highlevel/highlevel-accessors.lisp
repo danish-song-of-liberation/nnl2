@@ -324,6 +324,13 @@
           (tlet* ,(rest bindings) ,@body)
           (when (typep ,var 'nnl2-tensor) (free ,var)))))))
 
+(defun save-tensor (tensor path)
+  (let ((result (nnl2.ffi:%ts-serialize-tensor tensor (concatenate 'string path ".nnlt"))))
+    (unless result (error "[nnl2] Failed to save tensor: serializer returned false (fail)"))))
+  
+(defun load-tensor (path)
+  (nnl2.ffi:%ts-deserialize-tensor (concatenate 'string path ".nnlt")))  
+
 (defun empty (indices &key (dtype nnl2.system:*default-tensor-type*))
   "Makes an empty tensor of the specified shape
   

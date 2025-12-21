@@ -1695,6 +1695,13 @@
 (cffi:defcfun ("nnl2_nnlrepr_empty_from_vector" %nnlrepr-empty-from-vector) :pointer 
   (vector :pointer))
   
+(cffi:defcfun ("nnl2_tensor_serialize" %ts-serialize-tensor) :bool
+  (tensor :pointer)
+  (path :string))
+
+(cffi:defcfun ("nnl2_tensor_deserialize" %ts-deserialize-tensor) :pointer 
+  (path :string))
+  
 ;; -- Backends --  
  
 (cffi:defcfun ("nnl2_set_view_backend" %set-view-backend) :void
