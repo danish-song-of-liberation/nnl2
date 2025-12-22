@@ -1,0 +1,34 @@
+nnl2 0.1
+
+Date: 2025/12/23 (December)
+
+Development time: 177 Days
+Development time: 5 Months, 24 Days
+
+Total lines of code: 110017 (110.0k)
+/src: 107704	
+/src (C): 95413
+/src (lisp): 12291
+/tests: 2313
+
+/src Info: 
+- 499 files
+- 81 folders
+
+/tests Info:
+- 35 files
+- 6 folders
+
+Changelog:
+1. Added .nnlt (nnl tensor) serializing (save :nnl2.hli.ts tensor as .nnlt)
+2. Added .nnlt (nnl tensor) deserializing (load .nnlt tensor to :nnl2.hli.ts tensor)
+3. Added MVP Vanilla Recurrent Neural Network
+
+4. Refactored core:
+    4.1. Renamed struct from Tensor to nnl2_tensor (typedef)
+    4.2. Renamed struct from Implementation to nnl2_runtime_implementation (typedef)
+    4.3. Renamed struct from TensorType to nnl2_tensor_type (typedef)
+	4.4. Renamed product to nnl2_product (function)
+	4.5. Renamed current_backend to CURRENT_BACKEND (macro)
+	4.6. Renamed make_current_backend to MAKE_CURRENT_BACKEND (macro)
+	
