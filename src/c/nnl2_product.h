@@ -36,7 +36,7 @@
  ** @see NNL2_SAFETY_MODE
  ** @see NNL2_FORCE_INLINE
  **/
-NNL2_FORCE_INLINE static size_t product(const nnl2_int32* lst, int32_t len) { // todo rename from product to nnl2_product
+NNL2_FORCE_INLINE static size_t product(const nnl2_int32* lst, int32_t len) { 
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
 		NNL2_FUNC_ENTER();	
 		nnl2_int32 original_len = len;

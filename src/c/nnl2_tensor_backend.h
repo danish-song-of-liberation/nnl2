@@ -319,40 +319,40 @@ typedef Implementation nnl2_runtime_implementation;
 /// @{ [typedef]
 
 /** @brief
- * All typedef declarations for tensor functions
+ * All typedef declarations for nnl2_tensor functions
  */
 
-/** @brief Function pointer for in-place tensor filling operation
- ** @param tensor Target tensor to be filled
+/** @brief Function pointer for in-place nnl2_tensor filling operation
+ ** @param nnl2_tensor Target nnl2_tensor to be filled
  ** @param value Pointer to the value to fill with
  ** @param dtype Data type of the value
  ** @return true if successful, false otherwise
  **/
-typedef bool (*fn_inplace_fill)(Tensor*, void*, TensorType);
+typedef bool (*fn_inplace_fill)(nnl2_tensor*, void*, nnl2_tensor_type);
 
-/** @brief Function pointer for creating an uninitialized tensor
+/** @brief Function pointer for creating an uninitialized nnl2_tensor
  ** @param shape Array of dimension sizes
  ** @param rank Number of dimensions
- ** @param dtype Data type of tensor elements
- ** @return Pointer to newly created tensor
+ ** @param dtype Data type of nnl2_tensor elements
+ ** @return Pointer to newly created nnl2_tensor
  **/
-typedef Tensor* (*fn_empty)(const int*, int, TensorType);
+typedef nnl2_tensor* (*fn_empty)(const int*, int, nnl2_tensor_type);
 
-/** @brief Function pointer for creating a tensor filled with zeros
+/** @brief Function pointer for creating a nnl2_tensor filled with zeros
  ** @param shape Array of dimension sizes
  ** @param rank Number of dimensions
- ** @param dtype Data type of tensor elements
- ** @return Pointer to newly created zero-filled tensor
+ ** @param dtype Data type of nnl2_tensor elements
+ ** @return Pointer to newly created zero-filled nnl2_tensor
  **/
-typedef Tensor* (*fn_zeros)(const int*, int, TensorType);
+typedef nnl2_tensor* (*fn_zeros)(const int*, int, nnl2_tensor_type);
 
-/** @brief Function pointer for creating a tensor filled with ones
+/** @brief Function pointer for creating a nnl2_tensor filled with ones
  ** @param shape Array of dimension sizes
  ** @param rank Number of dimensions
- ** @param dtype Data type of tensor elements
- ** @return Pointer to newly created one-filled tensor
+ ** @param dtype Data type of nnl2_tensor elements
+ ** @return Pointer to newly created one-filled nnl2_tensor
  */
-typedef Tensor* (*fn_ones)(const int*, int, TensorType);
+typedef nnl2_tensor* (*fn_ones)(const int*, int, nnl2_tensor_type);
 
 /** @brief Single-precision GEMM in-place function pointer
  ** @defgroup GEMM_ops
@@ -372,739 +372,739 @@ typedef Tensor* (*fn_ones)(const int*, int, TensorType);
  ** @param ldc Leading dimension of matrix C
  **/
 typedef void (*sgemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
-							   const int, const int, const int, const float, const Tensor*, 
-							   const int, const Tensor*, const int, const float, Tensor*, const int);
+							   const int, const int, const int, const float, const nnl2_tensor*, 
+							   const int, const nnl2_tensor*, const int, const float, nnl2_tensor*, const int);
 
 /** @ingroup GEMM_ops
  ** @see sgemminplacefn
  **/
 typedef void (*dgemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
-							   const int, const int, const int, const double, const Tensor*, 
-							   const int, const Tensor*, const int, const double, Tensor*, const int);
+							   const int, const int, const int, const double, const nnl2_tensor*, 
+							   const int, const nnl2_tensor*, const int, const double, nnl2_tensor*, const int);
 							   
 /** @ingroup GEMM_ops
  ** @see sgemminplacefn
  **/
 typedef void (*i32gemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
-							     const int, const int, const int, const int32_t, const Tensor*, 
-							     const int, const Tensor*, const int, const int32_t, Tensor*, const int);							   
+							     const int, const int, const int, const int32_t, const nnl2_tensor*, 
+							     const int, const nnl2_tensor*, const int, const int32_t, nnl2_tensor*, const int);							   
 
 /** @ingroup GEMM_ops
  ** @see sgemminplacefn
  **/
-typedef Tensor* (*sgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
-					       const int, const int, const int, const float, const Tensor*, 
-					       const int, const Tensor*, const int, const float);
+typedef nnl2_tensor* (*sgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+					       const int, const int, const int, const float, const nnl2_tensor*, 
+					       const int, const nnl2_tensor*, const int, const float);
 
 /** @ingroup GEMM_ops
  ** @see sgemminplacefn
  **/
-typedef Tensor* (*dgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
-					       const int, const int, const int, const double, const Tensor*, 
-					       const int, const Tensor*, const int, const double);
+typedef nnl2_tensor* (*dgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+					       const int, const int, const int, const double, const nnl2_tensor*, 
+					       const int, const nnl2_tensor*, const int, const double);
 
-/** @brief In-place tensor addition function pointer
- ** @param a First tensor (modified in-place)
- ** @param b Second tensor
+/** @brief In-place nnl2_tensor addition function pointer
+ ** @param a First nnl2_tensor (modified in-place)
+ ** @param b Second nnl2_tensor
  */
-typedef void (*addinplacefn)(Tensor*, const Tensor*);		
+typedef void (*addinplacefn)(nnl2_tensor*, const nnl2_tensor*);		
 
-/** @brief In-place tensor subtraction function pointer
- ** @param a First tensor (modified in-place)
- ** @param b Second tensor
+/** @brief In-place nnl2_tensor subtraction function pointer
+ ** @param a First nnl2_tensor (modified in-place)
+ ** @param b Second nnl2_tensor
  */	
-typedef void (*subinplacefn)(Tensor*, const Tensor*);	
+typedef void (*subinplacefn)(nnl2_tensor*, const nnl2_tensor*);	
 
-/** @brief Tensor addition function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor containing element-wise sum a + b
+/** @brief nnl2_tensor addition function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise sum a + b
  **/
-typedef Tensor* (*addfn)(const Tensor*, const Tensor*);		
+typedef nnl2_tensor* (*addfn)(const nnl2_tensor*, const nnl2_tensor*);		
 
-/** @brief Tensor subtraction function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor containing element-wise difference a - b
+/** @brief nnl2_tensor subtraction function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise difference a - b
  **/
-typedef Tensor* (*subfn)(const Tensor*, const Tensor*);
+typedef nnl2_tensor* (*subfn)(const nnl2_tensor*, const nnl2_tensor*);
 
-/** @brief In-place tensor multiplication function pointer
- ** @param a First tensor (modified in-place)
- ** @param b Second tensor
+/** @brief In-place nnl2_tensor multiplication function pointer
+ ** @param a First nnl2_tensor (modified in-place)
+ ** @param b Second nnl2_tensor
  **/		
-typedef void (*mulinplacefn)(Tensor*, const Tensor*);	
+typedef void (*mulinplacefn)(nnl2_tensor*, const nnl2_tensor*);	
 
-/** @brief In-place tensor division function pointer
- ** @param a First tensor (modified in-place)
- ** @param b Second tensor
+/** @brief In-place nnl2_tensor division function pointer
+ ** @param a First nnl2_tensor (modified in-place)
+ ** @param b Second nnl2_tensor
  **/	
-typedef void (*divinplacefn)(Tensor*, const Tensor*);		
+typedef void (*divinplacefn)(nnl2_tensor*, const nnl2_tensor*);		
 
-/** @brief Tensor multiplication function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor containing element-wise product a * b
+/** @brief nnl2_tensor multiplication function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise product a * b
  **/
-typedef Tensor* (*mulfn)(const Tensor*, const Tensor*);	   
+typedef nnl2_tensor* (*mulfn)(const nnl2_tensor*, const nnl2_tensor*);	   
 
-/** @brief Tensor division function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor containing element-wise quotient a / b
+/** @brief nnl2_tensor division function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise quotient a / b
  **/
-typedef Tensor* (*divfn)(const Tensor*, const Tensor*);
+typedef nnl2_tensor* (*divfn)(const nnl2_tensor*, const nnl2_tensor*);
 
-/** @brief In-place tensor power function pointer
- ** @param a Base tensor (modified in-place)
- ** @param b Exponent tensor
+/** @brief In-place nnl2_tensor power function pointer
+ ** @param a Base nnl2_tensor (modified in-place)
+ ** @param b Exponent nnl2_tensor
  **/	
-typedef void (*powinplacefn)(Tensor*, const Tensor*);
+typedef void (*powinplacefn)(nnl2_tensor*, const nnl2_tensor*);
 
 /** @brief In-place exponential function pointer
- ** @param a Input tensor (modified in-place with e^a)
+ ** @param a Input nnl2_tensor (modified in-place with e^a)
  **/
-typedef void (*expinplacefn)(Tensor*);
+typedef void (*expinplacefn)(nnl2_tensor*);
 
-/** @brief Tensor power function pointer (creates new tensor)
- ** @param a Base tensor
- ** @param b Exponent tensor
- ** @return New tensor containing element-wise power a^b
+/** @brief nnl2_tensor power function pointer (creates new nnl2_tensor)
+ ** @param a Base nnl2_tensor
+ ** @param b Exponent nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise power a^b
  **/
-typedef Tensor* (*powfn)(const Tensor*, const Tensor*);
+typedef nnl2_tensor* (*powfn)(const nnl2_tensor*, const nnl2_tensor*);
 
-/** @brief Exponential function pointer (creates new tensor)
- ** @param a Input tensor
- ** @param inplace If true, may modify input tensor for optimization
- ** @return New tensor containing element-wise exponential e^a
+/** @brief Exponential function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
+ ** @param inplace If true, may modify input nnl2_tensor for optimization
+ ** @return New nnl2_tensor containing element-wise exponential e^a
  */
-typedef Tensor* (*expfn)(const Tensor*, bool);
+typedef nnl2_tensor* (*expfn)(const nnl2_tensor*, bool);
 
 /** @brief In-place natural logarithm function pointer
- ** @param a Input tensor (modified in-place with ln(a))
+ ** @param a Input nnl2_tensor (modified in-place with ln(a))
  **/
-typedef void (*loginplacefn)(Tensor* a);
+typedef void (*loginplacefn)(nnl2_tensor* a);
 
-/** @brief Natural logarithm function pointer (creates new tensor)
- ** @param a Input tensor
- ** @param inplace If true, may modify input tensor for optimization
- ** @return New tensor containing element-wise natural logarithm ln(a)
+/** @brief Natural logarithm function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
+ ** @param inplace If true, may modify input nnl2_tensor for optimization
+ ** @return New nnl2_tensor containing element-wise natural logarithm ln(a)
  **/
-typedef Tensor* (*logfn)(const Tensor* a, bool inplace);
+typedef nnl2_tensor* (*logfn)(const nnl2_tensor* a, bool inplace);
 
 /** @brief In-place matrix transpose function pointer
- ** @param a Input tensor (transposed in-place)
+ ** @param a Input nnl2_tensor (transposed in-place)
  **/
-typedef void (*transposeinplacefn)(Tensor* a, bool force);
+typedef void (*transposeinplacefn)(nnl2_tensor* a, bool force);
 
-/** @brief Matrix transpose function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Matrix transpose function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param force If true return mathematically correct result
- ** @return New tensor containing transposed matrix
+ ** @return New nnl2_tensor containing transposed matrix
  **/
-typedef Tensor* (*transposefn)(const Tensor* a, bool force);
+typedef nnl2_tensor* (*transposefn)(const nnl2_tensor* a, bool force);
 
 /** @brief In-place matrix transposition function pointer (view)
- ** @param a Input tensor (transposed in-place)
+ ** @param a Input nnl2_tensor (transposed in-place)
  **/
-typedef void (*transpositioninplacefn)(Tensor* a);
+typedef void (*transpositioninplacefn)(nnl2_tensor* a);
 
-/** @brief Matrix transposition function pointer (creates new tensor) (view)
- ** @param a Input tensor
- ** @return New tensor containing transposed matrix
+/** @brief Matrix transposition function pointer (creates new nnl2_tensor) (view)
+ ** @param a Input nnl2_tensor
+ ** @return New nnl2_tensor containing transposed matrix
  **/
-typedef Tensor* (*transpositionfn)(const Tensor* a);
+typedef nnl2_tensor* (*transpositionfn)(const nnl2_tensor* a);
 
 /** @brief In-place scaling function pointer
- ** @param a Input tensor (scaled in-place)
+ ** @param a Input nnl2_tensor (scaled in-place)
  ** @param scale Scaling factor
  **/
-typedef void (*scaleinplacefn)(Tensor* a, float scale);
+typedef void (*scaleinplacefn)(nnl2_tensor* a, float scale);
 
-/** @brief Scaling function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Scaling function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param scale Scaling factor
- ** @param inplace If true, may modify input tensor for optimization
- ** @return New tensor containing scaled values a * scale
+ ** @param inplace If true, may modify input nnl2_tensor for optimization
+ ** @return New nnl2_tensor containing scaled values a * scale
  **/
-typedef Tensor* (*scalefn)(const Tensor* a, float scale, bool inplace);
+typedef nnl2_tensor* (*scalefn)(const nnl2_tensor* a, float scale, bool inplace);
 
 /** @brief In-place element-wise maximum function pointer
- ** @param a First tensor (modified in-place with max(a, b))
- ** @param b Second tensor
+ ** @param a First nnl2_tensor (modified in-place with max(a, b))
+ ** @param b Second nnl2_tensor
  **/
-typedef void (*maxinplacefn)(Tensor* a, const Tensor* b);
+typedef void (*maxinplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place element-wise minimum function pointer
- ** @param a First tensor (modified in-place with min(a, b))
- ** @param b Second tensor
+ ** @param a First nnl2_tensor (modified in-place with min(a, b))
+ ** @param b Second nnl2_tensor
  **/
-typedef void (*mininplacefn)(Tensor* a, const Tensor* b);
+typedef void (*mininplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Element-wise maximum function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor containing element-wise maximum max(a, b)
+/** @brief Element-wise maximum function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise maximum max(a, b)
  **/
-typedef Tensor* (*maxfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*maxfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Element-wise minimum function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor containing element-wise minimum min(a, b)
+/** @brief Element-wise minimum function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise minimum min(a, b)
  **/
-typedef Tensor* (*minfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*minfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place absolute value function pointer
- ** @param a Input tensor (modified in-place with |a|)
+ ** @param a Input nnl2_tensor (modified in-place with |a|)
  **/
-typedef void (*absinplacefn)(Tensor* a);
+typedef void (*absinplacefn)(nnl2_tensor* a);
 
-/** @brief Absolute value function pointer (creates new tensor)
- ** @param a Input tensor
- ** @return New tensor containing element-wise absolute values |a|
+/** @brief Absolute value function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
+ ** @return New nnl2_tensor containing element-wise absolute values |a|
  **/
-typedef Tensor* (*absfn)(const Tensor* a);
+typedef nnl2_tensor* (*absfn)(const nnl2_tensor* a);
 
-/** @brief Horizontal stacking function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor with horizontally stacked matrices [a | b]
+/** @brief Horizontal stacking function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor with horizontally stacked matrices [a | b]
  **/
-typedef Tensor* (*hstackfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*hstackfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Vertical stacking function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
- ** @return New tensor with vertically stacked matrices [a; b]
+/** @brief Vertical stacking function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
+ ** @return New nnl2_tensor with vertically stacked matrices [a; b]
  **/
-typedef Tensor* (*vstackfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*vstackfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place ReLU activation function pointer
- ** @param a Input tensor (modified in-place with max(0, a))
+ ** @param a Input nnl2_tensor (modified in-place with max(0, a))
  **/
-typedef void (*reluinplacefn)(Tensor* a);
+typedef void (*reluinplacefn)(nnl2_tensor* a);
 
-/** @brief ReLU activation function pointer (creates new tensor)
- ** @param a Input tensor
- ** @return New tensor containing ReLU activation max(0, a)
+/** @brief ReLU activation function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
+ ** @return New nnl2_tensor containing ReLU activation max(0, a)
  **/
-typedef Tensor* (*relufn)(const Tensor* a);
+typedef nnl2_tensor* (*relufn)(const nnl2_tensor* a);
 
 /** @brief In-place Leaky ReLU activation function pointer
- ** @param a Input tensor (modified in-place with max(alpha * a, a))
+ ** @param a Input nnl2_tensor (modified in-place with max(alpha * a, a))
  ** @param alpha Negative slope coefficient
  **/
-typedef void (*leakyreluinplacefn)(Tensor* a, float alpha);
+typedef void (*leakyreluinplacefn)(nnl2_tensor* a, float alpha);
 
-/** @brief Leaky ReLU activation function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Leaky ReLU activation function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param alpha Negative slope coefficient
- ** @param inplace If true, may modify input tensor for optimization
- ** @return New tensor containing Leaky ReLU activation max(alpha * a, a)
+ ** @param inplace If true, may modify input nnl2_tensor for optimization
+ ** @return New nnl2_tensor containing Leaky ReLU activation max(alpha * a, a)
  **/
-typedef Tensor* (*leakyrelufn)(const Tensor* a, float alpha, bool inplace);
+typedef nnl2_tensor* (*leakyrelufn)(const nnl2_tensor* a, float alpha, bool inplace);
 
 /** @brief In-place sigmoid activation function pointer
- ** @param a Input tensor (modified in-place with 1/(1 + exp(-a)))
+ ** @param a Input nnl2_tensor (modified in-place with 1/(1 + exp(-a)))
  ** @param approx If true, use approximation for faster computation
  **/
-typedef void (*sigmoidinplacefn)(Tensor* a, bool approx);
+typedef void (*sigmoidinplacefn)(nnl2_tensor* a, bool approx);
 
-/** @brief Sigmoid activation function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Sigmoid activation function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param approx If true, use approximation for faster computation
- ** @return New tensor containing sigmoid activation 1/(1 + exp(-a))
+ ** @return New nnl2_tensor containing sigmoid activation 1/(1 + exp(-a))
  **/
-typedef Tensor* (*sigmoidfn)(const Tensor* a, bool approx);
+typedef nnl2_tensor* (*sigmoidfn)(const nnl2_tensor* a, bool approx);
 
 /** @brief In-place hyperbolic tangent function pointer
- ** @param a Input tensor (modified in-place with tanh(a))
+ ** @param a Input nnl2_tensor (modified in-place with tanh(a))
  ** @param approx If true, use approximation for faster computation
  **/
-typedef void (*tanhinplacefn)(Tensor* a, bool approx);
+typedef void (*tanhinplacefn)(nnl2_tensor* a, bool approx);
 
-/** @brief Hyperbolic tangent function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Hyperbolic tangent function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param approx If true, use approximation for faster computation
- ** @return New tensor containing element-wise tanh(a)
+ ** @return New nnl2_tensor containing element-wise tanh(a)
  **/
-typedef Tensor* (*tanhfn)(const Tensor* a, bool approx);
+typedef nnl2_tensor* (*tanhfn)(const nnl2_tensor* a, bool approx);
 
-/** @brief Concatenation function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
+/** @brief Concatenation function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
  ** @param axis Axis along which to concatenate
- ** @return New tensor containing concatenated tensors along specified axis
+ ** @return New nnl2_tensor containing concatenated tensors along specified axis
  **/
-typedef Tensor* (*concatfn)(const Tensor* a, const Tensor* b, int axis);
+typedef nnl2_tensor* (*concatfn)(const nnl2_tensor* a, const nnl2_tensor* b, int axis);
 
-/** @brief Random normal distribution function pointer (creates new tensor)
+/** @brief Random normal distribution function pointer (creates new nnl2_tensor)
  ** @param shape Array of dimension sizes
  ** @param rank Number of dimensions
- ** @param dtype Data type of tensor elements
+ ** @param dtype Data type of nnl2_tensor elements
  ** @param mean_ptr Pointer to mean value 
  ** @param stddev_ptr Pointer to standard deviation value 
- ** @return New tensor filled with random values from normal distribution
+ ** @return New nnl2_tensor filled with random values from normal distribution
  **/
-typedef Tensor* (*uniformfn)(const int* shape, int rank, TensorType dtype, void* mean_ptr, void* stddev_ptr);
+typedef nnl2_tensor* (*uniformfn)(const int* shape, int rank, nnl2_tensor_type dtype, void* mean_ptr, void* stddev_ptr);
 
-/** @brief Xavier initialization function pointer (creates new tensor)
+/** @brief Xavier initialization function pointer (creates new nnl2_tensor)
  ** @param shape Array of dimension sizes
  ** @param rank Number of dimensions
- ** @param dtype Data type of tensor elements
+ ** @param dtype Data type of nnl2_tensor elements
  ** @param fan_in Number of input units
  ** @param fan_out Number of output units
  ** @param gain Scaling factor
  ** @param scale Additional scaling factor
- ** @return New tensor with Xavier/Glorot initialized values
+ ** @return New nnl2_tensor with Xavier/Glorot initialized values
  **/
-typedef Tensor* (*xavierfn)(int* shape, int rank, TensorType dtype, int fan_in, int fan_out, float gain, float scale);
+typedef nnl2_tensor* (*xavierfn)(int* shape, int rank, nnl2_tensor_type dtype, int fan_in, int fan_out, float gain, float scale);
 
 /** @brief Sum without specified axis function pointer
- ** @param a Input tensor (sum stored in provided memory)
+ ** @param a Input nnl2_tensor (sum stored in provided memory)
  ** @param result_ptr Pointer to memory where sum result will be stored
  **/
-typedef void (*sumwithoutaxisfn)(Tensor* a, void* result_ptr);
+typedef void (*sumwithoutaxisfn)(nnl2_tensor* a, void* result_ptr);
 
 /** @brief Sum along specified axis function pointer
- ** @param a Input tensor (summed along axis in-place)
+ ** @param a Input nnl2_tensor (summed along axis in-place)
  ** @param axis Axis along which to compute sum
  **/
-typedef Tensor* (*sumwithaxisfn)(Tensor* a, int axis);
+typedef nnl2_tensor* (*sumwithaxisfn)(nnl2_tensor* a, int axis);
 
 /** @brief L2 norm computation function pointer
- ** @param a Input tensor
+ ** @param a Input nnl2_tensor
  ** @param result Pointer to where the result will be stored
  **/
-typedef void (*l2normfn)(const Tensor* a, void* result);
+typedef void (*l2normfn)(const nnl2_tensor* a, void* result);
 
-/** @brief Tensor copy function pointer (creates new tensor)
- ** @param a Input tensor to copy
+/** @brief nnl2_tensor copy function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor to copy
  ** @param dtype Copy type
- ** @return New tensor copy of the input
+ ** @return New nnl2_tensor copy of the input
  **/
-typedef Tensor* (*copyfn)(const Tensor* a, TensorType dtype);
+typedef nnl2_tensor* (*copyfn)(const nnl2_tensor* a, nnl2_tensor_type dtype);
 
 /** @brief In-place addition with constant function pointer
- ** @param a Input tensor (modified in-place with a + value)
+ ** @param a Input nnl2_tensor (modified in-place with a + value)
  ** @param value_ptr Pointer to constant value to add
  **/
-typedef void (*addincfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*addincfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Addition with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Addition with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value to add
- ** @return New tensor containing a + value
+ ** @return New nnl2_tensor containing a + value
  **/
-typedef Tensor* (*addincffn)(const Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*addincffn)(const nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place subtraction with constant function pointer
- ** @param a Input tensor (modified in-place with a - value)
+ ** @param a Input nnl2_tensor (modified in-place with a - value)
  ** @param value_ptr Pointer to constant value to subtract
  **/
-typedef void (*subdecfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*subdecfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Subtraction with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Subtraction with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value to subtract
- ** @return New tensor containing a - value
+ ** @return New nnl2_tensor containing a - value
  **/
-typedef Tensor* (*subdecffn)(const Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*subdecffn)(const nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place multiplication with constant function pointer
- ** @param a Input tensor (modified in-place with a * value)
+ ** @param a Input nnl2_tensor (modified in-place with a * value)
  ** @param value_ptr Pointer to constant value to multiply
  **/
-typedef void (*mulmulfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*mulmulfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Multiplication with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Multiplication with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value to multiply
- ** @return New tensor containing a * value
+ ** @return New nnl2_tensor containing a * value
  **/
-typedef Tensor* (*mulmulffn)(const Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*mulmulffn)(const nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place division with constant function pointer
- ** @param a Input tensor (modified in-place with a / value)
+ ** @param a Input nnl2_tensor (modified in-place with a / value)
  ** @param value_ptr Pointer to constant value to divide by
  **/
-typedef void (*divdivfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*divdivfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Division with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Division with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value to divide by
- ** @return New tensor containing a / value
+ ** @return New nnl2_tensor containing a / value
  **/
-typedef Tensor* (*divdivffn)(const Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*divdivffn)(const nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place power with constant function pointer
- ** @param a Input tensor (modified in-place with a^value)
+ ** @param a Input nnl2_tensor (modified in-place with a^value)
  ** @param value_ptr Pointer to constant exponent value
  **/
-typedef void (*powpowfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*powpowfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Power with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Power with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant exponent value
- ** @return New tensor containing a^value
+ ** @return New nnl2_tensor containing a^value
  **/
-typedef Tensor* (*powpowffn)(const Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*powpowffn)(const nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place maximum with constant function pointer
- ** @param a Input tensor (modified in-place with max(a, value))
+ ** @param a Input nnl2_tensor (modified in-place with max(a, value))
  ** @param value_ptr Pointer to constant value
  **/
-typedef void (*maxmaxfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*maxmaxfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Maximum with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Maximum with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value
- ** @return New tensor containing max(a, value)
+ ** @return New nnl2_tensor containing max(a, value)
  **/
-typedef Tensor* (*maxmaxffn)(Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*maxmaxffn)(nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place minimum with constant function pointer
- ** @param a Input tensor (modified in-place with min(a, value))
+ ** @param a Input nnl2_tensor (modified in-place with min(a, value))
  ** @param value_ptr Pointer to constant value
  **/
-typedef void (*minminfinplacefn)(Tensor* a, void* value_ptr);
+typedef void (*minminfinplacefn)(nnl2_tensor* a, void* value_ptr);
 
-/** @brief Minimum with constant function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief Minimum with constant function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value
- ** @return New tensor containing min(a, value)
+ ** @return New nnl2_tensor containing min(a, value)
  **/
-typedef Tensor* (*minminffn)(Tensor* a, void* value_ptr);
+typedef nnl2_tensor* (*minminffn)(nnl2_tensor* a, void* value_ptr);
 
 /** @brief In-place broadcasting addition function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*addbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*addbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting addition function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted sum a + b
+/** @brief Broadcasting addition function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted sum a + b
  **/
-typedef Tensor* (*addbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*addbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place broadcasting subtraction function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*subbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*subbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting subtraction function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted difference a - b
+/** @brief Broadcasting subtraction function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted difference a - b
  **/
-typedef Tensor* (*subbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*subbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place broadcasting multiplication function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*mulbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*mulbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting multiplication function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted product a * b
+/** @brief Broadcasting multiplication function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted product a * b
  **/
-typedef Tensor* (*mulbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*mulbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place broadcasting division function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*divbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*divbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting division function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted quotient a / b
+/** @brief Broadcasting division function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted quotient a / b
  **/
-typedef Tensor* (*divbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*divbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place broadcasting power function pointer
- ** @param a Base tensor (modified in-place with broadcasting)
- ** @param b Exponent tensor (broadcasted to match a's shape)
+ ** @param a Base nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Exponent nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*powbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*powbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting power function pointer (creates new tensor)
- ** @param a Base tensor
- ** @param b Exponent tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted power a^b
+/** @brief Broadcasting power function pointer (creates new nnl2_tensor)
+ ** @param a Base nnl2_tensor
+ ** @param b Exponent nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted power a^b
  **/
-typedef Tensor* (*powbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*powbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place broadcasting maximum function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*maxbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*maxbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
 /** @brief In-place broadcasting minimum function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  **/
-typedef void (*minbroadcastinginplacefn)(Tensor* a, const Tensor* b);
+typedef void (*minbroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting maximum function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted maximum max(a, b)
+/** @brief Broadcasting maximum function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted maximum max(a, b)
  **/
-typedef Tensor* (*maxbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*maxbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Broadcasting minimum function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
- ** @return New tensor containing broadcasted minimum min(a, b)
+/** @brief Broadcasting minimum function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
+ ** @return New nnl2_tensor containing broadcasted minimum min(a, b)
  **/
-typedef Tensor* (*minbroadcastingfn)(const Tensor* a, const Tensor* b);
+typedef nnl2_tensor* (*minbroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b);
 
-/** @brief Fill tensor with data function pointer
- ** @param a Target tensor to be filled
+/** @brief Fill nnl2_tensor with data function pointer
+ ** @param a Target nnl2_tensor to be filled
  ** @param data_ptr Pointer to source data
  ** @param data_size Size of data in bytes
  **/
-typedef void (*filltensorwithdatafn)(Tensor* a, void* data_ptr, size_t data_size);
+typedef void (*filltensorwithdatafn)(nnl2_tensor* a, void* data_ptr, size_t data_size);
 
 /** @brief In-place AXPY operation function pointer (a = a + alpha * b)
- ** @param a First tensor (modified in-place)
- ** @param b Second tensor
+ ** @param a First nnl2_tensor (modified in-place)
+ ** @param b Second nnl2_tensor
  ** @param alpha Scaling factor
  **/
-typedef void (*axpyinplacefn)(Tensor* a, const Tensor* b, float alpha);
+typedef void (*axpyinplacefn)(nnl2_tensor* a, const nnl2_tensor* b, float alpha);
 
-/** @brief AXPY operation function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor
+/** @brief AXPY operation function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor
  ** @param alpha Scaling factor
- ** @return New tensor containing result of a + alpha * b
+ ** @return New nnl2_tensor containing result of a + alpha * b
  **/
-typedef Tensor* (*axpyfn)(const Tensor* a, const Tensor* b, float alpha);
+typedef nnl2_tensor* (*axpyfn)(const nnl2_tensor* a, const nnl2_tensor* b, float alpha);
 
 /** @brief In-place AXP operation function pointer (a = a + alpha * value)
- ** @param a Input tensor (modified in-place)
+ ** @param a Input nnl2_tensor (modified in-place)
  ** @param value_ptr Pointer to constant value
  ** @param alpha Scaling factor
  **/
-typedef void (*axpfinplacefn)(Tensor* a, void* value_ptr, float alpha);
+typedef void (*axpfinplacefn)(nnl2_tensor* a, void* value_ptr, float alpha);
 
-/** @brief AXP operation function pointer (creates new tensor)
- ** @param a Input tensor
+/** @brief AXP operation function pointer (creates new nnl2_tensor)
+ ** @param a Input nnl2_tensor
  ** @param value_ptr Pointer to constant value
  ** @param alpha Scaling factor
- ** @return New tensor containing result of a + alpha * value
+ ** @return New nnl2_tensor containing result of a + alpha * value
  **/
-typedef Tensor* (*axpffn)(const Tensor* a, void* value_ptr, float alpha);
+typedef nnl2_tensor* (*axpffn)(const nnl2_tensor* a, void* value_ptr, float alpha);
 
 /** @brief In-place broadcasting AXPY operation function pointer
- ** @param a First tensor (modified in-place with broadcasting)
- ** @param b Second tensor (broadcasted to match a's shape)
+ ** @param a First nnl2_tensor (modified in-place with broadcasting)
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  ** @param alpha Scaling factor
  **/
-typedef void (*axpybroadcastinginplacefn)(Tensor* a, const Tensor* b, float alpha);
+typedef void (*axpybroadcastinginplacefn)(nnl2_tensor* a, const nnl2_tensor* b, float alpha);
 
-/** @brief Broadcasting AXPY operation function pointer (creates new tensor)
- ** @param a First tensor
- ** @param b Second tensor (broadcasted to match a's shape)
+/** @brief Broadcasting AXPY operation function pointer (creates new nnl2_tensor)
+ ** @param a First nnl2_tensor
+ ** @param b Second nnl2_tensor (broadcasted to match a's shape)
  ** @param alpha Scaling factor
- ** @return New tensor containing broadcasted result of a + alpha * b
+ ** @return New nnl2_tensor containing broadcasted result of a + alpha * b
  **/
-typedef Tensor* (*axpybroadcastingfn)(const Tensor* a, const Tensor* b, float alpha);
+typedef nnl2_tensor* (*axpybroadcastingfn)(const nnl2_tensor* a, const nnl2_tensor* b, float alpha);
 
-/** @brief Tensor view creation function pointer
- ** @param a Input tensor
+/** @brief nnl2_tensor view creation function pointer
+ ** @param a Input nnl2_tensor
  ** @param shape New shape array
  ** @param flags View creation flags
- ** @return Pointer to view tensor sharing data with original
+ ** @return Pointer to view nnl2_tensor sharing data with original
  **/
-typedef void* (*viewfn)(Tensor* a, const int32_t* shape, uint8_t flags);
+typedef void* (*viewfn)(nnl2_tensor* a, const int32_t* shape, uint8_t flags);
 
-/** @brief Tensor reference getter function pointer
- ** @param a Input tensor
+/** @brief nnl2_tensor reference getter function pointer
+ ** @param a Input nnl2_tensor
  ** @param indices Array of indices
  ** @param flags Access flags
  ** @return Pointer to element at specified indices
  **/
-typedef void* (*trefgetterfn)(Tensor* a, const int32_t* indices, uint8_t flags);
+typedef void* (*trefgetterfn)(nnl2_tensor* a, const int32_t* indices, uint8_t flags);
 
-/** @brief Tensor reference setter function pointer
- ** @param a Target tensor
+/** @brief nnl2_tensor reference setter function pointer
+ ** @param a Target nnl2_tensor
  ** @param indices Array of indices
  ** @param rank Number of indices
  ** @param value_ptr Pointer to value to set
- ** @param inplace If true, modify tensor in-place
+ ** @param inplace If true, modify nnl2_tensor in-place
  **/
-typedef void* (*trefsetterfn)(Tensor* a, int* indices, int rank, void* value_ptr, bool inplace);
+typedef void* (*trefsetterfn)(nnl2_tensor* a, int* indices, int rank, void* value_ptr, bool inplace);
 
 /** @brief Convert double array function pointer
- ** @param dest_ptr Destination pointer for tensor data
+ ** @param dest_ptr Destination pointer for nnl2_tensor data
  ** @param src_arr Source double array
  ** @param size Number of elements to convert
  ** @param dtype Target data type for conversion
  **/
-typedef void (*convf64arrfn)(void* dest_ptr, double* src_arr, size_t size, TensorType dtype);
+typedef void (*convf64arrfn)(void* dest_ptr, double* src_arr, size_t size, nnl2_tensor_type dtype);
 
-/** @brief Reshape tensor function pointer (creates new tensor or view)
- ** @param a Input tensor
+/** @brief Reshape nnl2_tensor function pointer (creates new nnl2_tensor or view)
+ ** @param a Input nnl2_tensor
  ** @param new_shape New shape array
  ** @param new_rank Number of dimensions in new shape
  ** @param copy If true, create copy instead of view
- ** @return New tensor with reshaped dimensions
+ ** @return New nnl2_tensor with reshaped dimensions
  **/
-typedef Tensor* (*reshapefn)(Tensor* a, int32_t* new_shape, int32_t new_rank, bool copy);
+typedef nnl2_tensor* (*reshapefn)(nnl2_tensor* a, int32_t* new_shape, int32_t new_rank, bool copy);
 
-/** @brief Reinterpret tensor function pointer (creates new view)
- ** @param a Input tensor
+/** @brief Reinterpret nnl2_tensor function pointer (creates new view)
+ ** @param a Input nnl2_tensor
  ** @param new_shape New shape array
  ** @param new_rank Number of dimensions in new shape
  ** @param copy If true, create copy instead of view
- ** @return New tensor with reinterpreted dimensions and strides
+ ** @return New nnl2_tensor with reinterpreted dimensions and strides
  **/
-typedef Tensor* (*reinterpretfn)(Tensor* a, int32_t* new_shape, int32_t new_rank, bool copy);
+typedef nnl2_tensor* (*reinterpretfn)(nnl2_tensor* a, int32_t* new_shape, int32_t new_rank, bool copy);
 
-/** @brief Returns a truncated copy of the tensor
- ** @param tensor Input tensor
- ** @param slice_from List of indices to start truncating the tensor
- ** @param slice_to List of indices for the end of the tensor truncation
- ** @return Sliced tensor (copy)
+/** @brief Returns a truncated copy of the nnl2_tensor
+ ** @param nnl2_tensor Input nnl2_tensor
+ ** @param slice_from List of indices to start truncating the nnl2_tensor
+ ** @param slice_to List of indices for the end of the nnl2_tensor truncation
+ ** @return Sliced nnl2_tensor (copy)
  **/
-typedef Tensor* (*slicefn)(Tensor* tensor, int32_t* slice_from, int32_t* slice_t);
+typedef nnl2_tensor* (*slicefn)(nnl2_tensor* nnl2_tensor, int32_t* slice_from, int32_t* slice_t);
 
-/** @brief Returns a truncated view of the tensor
- ** @param tensor Input tensor
- ** @param slice_from List of indices to start truncating the tensor
- ** @param slice_to List of indices for the end of the tensor truncation
- ** @return Sliced tensor (view)
+/** @brief Returns a truncated view of the nnl2_tensor
+ ** @param nnl2_tensor Input nnl2_tensor
+ ** @param slice_from List of indices to start truncating the nnl2_tensor
+ ** @param slice_to List of indices for the end of the nnl2_tensor truncation
+ ** @return Sliced nnl2_tensor (view)
  **/
-typedef Tensor* (*cutfn)(Tensor* tensor, int32_t* cut_from, int32_t* cut_to);
+typedef nnl2_tensor* (*cutfn)(nnl2_tensor* nnl2_tensor, int32_t* cut_from, int32_t* cut_to);
 
-/** @brief Applies element-wise negation to the input tensor (in-place)
- ** @details Each element of the tensor is replaced with its negated value: tensor[i] = -tensor[i]
- ** @param tensor Input tensor to be negated in-place
- ** @note This operation modifies the input tensor directly
+/** @brief Applies element-wise negation to the input nnl2_tensor (in-place)
+ ** @details Each element of the nnl2_tensor is replaced with its negated value: nnl2_tensor[i] = -nnl2_tensor[i]
+ ** @param nnl2_tensor Input nnl2_tensor to be negated in-place
+ ** @note This operation modifies the input nnl2_tensor directly
  ** @see negfn
  **/
-typedef void (*neginplacefn)(nnl2_tensor* tensor);
+typedef void (*neginplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief Returns a new tensor with element-wise negation of the input tensor
- ** @details Each element of the tensor is replaced with its negated value: tensor[i] = -tensor[i]
- ** @param tensor Input tensor
- ** @return New tensor containing the negated values of the input tensor
- ** @note The original tensor remains unchanged.=
+/** @brief Returns a new nnl2_tensor with element-wise negation of the input nnl2_tensor
+ ** @details Each element of the nnl2_tensor is replaced with its negated value: nnl2_tensor[i] = -nnl2_tensor[i]
+ ** @param nnl2_tensor Input nnl2_tensor
+ ** @return New nnl2_tensor containing the negated values of the input nnl2_tensor
+ ** @note The original nnl2_tensor remains unchanged.=
  ** @see neginplacefn
  **/
-typedef nnl2_tensor* (*negfn)(nnl2_tensor* tensor);
+typedef nnl2_tensor* (*negfn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief Fills the given tensor with random values from the specified range (in-place)
- ** @param tensor Tensor to fill with random values
+/** @brief Fills the given nnl2_tensor with random values from the specified range (in-place)
+ ** @param nnl2_tensor nnl2_tensor to fill with random values
  ** @param from Pointer to the lower bound of the random range
  ** @param to Pointer to the upper bound of the random range
  ** @see uniformfn
  **/
-typedef void (*uniforminplacefn)(nnl2_tensor* tensor, void* from, void* to);
+typedef void (*uniforminplacefn)(nnl2_tensor* nnl2_tensor, void* from, void* to);
 
-/** @brief Initializes the given tensor in-place using the Xavier distribution
- ** @param tensor Tensor to initialize
+/** @brief Initializes the given nnl2_tensor in-place using the Xavier distribution
+ ** @param nnl2_tensor nnl2_tensor to initialize
  ** @param in Number of input neurons (fan_in)
  ** @param out Number of output neurons (fan_out)
  ** @param gain Gain factor applied to the standard deviation
  ** @param distribution Distribution scaling constant (usually 2.0 or 6.0)
  ** @see xavierfn
  **/
-typedef void (*xavierinplacefn)(nnl2_tensor* tensor, int in, int out, float gain, float distribution);
+typedef void (*xavierinplacefn)(nnl2_tensor* nnl2_tensor, int in, int out, float gain, float distribution);
 
-/** @brief Creates a new tensor with element-wise square root of the input tensor
- ** @param tensor Input tensor to compute square root of
- ** @return New tensor with square root values
+/** @brief Creates a new nnl2_tensor with element-wise square root of the input nnl2_tensor
+ ** @param nnl2_tensor Input nnl2_tensor to compute square root of
+ ** @return New nnl2_tensor with square root values
  ** @see sqrtfn
  **/
-typedef nnl2_tensor* (*sqrtfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*sqrtfn)(const nnl2_tensor* nnl2_tensor);
 
-/** @brief Applies element-wise square root to the input tensor (in-place)
- ** @param tensor Tensor to modify with square root values
+/** @brief Applies element-wise square root to the input nnl2_tensor (in-place)
+ ** @param nnl2_tensor nnl2_tensor to modify with square root values
  ** @see sqrtinplacefn
  **/
-typedef void (*sqrtinplacefn)(nnl2_tensor* tensor);
+typedef void (*sqrtinplacefn)(nnl2_tensor* nnl2_tensor);
 
 /** @brief Function pointer for regional AXPY inplace operation
  ** @warning Strictly internal function. DO not use it in your code
  ** @warning There is no backend change
  */
-typedef void (*axpy_inplace_region_fn)(Tensor* summand, Tensor* sumend, float alpha, int* from, int* to);
+typedef void (*axpy_inplace_region_fn)(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha, int* from, int* to);
 
 /** @brief Computes Mean Squared Error between prediction and target tensors
- ** @param prediction Tensor containing predicted values
- ** @param target Tensor containing ground truth values
+ ** @param prediction nnl2_tensor containing predicted values
+ ** @param target nnl2_tensor containing ground truth values
  ** @param record Pointer to record result
- ** @return Tensor containing MSE loss value(s)
+ ** @return nnl2_tensor containing MSE loss value(s)
  ** @see nnl2_tensor
  */
 typedef nnl2_tensor_type (*msefn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record);
 
-/** @brief Generates tensor with random numbers from specific distribution
- ** @param shape Array defining tensor dimensions
+/** @brief Generates nnl2_tensor with random numbers from specific distribution
+ ** @param shape Array defining nnl2_tensor dimensions
  ** @param rank Number of dimensions
  ** @param dtype Data type of elements
- ** @return New tensor with random values
+ ** @return New nnl2_tensor with random values
  ** @see nnl2_tensor
  ** @see nnl2_tensor_type
  */
 typedef nnl2_tensor* (*randfn)(int* shape, int rank, nnl2_tensor_type dtype);
 
-/** @brief Fills existing tensor with random numbers from standard uniform distribution [0, 1]
- ** @param tensor Tensor to fill with random values
+/** @brief Fills existing nnl2_tensor with random numbers from standard uniform distribution [0, 1]
+ ** @param nnl2_tensor nnl2_tensor to fill with random values
  ** @see nnl2_tensor
  ** @see nnl2_tensor_type
  */
-typedef void (*randinplacefn)(nnl2_tensor* tensor);
+typedef void (*randinplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief Generates tensor with random numbers from normal distribution N(mean, std²)
- ** @param shape Array defining tensor dimensions
+/** @brief Generates nnl2_tensor with random numbers from normal distribution N(mean, std²)
+ ** @param shape Array defining nnl2_tensor dimensions
  ** @param rank Number of dimensions
  ** @param dtype Data type of elements
  ** @param mean Mean of the normal distribution
  ** @param std Standard deviation of the normal distribution
- ** @return New tensor with random values from N(mean, std²)
+ ** @return New nnl2_tensor with random values from N(mean, std²)
  ** @see nnl2_tensor
  ** @see nnl2_tensor_type
  */
 typedef nnl2_tensor* (*randnfn)(int* shape, int rank, nnl2_tensor_type dtype, double mean, double std);
 
-/** @brief Fills existing tensor with random numbers from normal distribution N(mean, std^2)
- ** @param tensor Tensor to fill with random values from N(mean, std^2)
+/** @brief Fills existing nnl2_tensor with random numbers from normal distribution N(mean, std^2)
+ ** @param nnl2_tensor nnl2_tensor to fill with random values from N(mean, std^2)
  ** @param mean Mean of the normal distribution
  ** @param std Standard deviation of the normal distribution
  ** @see nnl2_tensor
  ** @see nnl2_tensor_type
  */
-typedef void (*randninplacefn)(nnl2_tensor* tensor, double mean, double std);
+typedef void (*randninplacefn)(nnl2_tensor* nnl2_tensor, double mean, double std);
 
-/** @brief Creates a new tensor initialized using Kaiming (He) distribution
- ** @param shape Tensor shape array
- ** @param rank Tensor rank
- ** @param dtype Tensor data type
+/** @brief Creates a new nnl2_tensor initialized using Kaiming (He) distribution
+ ** @param shape nnl2_tensor shape array
+ ** @param rank nnl2_tensor rank
+ ** @param dtype nnl2_tensor data type
  ** @param fan_in Number of input neurons
  ** @param fan_out Number of output neurons
  ** @param gain Gain factor
  ** @param distribution Distribution parameter
  ** @param mode Initialization mode (fan_in/fan_out/fan_avg)
- ** @return New tensor with Kaiming initialization
+ ** @return New nnl2_tensor with Kaiming initialization
  ** @see nnl2_tensor
  ** @see nnl2_tensor_type
  */
 typedef nnl2_tensor* (*kaimingfn)(int* shape, int rank, nnl2_tensor_type dtype, int fan_in, int fan_out, float gain, float distribution, int mode);
 
-/** @brief In-place Kaiming initialization of a tensor
- ** @param tensor Pointer to the tensor to initialize
+/** @brief In-place Kaiming initialization of a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to initialize
  ** @param fan_in Number of input neurons
  ** @param fan_out Number of output neurons
  ** @param gain Gain factor
@@ -1112,96 +1112,96 @@ typedef nnl2_tensor* (*kaimingfn)(int* shape, int rank, nnl2_tensor_type dtype, 
  ** @param mode Initialization mode (fan_in/fan_out/fan_avg)
  ** @see nnl2_tensor
  */
-typedef void (*kaiminginplacefn)(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode);
+typedef void (*kaiminginplacefn)(nnl2_tensor* nnl2_tensor, int fan_in, int fan_out, float gain, float distribution, int mode);
 
-/** @brief In-place sine operation on a tensor
- ** @param tensor Pointer to the tensor to apply sine to
+/** @brief In-place sine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to apply sine to
  ** @see nnl2_tensor
  */
-typedef void (*sininplacefn)(nnl2_tensor* tensor);
+typedef void (*sininplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief In-place cosine operation on a tensor
- ** @param tensor Pointer to the tensor to apply cosine to
+/** @brief In-place cosine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to apply cosine to
  ** @see nnl2_tensor
  */
-typedef void (*cosinplacefn)(nnl2_tensor* tensor);
+typedef void (*cosinplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief Out-of-place sine operation on a tensor
- ** @param tensor Pointer to the input tensor
- ** @return New tensor with sine values
+/** @brief Out-of-place sine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor
+ ** @return New nnl2_tensor with sine values
  ** @see nnl2_tensor
  */
-typedef nnl2_tensor* (*sinfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*sinfn)(const nnl2_tensor* nnl2_tensor);
 
-/** @brief Out-of-place cosine operation on a tensor
- ** @param tensor Pointer to the input tensor
- ** @return New tensor with cosine values
+/** @brief Out-of-place cosine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor
+ ** @return New nnl2_tensor with cosine values
  ** @see nnl2_tensor
  */
-typedef nnl2_tensor* (*cosfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*cosfn)(const nnl2_tensor* nnl2_tensor);
 
-/** @brief In-place arcsine operation on a tensor
- ** @param tensor Pointer to the tensor to apply arcsine to
+/** @brief In-place arcsine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to apply arcsine to
  ** @note Input values must be in the range [-1, 1] for real results
  ** @see nnl2_tensor
  */
-typedef void (*asininplacefn)(nnl2_tensor* tensor);
+typedef void (*asininplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief In-place arccosine operation on a tensor
- ** @param tensor Pointer to the tensor to apply arccosine to
+/** @brief In-place arccosine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to apply arccosine to
  ** @note Input values must be in the range [-1, 1] for real results
  ** @see nnl2_tensor
  */
-typedef void (*acosinplacefn)(nnl2_tensor* tensor);
+typedef void (*acosinplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief Out-of-place arcsine operation on a tensor
- ** @param tensor Pointer to the input tensor
- ** @return New tensor with arcsine values
+/** @brief Out-of-place arcsine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor
+ ** @return New nnl2_tensor with arcsine values
  ** @note Input values must be in the range [-1, 1] for real results
  ** @see nnl2_tensor
  */
-typedef nnl2_tensor* (*asinfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*asinfn)(const nnl2_tensor* nnl2_tensor);
 
-/** @brief Out-of-place arccosine operation on a tensor
- ** @param tensor Pointer to the input tensor
- ** @return New tensor with arccosine values
+/** @brief Out-of-place arccosine operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor
+ ** @return New nnl2_tensor with arccosine values
  ** @note Input values must be in the range [-1, 1] for real results
  ** @see nnl2_tensor
  */
-typedef nnl2_tensor* (*acosfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*acosfn)(const nnl2_tensor* nnl2_tensor);
 
-/** @brief In-place tangent operation on a tensor
- ** @param tensor Pointer to the tensor to apply tangent to
+/** @brief In-place tangent operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to apply tangent to
  ** @see nnl2_tensor
  */
-typedef void (*taninplacefn)(nnl2_tensor* tensor);
+typedef void (*taninplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief In-place arctangent operation on a tensor
- ** @param tensor Pointer to the tensor to apply arctangent to
+/** @brief In-place arctangent operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the nnl2_tensor to apply arctangent to
  ** @see nnl2_tensor
  */
-typedef void (*ataninplacefn)(nnl2_tensor* tensor);
+typedef void (*ataninplacefn)(nnl2_tensor* nnl2_tensor);
 
-/** @brief Out-of-place tangent operation on a tensor
- ** @param tensor Pointer to the input tensor
- ** @return New tensor with tangent values
+/** @brief Out-of-place tangent operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor
+ ** @return New nnl2_tensor with tangent values
  ** @see nnl2_tensor
  */
-typedef nnl2_tensor* (*tanfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*tanfn)(const nnl2_tensor* nnl2_tensor);
 
-/** @brief Out-of-place arctangent operation on a tensor
- ** @param tensor Pointer to the input tensor
- ** @return New tensor with arctangent values (in radians)
+/** @brief Out-of-place arctangent operation on a nnl2_tensor
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor
+ ** @return New nnl2_tensor with arctangent values (in radians)
  ** @note Returns values in the range [-π/2, π/2]
  ** @see nnl2_tensor
  */
-typedef nnl2_tensor* (*atanfn)(const nnl2_tensor* tensor);
+typedef nnl2_tensor* (*atanfn)(const nnl2_tensor* nnl2_tensor);
 
 /** @brief Concatenates multiple tensors into a single vector
  ** @param tensors Array of pointers to input tensors
  ** @param count Number of tensors in the array
- ** @param dtype Data type for the resulting tensor
- ** @return New tensor containing concatenated data as a vector
+ ** @param dtype Data type for the resulting nnl2_tensor
+ ** @return New nnl2_tensor containing concatenated data as a vector
  ** @note All input tensors are flattened and concatenated sequentially
  ** @see nnl2_tensor
  ** @see nnl2_tensor_type
@@ -1215,98 +1215,98 @@ typedef nnl2_tensor* (*vectorconcatfn)(nnl2_tensor** tensors, size_t count, nnl2
 typedef nnl2_tensor* (*nn_ga_crossover_uniform_fn)(nnl2_tensor*, nnl2_tensor*, float);
 
 /** @brief Function pointer type for a uniform mutation operation
- ** @param tensor Pointer to the input tensor (parent individual)
+ ** @param nnl2_tensor Pointer to the input nnl2_tensor (parent individual)
  ** @param mutate_rate Probability of mutating each element [0.0 – 1.0]
  ** @param delta Range of uniform mutation 
- ** @return nnl2_tensor* Pointer to a new tensor (child) after mutation
+ ** @return nnl2_tensor* Pointer to a new nnl2_tensor (child) after mutation
  */
-typedef nnl2_tensor* (*nn_ga_mutation_uniform_fn)(nnl2_tensor* tensor, float mutate_rate, float delta);
+typedef nnl2_tensor* (*nn_ga_mutation_uniform_fn)(nnl2_tensor* nnl2_tensor, float mutate_rate, float delta);
 
-/** @param prediction Pointer to prediction tensor
- ** @param target Pointer to target tensor
+/** @param prediction Pointer to prediction nnl2_tensor
+ ** @param target Pointer to target nnl2_tensor
  ** @param record Pointer to memory where result will be stored
  */
 typedef void (*maefn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record);
 
 /** @brief Function pointer type for atan2 operation
- ** @param y Pointer to y-coordinate tensor (numerator)
- ** @param x Pointer to x-coordinate tensor (denominator)
- ** @return Pointer to new tensor with atan2(y/x) values
+ ** @param y Pointer to y-coordinate nnl2_tensor (numerator)
+ ** @param x Pointer to x-coordinate nnl2_tensor (denominator)
+ ** @return Pointer to new nnl2_tensor with atan2(y/x) values
  */
-typedef Tensor* (*atan2fn)(Tensor* y, Tensor* x);
+typedef nnl2_tensor* (*atan2fn)(nnl2_tensor* y, nnl2_tensor* x);
 
 /** @brief Function pointer type for atan2 in-place operation
- ** @param y Tensor to modify
- ** @param x Const tensor as denominator
+ ** @param y nnl2_tensor to modify
+ ** @param x Const nnl2_tensor as denominator
  */
-typedef void (*atan2inplacefn)(Tensor* y, const Tensor* x);
+typedef void (*atan2inplacefn)(nnl2_tensor* y, const nnl2_tensor* x);
 
 /** @brief Function pointer type for atan2 operation with broadcasting
- ** @param y y-coordinate tensor
- ** @param x x-coordinate tensor
- ** @return Result tensor
+ ** @param y y-coordinate nnl2_tensor
+ ** @param x x-coordinate nnl2_tensor
+ ** @return Result nnl2_tensor
  */
-typedef Tensor* (*atan2broadcastingfn)(Tensor* y, Tensor* x);
+typedef nnl2_tensor* (*atan2broadcastingfn)(nnl2_tensor* y, nnl2_tensor* x);
 
 /** @brief Function pointer type for atan2 operation with broadcasting (in place)
- ** @param y y-coordinate tensor (modified in place)
- ** @param x x-coordinate tensor
+ ** @param y y-coordinate nnl2_tensor (modified in place)
+ ** @param x x-coordinate nnl2_tensor
  */
-typedef void (*atan2broadcastinginplacefn)(Tensor* y, const Tensor* x);
+typedef void (*atan2broadcastinginplacefn)(nnl2_tensor* y, const nnl2_tensor* x);
 
 /** @brief Function pointer type for atan2 operation with scalar x
- ** @param y y-coordinate tensor
+ ** @param y y-coordinate nnl2_tensor
  ** @param x Pointer to scalar x-coordinate value
- ** @return Result tensor
+ ** @return Result nnl2_tensor
  */
-typedef Tensor* (*atan2correspondencefn)(const Tensor* y, void* x);
+typedef nnl2_tensor* (*atan2correspondencefn)(const nnl2_tensor* y, void* x);
 
 /** @brief Function pointer type for in-place atan2 operation with scalar x
- ** @param y y-coordinate tensor (modified in place)
+ ** @param y y-coordinate nnl2_tensor (modified in place)
  ** @param x Pointer to scalar x-coordinate value
  */
-typedef void (*atan2correspondenceinplacefn)(Tensor* y, void* x);
+typedef void (*atan2correspondenceinplacefn)(nnl2_tensor* y, void* x);
 
 /** @brief Function pointer type for base-10 logarithm operation
- ** @param tensor Input tensor
+ ** @param nnl2_tensor Input nnl2_tensor
  ** @param save_type Flag to save data type for special case (all elements = 1)
- ** @return Result tensor
+ ** @return Result nnl2_tensor
  */
-typedef Tensor* (*log10fn)(const Tensor* tensor, bool save_type);
+typedef nnl2_tensor* (*log10fn)(const nnl2_tensor* nnl2_tensor, bool save_type);
 
 /** @brief Function pointer type for in-place base-10 logarithm operation
- ** @param tensor Tensor to be modified in place
+ ** @param nnl2_tensor nnl2_tensor to be modified in place
  */
-typedef void (*log10inplacefn)(Tensor* tensor);
+typedef void (*log10inplacefn)(nnl2_tensor* nnl2_tensor);
 
 /** @brief Function pointer type for base-2 logarithm operation
- ** @param tensor Input tensor
+ ** @param nnl2_tensor Input nnl2_tensor
  ** @param save_type Flag to save data type for special case (all elements are powers of two)
- ** @return Result tensor
+ ** @return Result nnl2_tensor
  */
-typedef Tensor* (*log2fn)(const Tensor* tensor, bool save_type);
+typedef nnl2_tensor* (*log2fn)(const nnl2_tensor* nnl2_tensor, bool save_type);
 
 /** @brief Function pointer type for in-place base-2 logarithm operation
- ** @param tensor Tensor to be modified in place
+ ** @param nnl2_tensor nnl2_tensor to be modified in place
  */
-typedef void (*log2inplacefn)(Tensor* tensor);
+typedef void (*log2inplacefn)(nnl2_tensor* nnl2_tensor);
 
 /** @brief Function pointer type for log1p (log(1+x)) operation
- ** @param tensor Input tensor
+ ** @param nnl2_tensor Input nnl2_tensor
  ** @param save_type Flag to save data type for special case (all elements = 0)
- ** @return Result tensor
+ ** @return Result nnl2_tensor
  */
-typedef Tensor* (*log1pfn)(const Tensor* tensor, bool save_type);
+typedef nnl2_tensor* (*log1pfn)(const nnl2_tensor* nnl2_tensor, bool save_type);
 
 /** @brief Function pointer type for in-place log1p (log(1+x)) operation
- ** @param tensor Tensor to be modified in place
+ ** @param nnl2_tensor nnl2_tensor to be modified in place
  */
-typedef void (*log1pinplacefn)(Tensor* tensor);
+typedef void (*log1pinplacefn)(nnl2_tensor* nnl2_tensor);
 
 /** @brief Function pointer type for row assignment operation
- ** @param dst Destination 3D tensor [batch, seq, features]
+ ** @param dst Destination 3D nnl2_tensor [batch, seq, features]
  ** @param seq_index Sequence index to assign to (0..seq_length-1)
- ** @param src Source 2D tensor [batch, features]
+ ** @param src Source 2D nnl2_tensor [batch, features]
  */
 typedef int (*assignrowfn)(nnl2_tensor* dst, int seq_index, nnl2_tensor* src);
 
@@ -1317,15 +1317,15 @@ typedef int (*assignrowfn)(nnl2_tensor* dst, int seq_index, nnl2_tensor* src);
 /// @{
 
 /** @brief 
- * Get human-readable name for TensorType enum
+ * Get human-readable name for nnl2_tensor_type enum
  *
  ** @param 
- * dtype Tensor data type enum value
+ * dtype nnl2_tensor data type enum value
  *
  ** @return 
  * String representation of the data type
  */
-inline static char* get_tensortype_name(TensorType dtype) {
+inline static char* get_tensortype_name(nnl2_tensor_type dtype) {
 	switch(dtype) {
 		case INT32:   return "INT32";
 		case FLOAT32: return "FLOAT32";
@@ -1341,7 +1341,7 @@ inline static char* get_tensortype_name(TensorType dtype) {
 /// @{ [backends]
 
 /** @brief 
- * Initialize backend by selecting the fastest available implementation
+ * Initialize backend by selecting the fastest available nnl2_runtime_implementation
  *
  ** @param backends 
  * Array of available implementations
@@ -1350,12 +1350,12 @@ inline static char* get_tensortype_name(TensorType dtype) {
  * Number of implementations in the array
  *
  ** @return 
- * Pointer to the fastest available function implementation
+ * Pointer to the fastest available function nnl2_runtime_implementation
  */
-void* init_backend(Implementation* backends, size_t count) {
+void* init_backend(nnl2_runtime_implementation* backends, size_t count) {
     if (count == 0) return NULL;
     
-    Implementation* best = &backends[0];
+    nnl2_runtime_implementation* best = &backends[0];
     for (size_t i = 1; i < count; i++) {
         if (backends[i].speed_priority > best->speed_priority) {
             best = &backends[i];
@@ -1378,12 +1378,12 @@ void* init_backend(Implementation* backends, size_t count) {
  * Pointer to buffer for storing backend name
  *
  ** @return 
- * Pointer to the fastest available function implementation
+ * Pointer to the fastest available function nnl2_runtime_implementation
  */
-void* einit_backend(Implementation* backends, size_t count, char* cur_pntr) {
+void* einit_backend(nnl2_runtime_implementation* backends, size_t count, char* cur_pntr) {
     if (count == 0) return NULL;
     
-    Implementation* best = &backends[0];
+    nnl2_runtime_implementation* best = &backends[0];
     for (size_t i = 1; i < count; i++) {
         if (backends[i].speed_priority > best->speed_priority) {
             best = &backends[i];
@@ -1411,7 +1411,7 @@ void* einit_backend(Implementation* backends, size_t count, char* cur_pntr) {
  ** @param backend_name 
  * Name of the backend to select
  */
-void set_backend_by_name(Implementation* backends, size_t count, void** target_fn, const char* backend_name) {
+void set_backend_by_name(nnl2_runtime_implementation* backends, size_t count, void** target_fn, const char* backend_name) {
     for (size_t i = 0; i < count; i++) {
         if (strcmp(backends[i].name, backend_name) == 0) {
             *target_fn = backends[i].fn;
@@ -1438,7 +1438,7 @@ void set_backend_by_name(Implementation* backends, size_t count, void** target_f
  ** @param cur_pntr 
  * Pointer to buffer for storing backend name
  */
-void eset_backend_by_name(Implementation* backends, size_t count, void** target_fn, const char* backend_name, char* cur_pntr) {
+void eset_backend_by_name(nnl2_runtime_implementation* backends, size_t count, void** target_fn, const char* backend_name, char* cur_pntr) {
     for (size_t i = 0; i < count; i++) {
         if (strcmp(backends[i].name, backend_name) == 0) {
             *target_fn = backends[i].fn;
@@ -1462,12 +1462,12 @@ void eset_backend_by_name(Implementation* backends, size_t count, void** target_
  * Name of the current backend
  *
  ** @return 
- * Pointer to the fastest implementation that is slower than current_backend,
+ * Pointer to the fastest nnl2_runtime_implementation that is slower than current_backend,
  * or NULL if no such backend exists
  */
-Implementation* nnl2_get_suboptimal_backend(Implementation* backends, size_t count, const char* current_backend) {
-    Implementation* current_impl = NULL;
-    Implementation* suboptimal_impl = NULL;
+nnl2_runtime_implementation* nnl2_get_suboptimal_backend(nnl2_runtime_implementation* backends, size_t count, const char* current_backend) {
+    nnl2_runtime_implementation* current_impl = NULL;
+    nnl2_runtime_implementation* suboptimal_impl = NULL;
     
     // Find the current backend and its speed priority
     for (size_t i = 0; i < count; i++) {
@@ -1514,11 +1514,11 @@ Implementation* nnl2_get_suboptimal_backend(Implementation* backends, size_t cou
  * Name of the current backend
  *
  ** @return 
- * Name of the fastest implementation that is slower than current_backend,
+ * Name of the fastest nnl2_runtime_implementation that is slower than current_backend,
  * or NULL if no such backend exists
  */
-const char* get_suboptimal_backend_name(Implementation* backends, size_t count, const char* current_backend) {
-    Implementation* impl = nnl2_get_suboptimal_backend(backends, count, current_backend);
+const char* get_suboptimal_backend_name(nnl2_runtime_implementation* backends, size_t count, const char* current_backend) {
+    nnl2_runtime_implementation* impl = nnl2_get_suboptimal_backend(backends, count, current_backend);
     return impl ? impl->name : NULL;
 }
 
@@ -1534,7 +1534,7 @@ const char* get_suboptimal_backend_name(Implementation* backends, size_t count, 
  ** @return 
  * Array of backend name strings
  */
-const char** get_backends(Implementation* backends, size_t count) {
+const char** get_backends(nnl2_runtime_implementation* backends, size_t count) {
     static const char* backend_names[nnl2_implver_count]; 
 	
     if (count > nnl2_implver_count) {
@@ -1557,15 +1557,15 @@ const char** get_backends(Implementation* backends, size_t count) {
 /** @brief 
  * Lisp wrapper for getting nnl2_tensor.magic_number
  */
-int8_t nnl2_ts_get_magic_number(nnl2_tensor* tensor) {
-	return tensor -> magic_number;
+int8_t nnl2_ts_get_magic_number(nnl2_tensor* nnl2_tensor) {
+	return nnl2_tensor -> magic_number;
 }
 
 /** @brief 
  * Lisp wrapper for setting nnl2_tensor.magic_number
  */
-void nnl2_ts_set_magic_number(nnl2_tensor* tensor, int8_t new_magic) {
-	tensor -> magic_number = new_magic;
+void nnl2_ts_set_magic_number(nnl2_tensor* nnl2_tensor, int8_t new_magic) {
+	nnl2_tensor -> magic_number = new_magic;
 }
 
 /// @} [other]

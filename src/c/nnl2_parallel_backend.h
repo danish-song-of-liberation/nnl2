@@ -8,7 +8,7 @@
 ///@{ [single_arr_ptask]
 
 typedef struct {
-	void* data;    ///< Pointer to an array with tensor data
+	void* data;    ///< Pointer to an array with nnl2_tensor data
 	size_t start;  ///< Index for entering the data array
 	size_t end;    ///< Index for the end of the data entry into the array
 } single_arr_ptask;  
@@ -20,7 +20,7 @@ typedef struct {
 ///@{ [leaky_relu_single_arr_ptask]
 
 typedef struct {
-    void* data;	   ///< Pointer to an array with tensor data
+    void* data;	   ///< Pointer to an array with nnl2_tensor data
     size_t start;  ///< Index for entering the data array
     size_t end;    ///< Index for the end of the data entry into the array
     float alpha;   ///< Negative slope for leaky relu
@@ -37,7 +37,7 @@ typedef struct {
     size_t start;      ///< Start index for this thread
     size_t end;        ///< End index for this thread  
     void* value;       ///< Pointer to fill value
-    TensorType dtype;  ///< Data type of elements
+    nnl2_tensor_type dtype;  ///< Data type of elements
     bool aligned;      ///< Whether memory is aligned
 } fill_ptask;
 
@@ -48,14 +48,14 @@ typedef struct {
 ///@{ [add_ptask]
 
 typedef struct {
-    const void* summand_data;  ///< Pointer to summand tensor data 
-    const void* addend_data;   ///< Pointer to addend tensor data 
-    void* result_data;         ///< Pointer to result tensor data
+    const void* summand_data;  ///< Pointer to summand nnl2_tensor data 
+    const void* addend_data;   ///< Pointer to addend nnl2_tensor data 
+    void* result_data;         ///< Pointer to result nnl2_tensor data
     size_t start;              ///< Start index for this thread 
     size_t end;                ///< End index for this thread 
-    TensorType dtype_summand;  ///< Data type of summand tensor 
-    TensorType dtype_addend;   ///< Data type of addend tensor 
-    TensorType result_dtype;   ///< Data type of result tensor 
+    nnl2_tensor_type dtype_summand;  ///< Data type of summand nnl2_tensor 
+    nnl2_tensor_type dtype_addend;   ///< Data type of addend nnl2_tensor 
+    nnl2_tensor_type result_dtype;   ///< Data type of result nnl2_tensor 
 } add_ptask;
 
 ///@} [add_ptask]
@@ -65,14 +65,14 @@ typedef struct {
 ///@{ [sub_ptask]
 
 typedef struct {
-    const void* minuend_data;     ///< Pointer to minuend tensor data 
-    const void* subtrahend_data;  ///< Pointer to subtrahend tensor data 
-    void* result_data;            ///< Pointer to result tensor data 
+    const void* minuend_data;     ///< Pointer to minuend nnl2_tensor data 
+    const void* subtrahend_data;  ///< Pointer to subtrahend nnl2_tensor data 
+    void* result_data;            ///< Pointer to result nnl2_tensor data 
     size_t start;                 ///< Start index for this thread 
     size_t end;                   ///< End index for this thread 
-    TensorType dtype_minuend;     ///< Data type of minuend tensor 
-    TensorType dtype_subtrahend;  ///< Data type of subtrahend tensor 
-    TensorType result_dtype;      ///< Data type of result tensor 
+    nnl2_tensor_type dtype_minuend;     ///< Data type of minuend nnl2_tensor 
+    nnl2_tensor_type dtype_subtrahend;  ///< Data type of subtrahend nnl2_tensor 
+    nnl2_tensor_type result_dtype;      ///< Data type of result nnl2_tensor 
 } sub_ptask;
 
 ///@} [sub_ptask]
@@ -82,14 +82,14 @@ typedef struct {
 ///@{ [mul_ptask]
 
 typedef struct {
-    const void* multiplicand_data; ///< Pointer to multiplicand tensor data 
-    const void* multiplier_data;   ///< Pointer to multiplier tensor data 
-    void* result_data;             ///< Pointer to result tensor data 
+    const void* multiplicand_data; ///< Pointer to multiplicand nnl2_tensor data 
+    const void* multiplier_data;   ///< Pointer to multiplier nnl2_tensor data 
+    void* result_data;             ///< Pointer to result nnl2_tensor data 
     size_t start;                  ///< Start index for this thread 
     size_t end;                    ///< End index for this thread 
-    TensorType dtype_multiplicand; ///< Data type of multiplicand tensor 
-    TensorType dtype_multiplier;   ///< Data type of multiplier tensor 
-    TensorType result_dtype;       ///< Data type of result tensor 
+    nnl2_tensor_type dtype_multiplicand; ///< Data type of multiplicand nnl2_tensor 
+    nnl2_tensor_type dtype_multiplier;   ///< Data type of multiplier nnl2_tensor 
+    nnl2_tensor_type result_dtype;       ///< Data type of result nnl2_tensor 
 } mul_ptask;
 
 ///@} [mul_ptask]
@@ -99,14 +99,14 @@ typedef struct {
 ///@{ [div_ptask]
 
 typedef struct {
-    const void* dividend_data;    ///< Pointer to dividend tensor data 
-    const void* divisor_data;     ///< Pointer to divisor tensor data 
-    void* result_data;            ///< Pointer to result tensor data
+    const void* dividend_data;    ///< Pointer to dividend nnl2_tensor data 
+    const void* divisor_data;     ///< Pointer to divisor nnl2_tensor data 
+    void* result_data;            ///< Pointer to result nnl2_tensor data
     size_t start;                 ///< Start index for this thread 
     size_t end;                   ///< End index for this thread 
-    TensorType dtype_dividend;    ///< Data type of dividend tensor 
-    TensorType dtype_divisor;     ///< Data type of divisor tensor 
-    TensorType result_dtype;      ///< Data type of result tensor 
+    nnl2_tensor_type dtype_dividend;    ///< Data type of dividend nnl2_tensor 
+    nnl2_tensor_type dtype_divisor;     ///< Data type of divisor nnl2_tensor 
+    nnl2_tensor_type result_dtype;      ///< Data type of result nnl2_tensor 
 } div_ptask;
 
 ///@} [div_ptask]
@@ -116,11 +116,11 @@ typedef struct {
 ///@{ [abs_ptask]
 
 typedef struct {
-    const void* input_data;      ///< Pointer to input tensor data 
-    void* result_data;           ///< Pointer to result tensor data 
+    const void* input_data;      ///< Pointer to input nnl2_tensor data 
+    void* result_data;           ///< Pointer to result nnl2_tensor data 
     size_t start;                ///< Start index for this thread 
     size_t end;                  ///< End index for this thread 
-    TensorType dtype;            ///< Data type of tensor 
+    nnl2_tensor_type dtype;            ///< Data type of nnl2_tensor 
 } abs_ptask;
 
 ///@} [abs_ptask]
@@ -133,10 +133,10 @@ typedef struct {
  * Task structure for parallel in-place absolute value operation
  */
 typedef struct {
-    void* data;                 ///< Pointer to tensor data 
+    void* data;                 ///< Pointer to nnl2_tensor data 
     size_t start;               ///< Start index for this thread 
     size_t end;                 ///< End index for this thread 
-    TensorType dtype;           ///< Data type of tensor 
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor 
 } abs_inplace_ptask;
 
 ///@} [abs_inplace_ptask]
@@ -146,12 +146,12 @@ typedef struct {
 ///@{ [addinplace_ptask]
 	
 typedef struct {
-    void* summand_data;           ///< Pointer to summand tensor data (mutable) 
-    const void* addend_data;      ///< Pointer to addend tensor data (read-only) 
+    void* summand_data;           ///< Pointer to summand nnl2_tensor data (mutable) 
+    const void* addend_data;      ///< Pointer to addend nnl2_tensor data (read-only) 
     size_t start;                 ///< Start index for this thread's chunk 
     size_t end;                   ///< End index for this thread's chunk 
-    TensorType dtype_summand;     ///< Data type of summand tensor 
-    TensorType dtype_addend;      ///< Data type of addend tensor 
+    nnl2_tensor_type dtype_summand;     ///< Data type of summand nnl2_tensor 
+    nnl2_tensor_type dtype_addend;      ///< Data type of addend nnl2_tensor 
     bool aligned_summand;         ///< Flag indicating if summand data is 32-byte aligned 
     bool aligned_addend;          ///< Flag indicating if addend data is 32-byte aligned 
     size_t addend_step;           ///< Step size in bytes for addend data access 
@@ -164,12 +164,12 @@ typedef struct {
 ///@{ [subinplace_ptask]
 
 typedef struct {
-    void* minuend_data;           ///< Pointer to minuend tensor data (mutable) 
-    const void* subtrahend_data;  ///< Pointer to subtrahend tensor data (read-only) 
+    void* minuend_data;           ///< Pointer to minuend nnl2_tensor data (mutable) 
+    const void* subtrahend_data;  ///< Pointer to subtrahend nnl2_tensor data (read-only) 
     size_t start;                 ///< Start index for this thread's chunk 
     size_t end;                   ///< End index for this thread's chunk 
-    TensorType dtype_minuend;     ///< Data type of minuend tensor 
-    TensorType dtype_subtrahend;  ///< Data type of subtrahend tensor 
+    nnl2_tensor_type dtype_minuend;     ///< Data type of minuend nnl2_tensor 
+    nnl2_tensor_type dtype_subtrahend;  ///< Data type of subtrahend nnl2_tensor 
     bool aligned_minuend;         ///< Flag indicating if minuend data is 32-byte aligned 
     bool aligned_subtrahend;      ///< Flag indicating if subtrahend data is 32-byte aligned 
     size_t subtrahend_step;       ///< Step size in bytes for subtrahend data access 
@@ -182,12 +182,12 @@ typedef struct {
 ///@{ [mulinplace_ptask]
 
 typedef struct {
-    void* multiplicand_data;       ///< Pointer to multiplicand tensor data (mutable) 
-    const void* multiplier_data;   ///< Pointer to multiplier tensor data (read-only) 
+    void* multiplicand_data;       ///< Pointer to multiplicand nnl2_tensor data (mutable) 
+    const void* multiplier_data;   ///< Pointer to multiplier nnl2_tensor data (read-only) 
     size_t start;                  ///< Start index for this thread's chunk 
     size_t end;                    ///< End index for this thread's chunk 
-    TensorType dtype_multiplicand; ///< Data type of multiplicand tensor 
-    TensorType dtype_multiplier;   ///< Data type of multiplier tensor 
+    nnl2_tensor_type dtype_multiplicand; ///< Data type of multiplicand nnl2_tensor 
+    nnl2_tensor_type dtype_multiplier;   ///< Data type of multiplier nnl2_tensor 
     bool aligned_multiplicand;     ///< Flag indicating if multiplicand data is 32-byte aligned 
     bool aligned_multiplier;       ///< Flag indicating if multiplier data is 32-byte aligned 
     size_t multiplier_step;        ///< Step size in bytes for multiplier data access 
@@ -200,12 +200,12 @@ typedef struct {
 ///@{ [divinplace_ptask]
 
 typedef struct {
-    void* dividend_data;           ///< Pointer to dividend tensor data (mutable) 
-    const void* divisor_data;      ///< Pointer to divisor tensor data (read-only) 
+    void* dividend_data;           ///< Pointer to dividend nnl2_tensor data (mutable) 
+    const void* divisor_data;      ///< Pointer to divisor nnl2_tensor data (read-only) 
     size_t start;                  ///< Start index for this thread's chunk 
     size_t end;                    ///< End index for this thread's chunk 
-    TensorType dtype_dividend;     ///< Data type of dividend tensor 
-    TensorType dtype_divisor;      ///< Data type of divisor tensor 
+    nnl2_tensor_type dtype_dividend;     ///< Data type of dividend nnl2_tensor 
+    nnl2_tensor_type dtype_divisor;      ///< Data type of divisor nnl2_tensor 
     bool aligned_dividend;         ///< Flag indicating if dividend data is 32-byte aligned 
     bool aligned_divisor;          ///< Flag indicating if divisor data is 32-byte aligned 
     size_t divisor_step;           ///< Step size in bytes for divisor data access 
@@ -218,11 +218,11 @@ typedef struct {
 ///@{ [addincfinplace_ptask]
 
 typedef struct {
-    void* tensor_data;          ///< Pointer to tensor data (mutable) 
+    void* tensor_data;          ///< Pointer to nnl2_tensor data (mutable) 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype;           ///< Data type of tensor 
-    bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned 
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor 
+    bool aligned;               ///< Flag indicating if nnl2_tensor data is 32-byte aligned 
     union {
         nnl2_float64 float64_inc;    ///< Scalar increment for FLOAT64 
         nnl2_float32 float32_inc;    ///< Scalar increment for FLOAT32 
@@ -237,11 +237,11 @@ typedef struct {
 ///@{ [subdecfinplace_ptask]
 
 typedef struct {
-    void* tensor_data;          ///< Pointer to tensor data (mutable) 
+    void* tensor_data;          ///< Pointer to nnl2_tensor data (mutable) 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype;           ///< Data type of tensor 
-    bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned 
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor 
+    bool aligned;               ///< Flag indicating if nnl2_tensor data is 32-byte aligned 
     union {
         nnl2_float64 float64_dec;     ///< Scalar decrement for FLOAT64 
         nnl2_float32 float32_dec;     ///< Scalar decrement for FLOAT32 
@@ -256,11 +256,11 @@ typedef struct {
 ///@{ [mulmulfinplace_ptask]
 
 typedef struct {
-    void* tensor_data;          ///< Pointer to tensor data (mutable) 
+    void* tensor_data;          ///< Pointer to nnl2_tensor data (mutable) 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype;           ///< Data type of tensor 
-    bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned 
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor 
+    bool aligned;               ///< Flag indicating if nnl2_tensor data is 32-byte aligned 
     union {
         nnl2_float64 float64_mult;    ///< Scalar multiplier for FLOAT64 
         nnl2_float32 float32_mult;    ///< Scalar multiplier for FLOAT32 
@@ -275,11 +275,11 @@ typedef struct {
 ///@{ [divdivfinplace_ptask]
 
 typedef struct {
-    void* tensor_data;          ///< Pointer to tensor data (mutable)
+    void* tensor_data;          ///< Pointer to nnl2_tensor data (mutable)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
-    bool aligned;               ///< Flag indicating if tensor data is 32-byte aligned
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
+    bool aligned;               ///< Flag indicating if nnl2_tensor data is 32-byte aligned
     union {
         nnl2_float64 float64_div;     ///< Scalar divisor for FLOAT64
         nnl2_float32 float32_div;     ///< Scalar divisor for FLOAT32
@@ -294,12 +294,12 @@ typedef struct {
 ///@{ [addincf_non_inplace_ptask]
 
 typedef struct {
-    const void* tensor_data;    ///< Pointer to original tensor data (read-only)
-    void* result_data;          ///< Pointer to result tensor data (mutable)
+    const void* tensor_data;    ///< Pointer to original nnl2_tensor data (read-only)
+    void* result_data;          ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
-    bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
+    bool aligned_tensor;        ///< Flag indicating if nnl2_tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
         nnl2_float64 float64_inc;     ///< Scalar increment for FLOAT64
@@ -315,12 +315,12 @@ typedef struct {
 ///@{ [subdecf_non_inplace_ptask]
 
 typedef struct {
-    const void* tensor_data;    ///< Pointer to original tensor data (read-only)
-    void* result_data;          ///< Pointer to result tensor data (mutable)
+    const void* tensor_data;    ///< Pointer to original nnl2_tensor data (read-only)
+    void* result_data;          ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
-    bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
+    bool aligned_tensor;        ///< Flag indicating if nnl2_tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
         nnl2_float64 float64_dec;     ///< Scalar decrement for FLOAT64
@@ -336,12 +336,12 @@ typedef struct {
 ///@{ [subdecf_non_inplace_ptask]
 
 typedef struct {
-    const void* tensor_data;    ///< Pointer to original tensor data (read-only)
-    void* result_data;          ///< Pointer to result tensor data (mutable)
+    const void* tensor_data;    ///< Pointer to original nnl2_tensor data (read-only)
+    void* result_data;          ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
-    bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
+    bool aligned_tensor;        ///< Flag indicating if nnl2_tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
         nnl2_float64 float64_mult;    ///< Scalar multiplier for FLOAT64
@@ -357,12 +357,12 @@ typedef struct {
 ///@{ [divdivf_non_inplace_ptask]
 
 typedef struct {
-    const void* tensor_data;    ///< Pointer to original tensor data (read-only)
-    void* result_data;          ///< Pointer to result tensor data (mutable)
+    const void* tensor_data;    ///< Pointer to original nnl2_tensor data (read-only)
+    void* result_data;          ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
-    bool aligned_tensor;        ///< Flag indicating if tensor data is 32-byte aligned
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
+    bool aligned_tensor;        ///< Flag indicating if nnl2_tensor data is 32-byte aligned
     bool aligned_result;        ///< Flag indicating if result data is 32-byte aligned
     union {
         nnl2_float64 float64_div;     ///< Scalar divisor for FLOAT64
@@ -378,14 +378,14 @@ typedef struct {
 ///@{ [addbroadcasting_inplace_ptask]
 
 typedef struct {
-    TensorType dtype;           ///< Data type of both tensors (must match for optimized path)
+    nnl2_tensor_type dtype;           ///< Data type of both tensors (must match for optimized path)
     bool aligned_summand;       ///< Flag indicating if summand data is 32-byte aligned
     bool aligned_sumend;        ///< Flag indicating if sumend data is 32-byte aligned  
-    void* summand_data;         ///< Pointer to summand tensor data (mutable, modified in-place)
-    const void* sumend_data;    ///< Pointer to sumend tensor data (read-only, broadcasted)
+    void* summand_data;         ///< Pointer to summand nnl2_tensor data (mutable, modified in-place)
+    const void* sumend_data;    ///< Pointer to sumend nnl2_tensor data (read-only, broadcasted)
     size_t start;               ///< Start block index for this thread's chunk
     size_t end;                 ///< End block index for this thread's chunk
-    size_t numel_sumend;        ///< Number of elements in sumend tensor
+    size_t numel_sumend;        ///< Number of elements in sumend nnl2_tensor
     size_t broadcast_ratio;     ///< Broadcast ratio (numel_summand / numel_sumend)
 } addbroadcasting_inplace_ptask;
 
@@ -396,14 +396,14 @@ typedef struct {
 ///@{ [subbroadcasting_inplace_ptask]
 
 typedef struct {
-    TensorType dtype;            ///< Data type of both tensors (must match for optimized path)
+    nnl2_tensor_type dtype;            ///< Data type of both tensors (must match for optimized path)
     bool aligned_minuend;        ///< Flag indicating if minuend data is 32-byte aligned
     bool aligned_subtrahend;     ///< Flag indicating if subtrahend data is 32-byte aligned  
-    void* minuend_data;          ///< Pointer to minuend tensor data (mutable, modified in-place)
-    const void* subtrahend_data; ///< Pointer to subtrahend tensor data (read-only, broadcasted)
+    void* minuend_data;          ///< Pointer to minuend nnl2_tensor data (mutable, modified in-place)
+    const void* subtrahend_data; ///< Pointer to subtrahend nnl2_tensor data (read-only, broadcasted)
     size_t start;                ///< Start block index for this thread's chunk
     size_t end;                  ///< End block index for this thread's chunk
-    size_t numel_subtrahend;     ///< Number of elements in subtrahend tensor
+    size_t numel_subtrahend;     ///< Number of elements in subtrahend nnl2_tensor
     size_t broadcast_ratio;      ///< Broadcast ratio (numel_minuend / numel_subtrahend)
 } subbroadcasting_inplace_ptask;
 
@@ -414,14 +414,14 @@ typedef struct {
 ///@{ [mulbroadcasting_inplace_ptask]
 
 typedef struct {
-    TensorType dtype;               ///< Data type of both tensors (must match for optimized path)
+    nnl2_tensor_type dtype;               ///< Data type of both tensors (must match for optimized path)
     bool aligned_multiplicand;      ///< Flag indicating if multiplicand data is 32-byte aligned
     bool aligned_multiplier;        ///< Flag indicating if multiplier data is 32-byte aligned  
-    void* multiplicand_data;        ///< Pointer to multiplicand tensor data (mutable, modified in-place)
-    const void* multiplier_data;    ///< Pointer to multiplier tensor data (read-only, broadcasted)
+    void* multiplicand_data;        ///< Pointer to multiplicand nnl2_tensor data (mutable, modified in-place)
+    const void* multiplier_data;    ///< Pointer to multiplier nnl2_tensor data (read-only, broadcasted)
     size_t start;                   ///< Start block index for this thread's chunk
     size_t end;                     ///< End block index for this thread's chunk
-    size_t numel_multiplier;        ///< Number of elements in multiplier tensor
+    size_t numel_multiplier;        ///< Number of elements in multiplier nnl2_tensor
     size_t broadcast_ratio;         ///< Broadcast ratio (numel_multiplicand / numel_multiplier)
 } mulbroadcasting_inplace_ptask;
 
@@ -432,14 +432,14 @@ typedef struct {
 ///@{ [divbroadcasting_inplace_ptask]
 
 typedef struct {
-    TensorType dtype;               ///< Data type of both tensors (must match for optimized path)
+    nnl2_tensor_type dtype;               ///< Data type of both tensors (must match for optimized path)
     bool aligned_dividend;          ///< Flag indicating if dividend data is 32-byte aligned
     bool aligned_divisor;           ///< Flag indicating if divisor data is 32-byte aligned  
-    void* dividend_data;            ///< Pointer to dividend tensor data (mutable, modified in-place)
-    const void* divisor_data;       ///< Pointer to divisor tensor data (read-only, broadcasted)
+    void* dividend_data;            ///< Pointer to dividend nnl2_tensor data (mutable, modified in-place)
+    const void* divisor_data;       ///< Pointer to divisor nnl2_tensor data (read-only, broadcasted)
     size_t start;                   ///< Start block index for this thread's chunk
     size_t end;                     ///< End block index for this thread's chunk
-    size_t numel_divisor;           ///< Number of elements in divisor tensor
+    size_t numel_divisor;           ///< Number of elements in divisor nnl2_tensor
     size_t broadcast_ratio;         ///< Broadcast ratio (numel_dividend / numel_divisor)
 } divbroadcasting_inplace_ptask;
 
@@ -450,16 +450,16 @@ typedef struct {
 ///@{ [addbroadcasting_ptask]
 
 typedef struct {
-    TensorType dtype;               ///< Data type of result tensor
+    nnl2_tensor_type dtype;               ///< Data type of result nnl2_tensor
     bool aligned_summand;           ///< Flag indicating if summand data is 32-byte aligned
     bool aligned_sumend;            ///< Flag indicating if sumend data is 32-byte aligned  
     bool aligned_result;            ///< Flag indicating if result data is 32-byte aligned
-    const void* summand_data;       ///< Pointer to summand tensor data (read-only)
-    const void* sumend_data;        ///< Pointer to sumend tensor data (read-only, broadcasted)
-    void* result_data;              ///< Pointer to result tensor data (mutable)
+    const void* summand_data;       ///< Pointer to summand nnl2_tensor data (read-only)
+    const void* sumend_data;        ///< Pointer to sumend nnl2_tensor data (read-only, broadcasted)
+    void* result_data;              ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;                   ///< Start block index for this thread's chunk
     size_t end;                     ///< End block index for this thread's chunk
-    size_t numel_sumend;            ///< Number of elements in sumend tensor
+    size_t numel_sumend;            ///< Number of elements in sumend nnl2_tensor
     size_t broadcast_ratio;         ///< Broadcast ratio (numel_summand / numel_sumend)
 } addbroadcasting_ptask;
 
@@ -470,16 +470,16 @@ typedef struct {
 ///@{ [mulbroadcasting_ptask]
 
 typedef struct {
-    TensorType dtype;               ///< Data type of result tensor
+    nnl2_tensor_type dtype;               ///< Data type of result nnl2_tensor
     bool aligned_multiplicand;      ///< Flag indicating if multiplicand data is 32-byte aligned
     bool aligned_multiplier;        ///< Flag indicating if multiplier data is 32-byte aligned  
     bool aligned_result;            ///< Flag indicating if result data is 32-byte aligned
-    const void* multiplicand_data;  ///< Pointer to multiplicand tensor data (read-only)
-    const void* multiplier_data;    ///< Pointer to multiplier tensor data (read-only, broadcasted)
-    void* result_data;              ///< Pointer to result tensor data (mutable)
+    const void* multiplicand_data;  ///< Pointer to multiplicand nnl2_tensor data (read-only)
+    const void* multiplier_data;    ///< Pointer to multiplier nnl2_tensor data (read-only, broadcasted)
+    void* result_data;              ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;                   ///< Start block index for this thread's chunk
     size_t end;                     ///< End block index for this thread's chunk
-    size_t numel_multiplier;        ///< Number of elements in multiplier tensor
+    size_t numel_multiplier;        ///< Number of elements in multiplier nnl2_tensor
     size_t broadcast_ratio;         ///< Broadcast ratio (numel_multiplicand / numel_multiplier)
 } mulbroadcasting_ptask;
 
@@ -490,16 +490,16 @@ typedef struct {
 ///@{ [divbroadcasting_ptask]
 
 typedef struct {
-    TensorType dtype;               ///< Data type of result tensor
+    nnl2_tensor_type dtype;               ///< Data type of result nnl2_tensor
     bool aligned_dividend;          ///< Flag indicating if dividend data is 32-byte aligned
     bool aligned_divisor;           ///< Flag indicating if divisor data is 32-byte aligned  
     bool aligned_result;            ///< Flag indicating if result data is 32-byte aligned
-    const void* dividend_data;      ///< Pointer to dividend tensor data (read-only)
-    const void* divisor_data;       ///< Pointer to divisor tensor data (read-only, broadcasted)
-    void* result_data;              ///< Pointer to result tensor data (mutable)
+    const void* dividend_data;      ///< Pointer to dividend nnl2_tensor data (read-only)
+    const void* divisor_data;       ///< Pointer to divisor nnl2_tensor data (read-only, broadcasted)
+    void* result_data;              ///< Pointer to result nnl2_tensor data (mutable)
     size_t start;                   ///< Start block index for this thread's chunk
     size_t end;                     ///< End block index for this thread's chunk
-    size_t numel_divisor;           ///< Number of elements in divisor tensor
+    size_t numel_divisor;           ///< Number of elements in divisor nnl2_tensor
     size_t broadcast_ratio;         ///< Broadcast ratio (numel_dividend / numel_divisor)
 } divbroadcasting_ptask;
 
@@ -510,14 +510,14 @@ typedef struct {
 ///@{ [max_ptask]
 
 typedef struct {
-    const Tensor* tensora;      ///< Pointer to first input tensor 
-    const Tensor* tensorb;      ///< Pointer to second input tensor 
-    Tensor* result;             ///< Pointer to output tensor 
+    const nnl2_tensor* tensora;      ///< Pointer to first input nnl2_tensor 
+    const nnl2_tensor* tensorb;      ///< Pointer to second input nnl2_tensor 
+    nnl2_tensor* result;             ///< Pointer to output nnl2_tensor 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype_a;         ///< Data type of first tensor 
-    TensorType dtype_b;         ///< Data type of second tensor 
-    TensorType result_dtype;    ///< Data type of result tensor 
+    nnl2_tensor_type dtype_a;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type dtype_b;         ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_dtype;    ///< Data type of result nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
 } max_ptask;
 
@@ -528,14 +528,14 @@ typedef struct {
 ///@{ [min_ptask]
 
 typedef struct {
-    const Tensor* tensora;      ///< Pointer to first input tensor 
-    const Tensor* tensorb;      ///< Pointer to second input tensor 
-    Tensor* result;             ///< Pointer to output tensor 
+    const nnl2_tensor* tensora;      ///< Pointer to first input nnl2_tensor 
+    const nnl2_tensor* tensorb;      ///< Pointer to second input nnl2_tensor 
+    nnl2_tensor* result;             ///< Pointer to output nnl2_tensor 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype_a;         ///< Data type of first tensor 
-    TensorType dtype_b;         ///< Data type of second tensor 
-    TensorType result_dtype;    ///< Data type of result tensor 
+    nnl2_tensor_type dtype_a;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type dtype_b;         ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_dtype;    ///< Data type of result nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
 } min_ptask;
 
@@ -546,12 +546,12 @@ typedef struct {
 ///@{ [maxinplace_ptask]
 
 typedef struct {
-    Tensor* tensora;            ///< Pointer to first input tensor (modified in-place)
-    const Tensor* tensorb;      ///< Pointer to second input tensor 
+    nnl2_tensor* tensora;            ///< Pointer to first input nnl2_tensor (modified in-place)
+    const nnl2_tensor* tensorb;      ///< Pointer to second input nnl2_tensor 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype_a;         ///< Data type of first tensor 
-    TensorType dtype_b;         ///< Data type of second tensor 
+    nnl2_tensor_type dtype_a;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type dtype_b;         ///< Data type of second nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
 } maxinplace_ptask;
 
@@ -562,12 +562,12 @@ typedef struct {
 ///@{ [mininplace_ptask]
 
 typedef struct {
-    Tensor* tensora;            ///< Pointer to first input tensor (modified in-place)
-    const Tensor* tensorb;      ///< Pointer to second input tensor 
+    nnl2_tensor* tensora;            ///< Pointer to first input nnl2_tensor (modified in-place)
+    const nnl2_tensor* tensorb;      ///< Pointer to second input nnl2_tensor 
     size_t start;               ///< Start index for this thread's chunk 
     size_t end;                 ///< End index for this thread's chunk 
-    TensorType dtype_a;         ///< Data type of first tensor 
-    TensorType dtype_b;         ///< Data type of second tensor 
+    nnl2_tensor_type dtype_a;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type dtype_b;         ///< Data type of second nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
 } mininplace_ptask;
 
@@ -578,13 +578,13 @@ typedef struct {
 ///@{ [max_broadcasting_inplace_ptask]
 
 typedef struct {
-    Tensor* x;                  ///< Pointer to first input tensor (modified in-place)
-    const Tensor* y;            ///< Pointer to second input tensor 
+    nnl2_tensor* x;                  ///< Pointer to first input nnl2_tensor (modified in-place)
+    const nnl2_tensor* y;            ///< Pointer to second input nnl2_tensor 
     size_t start_block;         ///< Start block index for this thread's chunk
     size_t end_block;           ///< End block index for this thread's chunk
     size_t block_size;          ///< Size of each broadcast block (numel_y)
-    TensorType x_dtype;         ///< Data type of first tensor 
-    TensorType y_dtype;         ///< Data type of second tensor 
+    nnl2_tensor_type x_dtype;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type y_dtype;         ///< Data type of second nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
 } max_broadcasting_inplace_ptask;
 
@@ -595,13 +595,13 @@ typedef struct {
 ///@{ [min_broadcasting_inplace_ptask]
 
 typedef struct {
-    Tensor* x;                  ///< Pointer to first input tensor (modified in-place)
-    const Tensor* y;            ///< Pointer to second input tensor 
+    nnl2_tensor* x;                  ///< Pointer to first input nnl2_tensor (modified in-place)
+    const nnl2_tensor* y;            ///< Pointer to second input nnl2_tensor 
     size_t start_block;         ///< Start block index for this thread's chunk
     size_t end_block;           ///< End block index for this thread's chunk
     size_t block_size;          ///< Size of each broadcast block (numel_y)
-    TensorType x_dtype;         ///< Data type of first tensor 
-    TensorType y_dtype;         ///< Data type of second tensor 
+    nnl2_tensor_type x_dtype;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type y_dtype;         ///< Data type of second nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
 } min_broadcasting_inplace_ptask;
 
@@ -612,15 +612,15 @@ typedef struct {
 ///@{ [max_broadcasting_ptask]
 
 typedef struct {
-    const Tensor* x;            ///< Pointer to first input tensor
-    const Tensor* y;            ///< Pointer to second input tensor 
-    Tensor* result;             ///< Pointer to output tensor
+    const nnl2_tensor* x;            ///< Pointer to first input nnl2_tensor
+    const nnl2_tensor* y;            ///< Pointer to second input nnl2_tensor 
+    nnl2_tensor* result;             ///< Pointer to output nnl2_tensor
     size_t start_block;         ///< Start block index for this thread's chunk
     size_t end_block;           ///< End block index for this thread's chunk
     size_t block_size;          ///< Size of each broadcast block (numel_y)
-    TensorType x_dtype;         ///< Data type of first tensor 
-    TensorType y_dtype;         ///< Data type of second tensor 
-    TensorType result_dtype;    ///< Data type of result tensor
+    nnl2_tensor_type x_dtype;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type y_dtype;         ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_dtype;    ///< Data type of result nnl2_tensor
     bool aligned;               ///< Whether memory is properly aligned 
 } max_broadcasting_ptask;
 
@@ -631,15 +631,15 @@ typedef struct {
 ///@{ [min_broadcasting_ptask]
 
 typedef struct {
-    const Tensor* x;            ///< Pointer to first input tensor
-    const Tensor* y;            ///< Pointer to second input tensor 
-    Tensor* result;             ///< Pointer to output tensor
+    const nnl2_tensor* x;            ///< Pointer to first input nnl2_tensor
+    const nnl2_tensor* y;            ///< Pointer to second input nnl2_tensor 
+    nnl2_tensor* result;             ///< Pointer to output nnl2_tensor
     size_t start_block;         ///< Start block index for this thread's chunk
     size_t end_block;           ///< End block index for this thread's chunk
     size_t block_size;          ///< Size of each broadcast block (numel_y)
-    TensorType x_dtype;         ///< Data type of first tensor 
-    TensorType y_dtype;         ///< Data type of second tensor 
-    TensorType result_dtype;    ///< Data type of result tensor
+    nnl2_tensor_type x_dtype;         ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type y_dtype;         ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_dtype;    ///< Data type of result nnl2_tensor
     bool aligned;               ///< Whether memory is properly aligned 
 } min_broadcasting_ptask;
 
@@ -650,11 +650,11 @@ typedef struct {
 ///@{ [min_minf_ptask]
 
 typedef struct {
-    const Tensor* tensor;       ///< Pointer to input tensor
-    Tensor* result;             ///< Pointer to output tensor
+    const nnl2_tensor* tensor;       ///< Pointer to input nnl2_tensor
+    nnl2_tensor* result;             ///< Pointer to output nnl2_tensor
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
@@ -674,14 +674,14 @@ typedef struct {
  * 
  ** @details
  * Contains all necessary parameters for worker threads to compute
- * element-wise maximum between tensor elements and scalar value
+ * element-wise maximum between nnl2_tensor elements and scalar value
  */
 typedef struct {
-    const Tensor* tensor;       ///< Pointer to input tensor
-    Tensor* result;             ///< Pointer to output tensor
+    const nnl2_tensor* tensor;       ///< Pointer to input nnl2_tensor
+    nnl2_tensor* result;             ///< Pointer to output nnl2_tensor
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
@@ -697,10 +697,10 @@ typedef struct {
 ///@{ [max_maxf_inplace_ptask]
 
 typedef struct {
-    Tensor* tensor;             ///< Pointer to input tensor (modified in-place)
+    nnl2_tensor* tensor;             ///< Pointer to input nnl2_tensor (modified in-place)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
@@ -716,10 +716,10 @@ typedef struct {
 ///@{ [min_minf_inplace_ptask]
 
 typedef struct {
-    Tensor* tensor;             ///< Pointer to input tensor (modified in-place)
+    nnl2_tensor* tensor;             ///< Pointer to input nnl2_tensor (modified in-place)
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype;           ///< Data type of tensor
+    nnl2_tensor_type dtype;           ///< Data type of nnl2_tensor
     bool aligned;               ///< Whether memory is properly aligned
     union {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
@@ -735,12 +735,12 @@ typedef struct {
 ///@{ [axpy_inplace_ptask]
 
 typedef struct {
-    Tensor* summand;            ///< Pointer to summand tensor (modified in-place)
-    const Tensor* sumend;       ///< Pointer to sumend tensor 
+    nnl2_tensor* summand;            ///< Pointer to summand nnl2_tensor (modified in-place)
+    const nnl2_tensor* sumend;       ///< Pointer to sumend nnl2_tensor 
     size_t start;               ///< Start index for this thread's chunk
     size_t end;                 ///< End index for this thread's chunk
-    TensorType dtype_summand;   ///< Data type of summand tensor 
-    TensorType dtype_sumend;    ///< Data type of sumend tensor 
+    nnl2_tensor_type dtype_summand;   ///< Data type of summand nnl2_tensor 
+    nnl2_tensor_type dtype_sumend;    ///< Data type of sumend nnl2_tensor 
     bool aligned;               ///< Whether memory is properly aligned 
     union {
         nnl2_float64 float64_alpha;   ///< Alpha value for FLOAT64
@@ -756,14 +756,14 @@ typedef struct {
 ///@{ [axpy_ptask]
 
 typedef struct {
-    const Tensor* summand;          ///< Pointer to summand tensor
-    const Tensor* sumend;           ///< Pointer to sumend tensor 
-    Tensor* result;                 ///< Pointer to output tensor
+    const nnl2_tensor* summand;          ///< Pointer to summand nnl2_tensor
+    const nnl2_tensor* sumend;           ///< Pointer to sumend nnl2_tensor 
+    nnl2_tensor* result;                 ///< Pointer to output nnl2_tensor
     size_t start;                   ///< Start index for this thread's chunk
     size_t end;                     ///< End index for this thread's chunk
-    TensorType dtype_summand;       ///< Data type of summand tensor 
-    TensorType dtype_sumend;        ///< Data type of sumend tensor 
-    TensorType result_dtype;        ///< Data type of result tensor
+    nnl2_tensor_type dtype_summand;       ///< Data type of summand nnl2_tensor 
+    nnl2_tensor_type dtype_sumend;        ///< Data type of sumend nnl2_tensor 
+    nnl2_tensor_type result_dtype;        ///< Data type of result nnl2_tensor
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
@@ -779,11 +779,11 @@ typedef struct {
 ///@{ [axpf_ptask]
 
 typedef struct {
-    const Tensor* summand;          ///< Pointer to summand tensor
-    Tensor* result;                 ///< Pointer to output tensor
+    const nnl2_tensor* summand;          ///< Pointer to summand nnl2_tensor
+    nnl2_tensor* result;                 ///< Pointer to output nnl2_tensor
     size_t start;                   ///< Start index for this thread's chunk
     size_t end;                     ///< End index for this thread's chunk
-    TensorType dtype;               ///< Data type of tensor
+    nnl2_tensor_type dtype;               ///< Data type of nnl2_tensor
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
         nnl2_float64 float64_sumend;      ///< Sumend value for FLOAT64
@@ -804,13 +804,13 @@ typedef struct {
 ///@{ [axpy_broadcasting_inplace_ptask]
 
 typedef struct {
-    Tensor* summand;                ///< Pointer to summand tensor (modified in-place)
-    const Tensor* sumend;           ///< Pointer to sumend tensor 
+    nnl2_tensor* summand;                ///< Pointer to summand nnl2_tensor (modified in-place)
+    const nnl2_tensor* sumend;           ///< Pointer to sumend nnl2_tensor 
     size_t start_block;             ///< Start block index for this thread's chunk
     size_t end_block;               ///< End block index for this thread's chunk
     size_t block_size;              ///< Size of each broadcast block (numel_sumend)
-    TensorType summand_dtype;       ///< Data type of summand tensor 
-    TensorType sumend_dtype;        ///< Data type of sumend tensor 
+    nnl2_tensor_type summand_dtype;       ///< Data type of summand nnl2_tensor 
+    nnl2_tensor_type sumend_dtype;        ///< Data type of sumend nnl2_tensor 
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
@@ -826,15 +826,15 @@ typedef struct {
 ///@{ [axpy_broadcasting_ptask]
 
 typedef struct {
-    Tensor* summand;                ///< Pointer to summand tensor 
-    Tensor* sumend;                 ///< Pointer to sumend tensor 
-    Tensor* result;                 ///< Pointer to result tensor 
+    nnl2_tensor* summand;                ///< Pointer to summand nnl2_tensor 
+    nnl2_tensor* sumend;                 ///< Pointer to sumend nnl2_tensor 
+    nnl2_tensor* result;                 ///< Pointer to result nnl2_tensor 
     size_t start_block;             ///< Start block index for this thread's chunk
     size_t end_block;               ///< End block index for this thread's chunk
     size_t block_size;              ///< Size of each broadcast block (numel_sumend)
-    TensorType summand_dtype;       ///< Data type of summand tensor 
-    TensorType sumend_dtype;        ///< Data type of sumend tensor 
-    TensorType result_dtype;        ///< Data type of result tensor 
+    nnl2_tensor_type summand_dtype;       ///< Data type of summand nnl2_tensor 
+    nnl2_tensor_type sumend_dtype;        ///< Data type of sumend nnl2_tensor 
+    nnl2_tensor_type result_dtype;        ///< Data type of result nnl2_tensor 
     bool aligned;                   ///< Whether memory is properly aligned 
     union {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
@@ -850,11 +850,11 @@ typedef struct {
 ///@{ [axpf_inplace_ptask]
 
 typedef struct {
-    Tensor* summand;                ///< Pointer to summand tensor (modified in-place)
+    nnl2_tensor* summand;                ///< Pointer to summand nnl2_tensor (modified in-place)
     void* sumend;                   ///< Pointer to scalar sumend value
     size_t start_index;             ///< Start index for this thread's chunk
     size_t end_index;               ///< End index for this thread's chunk
-    TensorType summand_dtype;       ///< Data type of summand tensor
+    nnl2_tensor_type summand_dtype;       ///< Data type of summand nnl2_tensor
     bool aligned;                   ///< Whether memory is properly aligned
     union {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
@@ -881,9 +881,9 @@ typedef struct {
     void* dst_data;           ///< Pointer to destination data 
     size_t start;             ///< Start index for this thread 
     size_t end;               ///< End index for this thread 
-    TensorType dtype;         ///< Data type of the tensor 
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor 
     bool aligned;             ///< Whether memory is aligned 
-    TensorType target_dtype;  ///< Target data type for conversion 
+    nnl2_tensor_type target_dtype;  ///< Target data type for conversion 
 } copy_ptask;
 
 ///@} [copy_ptask]
@@ -893,17 +893,17 @@ typedef struct {
 ///@{ [hstack_ptask]
 
 typedef struct {
-    void* src_a;            		  ///< Pointer to first source tensor data 
-    void* src_b;             		  ///< Pointer to second source tensor data 
+    void* src_a;            		  ///< Pointer to first source nnl2_tensor data 
+    void* src_b;             		  ///< Pointer to second source nnl2_tensor data 
     void* dst;               		  ///< Pointer to destination data 
     size_t start_idx;        		  ///< Start index for this thread 
     size_t end_idx;          		  ///< End index for this thread 
-    size_t elements_per_row_a;		  ///< Elements per row in tensor A 
-    size_t elements_per_row_b;        ///< Elements per row in tensor B 
+    size_t elements_per_row_a;		  ///< Elements per row in nnl2_tensor A 
+    size_t elements_per_row_b;        ///< Elements per row in nnl2_tensor B 
     size_t elements_per_row_result;   ///< Elements per row in result 
-    TensorType type_a;      		  ///< Data type of first tensor 
-    TensorType type_b;       		  ///< Data type of second tensor 
-    TensorType result_type;  		  ///< Result data type 
+    nnl2_tensor_type type_a;      		  ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type type_b;       		  ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_type;  		  ///< Result data type 
     bool aligned;             		  ///< Whether memory is aligned 
     bool same_type;           		  ///< Whether both tensors have same type 
 } hstack_ptask;
@@ -915,18 +915,18 @@ typedef struct {
 ///@{ [vstack_ptask]
 
 typedef struct {
-    void* src_a;              ///< Pointer to first source tensor data 
-    void* src_b;              ///< Pointer to second source tensor data 
+    void* src_a;              ///< Pointer to first source nnl2_tensor data 
+    void* src_b;              ///< Pointer to second source nnl2_tensor data 
     void* dst;                ///< Pointer to destination data 
     size_t start_idx;         ///< Start index for this thread 
     size_t end_idx;           ///< End index for this thread 
-    size_t size_a;            ///< Total elements in tensor A 
-    size_t size_b;            ///< Total elements in tensor B 
-    size_t row_size_a;        ///< Row size in bytes for tensor A 
-    size_t row_size_b;        ///< Row size in bytes for tensor B 
-    TensorType type_a;        ///< Data type of first tensor 
-    TensorType type_b;        ///< Data type of second tensor 
-    TensorType result_type;   ///< Result data type 
+    size_t size_a;            ///< Total elements in nnl2_tensor A 
+    size_t size_b;            ///< Total elements in nnl2_tensor B 
+    size_t row_size_a;        ///< Row size in bytes for nnl2_tensor A 
+    size_t row_size_b;        ///< Row size in bytes for nnl2_tensor B 
+    nnl2_tensor_type type_a;        ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type type_b;        ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_type;   ///< Result data type 
     bool aligned;             ///< Whether memory is aligned 
     bool same_type;           ///< Whether both tensors have same type 
     int case_type;            ///< VStack case type: 0=1D-1D, 1=2D-1D, 2=1D-2D, 3=ND-ND 
@@ -939,23 +939,23 @@ typedef struct {
 ///@{ [concat_ptask]
 
 typedef struct {
-    void* src_a;                 ///< Pointer to first source tensor data 
-    void* src_b;                 ///< Pointer to second source tensor data 
+    void* src_a;                 ///< Pointer to first source nnl2_tensor data 
+    void* src_b;                 ///< Pointer to second source nnl2_tensor data 
     void* dst;                   ///< Pointer to destination data 
     size_t start_idx;            ///< Start index for this thread 
     size_t end_idx;              ///< End index for this thread 
     size_t total_elements;       ///< Total elements in result 
-    size_t a_axis_size;          ///< Size of concatenation axis in tensor A 
+    size_t a_axis_size;          ///< Size of concatenation axis in nnl2_tensor A 
     size_t item_size;            ///< Size of each element in bytes 
     int rank;                    ///< Rank of tensors 
     int axis;                    ///< Concatenation axis 
-    int* result_shape;           ///< Shape of result tensor 
-    nnl2_int32* result_strides;  ///< Strides of result tensor (in elements) 
-    nnl2_int32* a_strides;       ///< Strides of tensor A (in elements) 
-    nnl2_int32* b_strides;       ///< Strides of tensor B (in elements) 
-    TensorType type_a;           ///< Data type of first tensor 
-    TensorType type_b;           ///< Data type of second tensor 
-    TensorType result_type;      ///< Result data type 
+    int* result_shape;           ///< Shape of result nnl2_tensor 
+    nnl2_int32* result_strides;  ///< Strides of result nnl2_tensor (in elements) 
+    nnl2_int32* a_strides;       ///< Strides of nnl2_tensor A (in elements) 
+    nnl2_int32* b_strides;       ///< Strides of nnl2_tensor B (in elements) 
+    nnl2_tensor_type type_a;           ///< Data type of first nnl2_tensor 
+    nnl2_tensor_type type_b;           ///< Data type of second nnl2_tensor 
+    nnl2_tensor_type result_type;      ///< Result data type 
     bool aligned;                ///< Whether memory is aligned 
     bool same_type;              ///< Whether both tensors have same type 
 } concat_ptask;
@@ -989,9 +989,9 @@ typedef struct {
     size_t result_numel;      ///< Total elements in result 
     int axis;                 ///< Summation axis 
     int elements_along_axis;  ///< Elements along summation axis 
-    TensorType dtype;         ///< Data type 
-    Tensor* tensor;           ///< Source tensor 
-    Tensor* result;           ///< Result tensor 
+    nnl2_tensor_type dtype;         ///< Data type 
+    nnl2_tensor* tensor;           ///< Source nnl2_tensor 
+    nnl2_tensor* result;           ///< Result nnl2_tensor 
 } sum_axis_ptask;
 
 ///@} [sum_axis_ptask]
@@ -1004,7 +1004,7 @@ typedef struct {
     void* src_data;           ///< Pointer to source data 
     size_t start_idx;         ///< Start index for this thread 
     size_t end_idx;           ///< End index for this thread 
-    TensorType dtype;         ///< Data type of the tensor 
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor 
     bool aligned;             ///< Whether memory is aligned 
     union {
         nnl2_float64 float64_acc;
@@ -1024,7 +1024,7 @@ typedef struct {
     void* dst_data;           ///< Pointer to destination data 
     size_t start_idx;         ///< Start index for this thread 
     size_t end_idx;           ///< End index for this thread 
-    TensorType dtype;         ///< Data type of the tensor 
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor 
     bool aligned;             ///< Whether memory is aligned 
     bool inplace;             ///< Whether operation is in-place 
 } relu_ptask;
@@ -1040,7 +1040,7 @@ typedef struct {
     void* dst_data;           ///< Pointer to destination data 
     size_t start_idx;         ///< Start index for this thread 
     size_t end_idx;           ///< End index for this thread 
-    TensorType dtype;         ///< Data type of the tensor
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor
     float alpha;              ///< Negative slope coefficient
     bool inplace;             ///< Whether operation is in-place
 } leakyrelu_ptask;
@@ -1052,7 +1052,7 @@ typedef struct {
 ///@{ [tanh_ptask]
 
 typedef struct {
-    TensorType dtype;         ///< Data type of the tensor
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor
     bool approx;              ///< Whether to use approximation
     size_t start_idx;         ///< Start index for this thread
     size_t end_idx;           ///< End index for this thread
@@ -1067,11 +1067,11 @@ typedef struct {
 ///@{ [tanhinplace_ptask]
 
 typedef struct {
-    TensorType dtype;         ///< Data type of the tensor
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor
     bool approx;              ///< Whether to use approximation
     size_t start_idx;         ///< Start index for this thread
     size_t end_idx;           ///< End index for this thread
-    void* data;               ///< Pointer to tensor data (modified in-place)
+    void* data;               ///< Pointer to nnl2_tensor data (modified in-place)
 } tanhinplace_ptask;
 
 ///@} [tanhinplace_ptask]
@@ -1081,7 +1081,7 @@ typedef struct {
 ///@{ [sigmoid_ptask]
 	
 typedef struct {
-    TensorType dtype;
+    nnl2_tensor_type dtype;
     bool aligned;
     bool approx;
     size_t start_idx;
@@ -1100,7 +1100,7 @@ typedef struct {
     void* src_data;           ///< Pointer to source data 
     size_t start_idx;         ///< Start index for this thread 
     size_t end_idx;           ///< End index for this thread 
-    TensorType dtype;         ///< Data type of the tensor 
+    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor 
     bool aligned;             ///< Whether memory is aligned 
     union {
         double float64_acc;

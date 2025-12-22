@@ -8,7 +8,7 @@
 #ifdef NNL2_AVX256_AVAILABLE  
 	#include <immintrin.h> 
 #endif  	     
- 
+  
 #ifdef __SSE2__    
 	#include <emmintrin.h>  
 #endif               
@@ -112,7 +112,7 @@ void nnl2_init_initializers();
  */
 void nnl2_init_transposition();
 
-/** @brief  
+/** @brief   
  * Registers backend implementations for auxiliary/utility operations
  *   
  ** @details
@@ -129,7 +129,7 @@ void nnl2_init_auxiliary();
 void nnl2_init_correspondence_inplace();       
 
 /** @brief 
- * Registers out-of-place correspondence operations
+ * Registers out-of-place correspondence operations  
  *
  ** @details 
  * Out-of-place operations that correspond to a standard function
