@@ -612,12 +612,19 @@
   (dst :pointer)
   (seq-index :int)
   (src :pointer))
-
-(cffi:defcfun ("nnl2_ad_assign_row" %ad-internal-assign-row) :void 
+  
+(cffi:defcfun ("lisp_call_assign_row_add" %internal-assign-row-add) :void 
   (dst :pointer)
   (seq-index :int)
+  (src :pointer))
+  
+(cffi:defcfun ("nnl2_tensor_timestep_view" %internal-timestep-view) :pointer 
   (src :pointer)
-  (retain-graph :bool))
+  (time :int))  
+  
+(cffi:defcfun ("nnl2_ad_tensor_timestep_view" %ad-internal-timestep-view) :pointer 
+  (src :pointer)
+  (time :int))    
     
 ;; -- AD --
 
@@ -898,6 +905,12 @@
   (multiplier :float)
   (track-graph :bool)) 
   
+(cffi:defcfun ("nnl2_ad_assign_row" %ad-internal-assign-row) :void 
+  (dst :pointer)
+  (seq-index :int)
+  (src :pointer)
+  (retain-graph :bool))
+    
 (cffi:defcfun ("nnl2_ad_abs" %ad-.abs) :pointer
   (ad-pointer :pointer)
   (mode ad-mode)

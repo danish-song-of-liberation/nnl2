@@ -666,6 +666,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         #endif
 
         nnl2_free_tensor(ad_tensor->data);
+		ad_tensor->data = NULL;
     }
     
     // Free the gradient tensor
@@ -675,6 +676,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         #endif
         
         nnl2_free_tensor(ad_tensor->grad);
+		ad_tensor->grad = NULL;
     }
     
     // Free the name string
@@ -684,6 +686,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         #endif
         
         free(ad_tensor->name);
+		ad_tensor->name = NULL;
     }
     
     // Free the roots array
@@ -693,6 +696,7 @@ void nnl2_free_ad_tensor(nnl2_ad_tensor* ad_tensor) {
         #endif
         
         free(ad_tensor->roots);
+		ad_tensor->roots = NULL;
     }
 	
 	// Free extra_field if there's a cleanup function

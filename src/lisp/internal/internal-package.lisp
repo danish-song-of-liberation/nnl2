@@ -17,5 +17,8 @@
 	#:ad-concat-vectors
 	#:ts-vector-as-parameter
 	#:ts-assign-row
-	#:ad-assign-row))
+	#:ts-assign-row-add
+	#:ad-assign-row
+	#:ts-timestep-view
+	#:ad-timestep-view))
   

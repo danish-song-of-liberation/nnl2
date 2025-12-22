@@ -54,6 +54,15 @@
 (defun ts-assign-row (dst src &key (seq-index 0))
   (nnl2.ffi:%internal-assign-row dst seq-index src))	
   
-(defun ad-assign-row (dst src &key (seq-index 0))
-  (nnl2.ffi:%ad-internal-assign-row dst seq-index src nil))	  
-	
+(defun ad-assign-row (dst src &key (seq-index 0) (track-graph nnl2.system:*ad-default-track-graph*))
+  (nnl2.ffi:%ad-internal-assign-row dst seq-index src track-graph))	  
+
+(defun ts-assign-row-add (src dst &key (seq-index 0))
+  (nnl2.ffi:%internal-assign-row-add dst seq-index src))	
+  
+(defun ts-timestep-view (src time)
+  (nnl2.ffi:%internal-timestep-view src time))  
+  
+(defun ad-timestep-view (src time)
+  (nnl2.ffi:%ad-internal-timestep-view src time))    
+  

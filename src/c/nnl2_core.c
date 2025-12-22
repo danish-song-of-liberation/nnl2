@@ -379,6 +379,7 @@ void nnl2_init_auxiliary() {
 	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);  
 	INIT_BACKEND(nnl2_vector_concat, vector_concat_backends); 
 	INIT_BACKEND(nnl2_assign_row, assign_row_backends);
+	INIT_BACKEND(nnl2_assign_row_add, assign_row_add_backends);
 }       
  
 void nnl2_init_correspondence_inplace() {    
@@ -952,33 +953,38 @@ void lisp_call_atan_inplace(nnl2_tensor* tensor) {
 nnl2_tensor* lisp_call_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype) {
     return nnl2_vector_concat(tensors, count, dtype);
 }
-
+  
 nnl2_tensor* lisp_call_atan2(nnl2_tensor* y, nnl2_tensor* x) {
-    return nnl2_atan2(y, x);
+    return nnl2_atan2(y, x);  
 }
 
-void lisp_call_atan2_inplace(nnl2_tensor* y, nnl2_tensor* x) {
-    nnl2_atan2inplace(y, x);
+void lisp_call_atan2_inplace(nnl2_tensor* y, nnl2_tensor* x) {   
+    nnl2_atan2inplace(y, x); 
 }
 
-nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
+nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {  
     return nnl2_atan2_broadcasting(y, x);
 }
 
 void lisp_call_atan2_broadcasting_inplace(nnl2_tensor* y, nnl2_tensor* x) {
     nnl2_atan2_broadcasting_inplace(y, x);
 }
-     
-nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {
+        
+nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {       
     return nnl2_atan2_correspondence(y, x);
 }
-
-void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) {
+      
+void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) { 
     nnl2_atan2_correspondence_inplace(y, x);
 }     
 
 void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 	nnl2_assign_row(dst, seq_index, src);
+}
+
+/** @brief internal derivative of assign_row **/
+void lisp_call_assign_row_add(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
+	nnl2_assign_row_add(dst, seq_index, src);   
 }
 
 ///@} [lisp_wrappers]                

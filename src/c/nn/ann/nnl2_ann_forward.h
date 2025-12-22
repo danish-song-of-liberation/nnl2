@@ -100,6 +100,24 @@ nnl2_ad_tensor* nnl2_ann_forward(void* model, void** args) {
 			nnl2_nn_rnn_cell* cell = (nnl2_nn_rnn_cell*)model;
 			return cell->forward(cell, input, hidden);
 		}
+		
+		case nnl2_nn_type_rnn: {
+			#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+				if(safe_args[0] == NULL) {
+					NNL2_ERROR("Input tensor is NULL for RNN layer");
+					return NULL;
+				}
+			#endif 
+			
+			nnl2_ad_tensor* input = (nnl2_ad_tensor*)safe_args[0];
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+				NNL2_DEBUG("Dispatching forward to RNN layer");
+			#endif
+			
+			nnl2_nn_rnn* rnn = (nnl2_nn_rnn*)model;
+			return rnn->forward(rnn, input);
+		}
         
         case nnl2_nn_type_sigmoid: {
             #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN

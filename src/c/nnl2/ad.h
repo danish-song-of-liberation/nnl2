@@ -202,6 +202,7 @@
 #include "../ad/nnl2_ad_backpropagation.h"
 #include "../ad/nnl2_ad_backpropagation_through_time.h"
 #include "../ad/internal/nnl2_ad_share.h"
+#include "../ad/internal/nnl2_ad_timestep_view.h"
 #include "../ad/utils/nnl2_ad_step.h"
 #include "../ad/utils/nnl2_ad_step_inplace.h"
 #include "../ad/utils/nnl2_ad_ncast.h"

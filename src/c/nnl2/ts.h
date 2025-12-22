@@ -35,6 +35,8 @@
 #include "../tensorutils/internal/nnl2_vector_concat.h"
 #include "../tensorutils/internal/nnl2_vector_as_parameter.h"
 #include "../tensorutils/internal/nnl2_assign_row.h"
+#include "../tensorutils/internal/nnl2_assign_row_add.h"
+#include "../tensorutils/internal/nnl2_timestep_view.h"
 #include "../tensornorm/nnl2_l2.h"
 #include "../tensorops/gemm/nnl2_sgemm_inplace.h"
 #include "../tensorops/gemm/nnl2_dgemm_inplace.h"

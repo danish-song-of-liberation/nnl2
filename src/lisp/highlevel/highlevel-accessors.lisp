@@ -946,7 +946,7 @@
    tensors (&rest): Tensors for element-wise transmission to a function"
    
   (let ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
-        (numel (size first-tensor))
+        (numel (numel first-tensor))
         (type-t (dtype first-tensor)))
         
     (ecase type-t    
@@ -993,7 +993,7 @@
    tensors (&rest): Tensors for element-wise transmission to a function"
    
   (let* ((aggreg-data (mapcar #'nnl2.ffi:get-tensor-data tensors))
-         (numel (size first-tensor))
+         (numel (numel first-tensor))
          (type-t (dtype first-tensor))
          (new-tensor (empty-like first-tensor))
          (new-tensor-data (nnl2.ffi:get-tensor-data new-tensor)))

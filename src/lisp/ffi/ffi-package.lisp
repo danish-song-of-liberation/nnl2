@@ -758,5 +758,8 @@
    #:%internal-assign-row
    #:%ad-internal-assign-row
    #:%ts-serialize-tensor
-   #:%ts-deserialize-tensor))
+   #:%ts-deserialize-tensor
+   #:%internal-assign-row-add
+   #:%internal-timestep-view
+   #:%ad-internal-timestep-view))
    
