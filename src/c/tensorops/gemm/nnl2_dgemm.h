@@ -54,14 +54,14 @@
  *
  ** @example
  * // Multiply matrices and get new result tensor
- * Tensor* result = dgemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta);
+ * nnl2_tensor* result = dgemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, m, n, k, alpha, A, lda, B, ldb, beta);
  *
  ** @see dgemminplace()
  **/
-Tensor* dgemm(const nnl2_order order, const nnl2_transpose transa, 
+nnl2_tensor* dgemm(const nnl2_order order, const nnl2_transpose transa, 
 			  const nnl2_transpose transb, const int m, const int n, 
-			  const int k, const double alpha, const Tensor* a, const int lda,
-			  const Tensor* b, const int ldb, const double beta) {
+			  const int k, const double alpha, const nnl2_tensor* a, const int lda,
+			  const nnl2_tensor* b, const int ldb, const double beta) {
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
@@ -70,10 +70,10 @@ Tensor* dgemm(const nnl2_order order, const nnl2_transpose transa,
 	// Define shape and properties for result matrix C
 	int shape_c[] = {m, n}; // Result matrix dimensions: m x n
 	int rank_c = 2; 		// 2D matrix
-	TensorType type_c = FLOAT64;
+	nnl2_tensor_type type_c = FLOAT64;
 	
 	// Create output tensor
-	Tensor* c = nnl2_empty(shape_c, rank_c, type_c);
+	nnl2_tensor* c = nnl2_empty(shape_c, rank_c, type_c);
 	
 	// Perform in-place matrix multiplication on the created tensor
 	dgemminplace(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, n);

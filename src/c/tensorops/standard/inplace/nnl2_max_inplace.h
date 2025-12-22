@@ -25,8 +25,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
- * Tensor* b = nnl2_tensor((float[]){3.0, 1.0, 5.0}, (int[]){3}, 1, FLOAT32);
+ * nnl2_tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
+ * nnl2_tensor* b = nnl2_tensor((float[]){3.0, 1.0, 5.0}, (int[]){3}, 1, FLOAT32);
  * 
  * // Store element-wise maximum in tensor a
  * naive_maxinplace(a, b);
@@ -38,7 +38,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void naive_maxinplace(Tensor* tensora, const Tensor* tensorb) {
+void naive_maxinplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -58,8 +58,8 @@ void naive_maxinplace(Tensor* tensora, const Tensor* tensorb) {
     // If the tensor is empty, exit the function
     if(total_elems == 0) return;
     
-    TensorType typea = tensora->dtype;
-    TensorType typeb = tensorb->dtype;
+    nnl2_tensor_type typea = tensora->dtype;
+    nnl2_tensor_type typeb = tensorb->dtype;
     
     if(typea == typeb) {
         // Handling case when the tensors have the same type
@@ -227,7 +227,7 @@ void* nnl2_own_pmaxinplace_int32(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Modifies the first tensor directly
  */
-void nnl2_own_maxinplace(Tensor* tensora, const Tensor* tensorb) {
+void nnl2_own_maxinplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -248,8 +248,8 @@ void nnl2_own_maxinplace(Tensor* tensora, const Tensor* tensorb) {
         return;
     }
     
-    TensorType dtype_a = tensora->dtype;
-    TensorType dtype_b = tensorb->dtype;
+    nnl2_tensor_type dtype_a = tensora->dtype;
+    nnl2_tensor_type dtype_b = tensorb->dtype;
     
     // Fallback to naive implementation for small tensors or mixed types
     if(total_elems < NNL2_MAX_INPLACE_PARALLEL_THRESHOLD || dtype_a != dtype_b) {
@@ -491,7 +491,7 @@ void* nnl2_own_pmaxinplace_int32(void* arg) {
  * 
  * @see nnl2_naive
  */
-Implementation maxinplace_backends[] = {
+nnl2_runtime_implementation maxinplace_backends[] = {
 	REGISTER_BACKEND(naive_maxinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

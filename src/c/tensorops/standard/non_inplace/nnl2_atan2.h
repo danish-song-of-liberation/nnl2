@@ -27,10 +27,10 @@ nnl2_tensor* naive_atan2(nnl2_tensor* y, nnl2_tensor* x) {
 
     size_t len = product(y->shape, y->rank);
     
-    TensorType dtype_y = y->dtype;
-    TensorType dtype_x = x->dtype;
+    nnl2_tensor_type dtype_y = y->dtype;
+    nnl2_tensor_type dtype_x = x->dtype;
     
-    TensorType result_dtype;
+    nnl2_tensor_type result_dtype;
     if(dtype_y == INT32 && dtype_x == INT32) {
         int32_t* y_data = (int32_t*)y->data;
         int32_t* x_data = (int32_t*)x->data;
@@ -44,7 +44,7 @@ nnl2_tensor* naive_atan2(nnl2_tensor* y, nnl2_tensor* x) {
         }
         
         if (all_zeros) {
-            Tensor* result = nnl2_zeros(y->shape, y->rank, FLOAT64);
+            nnl2_tensor* result = nnl2_zeros(y->shape, y->rank, FLOAT64);
             #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
                 NNL2_FUNC_EXIT();
             #endif
@@ -57,7 +57,7 @@ nnl2_tensor* naive_atan2(nnl2_tensor* y, nnl2_tensor* x) {
         result_dtype = (dtype_y == FLOAT64 || dtype_x == FLOAT64) ? FLOAT64 : FLOAT32;
     }
     
-    Tensor* result = nnl2_empty(y->shape, y->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(y->shape, y->rank, result_dtype);
     if (len == 0) return result;
     
     if (result_dtype == FLOAT64) {
@@ -176,7 +176,7 @@ nnl2_tensor* naive_atan2(nnl2_tensor* y, nnl2_tensor* x) {
  * 
  * @see naive_atan2
  */
-Implementation atan2_backends[] = {
+nnl2_runtime_implementation atan2_backends[] = {
     REGISTER_BACKEND(naive_atan2, nnl2_naive, NAIVE_BACKEND_NAME),
 };    
 
@@ -191,7 +191,7 @@ atan2fn nnl2_atan2;
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(atan2);
+MAKE_CURRENT_BACKEND(atan2);
 
 /** 
  * @brief Sets the backend for atan2 operation
@@ -201,7 +201,7 @@ make_current_backend(atan2);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_atan2_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(atan2_backends, nnl2_atan2, backend_name, current_backend(atan2));
+    ESET_BACKEND_BY_NAME(atan2_backends, nnl2_atan2, backend_name, CURRENT_BACKEND(atan2));
 }
 
 /** 
@@ -211,7 +211,7 @@ void set_atan2_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_atan2_backend() {
-    return current_backend(atan2);
+    return CURRENT_BACKEND(atan2);
 }
 
 /** 

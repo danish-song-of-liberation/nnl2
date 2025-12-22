@@ -11,7 +11,7 @@
  ** @see fabsf
  ** @see abs
  **/
-void naive_absinplace(Tensor* tensor) {	
+void naive_absinplace(nnl2_tensor* tensor) {	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -109,7 +109,7 @@ void* nnl2_own_pabs_inplace_simd_int32(void* arg);
  ** @param tensor
  * Pointer to the input tensor (will be modified in-place)
  */
-void nnl2_own_abs_inplace(Tensor* tensor) {
+void nnl2_own_abs_inplace(nnl2_tensor* tensor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -563,7 +563,7 @@ void* nnl2_own_pabs_inplace_simd_int32(void* arg) {
  * @see nnl2_naive
  * @see nnl2_own_abs_inplace
  */
-Implementation absinplace_backends[] = {
+nnl2_runtime_implementation absinplace_backends[] = {
 	REGISTER_BACKEND(naive_absinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef NNL2_PTHREAD_AVAILABLE
@@ -580,9 +580,9 @@ absinplacefn absinplace;
 /** 
  * @brief Makes the absinplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(absinplace);
+MAKE_CURRENT_BACKEND(absinplace);
 
 /** 
  * @brief Sets the backend for absinplace operation
@@ -591,7 +591,7 @@ make_current_backend(absinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_absinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(absinplace_backends, absinplace, backend_name, current_backend(absinplace));
+    ESET_BACKEND_BY_NAME(absinplace_backends, absinplace, backend_name, CURRENT_BACKEND(absinplace));
 }
 
 /** 
@@ -600,7 +600,7 @@ void set_absinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_absinplace_backend() {
-	return current_backend(absinplace);
+	return CURRENT_BACKEND(absinplace);
 }
 
 /** 

@@ -10,14 +10,14 @@
  ** @return 
  * New tensor with absolute values of input elements
  */
-Tensor* naive_abs(Tensor* tensor) {	
+nnl2_tensor* naive_abs(nnl2_tensor* tensor) {	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 
 	size_t total_elems = product(tensor->shape, tensor->rank);	
 	
-	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	if(total_elems == 0) return result;
 	
 	void* data_t = tensor->data;
@@ -125,7 +125,7 @@ void* nnl2_own_pabs_ultra_int32(void* arg);
  ** @return 
  * Pointer to a new tensor with absolute values
  */
-Tensor* nnl2_own_abs(const Tensor* tensor) {
+nnl2_tensor* nnl2_own_abs(const nnl2_tensor* tensor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -134,7 +134,7 @@ Tensor* nnl2_own_abs(const Tensor* tensor) {
     size_t total_elems = product(tensor->shape, tensor->rank);
     
     // Create an output tensor with the same shape and data type
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     
     if(total_elems == 0) return result;
     
@@ -594,7 +594,7 @@ void* nnl2_own_pabs_ultra_int32(void* arg) {
  * @see nnl2_naive
  * @see nnl2_hyper_abs
  */
-Implementation abs_backends[] = {
+nnl2_runtime_implementation abs_backends[] = {
 	REGISTER_BACKEND(naive_abs, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef NNL2_PTHREAD_AVAILABLE
@@ -611,9 +611,9 @@ absfn nnl2_abs;
 /** 
  * @brief Makes the abs backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(abs);
+MAKE_CURRENT_BACKEND(abs);
 
 /** 
  * @brief Sets the backend for abs operation
@@ -622,7 +622,7 @@ make_current_backend(abs);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_abs_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(abs_backends, nnl2_abs, backend_name, current_backend(abs));
+    ESET_BACKEND_BY_NAME(abs_backends, nnl2_abs, backend_name, CURRENT_BACKEND(abs));
 }
 
 /** 
@@ -631,7 +631,7 @@ void set_abs_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_abs_backend() {
-	return current_backend(abs);
+	return CURRENT_BACKEND(abs);
 }
 
 /** 

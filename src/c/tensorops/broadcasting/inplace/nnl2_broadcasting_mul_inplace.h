@@ -10,7 +10,7 @@
  ** @param multiplier
  * Pointer to multiplier tensor
  */
-void naive_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multiplier) {
+void naive_mul_broadcasting_inplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -27,8 +27,8 @@ void naive_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multipli
     size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
     
     // Getting the tensor data types
-    TensorType multiplicand_dtype = multiplicand->dtype;
-    TensorType multiplier_dtype = multiplier->dtype;
+    nnl2_tensor_type multiplicand_dtype = multiplicand->dtype;
+    nnl2_tensor_type multiplier_dtype = multiplier->dtype;
 
     if((numel_multiplicand % numel_multiplier) == 0) {
         // Handling the case where the data types match (more efficiently)
@@ -189,7 +189,7 @@ void* nnl2_own_pmul_broadcasting_inplace_int32(void* arg);
  ** @param multiplier
  * Pointer to multiplier tensor (broadcasted)
  */
-void nnl2_own_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multiplier) {
+void nnl2_own_mul_broadcasting_inplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -229,7 +229,7 @@ void nnl2_own_mul_broadcasting_inplace(Tensor* multiplicand, const Tensor* multi
         return;
     }
     
-    TensorType dtype = multiplicand->dtype;
+    nnl2_tensor_type dtype = multiplicand->dtype;
     size_t broadcast_ratio = numel_multiplicand / numel_multiplier;
     
     bool is_aligned_multiplicand = NNL2_IS_ALIGNED(multiplicand->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -470,7 +470,7 @@ void* nnl2_own_pmul_broadcasting_inplace_int32(void* arg) {
  * @see naive_mul_broadcasting_inplace
  * @see nnl2_own_mul_broadcasting_inplace
  */
-Implementation mul_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation mul_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_mul_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

@@ -16,7 +16,7 @@
  ** @see log1p
  ** @see log1pf
  **/
-void nnl2_naive_log1pinplace(Tensor* tensor) {
+void nnl2_naive_log1pinplace(nnl2_tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -107,7 +107,7 @@ void nnl2_naive_log1pinplace(Tensor* tensor) {
  * 
  * @see nnl2_naive_log1pinplace
  */
-Implementation log1pinplace_backends[] = {
+nnl2_runtime_implementation log1pinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_log1pinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 

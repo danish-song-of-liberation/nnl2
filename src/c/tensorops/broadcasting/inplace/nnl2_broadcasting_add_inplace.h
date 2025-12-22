@@ -13,7 +13,7 @@
  ** @param sumend
  * Pointer to sumend tensor
  */
-void naive_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
+void naive_add_broadcasting_inplace(nnl2_tensor* summand, nnl2_tensor* sumend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -31,8 +31,8 @@ void naive_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
     size_t numel_sumend = product(sumend->shape, sumend->rank);
     
     // Getting the tensor data types
-    TensorType summand_dtype = summand->dtype;
-    TensorType sumend_dtype = sumend->dtype;
+    nnl2_tensor_type summand_dtype = summand->dtype;
+    nnl2_tensor_type sumend_dtype = sumend->dtype;
     
     // Checking the possibility of broadcasting (numel_summand must be a multiple of numel_sumend)
     if((numel_summand % numel_sumend) == 0) {
@@ -197,7 +197,7 @@ void* nnl2_own_padd_broadcasting_inplace_int32(void* arg);
  ** @param sumend
  * Pointer to sumend tensor (broadcasted)
  */
-void nnl2_own_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
+void nnl2_own_add_broadcasting_inplace(nnl2_tensor* summand, nnl2_tensor* sumend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -237,7 +237,7 @@ void nnl2_own_add_broadcasting_inplace(Tensor* summand, Tensor* sumend) {
         return;
     }
     
-    TensorType dtype = summand->dtype;
+    nnl2_tensor_type dtype = summand->dtype;
     size_t broadcast_ratio = numel_summand / numel_sumend;
     
     bool is_aligned_summand = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -479,7 +479,7 @@ void* nnl2_own_padd_broadcasting_inplace_int32(void* arg) {
  * @see naive_add_broadcasting_inplace
  * @see nnl2_own_add_broadcasting_inplace
  */
-Implementation add_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation add_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_add_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

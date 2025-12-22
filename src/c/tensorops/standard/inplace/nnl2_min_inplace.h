@@ -25,8 +25,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
- * Tensor* b = nnl2_tensor((float[]){3.0, 1.0, 5.0}, (int[]){3}, 1, FLOAT32);
+ * nnl2_tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
+ * nnl2_tensor* b = nnl2_tensor((float[]){3.0, 1.0, 5.0}, (int[]){3}, 1, FLOAT32);
  * 
  * // Store element-wise minimum in tensor a
  * naive_mininplace(a, b);
@@ -38,7 +38,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void naive_mininplace(Tensor* tensora, const Tensor* tensorb) {
+void naive_mininplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -58,8 +58,8 @@ void naive_mininplace(Tensor* tensora, const Tensor* tensorb) {
     // If the tensor is empty, exit the function
     if(total_elems == 0) return;
     
-    TensorType typea = tensora->dtype;
-    TensorType typeb = tensorb->dtype;
+    nnl2_tensor_type typea = tensora->dtype;
+    nnl2_tensor_type typeb = tensorb->dtype;
     
     if(typea == typeb) {
         // Handling case when the tensors have the same type
@@ -230,7 +230,7 @@ void* nnl2_own_pmininplace_int32(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Modifies the first tensor directly
  */
-void nnl2_own_mininplace(Tensor* tensora, const Tensor* tensorb) {
+void nnl2_own_mininplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -251,8 +251,8 @@ void nnl2_own_mininplace(Tensor* tensora, const Tensor* tensorb) {
         return;
     }
     
-    TensorType dtype_a = tensora->dtype;
-    TensorType dtype_b = tensorb->dtype;
+    nnl2_tensor_type dtype_a = tensora->dtype;
+    nnl2_tensor_type dtype_b = tensorb->dtype;
     
     // Fallback to naive implementation for small tensors or mixed types
     if(total_elems < NNL2_MIN_INPLACE_PARALLEL_THRESHOLD || dtype_a != dtype_b) {
@@ -494,7 +494,7 @@ void* nnl2_own_pmininplace_int32(void* arg) {
  * 
  * @see nnl2_naive
  */
-Implementation mininplace_backends[] = {
+nnl2_runtime_implementation mininplace_backends[] = {
 	REGISTER_BACKEND(naive_mininplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
@@ -511,9 +511,9 @@ mininplacefn mininplace;
 /** 
  * @brief Makes the mininplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(mininplace);
+MAKE_CURRENT_BACKEND(mininplace);
 
 /** 
  * @brief Sets the backend for mininplace operation
@@ -522,7 +522,7 @@ make_current_backend(mininplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_mininplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(mininplace_backends, mininplace, backend_name, current_backend(mininplace));
+    ESET_BACKEND_BY_NAME(mininplace_backends, mininplace, backend_name, CURRENT_BACKEND(mininplace));
 }
 
 /** 
@@ -531,7 +531,7 @@ void set_mininplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_mininplace_backend() {
-	return current_backend(mininplace);
+	return CURRENT_BACKEND(mininplace);
 }
 
 /** 

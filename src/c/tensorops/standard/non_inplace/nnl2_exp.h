@@ -18,7 +18,7 @@
  ** @return 
  * New tensor with exponential values applied element-wise
  */
-Tensor* naive_exp(Tensor* tensor, bool save_type) {
+nnl2_tensor* naive_exp(nnl2_tensor* tensor, bool save_type) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -41,7 +41,7 @@ Tensor* naive_exp(Tensor* tensor, bool save_type) {
 		}
 		
 		if (has_non_zero) {
-			Tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+			nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
 			double* result_data = (double*)result->data;
 			
 			for (size_t it = 0; it < len; it++) {
@@ -62,7 +62,7 @@ Tensor* naive_exp(Tensor* tensor, bool save_type) {
 		}
 	}
 	
-	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	if(len == 0) return result;
 	
 	switch(tensor->dtype) {
@@ -103,7 +103,7 @@ Tensor* naive_exp(Tensor* tensor, bool save_type) {
  * 
  * @see naive_exp
  */
-Implementation exp_backends[] = {
+nnl2_runtime_implementation exp_backends[] = {
 	REGISTER_BACKEND(naive_exp, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
@@ -118,7 +118,7 @@ expfn nnl2_exp;
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(exp);
+MAKE_CURRENT_BACKEND(exp);
 
 /** 
  * @brief Sets the backend for exponential operation
@@ -128,7 +128,7 @@ make_current_backend(exp);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_exp_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(exp_backends, exp, backend_name, current_backend(exp));
+    ESET_BACKEND_BY_NAME(exp_backends, exp, backend_name, CURRENT_BACKEND(exp));
 }
 
 /** 
@@ -138,7 +138,7 @@ void set_exp_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_exp_backend() {
-	return current_backend(exp);
+	return CURRENT_BACKEND(exp);
 }
 
 /** 

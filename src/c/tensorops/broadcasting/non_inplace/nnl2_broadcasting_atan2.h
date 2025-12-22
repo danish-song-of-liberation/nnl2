@@ -16,7 +16,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_atan2_broadcasting(Tensor* y, Tensor* x) {
+nnl2_tensor* naive_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -31,12 +31,12 @@ Tensor* naive_atan2_broadcasting(Tensor* y, Tensor* x) {
     size_t numel_y = product(y->shape, y->rank);
     size_t numel_x = product(x->shape, x->rank);
     
-    TensorType y_dtype = y->dtype;
-    TensorType x_dtype = x->dtype;
+    nnl2_tensor_type y_dtype = y->dtype;
+    nnl2_tensor_type x_dtype = x->dtype;
     
-    TensorType result_dtype = MAX(y_dtype, x_dtype);
+    nnl2_tensor_type result_dtype = MAX(y_dtype, x_dtype);
     
-    Tensor* result = nnl2_empty(y->shape, y->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(y->shape, y->rank, result_dtype);
 
     if((numel_y % numel_x) == 0) {
         if(y_dtype == x_dtype) {
@@ -176,7 +176,7 @@ Tensor* naive_atan2_broadcasting(Tensor* y, Tensor* x) {
  * @ingroup backend_system
  * @brief Backend implementations for atan2 operation with broadcasting
  */
-Implementation atan2_broadcasting_backends[] = {
+nnl2_runtime_implementation atan2_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_atan2_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
 };  
 

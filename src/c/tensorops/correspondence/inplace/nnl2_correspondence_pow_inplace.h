@@ -10,7 +10,7 @@
  ** @param exponent 
  * Pointer to the scalar exponent value
  */
-void naive_pow_powf_inplace(Tensor* tensor, void* exponent) {
+void naive_pow_powf_inplace(nnl2_tensor* tensor, void* exponent) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -62,7 +62,7 @@ void naive_pow_powf_inplace(Tensor* tensor, void* exponent) {
  * @see nnl2_naive
  * @see naive_pow_powf_inplace
  */
-Implementation pow_powf_inplace_backends[] = {
+nnl2_runtime_implementation pow_powf_inplace_backends[] = {
     REGISTER_BACKEND(naive_pow_powf_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };    
 

@@ -16,7 +16,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_min_broadcasting(Tensor* x, Tensor* y) {
+nnl2_tensor* naive_min_broadcasting(nnl2_tensor* x, nnl2_tensor* y) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -33,13 +33,13 @@ Tensor* naive_min_broadcasting(Tensor* x, Tensor* y) {
     size_t numel_y = product(y->shape, y->rank);
     
     // Getting the tensor data types
-    TensorType x_dtype = x->dtype;
-    TensorType y_dtype = y->dtype;
+    nnl2_tensor_type x_dtype = x->dtype;
+    nnl2_tensor_type y_dtype = y->dtype;
     
-    TensorType winner_in_the_type_hierarchy = MAX(x_dtype, y_dtype);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(x_dtype, y_dtype);
     
     // Сreating a resultant tensor
-    Tensor* result = nnl2_empty(x->shape, x->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(x->shape, x->rank, winner_in_the_type_hierarchy);
 
     if((numel_x % numel_y) == 0) {
         if(x_dtype == y_dtype) {
@@ -256,7 +256,7 @@ void* nnl2_own_pmin_broadcasting_int32(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Only supports simple broadcasting patterns where numel_x % numel_y == 0
  */
-Tensor* nnl2_own_min_broadcasting(const Tensor* x, const Tensor* y) {
+nnl2_tensor* nnl2_own_min_broadcasting(const nnl2_tensor* x, const nnl2_tensor* y) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -281,12 +281,12 @@ Tensor* nnl2_own_min_broadcasting(const Tensor* x, const Tensor* y) {
         return NULL;
     }
     
-    TensorType x_dtype = x->dtype;
-    TensorType y_dtype = y->dtype;
-    TensorType result_dtype = MAX(x_dtype, y_dtype);
+    nnl2_tensor_type x_dtype = x->dtype;
+    nnl2_tensor_type y_dtype = y->dtype;
+    nnl2_tensor_type result_dtype = MAX(x_dtype, y_dtype);
     
     // Create output tensor
-    Tensor* result = nnl2_empty(x->shape, x->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(x->shape, x->rank, result_dtype);
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -298,7 +298,7 @@ Tensor* nnl2_own_min_broadcasting(const Tensor* x, const Tensor* y) {
     if(numel_x < NNL2_MIN_BROADCASTING_PARALLEL_THRESHOLD || 
        x_dtype != y_dtype || 
        numel_y == 0) {
-        Tensor* naive_result = naive_min_broadcasting((Tensor*)x, (Tensor*)y);
+        nnl2_tensor* naive_result = naive_min_broadcasting((nnl2_tensor*)x, (nnl2_tensor*)y);
         if (naive_result != NULL) {
             // Copy data from naive result to our result tensor
             memcpy(result->data, naive_result->data, numel_x * get_dtype_size(result_dtype));
@@ -565,7 +565,7 @@ void* nnl2_own_pmin_broadcasting_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for minimum operation with broadcasting
  */
-Implementation min_broadcasting_backends[] = {
+nnl2_runtime_implementation min_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_min_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

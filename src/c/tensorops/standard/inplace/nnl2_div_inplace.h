@@ -26,8 +26,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
- * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
  * 
  * // Divide a by b (a becomes a / b)
  * nnl2_naive_divinplace(a, b);
@@ -39,7 +39,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void nnl2_naive_divinplace(Tensor* dividend, const Tensor* divisor) {
+void nnl2_naive_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -59,8 +59,8 @@ void nnl2_naive_divinplace(Tensor* dividend, const Tensor* divisor) {
     // If the tensor is empty, exit the function
     if(len_dividend == 0) return;
     
-    TensorType dtype_dividend = dividend->dtype;
-    TensorType dtype_divisor = divisor->dtype;
+    nnl2_tensor_type dtype_dividend = dividend->dtype;
+    nnl2_tensor_type dtype_divisor = divisor->dtype;
     
     if(dtype_dividend == dtype_divisor) {
         // Handling case when the tensors have the same type
@@ -267,7 +267,7 @@ void* nnl2_own_pdiv_int32_diff_type(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Division by zero may result in undefined behavior
  */
-void nnl2_own_divinplace(Tensor* dividend, const Tensor* divisor) {
+void nnl2_own_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -293,8 +293,8 @@ void nnl2_own_divinplace(Tensor* dividend, const Tensor* divisor) {
         return;
     }
     
-    TensorType dtype_dividend = dividend->dtype;
-    TensorType dtype_divisor = divisor->dtype;
+    nnl2_tensor_type dtype_dividend = dividend->dtype;
+    nnl2_tensor_type dtype_divisor = divisor->dtype;
     
     bool is_aligned_dividend = NNL2_IS_ALIGNED(dividend->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned_divisor = NNL2_IS_ALIGNED(divisor->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -705,7 +705,7 @@ void* nnl2_own_pdiv_int32_diff_type(void* arg) {
  * 
  * @see nnl2_naive_divinplace
  */
-Implementation divinplace_backends[] = {
+nnl2_runtime_implementation divinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_divinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_PTHREAD_AVAILABLE) && NNL2_AVX256_AVAILABLE
@@ -724,7 +724,7 @@ divinplacefn divinplace;
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(divinplace);
+MAKE_CURRENT_BACKEND(divinplace);
 
 /** 
  * @brief Sets the backend for division operation

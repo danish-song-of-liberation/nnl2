@@ -15,7 +15,7 @@
  ** @return
  * A pointer to a new tensor with the result of calculating the logarithm
  */
-Tensor* naive_log(const Tensor* tensor, bool save_type) {
+nnl2_tensor* naive_log(const nnl2_tensor* tensor, bool save_type) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -35,7 +35,7 @@ Tensor* naive_log(const Tensor* tensor, bool save_type) {
         }
         
         if (has_non_ones) {
-            Tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+            nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
             double* result_data = (double*)result->data;
             
             for (size_t it = 0; it < len; it++) {
@@ -52,7 +52,7 @@ Tensor* naive_log(const Tensor* tensor, bool save_type) {
         }
     }
 	
-	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -92,7 +92,7 @@ Tensor* naive_log(const Tensor* tensor, bool save_type) {
  * 
  * @see nnl2_naive
  */
-Implementation log_backends[] = {
+nnl2_runtime_implementation log_backends[] = {
 	REGISTER_BACKEND(naive_log, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
@@ -105,9 +105,9 @@ logfn nnl2_logarithm;
 /** 
  * @brief Makes the logarithm backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(log);
+MAKE_CURRENT_BACKEND(log);
 
 /** 
  * @brief Sets the backend for logarithm operation
@@ -116,7 +116,7 @@ make_current_backend(log);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_log_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(log_backends, log, backend_name, current_backend(log));
+    ESET_BACKEND_BY_NAME(log_backends, log, backend_name, CURRENT_BACKEND(log));
 }
 
 /** 
@@ -125,7 +125,7 @@ void set_log_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_log_backend() {
-	return current_backend(log);
+	return CURRENT_BACKEND(log);
 }
 
 /** 

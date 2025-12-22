@@ -14,7 +14,7 @@
  ** @param alpha
  * Scalar multiplier
  */
-void naive_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, float alpha) {
+void naive_axpy_broadcasting_inplace(nnl2_tensor* summand, const nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -31,8 +31,8 @@ void naive_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, floa
     size_t numel_sumend = product(sumend->shape, sumend->rank);
     
     // Getting the tensor data types
-    TensorType summand_dtype = summand->dtype;
-    TensorType sumend_dtype = sumend->dtype;
+    nnl2_tensor_type summand_dtype = summand->dtype;
+    nnl2_tensor_type sumend_dtype = sumend->dtype;
 
     if((numel_summand % numel_sumend) == 0) {
         // Handling the case where the data types match (more efficiently)
@@ -221,7 +221,7 @@ void* nnl2_own_paxpy_broadcasting_inplace_int32(void* arg);
  * Modifies the summand tensor directly
  * Only supports simple broadcasting patterns where numel_summand % numel_sumend == 0
  */
-void nnl2_own_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, float alpha) {
+void nnl2_own_axpy_broadcasting_inplace(nnl2_tensor* summand, const nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -246,8 +246,8 @@ void nnl2_own_axpy_broadcasting_inplace(Tensor* summand, const Tensor* sumend, f
         return;
     }
     
-    TensorType summand_dtype = summand->dtype;
-    TensorType sumend_dtype = sumend->dtype;
+    nnl2_tensor_type summand_dtype = summand->dtype;
+    nnl2_tensor_type sumend_dtype = sumend->dtype;
     
     // Fallback to naive implementation for small tensors, mixed types, or complex cases
     if(numel_summand < NNL2_AXPY_BROADCASTING_INPLACE_PARALLEL_THRESHOLD || 
@@ -530,7 +530,7 @@ void* nnl2_own_paxpy_broadcasting_inplace_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for AXPY operation with broadcasting (in place)
  */
-Implementation axpy_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation axpy_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_axpy_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

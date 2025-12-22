@@ -307,6 +307,11 @@ typedef Tensor nnl2_tensor;
  **/
 typedef TensorType nnl2_tensor_type;
 
+/** @typedef nnl2_tensor_type
+ ** @brief nnl2 Tensor Type
+ **/
+typedef Implementation nnl2_runtime_implementation;
+
 ///@}
 
 

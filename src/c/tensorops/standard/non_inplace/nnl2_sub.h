@@ -30,7 +30,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
+nnl2_tensor* nnl2_naive_sub(const nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -38,14 +38,14 @@ Tensor* nnl2_naive_sub(const Tensor* minuend, const Tensor* subtrahend) {
 	// Calculate the total number of elements in the tensors
 	size_t len = product(minuend->shape, minuend->rank);
 	
-	TensorType dtype_minuend = minuend->dtype;
-	TensorType dtype_subtrahend = subtrahend->dtype;
+	nnl2_tensor_type dtype_minuend = minuend->dtype;
+	nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
 	
 	// Selecting the winning type (higher in the hierarchy)
-	TensorType winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
+	nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
 
 	// Create an output tensor with the same shape and data type
-	Tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
+	nnl2_tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
 	
 	if(len == 0) return difference;
 	
@@ -239,20 +239,20 @@ static inline void nnl2_avx_sub_non_in_place_float64_same_type(double* a, const 
  ** @see nnl2_convert_to_float32()  
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_avx256_sub(const Tensor* minuend, const Tensor* subtrahend) {
+nnl2_tensor* nnl2_avx256_sub(const nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
     size_t len = product(minuend->shape, minuend->rank);
     
-    TensorType dtype_minuend = minuend->dtype;
-    TensorType dtype_subtrahend = subtrahend->dtype;
+    nnl2_tensor_type dtype_minuend = minuend->dtype;
+    nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
 	
 	// Selecting the winning type (higher in the hierarchy)
-	TensorType winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
+	nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
     
-    Tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
 	
 	if(len == 0) return difference; 
     
@@ -636,7 +636,7 @@ void* nnl2_own_psub_simd_int32(void* arg);
  ** @return 
  * Pointer to a new tensor with the subtraction result
  */
-Tensor* nnl2_own_sub(const Tensor* minuend, const Tensor* subtrahend) {
+nnl2_tensor* nnl2_own_sub(const nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -644,14 +644,14 @@ Tensor* nnl2_own_sub(const Tensor* minuend, const Tensor* subtrahend) {
     // Calculate the total number of elements in the tensors
     size_t len = product(minuend->shape, minuend->rank);
     
-    TensorType dtype_minuend = minuend->dtype;
-    TensorType dtype_subtrahend = subtrahend->dtype;
+    nnl2_tensor_type dtype_minuend = minuend->dtype;
+    nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_minuend, dtype_subtrahend);
 
     // Create an output tensor with the same shape and data type
-    Tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* difference = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
     
     if(len == 0) return difference;
     
@@ -976,7 +976,7 @@ void* nnl2_own_psub_mixed_types(void* arg) {
  * @see nnl2_naive_sub
  * @see nnl2_avx256_sub
  */
-Implementation sub_backends[] = {
+nnl2_runtime_implementation sub_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_sub, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef NNL2_AVX256_AVAILABLE
@@ -1019,7 +1019,7 @@ void set_sub_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_sub_backend() {
-	return current_backend(sub);
+	return CURRENT_BACKEND(sub);
 }
 
 /** 

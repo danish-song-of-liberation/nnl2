@@ -16,7 +16,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_add_broadcasting(Tensor* summand, Tensor* sumend) {	
+nnl2_tensor* naive_add_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend) {	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -34,13 +34,13 @@ Tensor* naive_add_broadcasting(Tensor* summand, Tensor* sumend) {
 	size_t numel_sumend = product(sumend->shape, sumend->rank);
 	
 	// Getting the tensor data types
-	TensorType summand_dtype = summand->dtype;
-	TensorType sumend_dtype = sumend->dtype;
+	nnl2_tensor_type summand_dtype = summand->dtype;
+	nnl2_tensor_type sumend_dtype = sumend->dtype;
 	
-	TensorType winner_in_the_type_hierarchy = MAX(summand_dtype, sumend_dtype);
+	nnl2_tensor_type winner_in_the_type_hierarchy = MAX(summand_dtype, sumend_dtype);
 	
 	// Сreating a resultant tensor
-	Tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+	nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
 	
 	// Checking the possibility of broadcasting (numel_summand must be a multiple of numel_sumend)
 	if((numel_summand % numel_sumend) == 0) {
@@ -237,7 +237,7 @@ void* nnl2_own_padd_broadcasting_int32(void* arg);
  ** @return
  * Pointer to a new tensor containing the result of the addition operation
  */
-Tensor* nnl2_own_add_broadcasting(Tensor* summand, Tensor* sumend) {
+nnl2_tensor* nnl2_own_add_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -261,10 +261,10 @@ Tensor* nnl2_own_add_broadcasting(Tensor* summand, Tensor* sumend) {
     }
     
     // Determine result data type
-    TensorType result_dtype = MAX(summand->dtype, sumend->dtype);
+    nnl2_tensor_type result_dtype = MAX(summand->dtype, sumend->dtype);
     
     // Create result tensor
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, result_dtype);
     if(result == NULL) {
         #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
             NNL2_ERROR("Failed to allocate result tensor");
@@ -282,7 +282,7 @@ Tensor* nnl2_own_add_broadcasting(Tensor* summand, Tensor* sumend) {
     // Fall back to naive implementation for small tensors or different dtypes
     if(numel_summand < NNL2_ADD_BROADCASTING_PARALLEL_THRESHOLD || 
        summand->dtype != sumend->dtype) {
-        Tensor* naive_result = naive_add_broadcasting(summand, sumend);
+        nnl2_tensor* naive_result = naive_add_broadcasting(summand, sumend);
         if(naive_result == NULL) {
             nnl2_free_tensor(result);
             return NULL;
@@ -627,7 +627,7 @@ void* nnl2_own_padd_broadcasting_int32(void* arg) {
  * @see naive_add_broadcasting
  * @see nnl2_own_add_broadcasting
  */
-Implementation add_broadcasting_backends[] = {
+nnl2_runtime_implementation add_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_add_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

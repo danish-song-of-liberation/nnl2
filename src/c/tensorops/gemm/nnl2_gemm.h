@@ -54,7 +54,7 @@
  *
  ** @example
  * // Multiply matrices with automatic type detection
- * Tensor* result = gemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, 
+ * nnl2_tensor* result = gemm(nnl2RowMajor, nnl2NoTrans, nnl2NoTrans, 
  *                      m, n, k, alpha, A, lda, B, ldb, beta);
  *
  ** @see sgemm()
@@ -62,15 +62,15 @@
  **/
 nnl2_tensor* gemm(const nnl2_order order, const nnl2_transpose transa, 
 				  const nnl2_transpose transb, const int m, const int n, 
-				  const int k, const double alpha, const Tensor* a, const int lda,
-				  const Tensor* b, const int ldb, const double beta) {
+				  const int k, const double alpha, const nnl2_tensor* a, const int lda,
+				  const nnl2_tensor* b, const int ldb, const double beta) {
 		
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif	
 		
 	// Determine data type from input tensor A			
-	TensorType dtype = a->dtype;
+	nnl2_tensor_type dtype = a->dtype;
 	
 	// Dispatch to appropriate precision implementation
 	switch(dtype) {

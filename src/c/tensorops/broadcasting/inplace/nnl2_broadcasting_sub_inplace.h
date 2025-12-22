@@ -13,7 +13,7 @@
  ** @param subtrahend
  * Pointer to subtrahend tensor
  */
-void naive_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend) {
+void naive_sub_broadcasting_inplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -31,8 +31,8 @@ void naive_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend) {
     size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
     
     // Getting the tensor data types
-    TensorType minuend_dtype = minuend->dtype;
-    TensorType subtrahend_dtype = subtrahend->dtype;
+    nnl2_tensor_type minuend_dtype = minuend->dtype;
+    nnl2_tensor_type subtrahend_dtype = subtrahend->dtype;
     
     // Checking the possibility of broadcasting (numel_minuend must be a multiple of numel_subtrahend)
     if((numel_minuend % numel_subtrahend) == 0) {
@@ -197,7 +197,7 @@ void* nnl2_own_psub_broadcasting_inplace_int32(void* arg);
  ** @param subtrahend
  * Pointer to subtrahend tensor (broadcasted)
  */
-void nnl2_own_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend) {
+void nnl2_own_sub_broadcasting_inplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -237,7 +237,7 @@ void nnl2_own_sub_broadcasting_inplace(Tensor* minuend, const Tensor* subtrahend
         return;
     }
     
-    TensorType dtype = minuend->dtype;
+    nnl2_tensor_type dtype = minuend->dtype;
     size_t broadcast_ratio = numel_minuend / numel_subtrahend;
     
     bool is_aligned_minuend = NNL2_IS_ALIGNED(minuend->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -478,7 +478,7 @@ void* nnl2_own_psub_broadcasting_inplace_int32(void* arg) {
  * @see naive_sub_broadcasting_inplace
  * @see nnl2_own_sub_broadcasting_inplace
  */
-Implementation sub_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation sub_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_sub_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

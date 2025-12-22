@@ -30,7 +30,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
+nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -38,14 +38,14 @@ Tensor* nnl2_naive_mul(const Tensor* multiplicand, const Tensor* multiplier) {
     // Calculate the total number of elements in the tensors
     size_t len = product(multiplicand->shape, multiplicand->rank);
     
-    TensorType dtype_multiplicand = multiplicand->dtype;
-    TensorType dtype_multiplier = multiplier->dtype;
+    nnl2_tensor_type dtype_multiplicand = multiplicand->dtype;
+    nnl2_tensor_type dtype_multiplier = multiplier->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
 
     // Create an output tensor with the same shape and winning data type
-    Tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
     
     if (product == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -245,7 +245,7 @@ void* nnl2_own_pmul_simd_int32(void* arg);
  ** @return 
  * Pointer to a new tensor with the multiplication result
  */
-Tensor* nnl2_own_mul(const Tensor* multiplicand, const Tensor* multiplier) {
+nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -253,14 +253,14 @@ Tensor* nnl2_own_mul(const Tensor* multiplicand, const Tensor* multiplier) {
     // Calculate the total number of elements in the tensors
     size_t len = product(multiplicand->shape, multiplicand->rank);
     
-    TensorType dtype_multiplicand = multiplicand->dtype;
-    TensorType dtype_multiplier = multiplier->dtype;
+    nnl2_tensor_type dtype_multiplicand = multiplicand->dtype;
+    nnl2_tensor_type dtype_multiplier = multiplier->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
 
     // Create an output tensor with the same shape and data type
-    Tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
     
     if(len == 0) return product;
     
@@ -591,7 +591,7 @@ void* nnl2_own_pmul_mixed_types(void* arg) {
  * @see nnl2_naive_mul
  * @see nnl2_own_mul
  */
-Implementation mul_backends[] = {
+nnl2_runtime_implementation mul_backends[] = {
     REGISTER_BACKEND(nnl2_naive_mul, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #ifdef NNL2_PTHREAD_AVAILABLE
@@ -610,7 +610,7 @@ mulfn mul;
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(mul);
+MAKE_CURRENT_BACKEND(mul);
 
 /** 
  * @brief Sets the backend for multiplication operation

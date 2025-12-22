@@ -14,12 +14,12 @@
  * Pointer to a new tensor containing the result of the minimum operation 
  * (or NULL in case of failure)
  */
-Tensor* naive_min_minf(const Tensor* tensor, void* threshold) {
+nnl2_tensor* naive_min_minf(const nnl2_tensor* tensor, void* threshold) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if(result == NULL) {
             NNL2_ERROR("Failed to allocate new tensor");
@@ -141,22 +141,22 @@ void* nnl2_own_pmin_minf_int32(void* arg);
  ** @warning
  * Requires pthread support and AVX256 capable CPU
  */
-Tensor* nnl2_own_min_minf(const Tensor* tensor, void* threshold) {
+nnl2_tensor* nnl2_own_min_minf(const nnl2_tensor* tensor, void* threshold) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Tensor is NULL", NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "nnl2_tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "nnl2_tensor data is NULL", NULL);
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(threshold, "Threshold pointer is NULL", NULL);
     #endif
     
     size_t total_elems = product(tensor->shape, tensor->rank);
     
     // Create output tensor
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -173,7 +173,7 @@ Tensor* nnl2_own_min_minf(const Tensor* tensor, void* threshold) {
     
     // Fallback to naive implementation for small tensors
     if(total_elems < NNL2_MIN_MINF_PARALLEL_THRESHOLD) {
-        Tensor* naive_result = naive_min_minf(tensor, threshold);
+        nnl2_tensor* naive_result = naive_min_minf(tensor, threshold);
         if (naive_result != NULL) {
             // Copy data from naive result to our result tensor
             memcpy(result->data, naive_result->data, total_elems * get_dtype_size(tensor->dtype));
@@ -185,7 +185,7 @@ Tensor* nnl2_own_min_minf(const Tensor* tensor, void* threshold) {
         return result;
     }
     
-    TensorType dtype = tensor->dtype;
+    nnl2_tensor_type dtype = tensor->dtype;
     bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32) &&
                       NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
     
@@ -434,7 +434,7 @@ void* nnl2_own_pmin_minf_int32(void* arg) {
  * @see nnl2_naive
  * @see naive_min_minf
  */
-Implementation min_minf_backends[] = {
+nnl2_runtime_implementation min_minf_backends[] = {
     REGISTER_BACKEND(naive_min_minf, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

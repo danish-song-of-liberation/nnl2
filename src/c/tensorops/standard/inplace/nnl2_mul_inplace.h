@@ -25,8 +25,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
- * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
  * 
  * // Multiply a by b (a becomes a * b)
  * naive_mulinplace(a, b);
@@ -38,7 +38,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void nnl2_naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
+void nnl2_naive_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -58,8 +58,8 @@ void nnl2_naive_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
     // If the tensor is empty, exit the function
     if(len_multiplicand == 0) return;
     
-    TensorType dtype_multiplicand = multiplicand->dtype;
-    TensorType dtype_multiplier = multiplier->dtype;
+    nnl2_tensor_type dtype_multiplicand = multiplicand->dtype;
+    nnl2_tensor_type dtype_multiplier = multiplier->dtype;
     
     if(dtype_multiplicand == dtype_multiplier) {
         // Handling case when the tensors have the same type
@@ -265,7 +265,7 @@ void* nnl2_own_pmulinplace_int32_diff_type(void* arg);
  ** @warning
  * Requires pthread support and AVX256 capable CPU
  */
-void nnl2_own_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
+void nnl2_own_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -291,8 +291,8 @@ void nnl2_own_mulinplace(Tensor* multiplicand, const Tensor* multiplier) {
         return;
     }
     
-    TensorType dtype_multiplicand = multiplicand->dtype;
-    TensorType dtype_multiplier = multiplier->dtype;
+    nnl2_tensor_type dtype_multiplicand = multiplicand->dtype;
+    nnl2_tensor_type dtype_multiplier = multiplier->dtype;
     
     bool is_aligned_multiplicand = NNL2_IS_ALIGNED(multiplicand->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned_multiplier = NNL2_IS_ALIGNED(multiplier->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -786,7 +786,7 @@ void* nnl2_own_pmulinplace_int32_diff_type(void* arg) {
  * 
  * @see nnl2_naive_mulinplace
  */
-Implementation mulinplace_backends[] = {
+nnl2_runtime_implementation mulinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_mulinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) 
@@ -805,7 +805,7 @@ mulinplacefn mulinplace;
  * @ingroup backend_system
  * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(mulinplace);
+MAKE_CURRENT_BACKEND(mulinplace);
 
 /** 
  * @brief Sets the backend for multiplication operation

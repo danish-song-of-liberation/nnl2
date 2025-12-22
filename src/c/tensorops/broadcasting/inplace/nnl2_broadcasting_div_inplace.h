@@ -10,7 +10,7 @@
  ** @param divisor
  * Pointer to divisor tensor
  */
-void naive_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) {
+void naive_div_broadcasting_inplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -27,8 +27,8 @@ void naive_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) {
     size_t numel_divisor = product(divisor->shape, divisor->rank);
     
     // Getting the tensor data types
-    TensorType dividend_dtype = dividend->dtype;
-    TensorType divisor_dtype = divisor->dtype;
+    nnl2_tensor_type dividend_dtype = dividend->dtype;
+    nnl2_tensor_type divisor_dtype = divisor->dtype;
 
     if((numel_dividend % numel_divisor) == 0) {
         // Handling the case where the data types match (more efficiently)
@@ -189,7 +189,7 @@ void* nnl2_own_pdiv_broadcasting_inplace_int32(void* arg);
  ** @param divisor
  * Pointer to divisor tensor (broadcasted)
  */
-void nnl2_own_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) {
+void nnl2_own_div_broadcasting_inplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -229,7 +229,7 @@ void nnl2_own_div_broadcasting_inplace(Tensor* dividend, const Tensor* divisor) 
         return;
     }
     
-    TensorType dtype = dividend->dtype;
+    nnl2_tensor_type dtype = dividend->dtype;
     size_t broadcast_ratio = numel_dividend / numel_divisor;
     
     bool is_aligned_dividend = NNL2_IS_ALIGNED(dividend->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -470,7 +470,7 @@ void* nnl2_own_pdiv_broadcasting_inplace_int32(void* arg) {
  * @see naive_div_broadcasting_inplace
  * @see nnl2_own_div_broadcasting_inplace
  */
-Implementation div_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation div_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_div_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

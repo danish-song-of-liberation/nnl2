@@ -10,7 +10,7 @@
  ** @param x
  * Pointer to x-coordinate tensor
  */
-void naive_atan2_broadcasting_inplace(Tensor* y, const Tensor* x) {
+void naive_atan2_broadcasting_inplace(nnl2_tensor* y, const nnl2_tensor* x) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -25,8 +25,8 @@ void naive_atan2_broadcasting_inplace(Tensor* y, const Tensor* x) {
     size_t numel_y = product(y->shape, y->rank);
     size_t numel_x = product(x->shape, x->rank);
     
-    TensorType y_dtype = y->dtype;
-    TensorType x_dtype = x->dtype;
+    nnl2_tensor_type y_dtype = y->dtype;
+    nnl2_tensor_type x_dtype = x->dtype;
 
     if((numel_y % numel_x) == 0) {
         if(y_dtype == x_dtype) {
@@ -145,7 +145,7 @@ void naive_atan2_broadcasting_inplace(Tensor* y, const Tensor* x) {
  * @ingroup backend_system
  * @brief Backend implementations for atan2 operation with broadcasting (in place)
  */
-Implementation atan2_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation atan2_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_atan2_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };  
 

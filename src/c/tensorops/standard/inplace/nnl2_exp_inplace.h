@@ -15,7 +15,7 @@
  ** @see exp
  ** @see expf
  **/
-void nnl2_naive_expinplace(Tensor* tensor) {
+void nnl2_naive_expinplace(nnl2_tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -80,7 +80,7 @@ void nnl2_naive_expinplace(Tensor* tensor) {
  * 
  * @see nnl2_naive_expinplace
  */
-Implementation expinplace_backends[] = {
+nnl2_runtime_implementation expinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_expinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 

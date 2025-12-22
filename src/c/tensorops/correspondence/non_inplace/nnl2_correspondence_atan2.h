@@ -13,12 +13,12 @@
  ** @return
  * Pointer to a new tensor containing the result of atan2 operation 
  */
-Tensor* naive_correspondence_atan2(const Tensor* y, void* x) {
+nnl2_tensor* naive_correspondence_atan2(const nnl2_tensor* y, void* x) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
-    Tensor* result = nnl2_empty(y->shape, y->rank, y->dtype);
+    nnl2_tensor* result = nnl2_empty(y->shape, y->rank, y->dtype);
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if(result == NULL) {
             NNL2_ERROR("Failed to allocate new tensor");
@@ -86,7 +86,7 @@ Tensor* naive_correspondence_atan2(const Tensor* y, void* x) {
  * @ingroup backend_system
  * @brief Backend implementations for atan2 operation with scalar x
  */
-Implementation atan2_correspondence_backends[] = {
+nnl2_runtime_implementation atan2_correspondence_backends[] = {
     REGISTER_BACKEND(naive_correspondence_atan2, nnl2_naive, NAIVE_BACKEND_NAME),
 };    
 

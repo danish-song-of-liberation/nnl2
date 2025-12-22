@@ -76,8 +76,8 @@
  **/
 void naive_i32gemminplace(const nnl2_order order, const nnl2_transpose transa, 
                          const nnl2_transpose transb, const int m, const int n, 
-                         const int k, const int32_t alpha, const Tensor* a, const int lda,
-                         const Tensor* b, const int ldb, const int32_t beta, Tensor* c,
+                         const int k, const int32_t alpha, const nnl2_tensor* a, const int lda,
+                         const nnl2_tensor* b, const int ldb, const int32_t beta, nnl2_tensor* c,
                          const int ldc) {
 							
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -122,7 +122,7 @@ void naive_i32gemminplace(const nnl2_order order, const nnl2_transpose transa,
     volatile int32_t* data_c = (volatile int32_t*)c->data;                          
     
     if(order == nnl2RowMajor) {
-		// Implementation for RowMajor order (lowercase data organization)
+		// nnl2_runtime_implementation for RowMajor order (lowercase data organization)
 		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {    
@@ -157,7 +157,7 @@ void naive_i32gemminplace(const nnl2_order order, const nnl2_transpose transa,
             }
         }
     } else {
-		// Implementation for ColumnMajor order (column-based data organization)
+		// nnl2_runtime_implementation for ColumnMajor order (column-based data organization)
 		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
@@ -207,7 +207,7 @@ void naive_i32gemminplace(const nnl2_order order, const nnl2_transpose transa,
  *
  ** @see naive_i32gemminplace
  **/
-Implementation i32gemminplace_backends[] = {	
+nnl2_runtime_implementation i32gemminplace_backends[] = {	
 	REGISTER_BACKEND(naive_i32gemminplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 

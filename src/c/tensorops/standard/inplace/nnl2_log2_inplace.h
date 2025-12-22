@@ -15,7 +15,7 @@
  ** @see log2
  ** @see log2f
  **/
-void nnl2_naive_log2inplace(Tensor* tensor) {
+void nnl2_naive_log2inplace(nnl2_tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -86,7 +86,7 @@ void nnl2_naive_log2inplace(Tensor* tensor) {
  * 
  * @see nnl2_naive_log2inplace
  */
-Implementation log2inplace_backends[] = {
+nnl2_runtime_implementation log2inplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_log2inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 

@@ -27,8 +27,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
- * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
  * 
  * // Add b to a (a becomes a + b)
  * naive_addinplace(a, b);
@@ -40,7 +40,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void nnl2_naive_addinplace(Tensor* summand, const Tensor* addend) {
+void nnl2_naive_addinplace(nnl2_tensor* summand, const nnl2_tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -60,8 +60,8 @@ void nnl2_naive_addinplace(Tensor* summand, const Tensor* addend) {
 	// If the tensor is empty, exit the function
 	if(len_summand == 0) return;
 	
-	TensorType dtype_summand = summand->dtype;
-	TensorType dtype_addend = addend->dtype;
+	nnl2_tensor_type dtype_summand = summand->dtype;
+	nnl2_tensor_type dtype_addend = addend->dtype;
 	
 	if(dtype_summand == dtype_addend) {
 		// Handling case when the tensors have the same type
@@ -211,7 +211,7 @@ static inline void nnl2_avx_add_int32_same_type(int32_t* summand, int32_t* adden
  ** @param aligned_summand 
  * Flag for aligning the summand data
  */
-static inline void nnl2_avx_add_float64_diff_type(double* summand, const Tensor* addend, size_t len, bool aligned_summand);
+static inline void nnl2_avx_add_float64_diff_type(double* summand, const nnl2_tensor* addend, size_t len, bool aligned_summand);
 
 /** @brief
  * AVX256 optimized addition for float with different types
@@ -219,7 +219,7 @@ static inline void nnl2_avx_add_float64_diff_type(double* summand, const Tensor*
  *
  ** @see nnl2_avx_add_float64_diff_type
  **/
-static inline void nnl2_avx_add_float32_diff_type(float* summand, const Tensor* addend, size_t len, bool aligned_summand);
+static inline void nnl2_avx_add_float32_diff_type(float* summand, const nnl2_tensor* addend, size_t len, bool aligned_summand);
 
 /** @brief
  * AVX256 optimized addition for int32 with different types
@@ -227,7 +227,7 @@ static inline void nnl2_avx_add_float32_diff_type(float* summand, const Tensor* 
  *
  ** @see nnl2_avx_add_float64_diff_type
  **/
-static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* addend, size_t len, bool aligned_summand);
+static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const nnl2_tensor* addend, size_t len, bool aligned_summand);
 
 // Main function
 
@@ -247,7 +247,7 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
  * Supports type conversion
  *
  ** @note
- * Tensors can be either memory-aligned or non-memory-aligned
+ * nnl2_tensors can be either memory-aligned or non-memory-aligned
  *
  ** @warning
  * if the tensors are not memory-aligned, the calculations may be slightly slower
@@ -260,7 +260,7 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
  ** @see nnl2_avx_add_float32_diff_type
  ** @see nnl2_avx_add_int32_diff_type
  **/
-void nnl2_avx256_addinplace(Tensor* summand, const Tensor* addend) {
+void nnl2_avx256_addinplace(nnl2_tensor* summand, const nnl2_tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -280,8 +280,8 @@ void nnl2_avx256_addinplace(Tensor* summand, const Tensor* addend) {
 	// If the tensor is empty, exit the function
     if(len_summand == 0) return;
     
-    TensorType dtype_summand = summand->dtype;
-	TensorType dtype_addend = addend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+	nnl2_tensor_type dtype_addend = addend->dtype;
 	
 	bool is_aligned_summand = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32);
 	bool is_aligned_addend = NNL2_IS_ALIGNED(addend->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -330,10 +330,10 @@ void nnl2_avx256_addinplace(Tensor* summand, const Tensor* addend) {
     #endif
 }
 
-// Implementations of auxiliary functions for the same type
+// nnl2_runtime_implementations of auxiliary functions for the same type
 
 /** @brief 
- * Implementation of double addition with the same types
+ * nnl2_runtime_implementation of double addition with the same types
  *
  ** @details 
  * Handles 4 combinations of memory alignment:
@@ -400,7 +400,7 @@ static inline void nnl2_avx_add_float64_same_type(double* summand, double* adden
 }
 
 /** @brief 
- * Implementation of float addition with the same types
+ * nnl2_runtime_implementation of float addition with the same types
  * Similar to double, but processes 8 elements per iteration
  *
  ** @see nnl2_avx256_addinplace
@@ -462,7 +462,7 @@ static inline void nnl2_avx_add_float32_same_type(float* summand, float* addend,
 }
 
 /** @brief 
- * Implementation of int32 addition with the same types
+ * nnl2_runtime_implementation of int32 addition with the same types
  *
  ** @see nnl2_avx256_addinplace
  ** @see nnl2_avx_add_float64_same_type
@@ -526,14 +526,14 @@ static inline void nnl2_avx_add_int32_same_type(int32_t* summand, int32_t* adden
 // implementations of auxiliary functions for different types
 
 /** @brief 
- * Implementation of double addition with conversion from other types
+ * nnl2_runtime_implementation of double addition with conversion from other types
  *
  ** @details 
  * Converts addend elements to double before addition
  *
  ** @see nnl2_avx256_addinplace
  **/
-static inline void nnl2_avx_add_float64_diff_type(double* summand, const Tensor* addend, size_t len, bool aligned_summand) {
+static inline void nnl2_avx_add_float64_diff_type(double* summand, const nnl2_tensor* addend, size_t len, bool aligned_summand) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -592,14 +592,14 @@ static inline void nnl2_avx_add_float64_diff_type(double* summand, const Tensor*
 }
 
 /** @brief 
- * Implementation of float addition with conversion from other types
+ * nnl2_runtime_implementation of float addition with conversion from other types
  *
  ** @details 
  * Converts addend elements to float before addition
  *
  ** @see nnl2_avx256_addinplace
  **/
-static inline void nnl2_avx_add_float32_diff_type(float* summand, const Tensor* addend, size_t len, bool aligned_summand) {
+static inline void nnl2_avx_add_float32_diff_type(float* summand, const nnl2_tensor* addend, size_t len, bool aligned_summand) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -662,14 +662,14 @@ static inline void nnl2_avx_add_float32_diff_type(float* summand, const Tensor* 
 }	
 
 /** @brief 
- * Implementation of int32 addition with conversion from other types
+ * nnl2_runtime_implementation of int32 addition with conversion from other types
  *
  ** @details 
  * Converts addend elements to int32 before addition
  *
  ** @see nnl2_avx256_addinplace
  **/
-static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* addend, size_t len, bool aligned_summand) {
+static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const nnl2_tensor* addend, size_t len, bool aligned_summand) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -736,11 +736,11 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
     /** @brief
      * BLAS implementation of add in-place operation
 	 */
-	void nnl2_blas_addinplace(Tensor* summand, Tensor* addend);
+	void nnl2_blas_addinplace(nnl2_tensor* summand, nnl2_tensor* addend);
 #endif
 
 #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE)
-	void nnl2_own_add_inplace(Tensor* summand, const Tensor* addend);
+	void nnl2_own_add_inplace(nnl2_tensor* summand, const nnl2_tensor* addend);
 #endif
 
 /** @ingroup backend_system
@@ -754,7 +754,7 @@ static inline void nnl2_avx_add_int32_diff_type(int32_t* summand, const Tensor* 
  ** @see nnl2_naive_addinplace
  ** @see nnl2_avx256_addinplace
  **/
-Implementation addinplace_backends[] = {	
+nnl2_runtime_implementation addinplace_backends[] = {	
 	REGISTER_BACKEND(nnl2_naive_addinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(__AVX__) && TENSOR_MEM_ALIGNMENT == 32
@@ -781,16 +781,16 @@ Implementation addinplace_backends[] = {
  */
 addinplacefn addinplace_blas_suboptimal = NULL;
 
-void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
+void nnl2_blas_addinplace(nnl2_tensor* summand, nnl2_tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
 	
 	if (addinplace_blas_suboptimal == NULL) {
-        addinplace_blas_suboptimal = ((Implementation*)nnl2_get_suboptimal_backend(addinplace_backends, sizeof(addinplace_backends) / sizeof(addinplace_backends[0]), BLAS_BACKEND_NAME))->fn;
+        addinplace_blas_suboptimal = ((nnl2_runtime_implementation*)nnl2_get_suboptimal_backend(addinplace_backends, sizeof(addinplace_backends) / sizeof(addinplace_backends[0]), BLAS_BACKEND_NAME))->fn;
     }
 	
-	TensorType dtype_summand = summand->dtype;
+	nnl2_tensor_type dtype_summand = summand->dtype;
 	
 	if(dtype_summand == INT32) { 
 	    addinplace_blas_suboptimal(summand, addend);
@@ -800,7 +800,7 @@ void nnl2_blas_addinplace(Tensor* summand, Tensor* addend) {
 		return;
 	}
 	
-    TensorType dtype_addend = addend->dtype;
+    nnl2_tensor_type dtype_addend = addend->dtype;
 	
 	// Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
@@ -959,7 +959,7 @@ void* nnl2_own_padd_int32_diff_type(void* arg);
  * Uses NNL2_NUM_THREADS for parallelization configuration
  * Falls back to naive implementation for small tensors
  */
-void nnl2_own_add_inplace(Tensor* summand, const Tensor* addend) {
+void nnl2_own_add_inplace(nnl2_tensor* summand, const nnl2_tensor* addend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -985,8 +985,8 @@ void nnl2_own_add_inplace(Tensor* summand, const Tensor* addend) {
         return;
     }
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_addend = addend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_addend = addend->dtype;
     
     bool is_aligned_summand = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned_addend = NNL2_IS_ALIGNED(addend->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -1491,7 +1491,7 @@ MAKE_CURRENT_BACKEND(addinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_addinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(addinplace_backends, addinplace, backend_name, current_backend(addinplace));
+    ESET_BACKEND_BY_NAME(addinplace_backends, addinplace, backend_name, CURRENT_BACKEND(addinplace));
 }
 
 /** 
@@ -1501,7 +1501,7 @@ void set_addinplace_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_addinplace_backend() {
-	return current_backend(addinplace);
+	return CURRENT_BACKEND(addinplace);
 }
 
 /** 

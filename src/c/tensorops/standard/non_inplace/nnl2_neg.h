@@ -25,8 +25,8 @@ nnl2_tensor* nnl2_naive_neg(const nnl2_tensor* tensor) {
 
     // Safety checks at maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Tensor is NULL (.neg)", NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor's data is NULL (.neg)", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "nnl2_tensor is NULL (.neg)", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "nnl2_tensor's data is NULL (.neg)", NULL);
     #endif
 
     size_t total_elems = product(tensor->shape, tensor->rank);
@@ -84,7 +84,7 @@ nnl2_tensor* nnl2_naive_neg(const nnl2_tensor* tensor) {
  *
  * @see nnl2_naive_neg
  */
-Implementation neg_backends[] = {
+nnl2_runtime_implementation neg_backends[] = {
     REGISTER_BACKEND(nnl2_naive_neg, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 

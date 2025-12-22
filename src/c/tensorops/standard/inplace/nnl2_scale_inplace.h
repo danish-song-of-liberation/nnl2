@@ -17,7 +17,7 @@
  ** @throws NNL2_ERROR
  * If you try to multiply an INT32 tensor by a fractional number
  */
-void naive_scaleinplace(Tensor* tensor, float multiplier) {
+void naive_scaleinplace(nnl2_tensor* tensor, float multiplier) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -75,7 +75,7 @@ void naive_scaleinplace(Tensor* tensor, float multiplier) {
  * 
  * @see nnl2_naive
  */
-Implementation scaleinplace_backends[] = {
+nnl2_runtime_implementation scaleinplace_backends[] = {
 	REGISTER_BACKEND(naive_scaleinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
@@ -88,9 +88,9 @@ scaleinplacefn scaleinplace;
 /** 
  * @brief Makes the scaleinplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(scaleinplace);
+MAKE_CURRENT_BACKEND(scaleinplace);
 
 /** 
  * @brief Sets the backend for scaleinplace operation
@@ -99,7 +99,7 @@ make_current_backend(scaleinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_scaleinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(scaleinplace_backends, scaleinplace, backend_name, current_backend(scaleinplace));
+    ESET_BACKEND_BY_NAME(scaleinplace_backends, scaleinplace, backend_name, CURRENT_BACKEND(scaleinplace));
 }
 
 /** 
@@ -108,7 +108,7 @@ void set_scaleinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_scaleinplace_backend() {
-	return current_backend(scaleinplace);
+	return CURRENT_BACKEND(scaleinplace);
 }
 
 /** 

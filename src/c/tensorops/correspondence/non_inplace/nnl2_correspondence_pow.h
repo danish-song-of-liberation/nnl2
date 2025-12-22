@@ -14,12 +14,12 @@
  * Pointer to a new tensor containing the result of the exponentiation operation 
  * (or NULL in case of failure)
  */
-Tensor* naive_pow_powf(const Tensor* tensor, void* exponent) {
+nnl2_tensor* naive_pow_powf(const nnl2_tensor* tensor, void* exponent) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if(result == NULL) {
             NNL2_ERROR("Failed to allocate new tensor");
@@ -80,7 +80,7 @@ Tensor* naive_pow_powf(const Tensor* tensor, void* exponent) {
  * @see nnl2_naive
  * @see naive_pow_powf
  */
-Implementation pow_powf_backends[] = {
+nnl2_runtime_implementation pow_powf_backends[] = {
     REGISTER_BACKEND(naive_pow_powf, nnl2_naive, NAIVE_BACKEND_NAME),
 };    
 

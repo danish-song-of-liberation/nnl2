@@ -25,8 +25,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
- * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
  * 
  * // Subtract b from a (a becomes a - b)
  * naive_subinplace(a, b);
@@ -38,7 +38,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void nnl2_naive_subinplace(Tensor* minuend, const Tensor* subtrahend) {
+void nnl2_naive_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -58,8 +58,8 @@ void nnl2_naive_subinplace(Tensor* minuend, const Tensor* subtrahend) {
     // If the tensor is empty, exit the function
     if(len_minuend == 0) return;
     
-    TensorType dtype_minuend = minuend->dtype;
-    TensorType dtype_subtrahend = subtrahend->dtype;
+    nnl2_tensor_type dtype_minuend = minuend->dtype;
+    nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
     
     if(dtype_minuend == dtype_subtrahend) {
         // Handling case when the tensors have the same type
@@ -211,7 +211,7 @@ static inline void nnl2_avx_sub_int32_same_type(int32_t* minuend, int32_t* subtr
  ** @param aligned_minuend 
  * Flag for aligning the minuend data
  */
-static inline void nnl2_avx_sub_float64_diff_type(double* minuend, const Tensor* subtrahend, size_t len, bool aligned_minuend);
+static inline void nnl2_avx_sub_float64_diff_type(double* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend);
 
 /** @brief
  * AVX256 optimized subtraction for float with different types
@@ -219,7 +219,7 @@ static inline void nnl2_avx_sub_float64_diff_type(double* minuend, const Tensor*
  *
  ** @see nnl2_avx_sub_float64_diff_type
  **/
-static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const Tensor* subtrahend, size_t len, bool aligned_minuend);
+static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend);
 
 /** @brief
  * AVX256 optimized subtraction for int32 with different types
@@ -227,7 +227,7 @@ static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const Tensor* 
  *
  ** @see nnl2_avx_sub_float64_diff_type
  **/
-static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const Tensor* subtrahend, size_t len, bool aligned_minuend);
+static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend);
 
 // Main function
 
@@ -247,7 +247,7 @@ static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const Tensor* 
  * Supports type conversion
  *
  ** @note
- * Tensors can be either memory-aligned or non-memory-aligned
+ * nnl2_tensors can be either memory-aligned or non-memory-aligned
  *
  ** @warning
  * if the tensors are not memory-aligned, the calculations may be slightly slower
@@ -260,7 +260,7 @@ static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const Tensor* 
  ** @see nnl2_avx_sub_float32_diff_type
  ** @see nnl2_avx_sub_int32_diff_type
  **/
-void nnl2_avx256_subinplace(Tensor* minuend, const Tensor* subtrahend) {
+void nnl2_avx256_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -280,8 +280,8 @@ void nnl2_avx256_subinplace(Tensor* minuend, const Tensor* subtrahend) {
     // If the tensor is empty, exit the function
     if(len_minuend == 0) return;
     
-    TensorType dtype_minuend = minuend->dtype;
-    TensorType dtype_subtrahend = subtrahend->dtype;
+    nnl2_tensor_type dtype_minuend = minuend->dtype;
+    nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
     
     bool is_aligned_minuend = NNL2_IS_ALIGNED(minuend->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned_subtrahend = NNL2_IS_ALIGNED(subtrahend->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -330,10 +330,10 @@ void nnl2_avx256_subinplace(Tensor* minuend, const Tensor* subtrahend) {
     #endif
 }
 
-// Implementations of auxiliary functions for the same type
+// nnl2_runtime_implementations of auxiliary functions for the same type
 
 /** @brief 
- * Implementation of double subtraction with the same types
+ * nnl2_runtime_implementation of double subtraction with the same types
  *
  ** @details 
  * Handles 4 combinations of memory alignment:
@@ -400,7 +400,7 @@ static inline void nnl2_avx_sub_float64_same_type(double* minuend, double* subtr
 }
 
 /** @brief 
- * Implementation of float subtraction with the same types
+ * nnl2_runtime_implementation of float subtraction with the same types
  * Similar to double, but processes 8 elements per iteration
  *
  ** @see nnl2_avx256_subinplace
@@ -462,7 +462,7 @@ static inline void nnl2_avx_sub_float32_same_type(float* minuend, float* subtrah
 }
 
 /** @brief 
- * Implementation of int32 subtraction with the same types
+ * nnl2_runtime_implementation of int32 subtraction with the same types
  *
  ** @see nnl2_avx256_subinplace
  ** @see nnl2_avx_sub_float64_same_type
@@ -526,14 +526,14 @@ static inline void nnl2_avx_sub_int32_same_type(int32_t* minuend, int32_t* subtr
 // implementations of auxiliary functions for different types
 
 /** @brief 
- * Implementation of double subtraction with conversion from other types
+ * nnl2_runtime_implementation of double subtraction with conversion from other types
  *
  ** @details 
  * Converts subtrahend elements to double before subtraction
  *
  ** @see nnl2_avx256_subinplace
  **/
-static inline void nnl2_avx_sub_float64_diff_type(double* minuend, const Tensor* subtrahend, size_t len, bool aligned_minuend) {
+static inline void nnl2_avx_sub_float64_diff_type(double* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -592,14 +592,14 @@ static inline void nnl2_avx_sub_float64_diff_type(double* minuend, const Tensor*
 }
 
 /** @brief 
- * Implementation of float subtraction with conversion from other types
+ * nnl2_runtime_implementation of float subtraction with conversion from other types
  *
  ** @details 
  * Converts subtrahend elements to float before subtraction
  *
  ** @see nnl2_avx256_subinplace
  **/
-static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const Tensor* subtrahend, size_t len, bool aligned_minuend) {
+static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -662,14 +662,14 @@ static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const Tensor* 
 }    
 
 /** @brief 
- * Implementation of int32 subtraction with conversion from other types
+ * nnl2_runtime_implementation of int32 subtraction with conversion from other types
  *
  ** @details 
  * Converts subtrahend elements to int32 before subtraction
  *
  ** @see nnl2_avx256_subinplace
  **/
-static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const Tensor* subtrahend, size_t len, bool aligned_minuend) {
+static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_ENTER();
     #endif
@@ -840,7 +840,7 @@ void* nnl2_own_psub_int32_diff_type(void* arg);
  * Uses NNL2_NUM_THREADS for parallelization configuration
  * Falls back to naive implementation for small tensors
  */
-void nnl2_own_sub_inplace(Tensor* minuend, const Tensor* subtrahend) {
+void nnl2_own_sub_inplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -866,8 +866,8 @@ void nnl2_own_sub_inplace(Tensor* minuend, const Tensor* subtrahend) {
         return;
     }
     
-    TensorType dtype_minuend = minuend->dtype;
-    TensorType dtype_subtrahend = subtrahend->dtype;
+    nnl2_tensor_type dtype_minuend = minuend->dtype;
+    nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
     
     bool is_aligned_minuend = NNL2_IS_ALIGNED(minuend->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned_subtrahend = NNL2_IS_ALIGNED(subtrahend->data, NNL2_TENSOR_ALIGNMENT_32);
@@ -1362,7 +1362,7 @@ void* nnl2_own_psub_int32_diff_type(void* arg) {
  ** @see nnl2_naive_subinplace
  ** @see nnl2_avx256_subinplace
  **/
-Implementation subinplace_backends[] = {
+nnl2_runtime_implementation subinplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_subinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
@@ -1395,7 +1395,7 @@ MAKE_CURRENT_BACKEND(subinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_subinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(subinplace_backends, subinplace, backend_name, current_backend(subinplace));
+    ESET_BACKEND_BY_NAME(subinplace_backends, subinplace, backend_name, CURRENT_BACKEND(subinplace));
 }
 
 /** 
@@ -1405,7 +1405,7 @@ void set_subinplace_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_subinplace_backend() {
-	return current_backend(subinplace);
+	return CURRENT_BACKEND(subinplace);
 }
 
 /** 

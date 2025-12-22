@@ -10,7 +10,7 @@
  ** @param y
  * Pointer to second tensor
  */
-void naive_min_broadcasting_inplace(Tensor* x, const Tensor* y) {
+void naive_min_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -27,8 +27,8 @@ void naive_min_broadcasting_inplace(Tensor* x, const Tensor* y) {
     size_t numel_y = product(y->shape, y->rank);
     
     // Getting the tensor data types
-    TensorType x_dtype = x->dtype;
-    TensorType y_dtype = y->dtype;
+    nnl2_tensor_type x_dtype = x->dtype;
+    nnl2_tensor_type y_dtype = y->dtype;
 
     if((numel_x % numel_y) == 0) {
         // Handling the case where the data types match (more efficiently)
@@ -213,7 +213,7 @@ void* nnl2_own_pmin_broadcasting_inplace_int32(void* arg);
  * Modifies the first tensor directly
  * Only supports simple broadcasting patterns where numel_x % numel_y == 0
  */
-void nnl2_own_min_broadcasting_inplace(Tensor* x, const Tensor* y) {
+void nnl2_own_min_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -238,8 +238,8 @@ void nnl2_own_min_broadcasting_inplace(Tensor* x, const Tensor* y) {
         return;
     }
     
-    TensorType x_dtype = x->dtype;
-    TensorType y_dtype = y->dtype;
+    nnl2_tensor_type x_dtype = x->dtype;
+    nnl2_tensor_type y_dtype = y->dtype;
     
     // Fallback to naive implementation for small tensors, mixed types, or complex cases
     if(numel_x < NNL2_MIN_BROADCASTING_INPLACE_PARALLEL_THRESHOLD || 
@@ -498,7 +498,7 @@ void* nnl2_own_pmin_broadcasting_inplace_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for minimum operation with broadcasting (in place)
  */
-Implementation min_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation min_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_min_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

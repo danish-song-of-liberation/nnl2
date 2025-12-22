@@ -10,7 +10,7 @@
  ** @param x 
  * Pointer to the scalar x-coordinate value
  */
-void naive_correspondence_atan2_inplace(Tensor* y, void* x) {
+void naive_correspondence_atan2_inplace(nnl2_tensor* y, void* x) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -62,7 +62,7 @@ void naive_correspondence_atan2_inplace(Tensor* y, void* x) {
  * @ingroup backend_system
  * @brief Backend implementations for in-place atan2 operation with scalar x
  */
-Implementation atan2_correspondence_inplace_backends[] = {
+nnl2_runtime_implementation atan2_correspondence_inplace_backends[] = {
     REGISTER_BACKEND(naive_correspondence_atan2_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };    
 

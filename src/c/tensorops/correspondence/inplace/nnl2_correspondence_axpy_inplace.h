@@ -14,7 +14,7 @@
  ** @param alpha
  * Scalar multiplier for the sumend value
  */
-void naive_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
+void naive_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -143,7 +143,7 @@ void* nnl2_own_paxpf_inplace_int32(void* arg);
  * Modifies the summand tensor directly
  * Only supports FLOAT64, FLOAT32, and INT32 data types
  */
-void nnl2_own_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
+void nnl2_own_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -163,7 +163,7 @@ void nnl2_own_axpf_inplace(Tensor* summand, void* sumend, float alpha) {
         return;
     }
     
-    TensorType summand_dtype = summand->dtype;
+    nnl2_tensor_type summand_dtype = summand->dtype;
     
     // Fallback to naive implementation for small tensors or unsupported types
     if(total_elems < NNL2_AXPF_INPLACE_PARALLEL_THRESHOLD) {
@@ -426,7 +426,7 @@ void* nnl2_own_paxpf_inplace_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for AXPF in-place operation
  */
-Implementation axpf_inplace_backends[] = {
+nnl2_runtime_implementation axpf_inplace_backends[] = {
     REGISTER_BACKEND(naive_axpf_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

@@ -11,7 +11,7 @@
  ** @param threshold 
  * Pointer to the scalar threshold value for maximum operation
  */
-void naive_max_maxf_inplace(Tensor* tensor, void* threshold) {
+void naive_max_maxf_inplace(nnl2_tensor* tensor, void* threshold) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -122,15 +122,15 @@ void* nnl2_own_pmax_maxf_inplace_int32(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Modifies the input tensor directly
  */
-void nnl2_own_max_maxf_inplace(Tensor* tensor, void* threshold) {
+void nnl2_own_max_maxf_inplace(nnl2_tensor* tensor, void* threshold) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "Tensor is NULL");
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "Tensor data is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "nnl2_tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "nnl2_tensor data is NULL");
         NNL2_CHECK_NULL_IF_ERR_RETURN(threshold, "Threshold pointer is NULL");
     #endif
     
@@ -151,7 +151,7 @@ void nnl2_own_max_maxf_inplace(Tensor* tensor, void* threshold) {
         return;
     }
     
-    TensorType dtype = tensor->dtype;
+    nnl2_tensor_type dtype = tensor->dtype;
     bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
     
     // Warning for unaligned memory in safety modes
@@ -391,7 +391,7 @@ void* nnl2_own_pmax_maxf_inplace_int32(void* arg) {
  * @see nnl2_naive
  * @see naive_max_maxf_inplace
  */
-Implementation max_maxf_inplace_backends[] = {
+nnl2_runtime_implementation max_maxf_inplace_backends[] = {
     REGISTER_BACKEND(naive_max_maxf_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

@@ -15,7 +15,7 @@
  ** @see log
  ** @see logf
  **/
-void nnl2_naive_loginplace(Tensor* tensor) {
+void nnl2_naive_loginplace(nnl2_tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -80,7 +80,7 @@ void nnl2_naive_loginplace(Tensor* tensor) {
  * 
  * @see nnl2_naive_loginplace
  */
-Implementation loginplace_backends[] = {
+nnl2_runtime_implementation loginplace_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_loginplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 

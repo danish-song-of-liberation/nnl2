@@ -10,7 +10,7 @@
  ** @param x 
  * Pointer to the tensor whose values are used as denominator
  */
-void nnl2_naive_atan2inplace(Tensor* y, const Tensor* x) {
+void nnl2_naive_atan2inplace(nnl2_tensor* y, const nnl2_tensor* x) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -19,8 +19,8 @@ void nnl2_naive_atan2inplace(Tensor* y, const Tensor* x) {
     
     if(len == 0) return;
     
-    TensorType dtype_y = y->dtype;
-    TensorType dtype_x = x->dtype;
+    nnl2_tensor_type dtype_y = y->dtype;
+    nnl2_tensor_type dtype_x = x->dtype;
     
     if(dtype_y == dtype_x) {
         switch(dtype_y) {
@@ -132,7 +132,7 @@ void nnl2_naive_atan2inplace(Tensor* y, const Tensor* x) {
  * 
  * @see nnl2_naive_atan2inplace
  */
-Implementation atan2inplace_backends[] = {
+nnl2_runtime_implementation atan2inplace_backends[] = {
     REGISTER_BACKEND(nnl2_naive_atan2inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };    
 

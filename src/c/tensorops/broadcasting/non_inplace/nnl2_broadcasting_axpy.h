@@ -20,7 +20,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_axpy_broadcasting(Tensor* summand, Tensor* sumend, float alpha) {
+nnl2_tensor* naive_axpy_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -37,13 +37,13 @@ Tensor* naive_axpy_broadcasting(Tensor* summand, Tensor* sumend, float alpha) {
     size_t numel_sumend = product(sumend->shape, sumend->rank);
     
     // Getting the tensor data types
-    TensorType summand_dtype = summand->dtype;
-    TensorType sumend_dtype = sumend->dtype;
+    nnl2_tensor_type summand_dtype = summand->dtype;
+    nnl2_tensor_type sumend_dtype = sumend->dtype;
     
-    TensorType winner_in_the_type_hierarchy = MAX(summand_dtype, sumend_dtype);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(summand_dtype, sumend_dtype);
     
     // Сreating a resultant tensor
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
 
     if((numel_summand % numel_sumend) == 0) {
         if(summand_dtype == sumend_dtype) {
@@ -262,7 +262,7 @@ void* nnl2_own_paxpy_broadcasting_int32(void* arg);
  * Returns new tensor - caller is responsible for freeing memory
  * Only supports simple broadcasting patterns where numel_summand % numel_sumend == 0
  */
-Tensor* nnl2_own_axpy_broadcasting(Tensor* summand, Tensor* sumend, float alpha) {
+nnl2_tensor* nnl2_own_axpy_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -288,18 +288,18 @@ Tensor* nnl2_own_axpy_broadcasting(Tensor* summand, Tensor* sumend, float alpha)
     }
     
     // Getting the tensor data types
-    TensorType summand_dtype = summand->dtype;
-    TensorType sumend_dtype = sumend->dtype;
-    TensorType winner_in_the_type_hierarchy = MAX(summand_dtype, sumend_dtype);
+    nnl2_tensor_type summand_dtype = summand->dtype;
+    nnl2_tensor_type sumend_dtype = sumend->dtype;
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(summand_dtype, sumend_dtype);
     
     // Сreating a resultant tensor
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
     
     // Fallback to naive implementation for small tensors, mixed types, or complex cases
     if(numel_summand < NNL2_AXPY_BROADCASTING_PARALLEL_THRESHOLD || 
        summand_dtype != sumend_dtype || 
        numel_sumend == 0) {
-        Tensor* naive_result = naive_axpy_broadcasting(summand, sumend, alpha);
+        nnl2_tensor* naive_result = naive_axpy_broadcasting(summand, sumend, alpha);
         if(naive_result != result) {
             nnl2_free_tensor(result);
             result = naive_result;
@@ -595,7 +595,7 @@ void* nnl2_own_paxpy_broadcasting_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for AXPY operation with broadcasting
  */
-Implementation axpy_broadcasting_backends[] = {
+nnl2_runtime_implementation axpy_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_axpy_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

@@ -11,7 +11,7 @@
  ** @param exponent
  * Pointer to exponent tensor
  */
-void naive_pow_broadcasting_inplace(Tensor* base, const Tensor* exponent) {
+void naive_pow_broadcasting_inplace(nnl2_tensor* base, const nnl2_tensor* exponent) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -28,8 +28,8 @@ void naive_pow_broadcasting_inplace(Tensor* base, const Tensor* exponent) {
     size_t numel_exponent = product(exponent->shape, exponent->rank);
     
     // Getting the tensor data types
-    TensorType base_dtype = base->dtype;
-    TensorType exponent_dtype = exponent->dtype;
+    nnl2_tensor_type base_dtype = base->dtype;
+    nnl2_tensor_type exponent_dtype = exponent->dtype;
 
     if((numel_base % numel_exponent) == 0) {
         // Handling the case where the data types match (more efficiently)
@@ -144,7 +144,7 @@ void naive_pow_broadcasting_inplace(Tensor* base, const Tensor* exponent) {
  * @ingroup backend_system
  * @brief Backend implementations for power operation with broadcasting (in place)
  */
-Implementation pow_broadcasting_inplace_backends[] = {
+nnl2_runtime_implementation pow_broadcasting_inplace_backends[] = {
     REGISTER_BACKEND(naive_pow_broadcasting_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };  
 

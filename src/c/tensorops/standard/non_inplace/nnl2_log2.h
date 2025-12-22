@@ -15,7 +15,7 @@
  ** @return
  * A pointer to a new tensor with the result of calculating the base-2 logarithm
  */
-Tensor* naive_log2(const Tensor* tensor, bool save_type) {
+nnl2_tensor* naive_log2(const nnl2_tensor* tensor, bool save_type) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -36,7 +36,7 @@ Tensor* naive_log2(const Tensor* tensor, bool save_type) {
         }
         
         if (!all_powers_of_two) {
-            Tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+            nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
             double* result_data = (double*)result->data;
             
             for (size_t it = 0; it < len; it++) {
@@ -46,7 +46,7 @@ Tensor* naive_log2(const Tensor* tensor, bool save_type) {
             return result;
         } else {
             if(save_type) {
-                Tensor* result = nnl2_empty(tensor->shape, tensor->rank, INT32);
+                nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, INT32);
                 int32_t* result_data = (int32_t*)result->data;
                 
                 for (size_t it = 0; it < len; it++) {
@@ -59,7 +59,7 @@ Tensor* naive_log2(const Tensor* tensor, bool save_type) {
                 }
                 return result;
             } else {
-                Tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+                nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
                 double* result_data = (double*)result->data;
                 
                 for (size_t it = 0; it < len; it++) {
@@ -76,7 +76,7 @@ Tensor* naive_log2(const Tensor* tensor, bool save_type) {
         }
     }
 	
-	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
@@ -116,7 +116,7 @@ Tensor* naive_log2(const Tensor* tensor, bool save_type) {
  * 
  * @see nnl2_naive
  */
-Implementation log2_backends[] = {
+nnl2_runtime_implementation log2_backends[] = {
 	REGISTER_BACKEND(naive_log2, nnl2_naive, NAIVE_BACKEND_NAME),
 };	
 
@@ -129,9 +129,9 @@ log2fn nnl2_log2;
 /** 
  * @brief Makes the base-2 logarithm backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(log2);
+MAKE_CURRENT_BACKEND(log2);
 
 /** 
  * @brief Sets the backend for base-2 logarithm operation
@@ -140,7 +140,7 @@ make_current_backend(log2);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_log2_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(log2_backends, nnl2_log2, backend_name, current_backend(log2));
+    ESET_BACKEND_BY_NAME(log2_backends, nnl2_log2, backend_name, CURRENT_BACKEND(log2));
 }
 
 /** 
@@ -149,7 +149,7 @@ void set_log2_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_log2_backend() {
-	return current_backend(log2);
+	return CURRENT_BACKEND(log2);
 }
 
 /** 

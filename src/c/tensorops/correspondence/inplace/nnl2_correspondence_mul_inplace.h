@@ -10,7 +10,7 @@
  ** @param multiplier 
  * Pointer to the scalar value to multiply by
  */
-void naive_mul_mulf_inplace(Tensor* tensor, void* multiplier) {
+void naive_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -121,15 +121,15 @@ void* nnl2_own_pmul_mulf_int32(void* arg);
  ** @warning
  * Requires pthread support and AVX256 capable CPU
  */
-void nnl2_own_2_mul_mulf_inplace(Tensor* tensor, void* multiplier) {
+void nnl2_own_2_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
     // Additional checks at the maximum safety level
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "Tensor is NULL");
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "Tensor data is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "nnl2_tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "nnl2_tensor data is NULL");
         NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier pointer is NULL");
     #endif
     
@@ -150,7 +150,7 @@ void nnl2_own_2_mul_mulf_inplace(Tensor* tensor, void* multiplier) {
         return;
     }
     
-    TensorType dtype = tensor->dtype;
+    nnl2_tensor_type dtype = tensor->dtype;
     bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
     
     // Warning for unaligned memory in safety modes
@@ -383,7 +383,7 @@ void* nnl2_own_pmul_mulf_int32(void* arg) {
  * @see naive_mul_mulf_inplace
  * @see nnl2_own_2_mul_mulf_inplace
  */
-Implementation mul_mulf_inplace_backends[] = {
+nnl2_runtime_implementation mul_mulf_inplace_backends[] = {
     REGISTER_BACKEND(naive_mul_mulf_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

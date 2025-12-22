@@ -38,7 +38,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_naive_add(Tensor* summand, Tensor* addend) {
+nnl2_tensor* nnl2_naive_add(nnl2_tensor* summand, nnl2_tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
@@ -46,14 +46,14 @@ Tensor* nnl2_naive_add(Tensor* summand, Tensor* addend) {
 	// Calculate the total number of elements in the tensors
 	size_t len = product(summand->shape, summand->rank);
 	
-	TensorType dtype_summand = summand->dtype;
-	TensorType dtype_addend = addend->dtype;
+	nnl2_tensor_type dtype_summand = summand->dtype;
+	nnl2_tensor_type dtype_addend = addend->dtype;
 	
 	// Selecting the winning type (higher in the hierarchy)
-	TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
+	nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
 
 	// Create an output tensor with the same shape and data type
-	Tensor* amount = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+	nnl2_tensor* amount = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
 	
 	if(len == 0) return amount;
 	
@@ -247,20 +247,20 @@ static inline void nnl2_avx_add_non_in_place_float64_same_type(double* a, const 
  ** @see nnl2_convert_to_float32()  
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_avx256_add(const Tensor* summand, const Tensor* addend) {
+nnl2_tensor* nnl2_avx256_add(const nnl2_tensor* summand, const nnl2_tensor* addend) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
     size_t len = product(summand->shape, summand->rank);
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_addend = addend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_addend = addend->dtype;
 	
 	// Selecting the winning type (higher in the hierarchy)
-	TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
+	nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
     
-    Tensor* sum = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* sum = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
 	
 	if(len == 0) return sum; 
     
@@ -666,7 +666,7 @@ void* nnl2_own_padd_simd_int32(void* arg);
  ** @return 
  * Pointer to a new tensor with the addition result
  */
-Tensor* nnl2_own_add(Tensor* summand, Tensor* addend) {
+nnl2_tensor* nnl2_own_add(nnl2_tensor* summand, nnl2_tensor* addend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -674,14 +674,14 @@ Tensor* nnl2_own_add(Tensor* summand, Tensor* addend) {
     // Calculate the total number of elements in the tensors
     size_t len = product(summand->shape, summand->rank);
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_addend = addend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_addend = addend->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_addend);
 
     // Create an output tensor with the same shape and data type
-    Tensor* amount = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* amount = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
     
     if(len == 0) return amount;
     
@@ -1007,7 +1007,7 @@ void* nnl2_own_padd_mixed_types(void* arg) {
  * @see nnl2_naive_add
  * @see nnl2_avx256_add
  */
-Implementation add_backends[] = {
+nnl2_runtime_implementation add_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_add, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(__AVX__) && TENSOR_MEM_ALIGNMENT == 32

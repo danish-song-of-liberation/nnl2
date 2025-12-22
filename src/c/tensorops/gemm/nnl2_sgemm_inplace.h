@@ -76,8 +76,8 @@
  **/
 void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa, 
                         const nnl2_transpose transb, const int m, const int n, 
-                        const int k, const float alpha, const Tensor* a, const int lda,
-                        const Tensor* b, const int ldb, const float beta, Tensor* c,
+                        const int k, const float alpha, const nnl2_tensor* a, const int lda,
+                        const nnl2_tensor* b, const int ldb, const float beta, nnl2_tensor* c,
                         const int ldc) {
 							
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -122,7 +122,7 @@ void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
     volatile float* data_c = (volatile float*)c->data;                          
     
     if(order == nnl2RowMajor) {
-		// Implementation for RowMajor order (lowercase data organization)
+		// nnl2_runtime_implementation for RowMajor order (lowercase data organization)
 		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {    
@@ -157,7 +157,7 @@ void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
             }
         }
     } else {
-		// Implementation for ColumnMajor order (column-based data organization)
+		// nnl2_runtime_implementation for ColumnMajor order (column-based data organization)
 		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
@@ -266,8 +266,8 @@ void naive_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
  **/
 void blas_sgemminplace(const nnl2_order order, const nnl2_transpose transa, 
                        const nnl2_transpose transb, const int m, const int n, 
-                       const int k, const float alpha, const Tensor* a, const int lda,
-                       const Tensor* b, const int ldb, const float beta, Tensor* c,
+                       const int k, const float alpha, const nnl2_tensor* a, const int lda,
+                       const nnl2_tensor* b, const int ldb, const float beta, nnl2_tensor* c,
                        const int ldc) {
 
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -366,7 +366,7 @@ void blas_sgemminplace(const nnl2_order order, const nnl2_transpose transa,
  ** @see naive_sgemminplace
  ** @see blas_sgemminplace
  **/
-Implementation sgemminplace_backends[] = {	
+nnl2_runtime_implementation sgemminplace_backends[] = {	
 	REGISTER_BACKEND(naive_sgemminplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef OPENBLAS_AVAILABLE

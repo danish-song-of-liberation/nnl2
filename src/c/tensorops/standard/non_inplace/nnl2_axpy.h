@@ -34,7 +34,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* naive_axpy(Tensor* summand, Tensor* sumend, float alpha) {
+nnl2_tensor* naive_axpy(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -51,14 +51,14 @@ Tensor* naive_axpy(Tensor* summand, Tensor* sumend, float alpha) {
     // Calculate the total number of elements in the tensors
     size_t len = product(summand->shape, summand->rank);
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_sumend = sumend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_sumend = sumend->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_sumend);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_summand, dtype_sumend);
 
     // Create an output tensor with the same shape and winning data type
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, winner_in_the_type_hierarchy);
     
     if(len == 0) return result;
     
@@ -252,7 +252,7 @@ void* nnl2_own_paxpy_int32(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Creates a new tensor for the result
  */
-Tensor* nnl2_own_axpy(const Tensor* summand, const Tensor* sumend, float alpha) {
+nnl2_tensor* nnl2_own_axpy(const nnl2_tensor* summand, const nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -267,12 +267,12 @@ Tensor* nnl2_own_axpy(const Tensor* summand, const Tensor* sumend, float alpha) 
     
     size_t total_elems = product(summand->shape, summand->rank);
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_sumend = sumend->dtype;
-    TensorType result_dtype = MAX(dtype_summand, dtype_sumend);
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_sumend = sumend->dtype;
+    nnl2_tensor_type result_dtype = MAX(dtype_summand, dtype_sumend);
     
     // Create output tensor
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, result_dtype);
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -289,7 +289,7 @@ Tensor* nnl2_own_axpy(const Tensor* summand, const Tensor* sumend, float alpha) 
     
     // Fallback to naive implementation for small tensors or mixed types
     if(total_elems < NNL2_AXPY_PARALLEL_THRESHOLD || dtype_summand != dtype_sumend) {
-        Tensor* naive_result = naive_axpy((Tensor*)summand, (Tensor*)sumend, alpha);
+        nnl2_tensor* naive_result = naive_axpy((nnl2_tensor*)summand, (nnl2_tensor*)sumend, alpha);
         if (naive_result != NULL) {
             // Copy data from naive result to our result tensor
             memcpy(result->data, naive_result->data, total_elems * get_dtype_size(result_dtype));
@@ -560,7 +560,7 @@ void* nnl2_own_paxpy_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for AXPY operation
  */
-Implementation axpy_backends[] = {
+nnl2_runtime_implementation axpy_backends[] = {
     REGISTER_BACKEND(naive_axpy, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
@@ -573,7 +573,7 @@ Implementation axpy_backends[] = {
  * @ingroup backend_system
  */
 axpyfn axpy;
-make_current_backend(axpy);
+MAKE_CURRENT_BACKEND(axpy);
 
 /**
  * @brief Sets the backend for AXPY operation
@@ -581,7 +581,7 @@ make_current_backend(axpy);
  * @param backend_name Name of the backend to activate for AXPY operation
  */
 void set_axpy_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(axpy_backends, axpy, backend_name, current_backend(axpy));
+    ESET_BACKEND_BY_NAME(axpy_backends, axpy, backend_name, CURRENT_BACKEND(axpy));
 }
 
 /**
@@ -590,7 +590,7 @@ void set_axpy_backend(const char* backend_name) {
  * @return const char* Name of the current backend
  */
 const char* get_axpy_backend() {
-    return current_backend(axpy);
+    return CURRENT_BACKEND(axpy);
 }
 
 /**

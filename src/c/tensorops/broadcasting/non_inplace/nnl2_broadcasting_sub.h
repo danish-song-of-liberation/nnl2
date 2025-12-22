@@ -16,7 +16,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {	
+nnl2_tensor* naive_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtrahend) {	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -34,13 +34,13 @@ Tensor* naive_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
 	size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
 	
 	// Getting the tensor data types
-	TensorType minuend_dtype = minuend->dtype;
-	TensorType subtrahend_dtype = subtrahend->dtype;
+	nnl2_tensor_type minuend_dtype = minuend->dtype;
+	nnl2_tensor_type subtrahend_dtype = subtrahend->dtype;
 	
-	TensorType winner_in_the_type_hierarchy = MAX(minuend_dtype, subtrahend_dtype);
+	nnl2_tensor_type winner_in_the_type_hierarchy = MAX(minuend_dtype, subtrahend_dtype);
 	
 	// Сreating a resultant tensor
-	Tensor* result = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
+	nnl2_tensor* result = nnl2_empty(minuend->shape, minuend->rank, winner_in_the_type_hierarchy);
 	
 	// Checking the possibility of broadcasting (numel_minuend must be a multiple of numel_subtrahend)
 	if((numel_minuend % numel_subtrahend) == 0) {
@@ -195,7 +195,7 @@ Tensor* naive_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
 ///@{ [subbroadcasting_ptask]
 
 typedef struct {
-    TensorType dtype;               ///< Data type of result tensor
+    nnl2_tensor_type dtype;               ///< Data type of result tensor
     bool aligned_minuend;           ///< Flag indicating if minuend data is 32-byte aligned
     bool aligned_subtrahend;        ///< Flag indicating if subtrahend data is 32-byte aligned  
     bool aligned_result;            ///< Flag indicating if result data is 32-byte aligned
@@ -255,7 +255,7 @@ void* nnl2_own_psub_broadcasting_int32(void* arg);
  ** @return
  * Pointer to a new tensor containing the result of the subtraction operation
  */
-Tensor* nnl2_own_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
+nnl2_tensor* nnl2_own_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtrahend) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -279,10 +279,10 @@ Tensor* nnl2_own_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
     }
     
     // Determine result data type
-    TensorType result_dtype = MAX(minuend->dtype, subtrahend->dtype);
+    nnl2_tensor_type result_dtype = MAX(minuend->dtype, subtrahend->dtype);
     
     // Create result tensor
-    Tensor* result = nnl2_empty(minuend->shape, minuend->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(minuend->shape, minuend->rank, result_dtype);
     if(result == NULL) {
         #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
             NNL2_ERROR("Failed to allocate result tensor");
@@ -300,7 +300,7 @@ Tensor* nnl2_own_sub_broadcasting(Tensor* minuend, Tensor* subtrahend) {
     // Fall back to naive implementation for small tensors or different dtypes
     if(numel_minuend < NNL2_SUB_BROADCASTING_PARALLEL_THRESHOLD || 
        minuend->dtype != subtrahend->dtype) {
-        Tensor* naive_result = naive_sub_broadcasting(minuend, subtrahend);
+        nnl2_tensor* naive_result = naive_sub_broadcasting(minuend, subtrahend);
         if(naive_result == NULL) {
             nnl2_free_tensor(result);
             return NULL;
@@ -645,7 +645,7 @@ void* nnl2_own_psub_broadcasting_int32(void* arg) {
  * @see naive_sub_broadcasting
  * @see nnl2_own_sub_broadcasting
  */
-Implementation sub_broadcasting_backends[] = {
+nnl2_runtime_implementation sub_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_sub_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

@@ -66,16 +66,16 @@
  **/
 void gemminplace(const nnl2_order order, const nnl2_transpose transa, 
 				 const nnl2_transpose transb, const int m, const int n, 
-				 const int k, const double alpha, const Tensor* a, const int lda,
-				 const Tensor* b, const int ldb, const double beta,
-				 Tensor* c, const int ldc) {
+				 const int k, const double alpha, const nnl2_tensor* a, const int lda,
+				 const nnl2_tensor* b, const int ldb, const double beta,
+				 nnl2_tensor* c, const int ldc) {
 
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif	
 
 	// Determine data type from input tensor A
-	TensorType dtype = a->dtype;
+	nnl2_tensor_type dtype = a->dtype;
 	
 	// Dispatch to appropriate precision implementation
 	switch(dtype) {

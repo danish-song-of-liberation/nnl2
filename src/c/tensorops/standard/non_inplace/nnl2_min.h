@@ -33,7 +33,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
+nnl2_tensor* naive_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -49,14 +49,14 @@ Tensor* naive_min(const Tensor* tensora, const Tensor* tensorb) {
     // Calculate the total number of elements in the tensors
     size_t len = product(tensora->shape, tensora->rank);
     
-    TensorType dtype_a = tensora->dtype;
-    TensorType dtype_b = tensorb->dtype;
+    nnl2_tensor_type dtype_a = tensora->dtype;
+    nnl2_tensor_type dtype_b = tensorb->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_a, dtype_b);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_a, dtype_b);
 
     // Create an output tensor with the same shape and winning data type
-    Tensor* result = nnl2_empty(tensora->shape, tensora->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(tensora->shape, tensora->rank, winner_in_the_type_hierarchy);
     
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -251,7 +251,7 @@ void* nnl2_own_pmin_int32(void* arg);
  ** @warning
  * Requires pthread support and AVX256 capable CPU
  */
-Tensor* nnl2_own_min(const Tensor* tensora, const Tensor* tensorb) {
+nnl2_tensor* nnl2_own_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -266,12 +266,12 @@ Tensor* nnl2_own_min(const Tensor* tensora, const Tensor* tensorb) {
     
     size_t total_elems = product(tensora->shape, tensora->rank);
     
-    TensorType dtype_a = tensora->dtype;
-    TensorType dtype_b = tensorb->dtype;
-    TensorType result_dtype = MAX(dtype_a, dtype_b);
+    nnl2_tensor_type dtype_a = tensora->dtype;
+    nnl2_tensor_type dtype_b = tensorb->dtype;
+    nnl2_tensor_type result_dtype = MAX(dtype_a, dtype_b);
     
     // Create output tensor
-    Tensor* result = nnl2_empty(tensora->shape, tensora->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(tensora->shape, tensora->rank, result_dtype);
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -288,7 +288,7 @@ Tensor* nnl2_own_min(const Tensor* tensora, const Tensor* tensorb) {
     
     // Fallback to naive implementation for small tensors or mixed types
     if (total_elems < NNL2_MIN_PARALLEL_THRESHOLD || dtype_a != dtype_b) {
-        Tensor* naive_result = naive_min(tensora, tensorb);
+        nnl2_tensor* naive_result = naive_min(tensora, tensorb);
         if (naive_result != NULL) {
             // Copy data from naive result to our result tensor
             memcpy(result->data, naive_result->data, total_elems * get_dtype_size(result_dtype));
@@ -540,7 +540,7 @@ void* nnl2_own_pmin_int32(void* arg) {
  * 
  * @see nnl2_naive
  */
-Implementation min_backends[] = {
+nnl2_runtime_implementation min_backends[] = {
 	REGISTER_BACKEND(naive_min, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
@@ -557,9 +557,9 @@ minfn nnl2_min;
 /** 
  * @brief Makes the min backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(min);
+MAKE_CURRENT_BACKEND(min);
 
 /** 
  * @brief Sets the backend for min operation
@@ -568,7 +568,7 @@ make_current_backend(min);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_min_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(min_backends, nnl2_min, backend_name, current_backend(min));
+    ESET_BACKEND_BY_NAME(min_backends, nnl2_min, backend_name, CURRENT_BACKEND(min));
 }
 
 /** 
@@ -577,7 +577,7 @@ void set_min_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_min_backend() {
-	return current_backend(min);
+	return CURRENT_BACKEND(min);
 }
 
 /** 

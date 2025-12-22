@@ -16,7 +16,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_pow_broadcasting(Tensor* base, Tensor* exponent) {
+nnl2_tensor* naive_pow_broadcasting(nnl2_tensor* base, nnl2_tensor* exponent) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -33,13 +33,13 @@ Tensor* naive_pow_broadcasting(Tensor* base, Tensor* exponent) {
     size_t numel_exponent = product(exponent->shape, exponent->rank);
     
     // Getting the tensor data types
-    TensorType base_dtype = base->dtype;
-    TensorType exponent_dtype = exponent->dtype;
+    nnl2_tensor_type base_dtype = base->dtype;
+    nnl2_tensor_type exponent_dtype = exponent->dtype;
     
-    TensorType winner_in_the_type_hierarchy = MAX(base_dtype, exponent_dtype);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(base_dtype, exponent_dtype);
     
     // Сreating a resultant tensor
-    Tensor* result = nnl2_empty(base->shape, base->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(base->shape, base->rank, winner_in_the_type_hierarchy);
 
     if((numel_base % numel_exponent) == 0) {
         if(base_dtype == exponent_dtype) {
@@ -181,7 +181,7 @@ Tensor* naive_pow_broadcasting(Tensor* base, Tensor* exponent) {
  * @ingroup backend_system
  * @brief Backend implementations for power operation with broadcasting
  */
-Implementation pow_broadcasting_backends[] = {
+nnl2_runtime_implementation pow_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_pow_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
 };  
 

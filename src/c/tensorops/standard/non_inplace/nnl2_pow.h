@@ -33,7 +33,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
+nnl2_tensor* naive_pow(const nnl2_tensor* base, const nnl2_tensor* exponent) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -47,14 +47,14 @@ Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
     // Calculate the total number of elements in the tensors
     size_t len = product(base->shape, base->rank);
     
-    TensorType dtype_base = base->dtype;
-    TensorType dtype_exponent = exponent->dtype;
+    nnl2_tensor_type dtype_base = base->dtype;
+    nnl2_tensor_type dtype_exponent = exponent->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_base, dtype_exponent);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_base, dtype_exponent);
 
     // Create an output tensor with the same shape and winning data type
-    Tensor* result = nnl2_empty(base->shape, base->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(base->shape, base->rank, winner_in_the_type_hierarchy);
     
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -187,7 +187,7 @@ Tensor* naive_pow(const Tensor* base, const Tensor* exponent) {
  * 
  * @see naive_pow
  */
-Implementation pow_backends[] = {
+nnl2_runtime_implementation pow_backends[] = {
 	REGISTER_BACKEND(naive_pow, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 

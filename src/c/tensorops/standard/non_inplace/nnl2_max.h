@@ -33,7 +33,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
+nnl2_tensor* naive_max(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -49,14 +49,14 @@ Tensor* naive_max(const Tensor* tensora, const Tensor* tensorb) {
     // Calculate the total number of elements in the tensors
     size_t len = product(tensora->shape, tensora->rank);
     
-    TensorType dtype_a = tensora->dtype;
-    TensorType dtype_b = tensorb->dtype;
+    nnl2_tensor_type dtype_a = tensora->dtype;
+    nnl2_tensor_type dtype_b = tensorb->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_a, dtype_b);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_a, dtype_b);
 
     // Create an output tensor with the same shape and winning data type
-    Tensor* result = nnl2_empty(tensora->shape, tensora->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(tensora->shape, tensora->rank, winner_in_the_type_hierarchy);
     
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -252,7 +252,7 @@ void* nnl2_own_pmax_int32(void* arg);
  ** @warning
  * Requires pthread support and AVX256 capable CPU
  */
-Tensor* nnl2_own_max(const Tensor* tensora, const Tensor* tensorb) {
+nnl2_tensor* nnl2_own_max(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -267,12 +267,12 @@ Tensor* nnl2_own_max(const Tensor* tensora, const Tensor* tensorb) {
     
     size_t total_elems = product(tensora->shape, tensora->rank);
     
-    TensorType dtype_a = tensora->dtype;
-    TensorType dtype_b = tensorb->dtype;
-    TensorType result_dtype = MAX(dtype_a, dtype_b);
+    nnl2_tensor_type dtype_a = tensora->dtype;
+    nnl2_tensor_type dtype_b = tensorb->dtype;
+    nnl2_tensor_type result_dtype = MAX(dtype_a, dtype_b);
     
     // Create output tensor
-    Tensor* result = nnl2_empty(tensora->shape, tensora->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(tensora->shape, tensora->rank, result_dtype);
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -289,7 +289,7 @@ Tensor* nnl2_own_max(const Tensor* tensora, const Tensor* tensorb) {
     
     // Fallback to naive implementation for small tensors or mixed types
     if (total_elems < NNL2_MAX_PARALLEL_THRESHOLD || dtype_a != dtype_b) {
-        Tensor* naive_result = naive_max(tensora, tensorb);
+        nnl2_tensor* naive_result = naive_max(tensora, tensorb);
         if (naive_result != NULL) {
             // Copy data from naive result to our result tensor
             memcpy(result->data, naive_result->data, total_elems * get_dtype_size(result_dtype));
@@ -541,7 +541,7 @@ void* nnl2_own_pmax_int32(void* arg) {
  * 
  * @see nnl2_naive
  */
-Implementation max_backends[] = {
+nnl2_runtime_implementation max_backends[] = {
 	REGISTER_BACKEND(naive_max, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
@@ -558,9 +558,9 @@ maxfn nnl2_max;
 /** 
  * @brief Makes the max backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(max);
+MAKE_CURRENT_BACKEND(max);
 
 /** 
  * @brief Sets the backend for max operation
@@ -569,7 +569,7 @@ make_current_backend(max);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_max_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(max_backends, nnl2_max, backend_name, current_backend(max));
+    ESET_BACKEND_BY_NAME(max_backends, nnl2_max, backend_name, CURRENT_BACKEND(max));
 }
 
 /** 
@@ -578,7 +578,7 @@ void set_max_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_max_backend() {
-	return current_backend(max);
+	return CURRENT_BACKEND(max);
 }
 
 /** 

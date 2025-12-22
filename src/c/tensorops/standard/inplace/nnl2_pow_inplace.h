@@ -25,8 +25,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
- * Tensor* b = nnl2_tensor((float[]){2.0, 1.0, 0.5}, (int[]){3}, 1, FLOAT32);
+ * nnl2_tensor* a = nnl2_tensor((float[]){2.0, 3.0, 4.0}, (int[]){3}, 1, FLOAT32);
+ * nnl2_tensor* b = nnl2_tensor((float[]){2.0, 1.0, 0.5}, (int[]){3}, 1, FLOAT32);
  * 
  * // Raise a to the power of b (a becomes a^b)
  * naive_powinplace(a, b);
@@ -38,7 +38,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void naive_powinplace(Tensor* base, const Tensor* exponent) {
+void naive_powinplace(nnl2_tensor* base, const nnl2_tensor* exponent) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -58,8 +58,8 @@ void naive_powinplace(Tensor* base, const Tensor* exponent) {
     // If the tensor is empty, exit the function
     if(len_base == 0) return;
     
-    TensorType dtype_base = base->dtype;
-    TensorType dtype_exponent = exponent->dtype;
+    nnl2_tensor_type dtype_base = base->dtype;
+    nnl2_tensor_type dtype_exponent = exponent->dtype;
     
     if(dtype_base == dtype_exponent) {
         // Handling case when the tensors have the same type
@@ -170,7 +170,7 @@ void naive_powinplace(Tensor* base, const Tensor* exponent) {
  * 
  * @see naive_powinplace
  */
-Implementation powinplace_backends[] = {
+nnl2_runtime_implementation powinplace_backends[] = {
 	REGISTER_BACKEND(naive_powinplace, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 

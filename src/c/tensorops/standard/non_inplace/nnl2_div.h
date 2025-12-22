@@ -30,7 +30,7 @@
  ** @see nnl2_convert_to_float32()
  ** @see nnl2_convert_to_int32()
  **/
-Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
+nnl2_tensor* nnl2_naive_div(const nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -38,14 +38,14 @@ Tensor* nnl2_naive_div(const Tensor* dividend, const Tensor* divisor) {
     // Calculate the total number of elements in the tensors
     size_t len = product(dividend->shape, dividend->rank);
     
-    TensorType dtype_dividend = dividend->dtype;
-    TensorType dtype_divisor = divisor->dtype;
+    nnl2_tensor_type dtype_dividend = dividend->dtype;
+    nnl2_tensor_type dtype_divisor = divisor->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_dividend, dtype_divisor);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_dividend, dtype_divisor);
 
     // Create an output tensor with the same shape and winning data type
-    Tensor* quotient = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* quotient = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
     
     if (quotient == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -270,7 +270,7 @@ void* nnl2_own_pdiv_simd_float32(void* arg);
  ** @return 
  * Pointer to a new tensor with the division result
  */
-Tensor* nnl2_own_div(const Tensor* dividend, const Tensor* divisor) {
+nnl2_tensor* nnl2_own_div(const nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -278,14 +278,14 @@ Tensor* nnl2_own_div(const Tensor* dividend, const Tensor* divisor) {
     // Calculate the total number of elements in the tensors
     size_t len = product(dividend->shape, dividend->rank);
     
-    TensorType dtype_dividend = dividend->dtype;
-    TensorType dtype_divisor = divisor->dtype;
+    nnl2_tensor_type dtype_dividend = dividend->dtype;
+    nnl2_tensor_type dtype_divisor = divisor->dtype;
     
     // Selecting the winning type (higher in the hierarchy)
-    TensorType winner_in_the_type_hierarchy = MAX(dtype_dividend, dtype_divisor);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_dividend, dtype_divisor);
 
     // Create an output tensor with the same shape and data type
-    Tensor* quotient = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* quotient = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
     
     if(len == 0) return quotient;
     
@@ -628,7 +628,7 @@ void* nnl2_own_pdiv_mixed_types(void* arg) {
  * @see nnl2_naive_div
  * @see nnl2_own_div
  */
-Implementation div_backends[] = {
+nnl2_runtime_implementation div_backends[] = {
     REGISTER_BACKEND(nnl2_naive_div, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #ifdef NNL2_PTHREAD_AVAILABLE

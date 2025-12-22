@@ -22,33 +22,33 @@
  ** @see nnl2_empty
  ** @see nnl2_free_tensor
  **/
-Tensor* nnl2_naive_scale(const Tensor* tensor, float multiplier, bool save_type) {
+nnl2_tensor* nnl2_naive_scale(const nnl2_tensor* tensor, float multiplier, bool save_type) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
 		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Passed tensor is NULL", NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", NULL);
-		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "nnl2_tensor data is NULL", NULL);
+		NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "nnl2_tensor shape is NULL", NULL);
 	#endif
 	
-	Tensor* result;
+	nnl2_tensor* result;
 	void* data_original = tensor->data;
 	
 	// Calculate the total number of elements in the tensor
 	size_t num_elems = product(tensor->shape, tensor->rank);
-	TensorType dtype = tensor->dtype;
+	nnl2_tensor_type dtype = tensor->dtype;
 	
 	if (multiplier == 1.0f) {
 		// For multiplication by 1, just return a copy
-		TensorType output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
+		nnl2_tensor_type output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
 		return nnl2_copy(tensor, output_dtype);
 	}
 	
 	if (multiplier == 0.0f) {
 		// For multiplication by 0, return a tensor of zeros
-		TensorType output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
+		nnl2_tensor_type output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
 		return nnl2_zeros(tensor->shape, tensor->rank, output_dtype);
 	}
 	
@@ -117,7 +117,7 @@ Tensor* nnl2_naive_scale(const Tensor* tensor, float multiplier, bool save_type)
  * 
  * @see nnl2_naive
  */
-Implementation scale_backends[] = {
+nnl2_runtime_implementation scale_backends[] = {
 	REGISTER_BACKEND(nnl2_naive_scale, nnl2_naive, NAIVE_BACKEND_NAME),
 };
 
@@ -130,9 +130,9 @@ scalefn scale;
 /** 
  * @brief Makes the scale backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(scale);
+MAKE_CURRENT_BACKEND(scale);
 
 /** 
  * @brief Sets the backend for scale operation
@@ -141,7 +141,7 @@ make_current_backend(scale);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_scale_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(scale_backends, scale, backend_name, current_backend(scale));
+    ESET_BACKEND_BY_NAME(scale_backends, scale, backend_name, CURRENT_BACKEND(scale));
 }
 
 /** 
@@ -150,7 +150,7 @@ void set_scale_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_scale_backend() {
-	return current_backend(scale);
+	return CURRENT_BACKEND(scale);
 }
 
 /** 

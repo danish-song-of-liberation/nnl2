@@ -14,12 +14,12 @@
  * Pointer to a new tensor containing the result of the multiplication operation 
  * (or NULL in case of failure)
  */
-Tensor* naive_mul_mulf(const Tensor* tensor, void* multiplier) {
+nnl2_tensor* naive_mul_mulf(const nnl2_tensor* tensor, void* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if(result == NULL) {
             NNL2_ERROR("Failed to allocate new tensor");
@@ -122,18 +122,18 @@ void* nnl2_own_pmul_mulf_int32_non_inplace(void* arg);
  ** @return 
  * Pointer to a new tensor containing the result of the multiplication operation
  */
-Tensor* nnl2_own_mul_mulf(const Tensor* tensor, void* multiplier) {
+nnl2_tensor* nnl2_own_mul_mulf(const nnl2_tensor* tensor, void* multiplier) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "Tensor is NULL", NULL);
-        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "Tensor data is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor, "nnl2_tensor is NULL", NULL);
+        NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "nnl2_tensor data is NULL", NULL);
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier, "Multiplier pointer is NULL", NULL);
     #endif
     
-    Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     if(result == NULL) {
         #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
             NNL2_ERROR("Failed to allocate new tensor");
@@ -150,7 +150,7 @@ Tensor* nnl2_own_mul_mulf(const Tensor* tensor, void* multiplier) {
     }
     
     if(total_elems < NNL2_MUL_MULF_PARALLEL_THRESHOLD) {
-        Tensor* naive_result = naive_mul_mulf(tensor, multiplier);
+        nnl2_tensor* naive_result = naive_mul_mulf(tensor, multiplier);
         if(naive_result == NULL) {
             nnl2_free_tensor(result);
             return NULL;
@@ -162,7 +162,7 @@ Tensor* nnl2_own_mul_mulf(const Tensor* tensor, void* multiplier) {
         return naive_result;
     }
     
-    TensorType dtype = tensor->dtype;
+    nnl2_tensor_type dtype = tensor->dtype;
     bool is_aligned_tensor = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
     bool is_aligned_result = NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
     
@@ -427,7 +427,7 @@ void* nnl2_own_pmul_mulf_int32_non_inplace(void* arg) {
  * @see naive_mul_mulf
  * @see nnl2_own_mul_mulf
  */
-Implementation mul_mulf_backends[] = {
+nnl2_runtime_implementation mul_mulf_backends[] = {
     REGISTER_BACKEND(naive_mul_mulf, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

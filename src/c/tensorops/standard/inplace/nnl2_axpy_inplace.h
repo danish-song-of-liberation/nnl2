@@ -30,8 +30,8 @@
  *
  * @example
  * // Create two tensors with the same shape
- * Tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
- * Tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* a = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
+ * nnl2_tensor* b = nnl2_ones((int[]){2, 3}, 2, FLOAT32);
  * 
  * // Compute a = a + 2.5 * b
  * naive_axpy_inplace(a, b, 2.5f);
@@ -43,7 +43,7 @@
  * nnl2_free_tensor(a);
  * nnl2_free_tensor(b);
  */
-void naive_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
+void naive_axpy_inplace(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -63,8 +63,8 @@ void naive_axpy_inplace(Tensor* summand, Tensor* sumend, float alpha) {
     // If the tensor is empty, exit the function
     if(total_elems == 0) return;
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_sumend = sumend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_sumend = sumend->dtype;
     
     if(dtype_summand == dtype_sumend) {
         // Handling case when the tensors have the same type
@@ -246,7 +246,7 @@ void* nnl2_own_paxpy_inplace_int32(void* arg);
  * Modifies the summand tensor directly
  * Both tensors must have the same shape
  */
-void nnl2_own_axpy_inplace(Tensor* summand, const Tensor* sumend, float alpha) {
+void nnl2_own_axpy_inplace(nnl2_tensor* summand, const nnl2_tensor* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -267,12 +267,12 @@ void nnl2_own_axpy_inplace(Tensor* summand, const Tensor* sumend, float alpha) {
         return;
     }
     
-    TensorType dtype_summand = summand->dtype;
-    TensorType dtype_sumend = sumend->dtype;
+    nnl2_tensor_type dtype_summand = summand->dtype;
+    nnl2_tensor_type dtype_sumend = sumend->dtype;
     
     // Fallback to naive implementation for small tensors or mixed types
     if(total_elems < NNL2_AXPY_INPLACE_PARALLEL_THRESHOLD || dtype_summand != dtype_sumend) {
-        naive_axpy_inplace(summand, (Tensor*)sumend, alpha);
+        naive_axpy_inplace(summand, (nnl2_tensor*)sumend, alpha);
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
         #endif
@@ -528,7 +528,7 @@ void* nnl2_own_paxpy_inplace_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for AXPY in-place operation
  */
-Implementation axpy_inplace_backends[] = {
+nnl2_runtime_implementation axpy_inplace_backends[] = {
     REGISTER_BACKEND(naive_axpy_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)
@@ -541,7 +541,7 @@ Implementation axpy_inplace_backends[] = {
  * @ingroup backend_system
  */
 axpyinplacefn axpy_inplace;
-make_current_backend(axpy_inplace);
+MAKE_CURRENT_BACKEND(axpy_inplace);
 
 /**
  * @brief Sets the backend for AXPY in-place operation
@@ -549,7 +549,7 @@ make_current_backend(axpy_inplace);
  * @param backend_name Name of the backend to activate for AXPY in-place operation
  */
 void set_axpy_inplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(axpy_inplace_backends, axpy_inplace, backend_name, current_backend(axpy_inplace));
+    ESET_BACKEND_BY_NAME(axpy_inplace_backends, axpy_inplace, backend_name, CURRENT_BACKEND(axpy_inplace));
 }
 
 /**
@@ -558,7 +558,7 @@ void set_axpy_inplace_backend(const char* backend_name) {
  * @return const char* Name of the current backend
  */
 const char* get_axpy_inplace_backend() {
-    return current_backend(axpy_inplace);
+    return CURRENT_BACKEND(axpy_inplace);
 }
 
 /**

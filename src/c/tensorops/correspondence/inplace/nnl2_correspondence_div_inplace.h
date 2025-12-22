@@ -10,7 +10,7 @@
  ** @param divisor 
  * Pointer to the scalar value to divide by
  */
-void naive_div_divf_inplace(Tensor* tensor, void* divisor) {
+void naive_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -101,14 +101,14 @@ void* nnl2_own_pdiv_divf_int32(void* arg);
  ** @param divisor 
  * Pointer to scalar value to divide each element by
  */
-void nnl2_own_div_divf_inplace(Tensor* tensor, void* divisor) {
+void nnl2_own_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MAX
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "Tensor is NULL");
-        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "Tensor data is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "nnl2_tensor is NULL");
+        NNL2_CHECK_NULL_IF_ERR_RETURN(tensor->data, "nnl2_tensor data is NULL");
         NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor pointer is NULL");
     #endif
     
@@ -128,7 +128,7 @@ void nnl2_own_div_divf_inplace(Tensor* tensor, void* divisor) {
         return;
     }
     
-    TensorType dtype = tensor->dtype;
+    nnl2_tensor_type dtype = tensor->dtype;
     bool is_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
     
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
@@ -322,7 +322,7 @@ void* nnl2_own_pdiv_divf_int32(void* arg) {
  * @see naive_div_divf_inplace
  * @see nnl2_own_div_divf_inplace
  */
-Implementation div_divf_inplace_backends[] = {
+nnl2_runtime_implementation div_divf_inplace_backends[] = {
     REGISTER_BACKEND(naive_div_divf_inplace, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32

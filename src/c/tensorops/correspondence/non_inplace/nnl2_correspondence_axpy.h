@@ -18,12 +18,12 @@
  * Pointer to a new tensor containing the result of the AXPF operation 
  * (or NULL in case of fail)
  */
-Tensor* naive_axpf(Tensor* summand, void* sumend, float alpha) {
+nnl2_tensor* naive_axpf(nnl2_tensor* summand, void* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
     
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
     #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
         if(result == NULL) {
             NNL2_ERROR("Failed to allocate new tensor");
@@ -150,7 +150,7 @@ void* nnl2_own_paxpf_int32(void* arg);
  * Requires pthread support and AVX256 capable CPU
  * Creates a new tensor for the result
  */
-Tensor* nnl2_own_axpf(const Tensor* summand, void* sumend, float alpha) {
+nnl2_tensor* nnl2_own_axpf(const nnl2_tensor* summand, void* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -165,7 +165,7 @@ Tensor* nnl2_own_axpf(const Tensor* summand, void* sumend, float alpha) {
     size_t total_elems = product(summand->shape, summand->rank);
     
     // Create output tensor
-    Tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
+    nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);
     if (result == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -182,7 +182,7 @@ Tensor* nnl2_own_axpf(const Tensor* summand, void* sumend, float alpha) {
     
     // Fallback to naive implementation for small tensors
     if(total_elems < NNL2_AXPF_PARALLEL_THRESHOLD) {
-        Tensor* naive_result = naive_axpf((Tensor*)summand, sumend, alpha);
+        nnl2_tensor* naive_result = naive_axpf((nnl2_tensor*)summand, sumend, alpha);
         if (naive_result != NULL) {
             // Copy data from naive result to our result tensor
             memcpy(result->data, naive_result->data, total_elems * get_dtype_size(summand->dtype));
@@ -194,7 +194,7 @@ Tensor* nnl2_own_axpf(const Tensor* summand, void* sumend, float alpha) {
         return result;
     }
     
-    TensorType dtype = summand->dtype;
+    nnl2_tensor_type dtype = summand->dtype;
     bool is_aligned = NNL2_IS_ALIGNED(summand->data, NNL2_TENSOR_ALIGNMENT_32) &&
                       NNL2_IS_ALIGNED(result->data, NNL2_TENSOR_ALIGNMENT_32);
     
@@ -450,7 +450,7 @@ void* nnl2_own_paxpf_int32(void* arg) {
  * @ingroup backend_system
  * @brief Backend implementations for AXPF operation
  */
-Implementation axpf_backends[] = {
+nnl2_runtime_implementation axpf_backends[] = {
     REGISTER_BACKEND(naive_axpf, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_AVX256_AVAILABLE) && defined(NNL2_PTHREAD_AVAILABLE)

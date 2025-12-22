@@ -75,8 +75,8 @@
  **/
 void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
                         const nnl2_transpose transb, const int m, const int n,
-                        const int k, const double alpha, const Tensor* a, const int lda,
-                        const Tensor* b, const int ldb, const double beta, Tensor* c,
+                        const int k, const double alpha, const nnl2_tensor* a, const int lda,
+                        const nnl2_tensor* b, const int ldb, const double beta, nnl2_tensor* c,
                         const int ldc) {	
 
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -120,7 +120,7 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
     volatile double* data_c = (volatile double*)c->data;
 
     if(order == nnl2RowMajor){
-		// Implementation for RowMajor order (row-wise data organization)
+		// nnl2_runtime_implementation for RowMajor order (row-wise data organization)
 		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
@@ -155,7 +155,7 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
             }
         }
     } else {
-		// Implementation for ColumnMajor order (column-wise data organization)
+		// nnl2_runtime_implementation for ColumnMajor order (column-wise data organization)
 		
         for(volatile int i = 0; i < m; i++) {
             for(volatile int j = 0; j < n; j++) {
@@ -266,8 +266,8 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
  **/
 void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa, 
                        const nnl2_transpose transb, const int m, const int n, 
-                       const int k, const double alpha, const Tensor* a, const int lda,
-                       const Tensor* b, const int ldb, const double beta, Tensor* c,
+                       const int k, const double alpha, const nnl2_tensor* a, const int lda,
+                       const nnl2_tensor* b, const int ldb, const double beta, nnl2_tensor* c,
                        const int ldc) {
 						   
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -370,7 +370,7 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
  ** @see naive_dgemminplace
  ** @see blas_dgemminplace
  **/
-Implementation dgemminplace_backends[] = {
+nnl2_runtime_implementation dgemminplace_backends[] = {
 	REGISTER_BACKEND(naive_dgemminplace, nnl2_naive, NAIVE_BACKEND_NAME),
 	
 	#ifdef OPENBLAS_AVAILABLE
@@ -399,7 +399,7 @@ MAKE_CURRENT_BACKEND(gemm);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_dgemminplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(dgemminplace_backends, dgemminplace, backend_name, current_backend(gemm));
+    ESET_BACKEND_BY_NAME(dgemminplace_backends, dgemminplace, backend_name, CURRENT_BACKEND(gemm));
 }
 
 /** 
@@ -409,7 +409,7 @@ void set_dgemminplace_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_gemm_backend() {
-	return current_backend(gemm);
+	return CURRENT_BACKEND(gemm);
 }
 
 /** 

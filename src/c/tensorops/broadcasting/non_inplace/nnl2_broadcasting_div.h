@@ -16,7 +16,7 @@
  ** @note
  * Contains type conversion
  */
-Tensor* naive_div_broadcasting(Tensor* dividend, Tensor* divisor) {
+nnl2_tensor* naive_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -33,13 +33,13 @@ Tensor* naive_div_broadcasting(Tensor* dividend, Tensor* divisor) {
     size_t numel_divisor = product(divisor->shape, divisor->rank);
     
     // Getting the tensor data types
-    TensorType dividend_dtype = dividend->dtype;
-    TensorType divisor_dtype = divisor->dtype;
+    nnl2_tensor_type dividend_dtype = dividend->dtype;
+    nnl2_tensor_type divisor_dtype = divisor->dtype;
     
-    TensorType winner_in_the_type_hierarchy = MAX(dividend_dtype, divisor_dtype);
+    nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dividend_dtype, divisor_dtype);
     
     // Сreating a resultant tensor
-    Tensor* result = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* result = nnl2_empty(dividend->shape, dividend->rank, winner_in_the_type_hierarchy);
 
     if((numel_dividend % numel_divisor) == 0) {
         if(dividend_dtype == divisor_dtype) {
@@ -230,7 +230,7 @@ void* nnl2_own_pdiv_broadcasting_int32(void* arg);
  ** @return
  * Pointer to a new tensor containing the result of the division operation
  */
-Tensor* nnl2_own_div_broadcasting(Tensor* dividend, Tensor* divisor) {
+nnl2_tensor* nnl2_own_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divisor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_ENTER();
     #endif
@@ -254,10 +254,10 @@ Tensor* nnl2_own_div_broadcasting(Tensor* dividend, Tensor* divisor) {
     }
     
     // Determine result data type
-    TensorType result_dtype = MAX(dividend->dtype, divisor->dtype);
+    nnl2_tensor_type result_dtype = MAX(dividend->dtype, divisor->dtype);
     
     // Create result tensor
-    Tensor* result = nnl2_empty(dividend->shape, dividend->rank, result_dtype);
+    nnl2_tensor* result = nnl2_empty(dividend->shape, dividend->rank, result_dtype);
     if(result == NULL) {
         #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
             NNL2_ERROR("Failed to allocate result tensor");
@@ -275,7 +275,7 @@ Tensor* nnl2_own_div_broadcasting(Tensor* dividend, Tensor* divisor) {
     // Fall back to naive implementation for small tensors or different dtypes
     if(numel_dividend < NNL2_DIV_BROADCASTING_PARALLEL_THRESHOLD || 
        dividend->dtype != divisor->dtype) {
-        Tensor* naive_result = naive_div_broadcasting(dividend, divisor);
+        nnl2_tensor* naive_result = naive_div_broadcasting(dividend, divisor);
         if(naive_result == NULL) {
             nnl2_free_tensor(result);
             return NULL;
@@ -620,7 +620,7 @@ void* nnl2_own_pdiv_broadcasting_int32(void* arg) {
  * @see naive_div_broadcasting
  * @see nnl2_own_div_broadcasting
  */
-Implementation div_broadcasting_backends[] = {
+nnl2_runtime_implementation div_broadcasting_backends[] = {
     REGISTER_BACKEND(naive_div_broadcasting, nnl2_naive, NAIVE_BACKEND_NAME),
     
     #if defined(NNL2_PTHREAD_AVAILABLE) && defined(NNL2_AVX256_AVAILABLE) && TENSOR_MEM_ALIGNMENT == 32
