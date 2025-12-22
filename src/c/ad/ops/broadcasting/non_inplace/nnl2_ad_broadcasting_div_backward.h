@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_div_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* dividend, nnl2_ad_tensor* divisor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -55,9 +55,9 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_div_broadcasting(nnl2_a
     nnl2_tensor* data_dividend = dividend->data;
     nnl2_tensor* data_divisor = divisor->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_dividend = product(data_dividend->shape, data_dividend->rank);
-    size_t numel_divisor = product(data_divisor->shape, data_divisor->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_dividend = nnl2_product(data_dividend->shape, data_dividend->rank);
+    size_t numel_divisor = nnl2_product(data_divisor->shape, data_divisor->rank);
 
     size_t blocks_dividend = numel_out / numel_dividend;
     size_t blocks_divisor = numel_out / numel_divisor;

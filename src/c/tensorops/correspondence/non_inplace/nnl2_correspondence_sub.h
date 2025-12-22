@@ -27,7 +27,7 @@ nnl2_tensor* naive_sub_decf(const nnl2_tensor* tensor, void* dec) {
         }
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return result;
     
     switch(tensor->dtype) {
@@ -144,7 +144,7 @@ nnl2_tensor* nnl2_own_sub_decf(const nnl2_tensor* tensor, void* dec) {
         return NULL;
     }
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

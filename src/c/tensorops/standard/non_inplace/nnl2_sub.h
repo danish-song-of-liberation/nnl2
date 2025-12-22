@@ -36,7 +36,7 @@ nnl2_tensor* nnl2_naive_sub(const nnl2_tensor* minuend, const nnl2_tensor* subtr
 	#endif
 	
 	// Calculate the total number of elements in the tensors
-	size_t len = product(minuend->shape, minuend->rank);
+	size_t len = nnl2_product(minuend->shape, minuend->rank);
 	
 	nnl2_tensor_type dtype_minuend = minuend->dtype;
 	nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
@@ -244,7 +244,7 @@ nnl2_tensor* nnl2_avx256_sub(const nnl2_tensor* minuend, const nnl2_tensor* subt
 		NNL2_FUNC_ENTER();
 	#endif
 	
-    size_t len = product(minuend->shape, minuend->rank);
+    size_t len = nnl2_product(minuend->shape, minuend->rank);
     
     nnl2_tensor_type dtype_minuend = minuend->dtype;
     nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;
@@ -642,7 +642,7 @@ nnl2_tensor* nnl2_own_sub(const nnl2_tensor* minuend, const nnl2_tensor* subtrah
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(minuend->shape, minuend->rank);
+    size_t len = nnl2_product(minuend->shape, minuend->rank);
     
     nnl2_tensor_type dtype_minuend = minuend->dtype;
     nnl2_tensor_type dtype_subtrahend = subtrahend->dtype;

@@ -14,7 +14,7 @@
  * If true - performs full transposition with data reordering
  * If false - only swaps dimensions without reordering data
  *
- ** @see product
+ ** @see nnl2_product
  ** @see https://en.wikipedia.org/wiki/Dont_repeat_yourself 
  **/
 void naive_transposeinplace(Tensor* tensor, bool force) {
@@ -33,7 +33,7 @@ void naive_transposeinplace(Tensor* tensor, bool force) {
     if (force) {
         // Full transposition with data reordering
         // Calculating the total number of elements in a tensor
-        size_t total_elems = product(tensor->shape, tensor->rank);
+        size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
         
         int* shape = tensor->shape;
         

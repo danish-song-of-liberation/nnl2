@@ -30,8 +30,8 @@ nnl2_tensor* naive_add_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend) {
 	#endif
  
 	// Calculate the total number of elements in each tensor
-	size_t numel_summand = product(summand->shape, summand->rank);
-	size_t numel_sumend = product(sumend->shape, sumend->rank);
+	size_t numel_summand = nnl2_product(summand->shape, summand->rank);
+	size_t numel_sumend = nnl2_product(sumend->shape, sumend->rank);
 	
 	// Getting the tensor data types
 	nnl2_tensor_type summand_dtype = summand->dtype;
@@ -251,8 +251,8 @@ nnl2_tensor* nnl2_own_add_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->data, "Sumend data is NULL", NULL);
     #endif
     
-    size_t numel_summand = product(summand->shape, summand->rank);
-    size_t numel_sumend = product(sumend->shape, sumend->rank);
+    size_t numel_summand = nnl2_product(summand->shape, summand->rank);
+    size_t numel_sumend = nnl2_product(sumend->shape, sumend->rank);
     
     // Check broadcasting compatibility
     if((numel_summand % numel_sumend) != 0) {

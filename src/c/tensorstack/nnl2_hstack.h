@@ -86,7 +86,7 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
         return NULL;
     }
     
-    size_t total_elements = product(result->shape, result->rank);
+    size_t total_elements = nnl2_product(result->shape, result->rank);
     if(total_elements == 0) {
         return result;
     }
@@ -168,7 +168,7 @@ Tensor* naive_hstack(Tensor* tensora, Tensor* tensorb) {
         
         // Calculate remaining elements (for dimensions > 2)
         if(ranka > 2) {
-            inner_elements_rest = product(tensora->shape + 2, ranka - 2);
+            inner_elements_rest = nnl2_product(tensora->shape + 2, ranka - 2);
         }
         
         size_t elements_per_row_a = inner_dim_a * inner_elements_rest;
@@ -415,7 +415,7 @@ Tensor* nnl2_own_hstack(Tensor* tensora, Tensor* tensorb) {
         return NULL;
     }
     
-    size_t total_elements = product(result->shape, result->rank);
+    size_t total_elements = nnl2_product(result->shape, result->rank);
     if(total_elements == 0) {
         return result;
     }
@@ -483,7 +483,7 @@ Tensor* nnl2_own_hstack(Tensor* tensora, Tensor* tensorb) {
         size_t inner_elements_rest = 1;
         
         if(ranka > 2) {
-            inner_elements_rest = product(tensora->shape + 2, ranka - 2);
+            inner_elements_rest = nnl2_product(tensora->shape + 2, ranka - 2);
         }
         
         size_t elements_per_row_a = inner_dim_a * inner_elements_rest;

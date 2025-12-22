@@ -25,7 +25,7 @@
  ** @note
  * Computes gradient as: d/dy = x / (x^2 + y^2) where x is the threshold
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_atan2_correspondence(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* y_tensor, void* threshold) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -59,7 +59,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_atan2_correspondence(nn
     nnl2_tensor* grad_in  = y_tensor->grad;
     nnl2_tensor* data_in  = y_tensor->data;
     
-    size_t n = product(data_in->shape, data_in->rank);
+    size_t n = nnl2_product(data_in->shape, data_in->rank);
 
     switch(data_in->dtype) {
         case FLOAT64: {

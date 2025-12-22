@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* base, nnl2_ad_tensor* exponent) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -48,7 +48,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow(nnl2_ad_tensor* out
 		NNL2_CHECK_NULL_IF_ERR_RETURN(exponent->data->shape, "In function nnl2_ad_reverse_derivative_pow, exponent data shape is NULL");
 	#endif
     
-    size_t numel = product(base->data->shape, base->data->rank);
+    size_t numel = nnl2_product(base->data->shape, base->data->rank);
     nnl2_tensor_type dtype = base->data->dtype;
 	
 	switch(dtype) {

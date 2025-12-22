@@ -27,7 +27,7 @@ nnl2_tensor* naive_pow_powf(const nnl2_tensor* tensor, void* exponent) {
         }
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return result;
     
     switch(tensor->dtype) {

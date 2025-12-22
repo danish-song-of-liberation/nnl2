@@ -59,7 +59,7 @@ void nnl2_ad_reverse_derivative_tanh(nnl2_ad_tensor* ad_tensor, nnl2_ad_tensor* 
     nnl2_tensor* grad_output = ad_tensor->grad;
     nnl2_tensor* grad_input = tensor_root->grad;
 
-    size_t total_elems = product(output->shape, output->rank);
+    size_t total_elems = nnl2_product(output->shape, output->rank);
 
     switch (output->dtype) {
         case FLOAT64: {

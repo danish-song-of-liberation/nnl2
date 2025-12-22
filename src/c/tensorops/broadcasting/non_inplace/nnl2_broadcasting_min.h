@@ -29,8 +29,8 @@ nnl2_tensor* naive_min_broadcasting(nnl2_tensor* x, nnl2_tensor* y) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", NULL);
     #endif
  
-    size_t numel_x = product(x->shape, x->rank);
-    size_t numel_y = product(y->shape, y->rank);
+    size_t numel_x = nnl2_product(x->shape, x->rank);
+    size_t numel_y = nnl2_product(y->shape, y->rank);
     
     // Getting the tensor data types
     nnl2_tensor_type x_dtype = x->dtype;
@@ -269,8 +269,8 @@ nnl2_tensor* nnl2_own_min_broadcasting(const nnl2_tensor* x, const nnl2_tensor* 
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(y->shape, "Y shape is NULL", NULL);
     #endif
  
-    size_t numel_x = product(x->shape, x->rank);
-    size_t numel_y = product(y->shape, y->rank);
+    size_t numel_x = nnl2_product(x->shape, x->rank);
+    size_t numel_y = nnl2_product(y->shape, y->rank);
     
     // Check broadcasting compatibility
     if((numel_x % numel_y) != 0) {

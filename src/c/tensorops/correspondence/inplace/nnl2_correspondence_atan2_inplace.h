@@ -15,7 +15,7 @@ void naive_correspondence_atan2_inplace(nnl2_tensor* y, void* x) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(y->shape, y->rank);
+    size_t total_elems = nnl2_product(y->shape, y->rank);
     if(total_elems == 0) return;
     
     switch(y->dtype) {

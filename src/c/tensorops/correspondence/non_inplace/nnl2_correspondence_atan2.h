@@ -26,7 +26,7 @@ nnl2_tensor* naive_correspondence_atan2(const nnl2_tensor* y, void* x) {
         }
     #endif
     
-    size_t total_elems = product(y->shape, y->rank);
+    size_t total_elems = nnl2_product(y->shape, y->rank);
     if(total_elems == 0) return result;
     
     switch(y->dtype) {

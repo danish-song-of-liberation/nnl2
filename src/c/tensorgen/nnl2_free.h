@@ -38,7 +38,7 @@ void nnl2_free_tensor(Tensor* tensor) {
 	    if (tensor->shape == NULL && tensor->rank > 0)  			 return;
 		if (tensor->data == NULL) 									 return;
 		if (tensor->rank < 0) 										 return;
-	    if (product(tensor->shape, tensor->rank) <= 0)			     return;
+	    if (nnl2_product(tensor->shape, tensor->rank) <= 0)			     return;
 		
 		for (int i = 0; i < tensor->rank; i++) {
 			if (tensor->shape[i] <= 1) {

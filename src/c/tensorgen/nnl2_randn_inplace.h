@@ -50,7 +50,7 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "In function nnl2_naive_randn_inplace, passed tensor is NULL");
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return; // If zero elems then early return
     
     // Filling with random values from N(mean, std²)

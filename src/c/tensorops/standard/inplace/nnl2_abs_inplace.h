@@ -16,7 +16,7 @@ void naive_absinplace(nnl2_tensor* tensor) {
 		NNL2_FUNC_ENTER();
 	#endif
 
-	size_t total_elems = product(tensor->shape, tensor->rank);
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 	if(total_elems == 0) return; // If tensor is empty then return
 	
 	void* data = tensor->data;
@@ -115,7 +115,7 @@ void nnl2_own_abs_inplace(nnl2_tensor* tensor) {
     #endif
     
     // Calculate the total number of elements in the tensor
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
     
     // For very small tensors use inline optimization

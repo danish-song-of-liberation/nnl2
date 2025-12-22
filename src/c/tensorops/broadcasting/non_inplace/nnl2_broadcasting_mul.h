@@ -29,8 +29,8 @@ nnl2_tensor* naive_mul_broadcasting(nnl2_tensor* multiplicand, nnl2_tensor* mult
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->shape, "Multiplier shape is NULL", NULL);
     #endif
  
-    size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
-    size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
+    size_t numel_multiplicand = nnl2_product(multiplicand->shape, multiplicand->rank);
+    size_t numel_multiplier = nnl2_product(multiplier->shape, multiplier->rank);
     
     // Getting the tensor data types
     nnl2_tensor_type multiplicand_dtype = multiplicand->dtype;
@@ -244,8 +244,8 @@ nnl2_tensor* nnl2_own_mul_broadcasting(nnl2_tensor* multiplicand, nnl2_tensor* m
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(multiplier->data, "Multiplier data is NULL", NULL);
     #endif
     
-    size_t numel_multiplicand = product(multiplicand->shape, multiplicand->rank);
-    size_t numel_multiplier = product(multiplier->shape, multiplier->rank);
+    size_t numel_multiplicand = nnl2_product(multiplicand->shape, multiplicand->rank);
+    size_t numel_multiplier = nnl2_product(multiplier->shape, multiplier->rank);
     
     // Check broadcasting compatibility
     if((numel_multiplicand % numel_multiplier) != 0) {

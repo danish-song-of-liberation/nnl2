@@ -27,7 +27,7 @@ Tensor* make_tensor_from_flatten(void* arr, size_t num_elems_arr, int* shape, in
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t num_elems_tensor = product(shape, rank);
+	size_t num_elems_tensor = nnl2_product(shape, rank);
 	
 	if(num_elems_tensor != num_elems_arr) {
 		NNL2_ERROR("The number of elements in the specified array does not match the specified shapes");

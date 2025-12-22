@@ -15,7 +15,7 @@ void naive_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
     
     switch(tensor->dtype) {
@@ -112,7 +112,7 @@ void nnl2_own_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(divisor, "Divisor pointer is NULL");
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

@@ -128,7 +128,7 @@ bool nnl2_tensor_serialize(nnl2_tensor* tensor, char* path) {
         NNL2_VALIDATE_FILE_WRITE(file, tensor->strides, sizeof(int32_t), tensor->rank, file_error);
 	}
 
-	size_t total_elements = product(tensor->shape, tensor->rank);
+	size_t total_elements = nnl2_product(tensor->shape, tensor->rank);
 	size_t dtype_size = get_dtype_size(tensor->dtype);
     
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN

@@ -29,7 +29,7 @@ nnl2_tensor* nnl2_nn_ga_naive_mutation_uniform(nnl2_tensor* tensor, float mutate
 		}
 	#endif 
 	
-	size_t numel = product(tensor -> shape, tensor -> rank);
+	size_t numel = nnl2_product(tensor -> shape, tensor -> rank);
 	
 	switch(result -> dtype) {
         case FLOAT64: {

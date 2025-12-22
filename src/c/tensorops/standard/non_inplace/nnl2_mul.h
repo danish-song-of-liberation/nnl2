@@ -5,7 +5,7 @@
  * Performs element-wise multiplication of two tensors (naive implementation)
  *
  ** @details
- * The function creates a new tensor containing the product of the corresponding elements
+ * The function creates a new tensor containing the nnl2_product of the corresponding elements
  * of the two input tensors. It supports various data types with automatic
  * casting to a higher type in the hierarchy
  *
@@ -36,7 +36,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(multiplicand->shape, multiplicand->rank);
+    size_t len = nnl2_product(multiplicand->shape, multiplicand->rank);
     
     nnl2_tensor_type dtype_multiplicand = multiplicand->dtype;
     nnl2_tensor_type dtype_multiplier = multiplier->dtype;
@@ -45,9 +45,9 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
     nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
 
     // Create an output tensor with the same shape and winning data type
-    nnl2_tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* nnl2_product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
     
-    if (product == NULL) {
+    if (nnl2_product == NULL) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
         #endif
@@ -58,7 +58,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
         #endif
-        return product;
+        return nnl2_product;
     }
     
     if (dtype_multiplicand == dtype_multiplier) {
@@ -68,7 +68,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
             case FLOAT64: {
                 volatile double* data_multiplicand = (double*)multiplicand->data;
                 volatile double* data_multiplier = (double*)multiplier->data;
-                volatile double* data_product = (double*)product->data;
+                volatile double* data_product = (double*)nnl2_product->data;
             
                 // Element-wise multiplication
                 for (size_t i = 0; i < len; i++) {
@@ -81,7 +81,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
             case FLOAT32: {
                 volatile float* data_multiplicand = (float*)multiplicand->data;
                 volatile float* data_multiplier = (float*)multiplier->data;
-                volatile float* data_product = (float*)product->data;
+                volatile float* data_product = (float*)nnl2_product->data;
         
                 // Element-wise multiplication
                 for (size_t i = 0; i < len; i++) {
@@ -94,7 +94,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
             case INT32: {
                 volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
                 volatile int32_t* data_multiplier = (int32_t*)multiplier->data;
-                volatile int32_t* data_product = (int32_t*)product->data;
+                volatile int32_t* data_product = (int32_t*)nnl2_product->data;
         
                 // Element-wise multiplication
                 for (size_t i = 0; i < len; i++) {
@@ -113,7 +113,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
         // Handling the case if the data types are NOT match
         switch (winner_in_the_type_hierarchy) {
             case FLOAT64: {
-                volatile double* data_product = (double*)product->data;
+                volatile double* data_product = (double*)nnl2_product->data;
                 
                 for (size_t i = 0; i < len; i++) {
                     // Calculate the pointers to the current elements, taking into account the size of the type
@@ -128,7 +128,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
             }
             
             case FLOAT32: {
-                volatile float* data_product = (float*)product->data;
+                volatile float* data_product = (float*)nnl2_product->data;
                 
                 for (size_t i = 0; i < len; i++) {
                     // Calculate the pointers to the current elements, taking into account the size of the type
@@ -143,7 +143,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
             }
         
             case INT32: {
-                volatile int32_t* data_product = (int32_t*)product->data;
+                volatile int32_t* data_product = (int32_t*)nnl2_product->data;
                 
                 for (size_t i = 0; i < len; i++) {
                     // Calculate the pointers to the current elements, taking into account the size of the type
@@ -168,7 +168,7 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
         NNL2_FUNC_EXIT();
     #endif
     
-    return product;
+    return nnl2_product;
 }
 
 #ifdef NNL2_PTHREAD_AVAILABLE
@@ -251,7 +251,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(multiplicand->shape, multiplicand->rank);
+    size_t len = nnl2_product(multiplicand->shape, multiplicand->rank);
     
     nnl2_tensor_type dtype_multiplicand = multiplicand->dtype;
     nnl2_tensor_type dtype_multiplier = multiplier->dtype;
@@ -260,14 +260,14 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
     nnl2_tensor_type winner_in_the_type_hierarchy = MAX(dtype_multiplicand, dtype_multiplier);
 
     // Create an output tensor with the same shape and data type
-    nnl2_tensor* product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
+    nnl2_tensor* nnl2_product = nnl2_empty(multiplicand->shape, multiplicand->rank, winner_in_the_type_hierarchy);
     
-    if(len == 0) return product;
+    if(len == 0) return nnl2_product;
     
     // Use naive implementation for small tensors
     if(len < NNL2_MUL_PARALLEL_THREASHOLD) {
-        product = nnl2_naive_mul(multiplicand, multiplier);
-        if(product == NULL) {
+        nnl2_product = nnl2_naive_mul(multiplicand, multiplier);
+        if(nnl2_product == NULL) {
             NNL2_ERROR("Failed to multiply");
         }
         
@@ -275,7 +275,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
             NNL2_FUNC_EXIT();
         #endif
         
-        return product;
+        return nnl2_product;
     }
     
     // Allocate arrays for thread handles and task descriptors
@@ -292,7 +292,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
     if(dtype_multiplicand == dtype_multiplier) {
         bool aligned_multiplicand = NNL2_IS_ALIGNED(multiplicand->data, NNL2_TENSOR_ALIGNMENT_32);
         bool aligned_multiplier = NNL2_IS_ALIGNED(multiplier->data, NNL2_TENSOR_ALIGNMENT_32);
-        bool aligned_result = NNL2_IS_ALIGNED(product->data, NNL2_TENSOR_ALIGNMENT_32);
+        bool aligned_result = NNL2_IS_ALIGNED(nnl2_product->data, NNL2_TENSOR_ALIGNMENT_32);
         use_simd = aligned_multiplicand && aligned_multiplier && aligned_result;
     }
     #endif
@@ -305,7 +305,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
         // Configure task for this thread
         tasks[i].multiplicand_data = multiplicand->data;
         tasks[i].multiplier_data = multiplier->data;
-        tasks[i].result_data = product->data;
+        tasks[i].result_data = nnl2_product->data;
         tasks[i].start = current_start;
         tasks[i].end = current_start + current_chunk;
         tasks[i].dtype_multiplicand = dtype_multiplicand;
@@ -344,7 +344,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
                 pthread_join(threads[j], NULL);
             }
             
-            nnl2_free_tensor(product);
+            nnl2_free_tensor(nnl2_product);
             return NULL;
         }
         
@@ -363,7 +363,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
         NNL2_FUNC_EXIT();
     #endif
     
-    return product;
+    return nnl2_product;
 }
 
 /** @brief

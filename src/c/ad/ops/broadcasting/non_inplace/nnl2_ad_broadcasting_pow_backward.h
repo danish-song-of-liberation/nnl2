@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* base, nnl2_ad_tensor* exponent) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -54,9 +54,9 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow_broadcasting(nnl2_a
     nnl2_tensor* data_base = base->data;
     nnl2_tensor* data_exp = exponent->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_base = product(data_base->shape, data_base->rank);
-    size_t numel_exp = product(data_exp->shape, data_exp->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_base = nnl2_product(data_base->shape, data_base->rank);
+    size_t numel_exp = nnl2_product(data_exp->shape, data_exp->rank);
     size_t blocks_for_base = numel_out / numel_base;
     size_t blocks_for_exp = numel_out / numel_exp;
 

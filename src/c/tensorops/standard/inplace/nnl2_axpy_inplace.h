@@ -58,7 +58,7 @@ void naive_axpy_inplace(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) 
     #endif
     
     // Calculating the total number of elements in the summand tensor
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     
     // If the tensor is empty, exit the function
     if(total_elems == 0) return;
@@ -259,7 +259,7 @@ void nnl2_own_axpy_inplace(nnl2_tensor* summand, const nnl2_tensor* sumend, floa
         NNL2_CHECK_NULL_IF_ERR_RETURN(sumend->data, "Sumend tensor data is NULL");
     #endif
     
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

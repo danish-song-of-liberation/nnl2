@@ -60,7 +60,7 @@ nnl2_tensor* nnl2_naive_kaiming(int* shape, int rank, nnl2_tensor_type dtype, in
     
     nnl2_tensor* result = nnl2_empty(shape, rank, dtype);
     
-    size_t total_elems = product(shape, rank);
+    size_t total_elems = nnl2_product(shape, rank);
     if(total_elems == 0) return result; // If tensor is empty return empty result
 
     // Calculate denominator based on mode

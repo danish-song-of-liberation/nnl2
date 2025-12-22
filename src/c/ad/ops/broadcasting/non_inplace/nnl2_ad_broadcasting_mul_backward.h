@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_mul_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* multiplier, nnl2_ad_tensor* multiplicand) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -54,9 +54,9 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_mul_broadcasting(nnl2_a
     nnl2_tensor* data_mult = multiplier->data;
     nnl2_tensor* data_cand = multiplicand->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_mult = product(data_mult->shape, data_mult->rank);
-    size_t numel_cand = product(data_cand->shape, data_cand->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_mult = nnl2_product(data_mult->shape, data_mult->rank);
+    size_t numel_cand = nnl2_product(data_cand->shape, data_cand->rank);
     size_t blocks_for_mult = numel_out / numel_mult;
     size_t blocks_for_cand = numel_out / numel_cand;
 

@@ -23,7 +23,7 @@ nnl2_tensor* naive_exp(nnl2_tensor* tensor, bool save_type) {
 		NNL2_FUNC_ENTER();
 	#endif
 		
-	size_t len = product(tensor->shape, tensor->rank);
+	size_t len = nnl2_product(tensor->shape, tensor->rank);
 	
 	// Processing a tensor with an integer data type of INT32.
 	// Calculates the exponent for each element, but only if the tensor

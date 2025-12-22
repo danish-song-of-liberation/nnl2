@@ -37,7 +37,7 @@ nnl2_tensor* nnl2_naive_scale(const nnl2_tensor* tensor, float multiplier, bool 
 	void* data_original = tensor->data;
 	
 	// Calculate the total number of elements in the tensor
-	size_t num_elems = product(tensor->shape, tensor->rank);
+	size_t num_elems = nnl2_product(tensor->shape, tensor->rank);
 	nnl2_tensor_type dtype = tensor->dtype;
 	
 	if (multiplier == 1.0f) {

@@ -56,7 +56,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_tan(nnl2_ad_tensor* out
 	// d(tan(x))/dx = sec^2(x) = 1 + tan^2(x)
 	// dL/dx = dL/dy * (1 + tan^2(x))
 	
-	size_t numel = product(ad_tensor->data->shape, ad_tensor->data->rank);
+	size_t numel = nnl2_product(ad_tensor->data->shape, ad_tensor->data->rank);
     nnl2_tensor_type dtype = ad_tensor->data->dtype;
 
     switch(dtype) {

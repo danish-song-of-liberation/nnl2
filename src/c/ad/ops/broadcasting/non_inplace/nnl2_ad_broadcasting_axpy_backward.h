@@ -28,7 +28,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_axpy_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* axpyend, nnl2_ad_tensor* sumend, float multiplier) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -58,9 +58,9 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_axpy_broadcasting(nnl2_
     nnl2_tensor* data_axpy = axpyend->data;
     nnl2_tensor* data_sum = sumend->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_axpy = product(data_axpy->shape, data_axpy->rank);
-    size_t numel_sum = product(data_sum->shape, data_sum->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_axpy = nnl2_product(data_axpy->shape, data_axpy->rank);
+    size_t numel_sum = nnl2_product(data_sum->shape, data_sum->rank);
 
     size_t blocks_axpy = numel_out / numel_axpy;
     size_t blocks_sum = numel_out / numel_sum;

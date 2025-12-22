@@ -26,7 +26,7 @@
  * Failed to allocate memory for shape buffer
  *
  ** @exception NNL2_ERROR_SHAPE_OVERFLOW 
- * Shape product would exceed maximum size
+ * Shape nnl2_product would exceed maximum size
  *
  ** @exception NNL2_ERROR_WILDCARD_COUNT 
  * More than one wildcard dimension found
@@ -60,7 +60,7 @@
  **
  ** @see nnl2_empty
  ** @see nnl2_free_tensor
- ** @see product
+ ** @see nnl2_product
  **/
 Tensor* nnl2_naive_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_len, bool force) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -77,7 +77,7 @@ Tensor* nnl2_naive_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape
     }
 	
 	// Calculate total elements from original tensor
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 	
 	// Allocate temporary buffer for shape processing (including wildcard resolution)
     int32_t* wildcard_shape = malloc(new_shape_len * sizeof(int32_t));
@@ -110,7 +110,7 @@ Tensor* nnl2_naive_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape
 				if (new_shape[i] > 0) {
 					// Check for multiplication overflow
 					if (wildcard_shape_product > SIZE_MAX / new_shape[i]) {
-						NNL2_ERROR("Shape product overflow at dimension %d: %d * %d would exceed maximum size", i, wildcard_shape_product, new_shape[i]);
+						NNL2_ERROR("Shape nnl2_product overflow at dimension %d: %d * %d would exceed maximum size", i, wildcard_shape_product, new_shape[i]);
 						free(wildcard_shape);
 						return NULL;
 					}
@@ -249,7 +249,7 @@ Tensor* nnl2_own_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_l
     }
     
     // Calculate total elements from original tensor
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     // Allocate temporary buffer for shape processing (including wildcard resolution)
     int32_t* wildcard_shape = malloc(new_shape_len * sizeof(int32_t));
@@ -278,7 +278,7 @@ Tensor* nnl2_own_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape_l
             #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
                 if (new_shape[i] > 0) {
                     if (wildcard_shape_product > SIZE_MAX / new_shape[i]) {
-                        NNL2_ERROR("Shape product overflow at dimension %d: %d * %d would exceed maximum size", i, wildcard_shape_product, new_shape[i]);
+                        NNL2_ERROR("Shape nnl2_product overflow at dimension %d: %d * %d would exceed maximum size", i, wildcard_shape_product, new_shape[i]);
                         free(wildcard_shape);
                         return NULL;
                     }

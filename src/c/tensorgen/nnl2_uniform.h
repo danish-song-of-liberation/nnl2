@@ -33,7 +33,7 @@
  * nnl2_tensor* cocoon_blockchain_ai = nnl2_naive_uniform((int[]){3, 3}, 2, FLOAT64, &min, &max);
  *
  ** @see nnl2_empty
- ** @see product
+ ** @see nnl2_product
  **/
 Tensor* naive_uniform(int* shape, int rank, TensorType dtype, void* from, void* to) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -42,7 +42,7 @@ Tensor* naive_uniform(int* shape, int rank, TensorType dtype, void* from, void* 
 	
 	Tensor* result = nnl2_empty(shape, rank, dtype);
 	
-	size_t total_elems = product(shape, rank);
+	size_t total_elems = nnl2_product(shape, rank);
 	if(total_elems == 0) return result; // If zero elems then result empty result
 	
 	switch(dtype) {

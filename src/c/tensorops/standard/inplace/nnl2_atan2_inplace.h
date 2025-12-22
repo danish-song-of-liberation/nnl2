@@ -15,7 +15,7 @@ void nnl2_naive_atan2inplace(nnl2_tensor* y, const nnl2_tensor* x) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t len = product(y->shape, y->rank);
+    size_t len = nnl2_product(y->shape, y->rank);
     
     if(len == 0) return;
     

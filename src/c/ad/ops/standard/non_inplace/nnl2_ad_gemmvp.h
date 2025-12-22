@@ -73,7 +73,7 @@ static void nnl2_ad_reverse_backward_gemmvp(nnl2_ad_tensor* tensor) {
  * Whether to track this operation in computation graph
  *  
  ** @return nnl2_ad_tensor*
- * New AD tensor containing matrix product A × B + V with shape [M, N], or NULL on failure
+ * New AD tensor containing matrix nnl2_product A × B + V with shape [M, N], or NULL on failure
  *
  ** @exception NNL2Error
  * Returns NULL if multiplicand, multiplier or vector is NULL (SAFETY_MODE_MODERATE+)

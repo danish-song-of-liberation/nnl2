@@ -51,7 +51,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_l2norm(nnl2_ad_tensor* 
     #endif
     
     // Calculate total number of elements in input tensor
-    size_t numel = product(input_tensor->data->shape, input_tensor->data->rank);
+    size_t numel = nnl2_product(input_tensor->data->shape, input_tensor->data->rank);
     
     // Output tensor should be scalar (L2 norm)
     if(output_tensor->data->shape[0] != 1) {

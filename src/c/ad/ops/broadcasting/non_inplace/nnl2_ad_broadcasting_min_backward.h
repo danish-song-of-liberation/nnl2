@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_min_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* a, nnl2_ad_tensor* b) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -52,9 +52,9 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_min_broadcasting(nnl2_a
     nnl2_tensor* data_a = a->data;
     nnl2_tensor* data_b = b->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_a = product(data_a->shape, data_a->rank);
-    size_t numel_b = product(data_b->shape, data_b->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_a = nnl2_product(data_a->shape, data_a->rank);
+    size_t numel_b = nnl2_product(data_b->shape, data_b->rank);
 
     size_t blocks_a = numel_out / numel_a;
     size_t blocks_b = numel_out / numel_b;

@@ -429,8 +429,8 @@ Tensor* nnl2_own_concat(Tensor* tensora, Tensor* tensorb, int axis) {
     TensorType winner_type = MAX(typea, typeb);
     bool same_type = (typea == typeb && typea == winner_type);
     
-    size_t total_elements_a = product(tensora->shape, rank);
-    size_t total_elements_b = product(tensorb->shape, rank);
+    size_t total_elements_a = nnl2_product(tensora->shape, rank);
+    size_t total_elements_b = nnl2_product(tensorb->shape, rank);
     size_t total_elements = total_elements_a + total_elements_b;
     
     // Fallback to naive implementation for small tensors

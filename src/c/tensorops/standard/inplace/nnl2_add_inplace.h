@@ -55,7 +55,7 @@ void nnl2_naive_addinplace(nnl2_tensor* summand, const nnl2_tensor* addend) {
 	#endif
 	
 	// Calculating the total number of elements in the summand tensor
-	size_t len_summand = product(summand->shape, summand->rank);
+	size_t len_summand = nnl2_product(summand->shape, summand->rank);
 	
 	// If the tensor is empty, exit the function
 	if(len_summand == 0) return;
@@ -275,7 +275,7 @@ void nnl2_avx256_addinplace(nnl2_tensor* summand, const nnl2_tensor* addend) {
     #endif
 	
 	// Calculating the total number of elements in the summand tensor
-    size_t len_summand = product(summand->shape, summand->rank);	
+    size_t len_summand = nnl2_product(summand->shape, summand->rank);	
 	
 	// If the tensor is empty, exit the function
     if(len_summand == 0) return;
@@ -812,7 +812,7 @@ void nnl2_blas_addinplace(nnl2_tensor* summand, nnl2_tensor* addend) {
     #endif
 	
 	// Calculating the total number of elements in the summand tensor
-    size_t len_summand = product(summand->shape, summand->rank);
+    size_t len_summand = nnl2_product(summand->shape, summand->rank);
 	
 	// If the tensor is empty, exit the function
     if(len_summand == 0) return;
@@ -974,7 +974,7 @@ void nnl2_own_add_inplace(nnl2_tensor* summand, const nnl2_tensor* addend) {
     #endif
     
     // Calculating the total number of elements in the summand tensor
-    size_t len_summand = product(summand->shape, summand->rank);
+    size_t len_summand = nnl2_product(summand->shape, summand->rank);
     
     // Fallback to naive implementation for small tensors
     if(len_summand < NNL2_ADD_INPLACE_PARALLEL_THRESHOLD) {

@@ -24,7 +24,7 @@
  * Number of columns in matrix A and rows in matrix B
  *
  ** @param alpha
- * Scalar multiplier for the matrix product A*B
+ * Scalar multiplier for the matrix nnl2_product A*B
  *
  ** @param a
  * Pointer to tensor containing matrix A (must be FLOAT64)

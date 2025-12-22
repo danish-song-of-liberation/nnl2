@@ -15,7 +15,7 @@ void naive_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
     
     switch(tensor->dtype) {
@@ -133,7 +133,7 @@ void nnl2_own_2_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(multiplier, "Multiplier pointer is NULL");
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

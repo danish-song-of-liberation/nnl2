@@ -60,7 +60,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_asin(nnl2_ad_tensor* ou
 	// d(asin(x))/dx = 1 / sqrt(1 - x^2)
 	// dL/dx = dL/dy * (1 / sqrt(1 - x^2))
 	
-	size_t numel = product(ad_tensor->data->shape, ad_tensor->data->rank);
+	size_t numel = nnl2_product(ad_tensor->data->shape, ad_tensor->data->rank);
     nnl2_tensor_type dtype = ad_tensor->data->dtype;
 
     switch(dtype) {

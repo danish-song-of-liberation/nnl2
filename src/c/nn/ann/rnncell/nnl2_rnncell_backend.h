@@ -613,7 +613,7 @@ static nnl2_nnlrepr_template* nnl2_nn_rnn_cell_nnlrepr_template(nnl2_nn_rnn_cell
         if (!allocation_failed) {
             result->shapes[shape_index][0] = cell->wxh->data->shape[0];
             result->shapes[shape_index][1] = cell->wxh->data->shape[1];
-            result->vector_size += product(cell->wxh->data->shape, dims);
+            result->vector_size += nnl2_product(cell->wxh->data->shape, dims);
             
             #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
                 NNL2_INFO("Added wxh shape: [%d, %d]", 
@@ -640,7 +640,7 @@ static nnl2_nnlrepr_template* nnl2_nn_rnn_cell_nnlrepr_template(nnl2_nn_rnn_cell
         if(!allocation_failed) {
             result->shapes[shape_index][0] = cell->whh->data->shape[0];
             result->shapes[shape_index][1] = cell->whh->data->shape[1];
-            result->vector_size += product(cell->whh->data->shape, dims);
+            result->vector_size += nnl2_product(cell->whh->data->shape, dims);
             
             #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
                 NNL2_INFO("Added whh shape: [%d, %d]", 
@@ -784,7 +784,7 @@ static nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_nnlrepr_decode(nnl2_ad_tensor* vector,
         }
     #endif
     
-    offset += product(shape_wxh, 2);
+    offset += nnl2_product(shape_wxh, 2);
     
     // Extract whh (hidden-hidden weights)
     nnl2_ad_tensor* whh_view = nnl2_ad_vector_as_parameter(shape_whh, 2, offset, vector);
@@ -797,7 +797,7 @@ static nnl2_nn_rnn_cell* nnl2_nn_rnn_cell_nnlrepr_decode(nnl2_ad_tensor* vector,
         }
     #endif
     
-    offset += product(shape_whh, 2);
+    offset += nnl2_product(shape_whh, 2);
     
     // Extract biases if present
     nnl2_ad_tensor* bxh_view = NULL;

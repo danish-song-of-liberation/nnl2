@@ -462,7 +462,7 @@ static nnl2_nnlrepr_template* nnl2_nn_fnn_nnlrepr_template(nnl2_nn_fnn* nn) {
     result -> nn_type = nnl2_nn_type_fnn;
 	result -> dtype = nn -> weights -> data -> dtype;
     result -> num_shapes = (nn -> metadata.use_bias ? 2 : 1);   // 2 - weights + bias : 1 - weights only
-    result -> vector_size = product(nn -> weights -> data -> shape, 2); // 2 dimensions
+    result -> vector_size = nnl2_product(nn -> weights -> data -> shape, 2); // 2 dimensions
     result -> num_childrens = 0;
     result -> childrens = NULL;
     result -> additional_data = NULL;
@@ -570,7 +570,7 @@ static nnl2_nn_fnn* nnl2_nn_fnn_nnlrepr_decode(nnl2_ad_tensor* vector, size_t of
         }
     #endif
 	
-	offset += product(shape_w, 2); // 2 dimensions
+	offset += nnl2_product(shape_w, 2); // 2 dimensions
 	
 	nnl2_ad_tensor* b_view = NULL;
 	if(num_shapes == 2) {

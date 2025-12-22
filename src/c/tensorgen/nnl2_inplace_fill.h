@@ -78,7 +78,7 @@ bool nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#endif
 	
 	// Calculate total number of elements from tensor shape and rank
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if (total_elems == 0) return true; // Early return for empty tensors
 	
 	bool result = true;
@@ -213,7 +213,7 @@ bool nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 	#endif
 	
 	// Calculating the total number of elements in a tensor
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if (total_elems == 0) return true; // Exit if the tensor is empty
 	
 	bool result = true;
@@ -387,7 +387,7 @@ bool nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 	#endif
 	
 	// Calculating the total number of elements in a tensor
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if (total_elems == 0) return true; // Exit if the tensor is empty
 	
 	bool result = true;
@@ -562,7 +562,7 @@ bool nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 	#endif
 	
 	// Calculating the total number of elements in a tensor
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if (total_elems == 0) return true; // Exit if the tensor is empty
 	
 	bool result = true;
@@ -731,7 +731,7 @@ bool nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 	#endif
 	
 	// Calculate total elements from tensor shape and rank
-	size_t total_elems = product(tensor->shape, tensor->rank);
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 	if (total_elems == 0) return true; // Exit if the tensor is empty
 	
 	// Check if tensor data is 32-byte aligned for optimal AVX performance
@@ -956,7 +956,7 @@ bool nnl2_own_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
         }
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);    
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);    
     if (total_elems == 0) return true; // If tensor empty exiting
     
     // Use naive implementation for small tensors

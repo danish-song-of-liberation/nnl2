@@ -25,7 +25,7 @@ nnl2_tensor* naive_atan2(nnl2_tensor* y, nnl2_tensor* x) {
         NNL2_FUNC_ENTER();
     #endif
 
-    size_t len = product(y->shape, y->rank);
+    size_t len = nnl2_product(y->shape, y->rank);
     
     nnl2_tensor_type dtype_y = y->dtype;
     nnl2_tensor_type dtype_x = x->dtype;

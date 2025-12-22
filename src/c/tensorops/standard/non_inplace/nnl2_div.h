@@ -36,7 +36,7 @@ nnl2_tensor* nnl2_naive_div(const nnl2_tensor* dividend, const nnl2_tensor* divi
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(dividend->shape, dividend->rank);
+    size_t len = nnl2_product(dividend->shape, dividend->rank);
     
     nnl2_tensor_type dtype_dividend = dividend->dtype;
     nnl2_tensor_type dtype_divisor = divisor->dtype;
@@ -276,7 +276,7 @@ nnl2_tensor* nnl2_own_div(const nnl2_tensor* dividend, const nnl2_tensor* diviso
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(dividend->shape, dividend->rank);
+    size_t len = nnl2_product(dividend->shape, dividend->rank);
     
     nnl2_tensor_type dtype_dividend = dividend->dtype;
     nnl2_tensor_type dtype_divisor = divisor->dtype;

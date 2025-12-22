@@ -50,7 +50,7 @@ static void nnl2_ad_reverse_derivative_mae(nnl2_ad_tensor* output_tensor, nnl2_a
     #endif
     
     // Calculate total number of elements
-    size_t numel = product(prediction_tensor->data->shape, prediction_tensor->data->rank);
+    size_t numel = nnl2_product(prediction_tensor->data->shape, prediction_tensor->data->rank);
     
     if(numel == 0) {
         return;

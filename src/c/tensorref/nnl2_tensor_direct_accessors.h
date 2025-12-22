@@ -212,10 +212,10 @@ int get_mem_alignment() {
  * @brief Gets the total number of elements in a tensor
  * @ingroup tensor_utils
  * @param tensor Pointer to the tensor
- * @return Total number of elements (product of all dimensions)
+ * @return Total number of elements (nnl2_product of all dimensions)
  */
 int get_size(Tensor* tensor) {
-	return product(tensor->shape, tensor->rank);
+	return nnl2_product(tensor->shape, tensor->rank);
 }
 
 /**
@@ -225,7 +225,7 @@ int get_size(Tensor* tensor) {
  * @return Total memory size in bytes
  */
 int get_size_in_bytes(Tensor* tensor) {
-	return product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
+	return nnl2_product(tensor->shape, tensor->rank) * get_dtype_size(tensor->dtype);
 }
 
 #endif /** NNL2_TENSOR_DIRECT_ACCESSORS_H **/

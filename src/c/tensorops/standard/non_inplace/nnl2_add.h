@@ -44,7 +44,7 @@ nnl2_tensor* nnl2_naive_add(nnl2_tensor* summand, nnl2_tensor* addend) {
 	#endif
 	
 	// Calculate the total number of elements in the tensors
-	size_t len = product(summand->shape, summand->rank);
+	size_t len = nnl2_product(summand->shape, summand->rank);
 	
 	nnl2_tensor_type dtype_summand = summand->dtype;
 	nnl2_tensor_type dtype_addend = addend->dtype;
@@ -252,7 +252,7 @@ nnl2_tensor* nnl2_avx256_add(const nnl2_tensor* summand, const nnl2_tensor* adde
 		NNL2_FUNC_ENTER();
 	#endif
 	
-    size_t len = product(summand->shape, summand->rank);
+    size_t len = nnl2_product(summand->shape, summand->rank);
     
     nnl2_tensor_type dtype_summand = summand->dtype;
     nnl2_tensor_type dtype_addend = addend->dtype;
@@ -672,7 +672,7 @@ nnl2_tensor* nnl2_own_add(nnl2_tensor* summand, nnl2_tensor* addend) {
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(summand->shape, summand->rank);
+    size_t len = nnl2_product(summand->shape, summand->rank);
     
     nnl2_tensor_type dtype_summand = summand->dtype;
     nnl2_tensor_type dtype_addend = addend->dtype;

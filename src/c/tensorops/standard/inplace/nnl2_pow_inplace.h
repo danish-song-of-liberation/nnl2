@@ -53,7 +53,7 @@ void naive_powinplace(nnl2_tensor* base, const nnl2_tensor* exponent) {
     #endif
     
     // Calculating the total number of elements in the base tensor
-    size_t len_base = product(base->shape, base->rank);
+    size_t len_base = nnl2_product(base->shape, base->rank);
     
     // If the tensor is empty, exit the function
     if(len_base == 0) return;

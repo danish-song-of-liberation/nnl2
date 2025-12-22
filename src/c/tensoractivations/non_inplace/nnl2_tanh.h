@@ -40,7 +40,7 @@ Tensor* naive_tanh(Tensor* tensor, bool approx) {
         }
     #endif
 
-	int total_elems = product(tensor->shape, tensor->rank);
+	int total_elems = nnl2_product(tensor->shape, tensor->rank);
 	TensorType dtype = tensor->dtype;
 	
 	if(dtype == INT32) dtype = FLOAT64;
@@ -151,7 +151,7 @@ Tensor* nnl2_own_tanh(Tensor* tensor, bool approx) {
         }
     #endif
 
-    int total_elems = product(tensor->shape, tensor->rank);
+    int total_elems = nnl2_product(tensor->shape, tensor->rank);
     TensorType dtype = tensor->dtype;
     
     if(dtype == INT32) dtype = FLOAT64;

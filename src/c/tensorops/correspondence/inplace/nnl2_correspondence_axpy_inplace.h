@@ -26,7 +26,7 @@ void naive_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(summand->shape, "Summand shape is NULL");
     #endif
     
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();
@@ -155,7 +155,7 @@ void nnl2_own_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(summand->shape, "Summand shape is NULL");
     #endif
     
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

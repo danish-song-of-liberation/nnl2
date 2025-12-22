@@ -23,8 +23,8 @@ void naive_max_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(y->shape, "Y shape is NULL");
     #endif
     
-    size_t numel_x = product(x->shape, x->rank);
-    size_t numel_y = product(y->shape, y->rank);
+    size_t numel_x = nnl2_product(x->shape, x->rank);
+    size_t numel_y = nnl2_product(y->shape, y->rank);
     
     // Getting the tensor data types
     nnl2_tensor_type x_dtype = x->dtype;
@@ -226,8 +226,8 @@ void nnl2_own_max_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(y->shape, "Y shape is NULL");
     #endif
     
-    size_t numel_x = product(x->shape, x->rank);
-    size_t numel_y = product(y->shape, y->rank);
+    size_t numel_x = nnl2_product(x->shape, x->rank);
+    size_t numel_y = nnl2_product(y->shape, y->rank);
     
     // Check broadcasting compatibility
     if((numel_x % numel_y) != 0) {

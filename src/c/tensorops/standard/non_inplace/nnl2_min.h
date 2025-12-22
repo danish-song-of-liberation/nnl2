@@ -47,7 +47,7 @@ nnl2_tensor* naive_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
 	#endif
 	
     // Calculate the total number of elements in the tensors
-    size_t len = product(tensora->shape, tensora->rank);
+    size_t len = nnl2_product(tensora->shape, tensora->rank);
     
     nnl2_tensor_type dtype_a = tensora->dtype;
     nnl2_tensor_type dtype_b = tensorb->dtype;
@@ -264,7 +264,7 @@ nnl2_tensor* nnl2_own_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensorb->data, "Second tensor data is NULL", NULL);
     #endif
     
-    size_t total_elems = product(tensora->shape, tensora->rank);
+    size_t total_elems = nnl2_product(tensora->shape, tensora->rank);
     
     nnl2_tensor_type dtype_a = tensora->dtype;
     nnl2_tensor_type dtype_b = tensorb->dtype;

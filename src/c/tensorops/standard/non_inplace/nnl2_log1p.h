@@ -20,7 +20,7 @@ nnl2_tensor* naive_log1p(const nnl2_tensor* tensor, bool save_type) {
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t len = product(tensor->shape, tensor->rank);
+	size_t len = nnl2_product(tensor->shape, tensor->rank);
 	
     if(tensor->dtype == INT32) {
         int32_t* tensor_data = (int32_t*)tensor->data;

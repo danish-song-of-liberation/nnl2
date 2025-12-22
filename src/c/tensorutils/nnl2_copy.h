@@ -36,7 +36,7 @@ Tensor* naive_copy(Tensor* tensor, TensorType copy_type) {
 	
 	TensorType dtype = tensor->dtype;
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 	Tensor* result;
 	
 	if(dtype == copy_type) {
@@ -219,7 +219,7 @@ Tensor* nnl2_own_copy(Tensor* tensor, TensorType copy_type) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->shape, "Tensor shape is NULL", NULL);
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

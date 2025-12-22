@@ -24,7 +24,7 @@ void naive_leakyreluinplace(Tensor* tensor, float alpha) {
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if(total_elems == 0) return; // If tensor is empty return
 	
 	void* data = tensor->data;
@@ -335,7 +335,7 @@ void nnl2_own_leaky_relu_inplace(Tensor* tensor, float alpha) {
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	bool tensor_aligned = NNL2_IS_ALIGNED(tensor->data, NNL2_TENSOR_ALIGNMENT_32);
 	
 	// Warning for unaligned memory in safety modes (performance impact)

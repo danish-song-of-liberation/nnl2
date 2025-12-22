@@ -49,7 +49,7 @@ void nnl2_ad_reverse_derivative_relu(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor*
 		NNL2_CHECK_NULL_IF_ERR_RETURN(a->grad, "In function nnl2_ad_reverse_derivative_relu, input tensor a grad is NULL");
 	#endif
 	
-    size_t numel = product(a->data->shape, a->data->rank);
+    size_t numel = nnl2_product(a->data->shape, a->data->rank);
     nnl2_tensor_type dtype = a->data->dtype;
 
     switch (dtype) {

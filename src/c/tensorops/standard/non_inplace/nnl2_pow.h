@@ -45,7 +45,7 @@ nnl2_tensor* naive_pow(const nnl2_tensor* base, const nnl2_tensor* exponent) {
 	#endif
 	
     // Calculate the total number of elements in the tensors
-    size_t len = product(base->shape, base->rank);
+    size_t len = nnl2_product(base->shape, base->rank);
     
     nnl2_tensor_type dtype_base = base->dtype;
     nnl2_tensor_type dtype_exponent = exponent->dtype;

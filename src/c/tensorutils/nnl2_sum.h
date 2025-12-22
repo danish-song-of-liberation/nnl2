@@ -15,7 +15,7 @@ void naive_sum_without_axis(Tensor* tensor, void* result) {
         NNL2_FUNC_ENTER();
     #endif
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 	if(total_elems == 0) return; // If tensor if empty then return empty result
 		
 	switch(tensor->dtype) {
@@ -94,7 +94,7 @@ void nnl2_own_sum_without_axis(Tensor* tensor, void* result) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
     
     // Fallback to naive implementation for small tensors
@@ -524,7 +524,7 @@ Tensor* naive_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
 		}
 	#endif
 	
-    size_t result_numel = product(result->shape, result->rank);
+    size_t result_numel = nnl2_product(result->shape, result->rank);
     int elements_along_axis = tensor->shape[axis];
     
     // Use optimized implementation for large tensors
@@ -605,7 +605,7 @@ Tensor* nnl2_own_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
         return NULL;
     }
     
-    size_t result_numel = product(result->shape, result->rank);
+    size_t result_numel = nnl2_product(result->shape, result->rank);
     int elements_along_axis = tensor->shape[axis];
     
     size_t num_threads = NNL2_NUM_THREADS;

@@ -54,7 +54,7 @@ void nnl2_naive_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #endif
     
     // Calculating the total number of elements in the dividend tensor
-    size_t len_dividend = product(dividend->shape, dividend->rank);
+    size_t len_dividend = nnl2_product(dividend->shape, dividend->rank);
     
     // If the tensor is empty, exit the function
     if(len_dividend == 0) return;
@@ -282,7 +282,7 @@ void nnl2_own_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
     #endif
     
     // Calculating the total number of elements in the dividend tensor
-    size_t len_dividend = product(dividend->shape, dividend->rank);
+    size_t len_dividend = nnl2_product(dividend->shape, dividend->rank);
     
     // Fallback to naive implementation for small tensors
     if(len_dividend < NNL2_DIV_INPLACE_PARALLEL_THRESHOLD) {

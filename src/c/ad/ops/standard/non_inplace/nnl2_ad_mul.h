@@ -14,7 +14,7 @@
  * The output tensor from mul operation that needs gradient computation
  *
  ** @details
- * Derivative of a * b follows product rule:
+ * Derivative of a * b follows nnl2_product rule:
  * da = b * dout
  * db = a * dout
  * Propagates gradients to both root tensors using element-wise multiplication
@@ -68,7 +68,7 @@ static void nnl2_ad_reverse_backward_mul(nnl2_ad_tensor* tensor) {
  * Whether to track this operation in computation graph
  *  
  ** @return nnl2_ad_tensor*
- * New AD tensor containing element-wise product of inputs, or NULL on failure
+ * New AD tensor containing element-wise nnl2_product of inputs, or NULL on failure
  *
  ** @exception NNL2Error
  * Returns NULL if multiplicand or multiplier is NULL (SAFETY_MODE_MODERATE+)

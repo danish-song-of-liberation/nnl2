@@ -39,7 +39,7 @@
  *
  ** @see nnl2_ad_tensor
  ** @see naive_transposeinplace()
- ** @see product
+ ** @see nnl2_product
  **
  ** @return void
  **

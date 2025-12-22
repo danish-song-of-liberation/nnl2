@@ -31,7 +31,7 @@
  ** @exception NNL2Error 
  * If passed tensor with unknown type
  *
- ** @see product
+ ** @see nnl2_product
  **/ 
 void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE 
@@ -48,7 +48,7 @@ void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
 		NNL2_CHECK_NULL_IF_ERR_RETURN(to, "In function nnl2_naive_uniform_inplace, to is NULL");
 	#endif
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 	if(total_elems == 0) return; // If zero elems then early return
 	
 	// Filling with random values

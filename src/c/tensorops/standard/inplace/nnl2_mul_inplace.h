@@ -53,7 +53,7 @@ void nnl2_naive_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multipl
     #endif
     
     // Calculating the total number of elements in the multiplicand tensor
-    size_t len_multiplicand = product(multiplicand->shape, multiplicand->rank);
+    size_t len_multiplicand = nnl2_product(multiplicand->shape, multiplicand->rank);
     
     // If the tensor is empty, exit the function
     if(len_multiplicand == 0) return;
@@ -280,7 +280,7 @@ void nnl2_own_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplie
     #endif
     
     // Calculating the total number of elements in the multiplicand tensor
-    size_t len_multiplicand = product(multiplicand->shape, multiplicand->rank);
+    size_t len_multiplicand = nnl2_product(multiplicand->shape, multiplicand->rank);
     
     // Fallback to naive implementation for small tensors
     if(len_multiplicand < NNL2_MUL_INPLACE_PARALLEL_THRESHOLD) {

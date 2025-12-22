@@ -29,8 +29,8 @@ nnl2_tensor* naive_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divisor)
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(divisor->shape, "Divisor shape is NULL", NULL);
     #endif
  
-    size_t numel_dividend = product(dividend->shape, dividend->rank);
-    size_t numel_divisor = product(divisor->shape, divisor->rank);
+    size_t numel_dividend = nnl2_product(dividend->shape, dividend->rank);
+    size_t numel_divisor = nnl2_product(divisor->shape, divisor->rank);
     
     // Getting the tensor data types
     nnl2_tensor_type dividend_dtype = dividend->dtype;
@@ -244,8 +244,8 @@ nnl2_tensor* nnl2_own_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divis
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(divisor->data, "Divisor data is NULL", NULL);
     #endif
     
-    size_t numel_dividend = product(dividend->shape, dividend->rank);
-    size_t numel_divisor = product(divisor->shape, divisor->rank);
+    size_t numel_dividend = nnl2_product(dividend->shape, dividend->rank);
+    size_t numel_divisor = nnl2_product(divisor->shape, divisor->rank);
     
     // Check broadcasting compatibility
     if((numel_dividend % numel_divisor) != 0) {

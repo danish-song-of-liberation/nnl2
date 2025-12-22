@@ -22,7 +22,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_exp(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* ad_tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -52,7 +52,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_exp(nnl2_ad_tensor* out
 	#endif
     
 	// Calculate total number of elements in tensors
-    size_t numel = product(ad_tensor->data->shape, ad_tensor->data->rank);
+    size_t numel = nnl2_product(ad_tensor->data->shape, ad_tensor->data->rank);
     nnl2_tensor_type dtype = ad_tensor->data->dtype;
 
     switch(dtype) {

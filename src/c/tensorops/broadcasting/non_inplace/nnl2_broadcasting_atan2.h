@@ -28,8 +28,8 @@ nnl2_tensor* naive_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(x->shape, "x shape is NULL", NULL);
     #endif
  
-    size_t numel_y = product(y->shape, y->rank);
-    size_t numel_x = product(x->shape, x->rank);
+    size_t numel_y = nnl2_product(y->shape, y->rank);
+    size_t numel_x = nnl2_product(x->shape, x->rank);
     
     nnl2_tensor_type y_dtype = y->dtype;
     nnl2_tensor_type x_dtype = x->dtype;

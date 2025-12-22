@@ -15,7 +15,7 @@ nnl2_tensor* naive_abs(nnl2_tensor* tensor) {
 		NNL2_FUNC_ENTER();
 	#endif
 
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	
 	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	if(total_elems == 0) return result;
@@ -131,7 +131,7 @@ nnl2_tensor* nnl2_own_abs(const nnl2_tensor* tensor) {
     #endif
     
     // Calculate the total number of elements in the tensor
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     // Create an output tensor with the same shape and data type
     nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);

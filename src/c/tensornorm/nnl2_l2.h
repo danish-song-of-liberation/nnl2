@@ -18,7 +18,7 @@ void naive_l2norm(Tensor* tensor, void* result) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     switch(tensor->dtype) {
         case FLOAT64: {
@@ -106,7 +106,7 @@ void nnl2_own_l2norm(Tensor* tensor, void* result) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) {
         switch(tensor->dtype) {
             case FLOAT64: *((double*)result) = 0.0; break;

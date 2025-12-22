@@ -50,7 +50,7 @@ Tensor* naive_xavier(int* shape, int rank, TensorType dtype, int in, int out, fl
 	
 	Tensor* result = nnl2_empty(shape, rank, dtype);
 	
-	size_t total_elems = product(shape, rank);
+	size_t total_elems = nnl2_product(shape, rank);
 	if(total_elems == 0) return result; // If tensor is empty return empty result
 
 	float scale_param = gain * sqrtf(distribution / (in + out));

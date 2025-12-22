@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  ** @see nnl2_add_inplace
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_sub_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* minuend, nnl2_ad_tensor* subtrahend) {
@@ -54,8 +54,8 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_sub_broadcasting(nnl2_a
     nnl2_tensor* grad_sub = subtrahend->grad;
     nnl2_tensor* data_sub = subtrahend->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_sub = product(data_sub->shape, data_sub->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_sub = nnl2_product(data_sub->shape, data_sub->rank);
     size_t blocks = numel_out / numel_sub;
 
     if(minuend->requires_grad) nnl2_add_inplace(grad_min, grad_out);

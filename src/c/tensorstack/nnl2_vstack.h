@@ -33,8 +33,8 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
     TensorType winner_type = MAX(typea, typeb);
     
 	// Calculate total number of elements in each tensor
-    size_t sizea = product(tensora->shape, tensora->rank);
-    size_t sizeb = product(tensorb->shape, tensorb->rank);
+    size_t sizea = nnl2_product(tensora->shape, tensora->rank);
+    size_t sizeb = nnl2_product(tensorb->shape, tensorb->rank);
     
     void* dataa = tensora->data;
     void* datab = tensorb->data;
@@ -566,8 +566,8 @@ Tensor* nnl2_own_vstack(const Tensor* tensora, const Tensor* tensorb) {
     TensorType winner_type = MAX(typea, typeb);
     bool same_type = (typea == typeb && typea == winner_type);
 
-    size_t sizea = product(tensora->shape, tensora->rank);
-    size_t sizeb = product(tensorb->shape, tensorb->rank);
+    size_t sizea = nnl2_product(tensora->shape, tensora->rank);
+    size_t sizeb = nnl2_product(tensorb->shape, tensorb->rank);
     size_t total_elements = sizea + sizeb;
 
     // Fallback to naive implementation for small tensors

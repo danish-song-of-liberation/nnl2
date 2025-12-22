@@ -49,7 +49,7 @@ nnl2_tensor* naive_axpy(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) 
     #endif
     
     // Calculate the total number of elements in the tensors
-    size_t len = product(summand->shape, summand->rank);
+    size_t len = nnl2_product(summand->shape, summand->rank);
     
     nnl2_tensor_type dtype_summand = summand->dtype;
     nnl2_tensor_type dtype_sumend = sumend->dtype;
@@ -265,7 +265,7 @@ nnl2_tensor* nnl2_own_axpy(const nnl2_tensor* summand, const nnl2_tensor* sumend
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend->data, "Sumend tensor data is NULL", NULL);
     #endif
     
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     
     nnl2_tensor_type dtype_summand = summand->dtype;
     nnl2_tensor_type dtype_sumend = sumend->dtype;

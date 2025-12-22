@@ -30,7 +30,7 @@ nnl2_tensor* naive_axpf(nnl2_tensor* summand, void* sumend, float alpha) {
         }
     #endif
     
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     if(total_elems == 0) return result;
     
     switch(summand->dtype) {
@@ -162,7 +162,7 @@ nnl2_tensor* nnl2_own_axpf(const nnl2_tensor* summand, void* sumend, float alpha
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(sumend, "Sumend pointer is NULL", NULL);
     #endif
     
-    size_t total_elems = product(summand->shape, summand->rank);
+    size_t total_elems = nnl2_product(summand->shape, summand->rank);
     
     // Create output tensor
     nnl2_tensor* result = nnl2_empty(summand->shape, summand->rank, summand->dtype);

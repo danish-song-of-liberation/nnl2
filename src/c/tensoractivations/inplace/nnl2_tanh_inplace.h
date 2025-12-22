@@ -27,7 +27,7 @@ void naive_tanhinplace(Tensor* tensor, bool approx) {
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	int total_elems = product(tensor->shape, tensor->rank);	
+	int total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if(total_elems == 0) return; // If tensor is empty then return
 	
 	void* data = tensor->data;
@@ -97,7 +97,7 @@ void nnl2_own_tanhinplace(Tensor* tensor, bool approx) {
         NNL2_FUNC_ENTER();
     #endif
     
-    int total_elems = product(tensor->shape, tensor->rank);	
+    int total_elems = nnl2_product(tensor->shape, tensor->rank);	
     if(total_elems == 0) return;
 
     // For small tensors, use naive implementation

@@ -53,7 +53,7 @@ void naive_maxinplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
     #endif
     
     // Calculating the total number of elements in the first tensor
-    size_t total_elems = product(tensora->shape, tensora->rank);
+    size_t total_elems = nnl2_product(tensora->shape, tensora->rank);
     
     // If the tensor is empty, exit the function
     if(total_elems == 0) return;
@@ -240,7 +240,7 @@ void nnl2_own_maxinplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(tensorb->data, "Second tensor data is NULL");
     #endif
     
-    size_t total_elems = product(tensora->shape, tensora->rank);
+    size_t total_elems = nnl2_product(tensora->shape, tensora->rank);
     if(total_elems == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
             NNL2_FUNC_EXIT();

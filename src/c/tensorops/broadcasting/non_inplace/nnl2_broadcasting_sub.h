@@ -30,8 +30,8 @@ nnl2_tensor* naive_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtrahen
 	#endif
  
 	// Calculate the total number of elements in each tensor
-	size_t numel_minuend = product(minuend->shape, minuend->rank);
-	size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
+	size_t numel_minuend = nnl2_product(minuend->shape, minuend->rank);
+	size_t numel_subtrahend = nnl2_product(subtrahend->shape, subtrahend->rank);
 	
 	// Getting the tensor data types
 	nnl2_tensor_type minuend_dtype = minuend->dtype;
@@ -269,8 +269,8 @@ nnl2_tensor* nnl2_own_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtra
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(subtrahend->data, "Subtrahend data is NULL", NULL);
     #endif
     
-    size_t numel_minuend = product(minuend->shape, minuend->rank);
-    size_t numel_subtrahend = product(subtrahend->shape, subtrahend->rank);
+    size_t numel_minuend = nnl2_product(minuend->shape, minuend->rank);
+    size_t numel_subtrahend = nnl2_product(subtrahend->shape, subtrahend->rank);
     
     // Check broadcasting compatibility
     if((numel_minuend % numel_subtrahend) != 0) {

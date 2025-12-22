@@ -35,7 +35,7 @@
  * Integer data types are not supported
  *
  ** @see RAND_MAX
- ** @see product
+ ** @see nnl2_product
  ** @see sqrt
  **/
 void nnl2_naive_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, float gain, float distribution, int mode) {
@@ -52,7 +52,7 @@ void nnl2_naive_kaiming_inplace(nnl2_tensor* tensor, int fan_in, int fan_out, fl
         return;
     }
 
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
 
     // Calculate denominator based on mode

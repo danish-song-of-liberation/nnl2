@@ -41,7 +41,7 @@ static Tensor* nnl2_create_view(Tensor* tensor, int32_t* indices, uint8_t num_in
  * The original tensor must not be freed while reinterpreted views exist
  *
  ** @exception NNL2_ERROR_SHAPE_OVERFLOW 
- * Shape product would exceed maximum size
+ * Shape nnl2_product would exceed maximum size
  *
  ** @exception NNL2_ERROR_WILDCARD_COUNT 
  * More than one wildcard dimension found
@@ -82,7 +82,7 @@ Tensor* nnl2_naive_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_s
     }
     
     // Calculate total elements from original tensor
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     // Process shape and handle wildcards
     int32_t wildcard_index = -1; 
@@ -100,7 +100,7 @@ Tensor* nnl2_naive_reinterpret(Tensor* tensor, int32_t* new_shape, int32_t new_s
             #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
                 if (new_shape[i] > 0) {
                     if (wildcard_shape_product > SIZE_MAX / new_shape[i]) {
-                        NNL2_ERROR("Shape product overflow at dimension %d", i);
+                        NNL2_ERROR("Shape nnl2_product overflow at dimension %d", i);
                         return NULL;
                     }
                 }

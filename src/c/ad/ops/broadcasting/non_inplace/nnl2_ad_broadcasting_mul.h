@@ -14,7 +14,7 @@
  * The output tensor from mul_broadcasting operation that needs gradient computation
  *
  ** @details
- * Derivative of a * b with broadcasting follows product rule: 
+ * Derivative of a * b with broadcasting follows nnl2_product rule: 
  * da = b * dout (with broadcasting)
  * db = a * dout (with broadcasting)
  * Broadcasting dimensions receive summed gradients (reduction)
@@ -69,7 +69,7 @@ static void nnl2_ad_reverse_backward_mul_broadcasting(nnl2_ad_tensor* tensor) {
  * Whether to track this operation in computation graph
  *  
  ** @return nnl2_ad_tensor*
- * New AD tensor containing product of inputs with broadcasting, or NULL on failure
+ * New AD tensor containing nnl2_product of inputs with broadcasting, or NULL on failure
  *
  ** @exception NNL2Error
  * Returns NULL if multiplier or multiplicand is NULL (SAFETY_MODE_MODERATE+)

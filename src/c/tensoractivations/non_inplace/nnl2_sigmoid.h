@@ -49,7 +49,7 @@ Tensor* naive_sigmoid(Tensor* tensor, bool approx) {
         }
     #endif
 
-    size_t total_elems = product(tensor->shape, tensor->rank);    
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);    
     Tensor* result = NULL;
     
     // For INT32 input, create FLOAT64 output tensor
@@ -659,7 +659,7 @@ Tensor* nnl2_own_sigmoid(Tensor* tensor, bool approx) {
         }
     #endif
 
-    size_t total_elems = product(tensor->shape, tensor->rank);    
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);    
     Tensor* result = NULL;
     
     // For INT32 input, create FLOAT64 output tensor

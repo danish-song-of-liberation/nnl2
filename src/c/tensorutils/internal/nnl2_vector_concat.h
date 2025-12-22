@@ -19,13 +19,13 @@
 nnl2_tensor* nnl2_naive_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype) {
 	size_t numel = 0;
 	
-	for(size_t it = 0; it < count; it++) numel += product(tensors[it] -> shape, tensors[it] -> rank);
+	for(size_t it = 0; it < count; it++) numel += nnl2_product(tensors[it] -> shape, tensors[it] -> rank);
 
 	nnl2_tensor* tensor = nnl2_empty((int[]){ numel }, 1, dtype);
 	
 	size_t offset = 0;
     for (size_t it = 0; it < count; it++) {
-        size_t elem_count = product(tensors[it]->shape, tensors[it]->rank);
+        size_t elem_count = nnl2_product(tensors[it]->shape, tensors[it]->rank);
         size_t byte_size = elem_count * get_dtype_size(dtype);
         memcpy((char*)tensor->data + offset, tensors[it]->data, byte_size);
         offset += byte_size;

@@ -15,7 +15,7 @@
  ** @see nnl2_relu_float32
  ** @see nnl2_relu_int32
  ** @see nnl2_empty
- ** @see product
+ ** @see nnl2_product
  **/
 Tensor* naive_relu(Tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -28,7 +28,7 @@ Tensor* naive_relu(Tensor* tensor) {
 		}
 	#endif
 
-	int total_elems = product(tensor->shape, tensor->rank);	
+	int total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
 	
 	if(total_elems == 0) return result; // If tensor is empty return tensor with 0 elements
@@ -126,7 +126,7 @@ Tensor* nnl2_own_relu(Tensor* tensor) {
         }
     #endif
 
-    size_t total_elems = product(tensor->shape, tensor->rank);	
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
     Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     
     if(total_elems == 0) return result;
@@ -235,7 +235,7 @@ Tensor* nnl2_own_relu(Tensor* tensor) {
 void nnl2_own_relu_float64_non_inplace(Tensor* tensor, Tensor* result) {
     double* src_data = (double*)tensor->data;
     double* dst_data = (double*)result->data;
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     #if defined(NNL2_AVX512_AVAILABLE)
 		// AVX-512 version (8 elements per iteration)
@@ -450,7 +450,7 @@ void* nnl2_own_prelu_int32(void* arg) {
  */
 void nnl2_own_relu_inplace_float64_extreme(Tensor* tensor) {
     double* data = (double*)tensor->data;
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     #if defined(NNL2_AVX512_AVAILABLE)
 		// AVX-512 version

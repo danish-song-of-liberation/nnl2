@@ -41,7 +41,7 @@ void nnl2_naive_rand_inplace(nnl2_tensor* tensor) {
         NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "In function nnl2_naive_rand_inplace, passed tensor is NULL");
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return; // If zero elems then early return
     
     // Filling with random values [0, 1]

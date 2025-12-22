@@ -17,7 +17,7 @@
  *
  ** @see nnl2_tensor
  * @see nnl2_empty
- * @see product
+ * @see nnl2_product
  */
 nnl2_tensor* nnl2_naive_sqrt(const nnl2_tensor* tensor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -30,7 +30,7 @@ nnl2_tensor* nnl2_naive_sqrt(const nnl2_tensor* tensor) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "nnl2_tensor's data is NULL (.sqrt)", NULL);
     #endif
 
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 
     // Allocate new tensor of the same shape and dtype
     nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);

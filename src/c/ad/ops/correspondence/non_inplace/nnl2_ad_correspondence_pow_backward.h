@@ -25,7 +25,7 @@
  ** @note
  * MVP
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow_correspondence(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* exponent_tensor, void* exponent) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -66,7 +66,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow_correspondence(nnl2
             nnl2_float64* x = (nnl2_float64*)data_in->data;
             nnl2_float64* gout = (nnl2_float64*)grad_out->data;
             nnl2_float64* gin  = (nnl2_float64*)grad_in->data;
-            size_t n = product(data_in->shape, data_in->rank);
+            size_t n = nnl2_product(data_in->shape, data_in->rank);
             for(size_t i = 0; i < n; i++) gin[i] += gout[i] * k * pow(x[i], k - 1.0);
             break;
         }
@@ -77,7 +77,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow_correspondence(nnl2
             nnl2_float32* x = (nnl2_float32*)data_in->data;
             nnl2_float32* gout = (nnl2_float32*)grad_out->data;
             nnl2_float32* gin  = (nnl2_float32*)grad_in->data;
-            size_t n = product(data_in->shape, data_in->rank);
+            size_t n = nnl2_product(data_in->shape, data_in->rank);
             for(size_t i = 0; i < n; i++) gin[i] += gout[i] * k * powf(x[i], k - 1.0f);
             break;
         }
@@ -88,7 +88,7 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_pow_correspondence(nnl2
             nnl2_int32* x = (nnl2_int32*)data_in->data;
             nnl2_int32* gout = (nnl2_int32*)grad_out->data;
             nnl2_int32* gin  = (nnl2_int32*)grad_in->data;
-            size_t n = product(data_in->shape, data_in->rank);
+            size_t n = nnl2_product(data_in->shape, data_in->rank);
 			
             for(size_t i = 0; i < n; i++) {
                 nnl2_int32 p = 1;

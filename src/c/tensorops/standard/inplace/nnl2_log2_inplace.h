@@ -20,7 +20,7 @@ void nnl2_naive_log2inplace(nnl2_tensor* tensor) {
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t len = product(tensor->shape, tensor->rank);
+	size_t len = nnl2_product(tensor->shape, tensor->rank);
 	
 	// If tensor empty, exiting the function
 	if(len == 0) return;

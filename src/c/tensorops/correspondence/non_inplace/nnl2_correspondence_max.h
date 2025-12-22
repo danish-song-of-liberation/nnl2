@@ -27,7 +27,7 @@ nnl2_tensor* naive_max_maxf(const nnl2_tensor* tensor, void* threshold) {
         }
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return result;
     
     switch(tensor->dtype) {
@@ -153,7 +153,7 @@ nnl2_tensor* nnl2_own_max_maxf(const nnl2_tensor* tensor, void* threshold) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(threshold, "Threshold pointer is NULL", NULL);
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     // Create output tensor
     nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);

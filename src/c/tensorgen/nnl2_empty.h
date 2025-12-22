@@ -67,7 +67,7 @@
  *
  ** @see free_tensor
  ** @see get_dtype_size
- ** @see product
+ ** @see nnl2_product
  ** @see ALLOC_ALIGNED
  ** @see NNL2_DEBUG_MODE
  ** @see NNL2_SAFETY_MODE

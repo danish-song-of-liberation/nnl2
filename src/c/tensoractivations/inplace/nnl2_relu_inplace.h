@@ -23,14 +23,14 @@
  ** @see nnl2_relu_float64_inplace
  ** @see nnl2_relu_float32_inplace
  ** @see nnl2_relu_int32_inplace
- ** @see product
+ ** @see nnl2_product
  **/
 void naive_reluinplace(Tensor* tensor) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if(total_elems == 0) return; // If tensor is empty return
 	
 	void* data = tensor->data;
@@ -132,7 +132,7 @@ void nnl2_own_relu_inplace(Tensor* tensor) {
 		NNL2_FUNC_ENTER();
 	#endif
 	
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	
 	if(total_elems == 0) {
 		return; // If tensor is empty return

@@ -27,7 +27,7 @@
  * d/dy = x / (x^2 + y^2)
  * d/dx = -y / (x^2 + y^2)
  *
- ** @see product
+ ** @see nnl2_product
  **/
 static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_atan2_broadcasting(nnl2_ad_tensor* out_tensor, nnl2_ad_tensor* y, nnl2_ad_tensor* x) {
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -54,9 +54,9 @@ static NNL2_FORCE_INLINE void nnl2_ad_reverse_derivative_atan2_broadcasting(nnl2
     nnl2_tensor* data_y = y->data;
     nnl2_tensor* data_x = x->data;
 
-    size_t numel_out = product(grad_out->shape, grad_out->rank);
-    size_t numel_y = product(data_y->shape, data_y->rank);
-    size_t numel_x = product(data_x->shape, data_x->rank);
+    size_t numel_out = nnl2_product(grad_out->shape, grad_out->rank);
+    size_t numel_y = nnl2_product(data_y->shape, data_y->rank);
+    size_t numel_x = nnl2_product(data_x->shape, data_x->rank);
 
     size_t blocks_y = numel_out / numel_y;
     size_t blocks_x = numel_out / numel_x;

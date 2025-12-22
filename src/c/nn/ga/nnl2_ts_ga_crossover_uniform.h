@@ -33,7 +33,7 @@ nnl2_tensor* nnl2_nn_ga_naive_crossover_uniform(nnl2_tensor* parent_x, nnl2_tens
 		}
 	#endif 
 	
-	size_t numel = product(parent_x -> shape, parent_x -> rank);
+	size_t numel = nnl2_product(parent_x -> shape, parent_x -> rank);
 	
 	switch(child -> dtype) {
         case FLOAT64: {

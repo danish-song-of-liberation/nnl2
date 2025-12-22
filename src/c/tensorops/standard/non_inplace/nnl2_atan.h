@@ -19,7 +19,7 @@
  *
  ** @see nnl2_tensor
  ** @see nnl2_empty
- ** @see product
+ ** @see nnl2_product
  */
 nnl2_tensor* nnl2_naive_atan(const nnl2_tensor* tensor) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -32,7 +32,7 @@ nnl2_tensor* nnl2_naive_atan(const nnl2_tensor* tensor) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(tensor->data, "nnl2_tensor's data is NULL (.atan)", NULL);
     #endif
 
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 
     nnl2_tensor_type result_dtype = tensor->dtype;
     

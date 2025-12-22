@@ -29,8 +29,8 @@ nnl2_tensor* naive_pow_broadcasting(nnl2_tensor* base, nnl2_tensor* exponent) {
         NNL2_CHECK_NULL_IF_ERR_RETURN_VAL(exponent->shape, "Exponent shape is NULL", NULL);
     #endif
  
-    size_t numel_base = product(base->shape, base->rank);
-    size_t numel_exponent = product(exponent->shape, exponent->rank);
+    size_t numel_base = nnl2_product(base->shape, base->rank);
+    size_t numel_exponent = nnl2_product(exponent->shape, exponent->rank);
     
     // Getting the tensor data types
     nnl2_tensor_type base_dtype = base->dtype;

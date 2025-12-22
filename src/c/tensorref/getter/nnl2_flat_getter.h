@@ -19,7 +19,7 @@ void* nnl2_get_raw_tensor_elem_at(Tensor* tensor, size_t at) {
 	#endif
 	
 	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-		size_t total_elems = product(tensor->shape, tensor->rank);
+		size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
 		if(at >= total_elems) {
 			NNL2_ERROR("Index out of bounds: index %zd exceeds tensor size %zd", at, total_elems);
 			return NULL;

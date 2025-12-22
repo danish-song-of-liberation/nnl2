@@ -34,7 +34,7 @@ static void nnl2_ad_reverse_derivative_vstack(nnl2_ad_tensor* output_tensor, nnl
 	nnl2_tensor_type dtype = output_tensor->data->dtype;
 	size_t type_size = get_dtype_size(dtype);
 
-	size_t numela = product(tensora->data->shape, tensora->data->rank);
+	size_t numela = nnl2_product(tensora->data->shape, tensora->data->rank);
 	
 	if(tensora->requires_grad) {
 		if(!memcpy(tensora->grad->data, output_tensor->grad, numela * type_size)) {
@@ -43,7 +43,7 @@ static void nnl2_ad_reverse_derivative_vstack(nnl2_ad_tensor* output_tensor, nnl
 	}
 	
 	if(tensorb->requires_grad) {
-		size_t numelb = product(tensorb->data->shape, tensorb->data->rank);
+		size_t numelb = nnl2_product(tensorb->data->shape, tensorb->data->rank);
 		void* src = (char*)output_tensor->grad + numela * type_size;
 		
 		if(!memcpy(tensorb->grad->data, src, numelb * type_size)) {

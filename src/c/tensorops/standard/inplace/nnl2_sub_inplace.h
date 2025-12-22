@@ -53,7 +53,7 @@ void nnl2_naive_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) 
     #endif
     
     // Calculating the total number of elements in the minuend tensor
-    size_t len_minuend = product(minuend->shape, minuend->rank);
+    size_t len_minuend = nnl2_product(minuend->shape, minuend->rank);
     
     // If the tensor is empty, exit the function
     if(len_minuend == 0) return;
@@ -275,7 +275,7 @@ void nnl2_avx256_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend)
     #endif
     
     // Calculating the total number of elements in the minuend tensor
-    size_t len_minuend = product(minuend->shape, minuend->rank);    
+    size_t len_minuend = nnl2_product(minuend->shape, minuend->rank);    
     
     // If the tensor is empty, exit the function
     if(len_minuend == 0) return;
@@ -855,7 +855,7 @@ void nnl2_own_sub_inplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
     #endif
     
     // Calculating the total number of elements in the minuend tensor
-    size_t len_minuend = product(minuend->shape, minuend->rank);
+    size_t len_minuend = nnl2_product(minuend->shape, minuend->rank);
     
     // Fallback to naive implementation for small tensors
     if(len_minuend < NNL2_SUB_INPLACE_PARALLEL_THRESHOLD) {

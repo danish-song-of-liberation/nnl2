@@ -16,7 +16,7 @@
  * Pointer to memory where result will be stored
  */
 void nnl2_naive_mae(nnl2_tensor* prediction, nnl2_tensor* target, void* record) {
-    size_t numel = product(prediction -> shape, prediction -> rank);
+    size_t numel = nnl2_product(prediction -> shape, prediction -> rank);
     
     switch(prediction -> dtype) {
         case FLOAT64: {

@@ -28,7 +28,7 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
 	#endif
 	
 	// Calculate total number of elements
-	int total_elems = product(tensor->shape, tensor->rank);	
+	int total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype); 
 	
 	if(total_elems == 0) return result; // If tensor is empty then return new empty tensor
@@ -194,7 +194,7 @@ void* nnl2_simple_pleakyrelu_int32_to_float64(void* arg) {
  */
 static bool nnl2_leakyrelu_int32_needs_conversion(Tensor* tensor, float alpha) {
     int32_t* data = (int32_t*)tensor->data;
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     
     for(size_t i = 0; i < total_elems; i++) {
         if(data[i] < 0) {
@@ -228,7 +228,7 @@ Tensor* nnl2_simple_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
     #endif
     
     // Calculate total number of elements
-    size_t total_elems = product(tensor->shape, tensor->rank);	
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
     Tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
     
     if(total_elems == 0) return result;
@@ -387,7 +387,7 @@ void nnl2_simple_leakyrelu_inplace(Tensor* tensor, float alpha) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);	
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
     if(total_elems == 0) return;
     
     // In-place doesn't support int32->float64 conversion

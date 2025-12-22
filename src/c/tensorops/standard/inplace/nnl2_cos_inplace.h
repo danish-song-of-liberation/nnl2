@@ -12,7 +12,7 @@
  ** @note
  * Works in-place
  *
- ** @see product (maybe already nnl2_product)
+ ** @see nnl2_product (maybe already nnl2_product)
  ** @see nnl2_tensor
  **/
 void nnl2_naive_cos_inplace(nnl2_tensor* tensor) {
@@ -27,7 +27,7 @@ void nnl2_naive_cos_inplace(nnl2_tensor* tensor) {
 	#endif
 	
 	// Calculating the total number of elements in the base tensor
-    size_t numel = product(tensor->shape, tensor->rank);
+    size_t numel = nnl2_product(tensor->shape, tensor->rank);
 	
 	// If the tensor is empty, exit the function
     if(numel == 0) return;

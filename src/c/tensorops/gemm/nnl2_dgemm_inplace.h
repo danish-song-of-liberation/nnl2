@@ -23,7 +23,7 @@
  * Number of columns in matrix A and rows in matrix B
  *
  ** @param alpha
- * Scalar multiplier for the matrix product A*B
+ * Scalar multiplier for the matrix nnl2_product A*B
  *
  ** @param a
  * Pointer to tensor containing matrix A
@@ -221,7 +221,7 @@ void naive_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
  * Number of columns in matrix A and rows in matrix B
  *
  ** @param alpha
- * Scalar multiplier for the matrix product A*B
+ * Scalar multiplier for the matrix nnl2_product A*B
  *
  ** @param a
  * Pointer to tensor containing matrix A
@@ -343,7 +343,7 @@ void blas_dgemminplace(const nnl2_order order, const nnl2_transpose transa,
                 m,               // Number of rows in matrices A and C
                 n,               // Number of columns in matrices B and C
                 k,               // Number of columns in A and rows in B
-                alpha,           // Scalar multiplier for A*B product
+                alpha,           // Scalar multiplier for A*B nnl2_product
                 a_data,          // Pointer to matrix A data
                 lda,             // Leading dimension of matrix A
                 b_data,          // Pointer to matrix B data

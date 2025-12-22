@@ -38,7 +38,7 @@ void naive_sigmoidinplace(Tensor* tensor, bool approx) {
 	#endif
 	
 	// Calculate total number of elements
-	size_t total_elems = product(tensor->shape, tensor->rank);	
+	size_t total_elems = nnl2_product(tensor->shape, tensor->rank);	
 	if(total_elems == 0) return; // If 0 elems then return
 	
 	void* data = tensor->data;
@@ -632,7 +632,7 @@ void nnl2_own_sigmoid_inplace(Tensor* tensor, bool approx) {
         NNL2_FUNC_ENTER();
     #endif
     
-    size_t total_elems = product(tensor->shape, tensor->rank);    
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);    
     
     if(total_elems == 0) {
         return;

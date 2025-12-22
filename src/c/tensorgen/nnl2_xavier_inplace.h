@@ -25,7 +25,7 @@
  * Integer data types are not supported
  *
  ** @see RAND_MAX
- ** @see product
+ ** @see nnl2_product
  ** @see sqrt
  **/
 void nnl2_naive_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain, float distribution) {
@@ -42,7 +42,7 @@ void nnl2_naive_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain,
         return;
     }
 
-    size_t total_elems = product(tensor->shape, tensor->rank);
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
     if(total_elems == 0) return;
 
     float scale_param = gain * sqrt(distribution / (in + out));

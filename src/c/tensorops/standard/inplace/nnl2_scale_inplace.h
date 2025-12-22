@@ -25,7 +25,7 @@ void naive_scaleinplace(nnl2_tensor* tensor, float multiplier) {
 	void* data = tensor->data;
 	
 	// Calculate the total number of elements in the tensor
-	int num_elems = product(tensor->shape, tensor->rank);
+	int num_elems = nnl2_product(tensor->shape, tensor->rank);
 	if(num_elems == 0) return; // If the tensor is empty, exit
 	
 	switch(tensor->dtype) {

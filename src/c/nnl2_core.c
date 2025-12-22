@@ -129,7 +129,7 @@ void nnl2_init_auxiliary();
 void nnl2_init_correspondence_inplace();       
 
 /** @brief 
- * Registers out-of-place correspondence operations  
+ * Registers out-of-place correspondence operations   
  *
  ** @details 
  * Out-of-place operations that correspond to a standard function
@@ -623,6 +623,10 @@ nnl2_tensor* lisp_call_sqrt(const nnl2_tensor* tensor) {
    
 void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {  
 	leakyreluinplace(tensor, alpha);    
+}  
+
+void lisp_call_reluinplace(Tensor* tensor) {  
+	reluinplace(tensor);    
 }  
    
 Tensor* lisp_call_leakyrelu(Tensor* tensor, float alpha, bool save_type) {   

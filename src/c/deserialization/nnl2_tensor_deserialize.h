@@ -210,7 +210,7 @@ nnl2_tensor* nnl2_tensor_deserialize(const char* path) {
 	size_t total_elements;
 
 	if(tensor -> rank > 0) {
-		total_elements = product(tensor->shape, rank);
+		total_elements = nnl2_product(tensor->shape, rank);
 	} else {
 		total_elements = 0;
 	}
