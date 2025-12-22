@@ -1022,9 +1022,9 @@ concatfn nnl2_concat;
 /** 
  * @brief Makes the concat backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(concat);
+MAKE_CURRENT_BACKEND(concat);
 
 /** 
  * @brief Sets the backend for concat operation
@@ -1033,7 +1033,7 @@ make_current_backend(concat);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_concat_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(concat_backends, nnl2_concat, backend_name, current_backend(concat));
+    ESET_BACKEND_BY_NAME(concat_backends, nnl2_concat, backend_name, CURRENT_BACKEND(concat));
 }
 
 /** 
@@ -1042,7 +1042,7 @@ void set_concat_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_concat_backend() {
-	return current_backend(concat);
+	return CURRENT_BACKEND(concat);
 }
 
 /** 

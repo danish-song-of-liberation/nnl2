@@ -708,9 +708,9 @@ sigmoidinplacefn sigmoidinplace;
 /** 
  * @brief Makes the sigmoidinplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(sigmoidinplace);
+MAKE_CURRENT_BACKEND(sigmoidinplace);
 
 /** 
  * @brief Sets the backend for sigmoidinplace operation
@@ -719,7 +719,7 @@ make_current_backend(sigmoidinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_sigmoidinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(sigmoidinplace_backends, sigmoidinplace, backend_name, current_backend(sigmoidinplace));
+    ESET_BACKEND_BY_NAME(sigmoidinplace_backends, sigmoidinplace, backend_name, CURRENT_BACKEND(sigmoidinplace));
 }
 
 /** 
@@ -728,7 +728,7 @@ void set_sigmoidinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_sigmoidinplace_backend() {
-	return current_backend(sigmoidinplace);
+	return CURRENT_BACKEND(sigmoidinplace);
 }
 
 /** 

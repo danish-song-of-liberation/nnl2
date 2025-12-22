@@ -148,9 +148,9 @@ transposefn transpose;
 /** 
  * @brief Makes the transpose backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(transpose);
+MAKE_CURRENT_BACKEND(transpose);
 
 /** 
  * @brief Sets the backend for transpose operation
@@ -159,7 +159,7 @@ make_current_backend(transpose);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_transpose_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(transpose_backends, transpose, backend_name, current_backend(transpose));
+    ESET_BACKEND_BY_NAME(transpose_backends, transpose, backend_name, CURRENT_BACKEND(transpose));
 }
 
 /** 
@@ -168,7 +168,7 @@ void set_transpose_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_transpose_backend() {
-    return current_backend(transpose);
+    return CURRENT_BACKEND(transpose);
 }
 
 /** 

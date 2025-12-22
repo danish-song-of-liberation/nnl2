@@ -625,7 +625,7 @@ void lisp_call_leakyreluinplace(Tensor* tensor, float alpha) {
 	leakyreluinplace(tensor, alpha);    
 }  
 
-void lisp_call_reluinplace(Tensor* tensor) {  
+void lisp_call_reluinplace(Tensor* tensor) {   
 	reluinplace(tensor);    
 }  
    

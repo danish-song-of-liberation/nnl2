@@ -86,7 +86,7 @@ xavierinplacefn xavier_inplace;
 /**
  * @brief Makes the in-place Xavier backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
 MAKE_CURRENT_BACKEND(xavier_inplace);
 

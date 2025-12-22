@@ -144,9 +144,9 @@ randninplacefn randn_inplace;
 /** 
  * @brief Makes the randn_inplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(randn_inplace);
+MAKE_CURRENT_BACKEND(randn_inplace);
 
 /** 
  * @brief Sets the backend for randn_inplace operation
@@ -155,7 +155,7 @@ make_current_backend(randn_inplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_randn_inplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(randn_inplace_backends, randn_inplace, backend_name, current_backend(randn_inplace));
+    ESET_BACKEND_BY_NAME(randn_inplace_backends, randn_inplace, backend_name, CURRENT_BACKEND(randn_inplace));
 }
 
 /** 
@@ -164,7 +164,7 @@ void set_randn_inplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_randn_inplace_backend() {
-    return current_backend(randn_inplace);
+    return CURRENT_BACKEND(randn_inplace);
 }
 
 /**

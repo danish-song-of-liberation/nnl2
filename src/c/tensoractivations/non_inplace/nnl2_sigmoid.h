@@ -845,9 +845,9 @@ sigmoidfn sigmoid;
 /** 
  * @brief Makes the sigmoid backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(sigmoid);
+MAKE_CURRENT_BACKEND(sigmoid);
 
 /** 
  * @brief Sets the backend for sigmoid operation
@@ -856,7 +856,7 @@ make_current_backend(sigmoid);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_sigmoid_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(sigmoid_backends, sigmoid, backend_name, current_backend(sigmoid));
+    ESET_BACKEND_BY_NAME(sigmoid_backends, sigmoid, backend_name, CURRENT_BACKEND(sigmoid));
 }
 
 /** 
@@ -865,7 +865,7 @@ void set_sigmoid_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_sigmoid_backend() {
-    return current_backend(sigmoid);
+    return CURRENT_BACKEND(sigmoid);
 }
 
 /** 

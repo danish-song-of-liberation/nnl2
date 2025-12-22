@@ -521,9 +521,9 @@ relufn relu;
 /** 
  * @brief Makes the relu backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(relu);
+MAKE_CURRENT_BACKEND(relu);
 
 /** 
  * @brief Sets the backend for ReLU operation
@@ -532,7 +532,7 @@ make_current_backend(relu);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_relu_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(relu_backends, relu, backend_name, current_backend(relu));
+    ESET_BACKEND_BY_NAME(relu_backends, relu, backend_name, CURRENT_BACKEND(relu));
 }
 
 /** 
@@ -541,7 +541,7 @@ void set_relu_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_relu_backend() {
-	return current_backend(relu);
+	return CURRENT_BACKEND(relu);
 }
 
 /** 

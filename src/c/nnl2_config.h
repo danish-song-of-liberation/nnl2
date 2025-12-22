@@ -126,17 +126,6 @@
 #ifdef OPENBLAS_AVAILABLE
 #include <cblas.h>
 #endif
-
-///@{ [temp_backend_macros]
-
-/** @brief
- * I had to delete all these macros after a certain period of time. 
- * if you see this, it means that I forgot, please let me know
- */
-#define current_backend(name) current_##name##_backend_name 
-#define make_current_backend(name) static char current_##name##_backend_name[MAX_BACKEND_NAME_LENGTH] = ""
-
-///@} [temp_backend_macros]
 	
 ///@{ [backend_macros]	
 	

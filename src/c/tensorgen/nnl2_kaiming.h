@@ -125,9 +125,9 @@ kaimingfn kaiming;
 /** 
  * @brief Makes the kaiming backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(kaiming);
+MAKE_CURRENT_BACKEND(kaiming);
 
 /** 
  * @brief Sets the backend for kaiming operation
@@ -136,7 +136,7 @@ make_current_backend(kaiming);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_kaiming_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(kaiming_backends, kaiming, backend_name, current_backend(kaiming));
+    ESET_BACKEND_BY_NAME(kaiming_backends, kaiming, backend_name, CURRENT_BACKEND(kaiming));
 }
 
 /** 
@@ -145,7 +145,7 @@ void set_kaiming_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_kaiming_backend() {
-    return current_backend(kaiming);
+    return CURRENT_BACKEND(kaiming);
 }
 
 /** 

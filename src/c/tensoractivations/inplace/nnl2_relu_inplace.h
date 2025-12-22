@@ -385,9 +385,9 @@ reluinplacefn reluinplace;
 /** 
  * @brief Makes the reluinplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(reluinplace);
+MAKE_CURRENT_BACKEND(reluinplace);
 
 /** 
  * @brief Sets the backend for in-place ReLU operation
@@ -396,7 +396,7 @@ make_current_backend(reluinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_reluinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(reluinplace_backends, reluinplace, backend_name, current_backend(reluinplace));
+    ESET_BACKEND_BY_NAME(reluinplace_backends, reluinplace, backend_name, CURRENT_BACKEND(reluinplace));
 }
 
 /** 
@@ -405,7 +405,7 @@ void set_reluinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_reluinplace_backend() {
-	return current_backend(reluinplace);
+	return CURRENT_BACKEND(reluinplace);
 }
 
 /** 

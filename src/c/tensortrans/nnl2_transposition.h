@@ -128,7 +128,7 @@ void set_transposition_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_transposition_backend() {
-	return current_backend(transposition);
+	return CURRENT_BACKEND(transposition);
 }
 
 /** 

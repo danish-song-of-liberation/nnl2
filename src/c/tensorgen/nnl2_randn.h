@@ -134,9 +134,9 @@ randnfn nnl2_randn;
 /** 
  * @brief Makes the randn backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(randn);
+MAKE_CURRENT_BACKEND(randn);
 
 /** 
  * @brief Sets the backend for randn operation
@@ -145,7 +145,7 @@ make_current_backend(randn);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_randn_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(randn_backends, nnl2_randn, backend_name, current_backend(randn));
+    ESET_BACKEND_BY_NAME(randn_backends, nnl2_randn, backend_name, CURRENT_BACKEND(randn));
 }
 
 /** 
@@ -154,7 +154,7 @@ void set_randn_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_randn_backend() {
-    return current_backend(randn);
+    return CURRENT_BACKEND(randn);
 }
 
 /** 

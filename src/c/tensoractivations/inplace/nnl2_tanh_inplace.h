@@ -224,9 +224,9 @@ tanhinplacefn tanhinplace;
 /** 
  * @brief Makes the tanh in-place backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(tanhinplace);
+MAKE_CURRENT_BACKEND(tanhinplace);
 
 /** 
  * @brief Sets the backend for tanh in-place operation
@@ -235,7 +235,7 @@ make_current_backend(tanhinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_tanhinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(tanhinplace_backends, tanhinplace, backend_name, current_backend(tanhinplace));
+    ESET_BACKEND_BY_NAME(tanhinplace_backends, tanhinplace, backend_name, CURRENT_BACKEND(tanhinplace));
 }
 
 /** 
@@ -244,7 +244,7 @@ void set_tanhinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_tanhinplace_backend() {
-	return current_backend(tanhinplace);
+	return CURRENT_BACKEND(tanhinplace);
 }
 
 /** 

@@ -108,9 +108,9 @@ uniformfn uniform;
 /** 
  * @brief Makes the uniform backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(uniform);
+MAKE_CURRENT_BACKEND(uniform);
 
 /** 
  * @brief Sets the backend for uniform operation
@@ -119,7 +119,7 @@ make_current_backend(uniform);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_uniform_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(uniform_backends, uniform, backend_name, current_backend(uniform));
+    ESET_BACKEND_BY_NAME(uniform_backends, uniform, backend_name, CURRENT_BACKEND(uniform));
 }
 
 /** 
@@ -128,7 +128,7 @@ void set_uniform_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_uniform_backend() {
-	return current_backend(uniform);
+	return CURRENT_BACKEND(uniform);
 }
 
 /** 

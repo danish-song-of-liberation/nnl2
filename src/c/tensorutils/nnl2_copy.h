@@ -490,9 +490,9 @@ copyfn nnl2_copy;
 /** 
  * @brief Makes the copy backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(copy);
+MAKE_CURRENT_BACKEND(copy);
 
 /** 
  * @brief Sets the backend for copy operation
@@ -501,7 +501,7 @@ make_current_backend(copy);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_copy_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(copy_backends, nnl2_copy, backend_name, current_backend(copy));
+    ESET_BACKEND_BY_NAME(copy_backends, nnl2_copy, backend_name, CURRENT_BACKEND(copy));
 }
 
 /** 
@@ -510,7 +510,7 @@ void set_copy_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_copy_backend() {
-	return current_backend(copy);
+	return CURRENT_BACKEND(copy);
 }
 
 /** 

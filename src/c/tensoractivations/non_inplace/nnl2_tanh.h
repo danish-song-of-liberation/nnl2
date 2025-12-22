@@ -315,9 +315,9 @@ tanhfn nnl2_tanh;
 /** 
  * @brief Makes the tanh backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(tanh);
+MAKE_CURRENT_BACKEND(tanh);
 
 /** 
  * @brief Sets the backend for tanh operation
@@ -326,7 +326,7 @@ make_current_backend(tanh);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_tanh_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(tanh_backends, nnl2_tanh, backend_name, current_backend(tanh));
+    ESET_BACKEND_BY_NAME(tanh_backends, nnl2_tanh, backend_name, CURRENT_BACKEND(tanh));
 }
 
 /** 
@@ -335,7 +335,7 @@ void set_tanh_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_tanh_backend() {
-	return current_backend(tanh);
+	return CURRENT_BACKEND(tanh);
 }
 
 /** 

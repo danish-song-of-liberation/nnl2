@@ -889,9 +889,9 @@ vstackfn vstack;
 /** 
  * @brief Makes the vstack backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(vstack);
+MAKE_CURRENT_BACKEND(vstack);
 
 /** 
  * @brief Sets the backend for vstack operation
@@ -900,7 +900,7 @@ make_current_backend(vstack);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_vstack_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(vstack_backends, vstack, backend_name, current_backend(vstack));
+    ESET_BACKEND_BY_NAME(vstack_backends, vstack, backend_name, CURRENT_BACKEND(vstack));
 }
 
 /** 
@@ -909,7 +909,7 @@ void set_vstack_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_vstack_backend() {
-	return current_backend(vstack);
+	return CURRENT_BACKEND(vstack);
 }
 
 /** 

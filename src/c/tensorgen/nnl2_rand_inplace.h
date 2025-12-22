@@ -108,9 +108,9 @@ randinplacefn rand_inplace;
 /** 
  * @brief Makes the rand_inplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(rand_inplace);
+MAKE_CURRENT_BACKEND(rand_inplace);
 
 /** 
  * @brief Sets the backend for rand_inplace operation
@@ -119,7 +119,7 @@ make_current_backend(rand_inplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_rand_inplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(rand_inplace_backends, rand_inplace, backend_name, current_backend(rand_inplace));
+    ESET_BACKEND_BY_NAME(rand_inplace_backends, rand_inplace, backend_name, CURRENT_BACKEND(rand_inplace));
 }
 
 /** 
@@ -128,7 +128,7 @@ void set_rand_inplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_rand_inplace_backend() {
-    return current_backend(rand_inplace);
+    return CURRENT_BACKEND(rand_inplace);
 }
 
 /**

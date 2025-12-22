@@ -1580,7 +1580,7 @@ void set_inplace_fill_backend(const char* backend_name) {
  * @see CURRENT_BACKEND
  */
 const char* get_inplace_fill_backend() {
-	return current_backend(inplace_fill);
+	return CURRENT_BACKEND(inplace_fill);
 }
 
 /** 

@@ -92,9 +92,9 @@ randfn nnl2_rand;
 /** 
  * @brief Makes the rand backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(rand);
+MAKE_CURRENT_BACKEND(rand);
 
 /** 
  * @brief Sets the backend for rand operation
@@ -103,7 +103,7 @@ make_current_backend(rand);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_rand_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(rand_backends, nnl2_rand, backend_name, current_backend(rand));
+    ESET_BACKEND_BY_NAME(rand_backends, nnl2_rand, backend_name, CURRENT_BACKEND(rand));
 }
 
 /** 
@@ -112,7 +112,7 @@ void set_rand_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_rand_backend() {
-    return current_backend(rand);
+    return CURRENT_BACKEND(rand);
 }
 
 /** 

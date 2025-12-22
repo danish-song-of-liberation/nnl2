@@ -112,9 +112,9 @@ uniforminplacefn uniform_inplace;
 /** 
  * @brief Makes the uniform_inplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(uniform_inplace);
+MAKE_CURRENT_BACKEND(uniform_inplace);
 
 /** 
  * @brief Sets the backend for uniform_inplace operation
@@ -123,7 +123,7 @@ make_current_backend(uniform_inplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_uniform_inplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(uniform_inplace_backends, uniform_inplace, backend_name, current_backend(uniform_inplace));
+    ESET_BACKEND_BY_NAME(uniform_inplace_backends, uniform_inplace, backend_name, CURRENT_BACKEND(uniform_inplace));
 }
 
 /** 
@@ -132,7 +132,7 @@ void set_uniform_inplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_uniform_inplace_backend() {
-    return current_backend(uniform_inplace);
+    return CURRENT_BACKEND(uniform_inplace);
 }
 
 /**

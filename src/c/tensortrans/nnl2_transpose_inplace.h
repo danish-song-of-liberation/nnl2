@@ -169,9 +169,9 @@ transposeinplacefn transposeinplace;
 /** 
  * @brief Makes the transposeinplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(transposeinplace);
+MAKE_CURRENT_BACKEND(transposeinplace);
 
 /** 
  * @brief Sets the backend for transposeinplace operation
@@ -180,7 +180,7 @@ make_current_backend(transposeinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_transposeinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(transposeinplace_backends, transposeinplace, backend_name, current_backend(transposeinplace));
+    ESET_BACKEND_BY_NAME(transposeinplace_backends, transposeinplace, backend_name, CURRENT_BACKEND(transposeinplace));
 }
 
 /** 
@@ -189,7 +189,7 @@ void set_transposeinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_transposeinplace_backend() {
-	return current_backend(transposeinplace);
+	return CURRENT_BACKEND(transposeinplace);
 }
 
 /** 

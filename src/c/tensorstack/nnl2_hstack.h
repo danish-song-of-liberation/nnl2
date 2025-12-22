@@ -696,9 +696,9 @@ hstackfn hstack;
 /** 
  * @brief Makes the hstack backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(hstack);
+MAKE_CURRENT_BACKEND(hstack);
 
 /** 
  * @brief Sets the backend for hstack operation
@@ -707,7 +707,7 @@ make_current_backend(hstack);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_hstack_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(hstack_backends, hstack, backend_name, current_backend(hstack));
+    ESET_BACKEND_BY_NAME(hstack_backends, hstack, backend_name, CURRENT_BACKEND(hstack));
 }
 
 /** 
@@ -716,7 +716,7 @@ void set_hstack_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_hstack_backend() {
-    return current_backend(hstack);
+    return CURRENT_BACKEND(hstack);
 }
 
 /** 

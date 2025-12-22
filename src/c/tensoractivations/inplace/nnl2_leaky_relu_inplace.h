@@ -698,9 +698,9 @@ leakyreluinplacefn leakyreluinplace;
 /** 
  * @brief Makes the leakyreluinplace backend current
  * @ingroup backend_system
- * @see make_current_backend
+ * @see MAKE_CURRENT_BACKEND
  */
-make_current_backend(leakyreluinplace);
+MAKE_CURRENT_BACKEND(leakyreluinplace);
 
 /** 
  * @brief Sets the backend for LeakyReLU in-place operation
@@ -709,7 +709,7 @@ make_current_backend(leakyreluinplace);
  * @see ESET_BACKEND_BY_NAME
  */
 void set_leakyreluinplace_backend(const char* backend_name) {
-    ESET_BACKEND_BY_NAME(leakyreluinplace_backends, leakyreluinplace, backend_name, current_backend(leakyreluinplace));
+    ESET_BACKEND_BY_NAME(leakyreluinplace_backends, leakyreluinplace, backend_name, CURRENT_BACKEND(leakyreluinplace));
 }
 
 /** 
@@ -718,7 +718,7 @@ void set_leakyreluinplace_backend(const char* backend_name) {
  * @return Name of the current backend as constant string
  */
 const char* get_leakyreluinplace_backend() {
-	return current_backend(leakyreluinplace);
+	return CURRENT_BACKEND(leakyreluinplace);
 }
 
 /** 
