@@ -68,6 +68,20 @@ void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
             for(size_t i = 0; i < total_elems; i++) data[i] = from_cast + (to_cast - from_cast) * ((float)rand() / RAND_MAX);
             break;
         }
+		
+		case INT64: {
+            nnl2_int64 from_cast = *((nnl2_int64*)from);
+            nnl2_int64 to_cast = *((nnl2_int64*)to);
+            nnl2_int64* data = (nnl2_int64*)tensor->data;
+            nnl2_int64 range = to_cast - from_cast + 1;
+            
+            for(size_t i = 0; i < total_elems; i++) {
+                double rand_ratio = (double)rand() / RAND_MAX;
+                data[i] = from_cast + (nnl2_int64)(rand_ratio * range);
+            }
+			
+            break;
+        }
 
         case INT32: {
             nnl2_int32 from_cast = *((nnl2_int32*)from);

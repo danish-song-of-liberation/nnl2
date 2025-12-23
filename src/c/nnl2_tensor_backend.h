@@ -172,10 +172,11 @@
 /// @{  
 
 /** @brief 
- * Enumerations of available tensor types (INT32/INT, FLOAT32/FLOAT, FLOAT64/DOUBLE)
+ * Enumerations of available tensor types (INT32/INT, INT64/LONG, FLOAT32/FLOAT, FLOAT64/DOUBLE)
  */
 typedef enum {
 	INT32,
+	INT64,
 	FLOAT32,
 	FLOAT64
 } TensorType;
@@ -1519,6 +1520,7 @@ typedef int (*f32sgesddfn)(const nnl2_order order, const char jobz,
 inline static char* get_tensortype_name(nnl2_tensor_type dtype) {
 	switch(dtype) {
 		case INT32:   return "INT32";
+		case INT64:   return "INT64";
 		case FLOAT32: return "FLOAT32";
 		case FLOAT64: return "FLOAT64";
 		default:	  return "UNKNOWN";

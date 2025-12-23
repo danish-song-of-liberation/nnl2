@@ -63,6 +63,15 @@ void nnl2_naive_rand_inplace(nnl2_tensor* tensor) {
 
             break;
         }
+		
+		case INT64: {
+            nnl2_int64* data = (nnl2_int64*)tensor->data;
+            
+            for(size_t i = 0; i < total_elems; i++) 
+                data[i] = rand() % 2;
+            
+            break;
+        }
 
         case INT32: {
             nnl2_int32* data = (nnl2_int32*)tensor->data;

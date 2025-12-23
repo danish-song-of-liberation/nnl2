@@ -17,6 +17,11 @@ typedef float   nnl2_float32;
  ** @brief 32-bit signed integer
  **/
 typedef int32_t nnl2_int32;
+
+/** @typedef nnl2_int64
+ ** @brief 64-bit signed integer
+ **/
+typedef int64_t nnl2_int64;
 	
 ///@}
 

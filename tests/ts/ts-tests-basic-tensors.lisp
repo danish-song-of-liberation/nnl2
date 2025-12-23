@@ -138,6 +138,9 @@
 (fiveam:test nnl2.hli.ts/empty/int32
   (check-nnl2.hli.ts/empty :dtype :int32 :int-dtype nnl2.hli.ts.tests:+enum-int32+ :shape *default-empty-test-shape*)) 
   
+(fiveam:test nnl2.hli.ts/empty/int64
+  (check-nnl2.hli.ts/empty :dtype :int64 :int-dtype nnl2.hli.ts.tests:+enum-int64+ :shape *default-empty-test-shape*))   
+  
 ;; -- `Zeros` tests section --
 
 (fiveam:test nnl2.hli.ts/zeros/float64
@@ -148,6 +151,9 @@
   
 (fiveam:test nnl2.hli.ts/zeros/int32
   (check-nnl2.hli.ts/check-value :dtype :int32 :int-dtype nnl2.hli.ts.tests:+enum-int32+ :shape *default-zeros-test-shape* :expected-value 0 :tensor-func :zeros))   
+  
+(fiveam:test nnl2.hli.ts/zeros/int64
+  (check-nnl2.hli.ts/check-value :dtype :int64 :int-dtype nnl2.hli.ts.tests:+enum-int64+ :shape *default-zeros-test-shape* :expected-value 0 :tensor-func :zeros))     
 
 ;; -- `Ones` tests section --
 
@@ -159,6 +165,9 @@
   
 (fiveam:test nnl2.hli.ts/ones/int32
   (check-nnl2.hli.ts/check-value :dtype :int32 :int-dtype nnl2.hli.ts.tests:+enum-int32+ :shape *default-ones-test-shape* :expected-value 1 :tensor-func :ones))   
+  
+(fiveam:test nnl2.hli.ts/ones/int64
+  (check-nnl2.hli.ts/check-value :dtype :int64 :int-dtype nnl2.hli.ts.tests:+enum-int64+ :shape *default-ones-test-shape* :expected-value 1 :tensor-func :ones))     
 
 ;; -- `Full` tests section --
 
@@ -169,5 +178,8 @@
   (check-nnl2.hli.ts/full :dtype :float32 :int-dtype nnl2.hli.ts.tests:+enum-float32+ :shape *default-full-test-shape* :filler 2.0s0))
   
 (fiveam:test nnl2.hli.ts/full/int32
-  (check-nnl2.hli.ts/full :dtype :int32 :int-dtype nnl2.hli.ts.tests:+enum-int32+ :shape *default-full-test-shape* :filler 2))     
+  (check-nnl2.hli.ts/full :dtype :int32 :int-dtype nnl2.hli.ts.tests:+enum-int32+ :shape *default-full-test-shape* :filler 2)) 
+
+(fiveam:test nnl2.hli.ts/full/int64
+  (check-nnl2.hli.ts/full :dtype :int64 :int-dtype nnl2.hli.ts.tests:+enum-int64+ :shape *default-full-test-shape* :filler 2))   
   

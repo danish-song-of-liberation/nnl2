@@ -77,9 +77,10 @@ Tensor* nnl2_zeros(int32_t* shape, int32_t rank, TensorType dtype) {
 
 	// Filling the tensor with units depending on the data type
     switch(dtype) {
-        case INT32:    success = inplace_fill(tensor_t, &(int32_t){0}, dtype);   break;
-        case FLOAT32:  success = inplace_fill(tensor_t, &(float){0.0f}, dtype);  break;     
-        case FLOAT64:  success = inplace_fill(tensor_t, &(double){0.0}, dtype);  break;
+        case INT32:    success = inplace_fill(tensor_t, &(nnl2_int32){0}, dtype);   break;
+        case INT64:    success = inplace_fill(tensor_t, &(nnl2_int64){0}, dtype);   break;
+        case FLOAT32:  success = inplace_fill(tensor_t, &(nnl2_float32){0.0f}, dtype);  break;     
+        case FLOAT64:  success = inplace_fill(tensor_t, &(nnl2_float64){0.0}, dtype);  break;
 
 		// Processing unsupported data types
         default: {

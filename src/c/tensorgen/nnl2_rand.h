@@ -54,6 +54,22 @@ Tensor* naive_rand(int* shape, int rank, TensorType dtype) {
             break;
         }
         
+		case INT32: {
+            int32_t* data = (int32_t*)result->data;
+            for(size_t i = 0; i < total_elems; i++) {
+                data[i] = rand() % 2; 
+            }
+            break;
+        }
+        
+        case INT64: {
+            int64_t* data = (int64_t*)result->data;
+            for(size_t i = 0; i < total_elems; i++) {
+                data[i] = rand() % 2; 
+            }
+            break;
+        }
+		
         default: {
             NNL2_TYPE_ERROR(dtype);
             nnl2_free_tensor(result);

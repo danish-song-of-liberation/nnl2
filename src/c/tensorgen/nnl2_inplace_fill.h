@@ -99,6 +99,21 @@ bool nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t filler = *(int64_t*)value; // Extract int64 fill value
+			
+			// Cast tensor data to int64 pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int64_t* data = (int64_t*)tensor->data;
+			#else
+				volatile int64_t* data = (int64_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for INT64 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+		
 		case FLOAT32: {
 			float filler = *(float*)value; // Extract float fill value
 			
@@ -241,6 +256,33 @@ bool nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 			for (; i < total_elems; i++) {
                 data[i] = filler;
             }
+			
+			break;
+		}
+		
+		case INT64: {
+			int64_t filler = *(int64_t*)value; // Extracting the value to fill in
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int64_t* data = (int64_t*)tensor->data;    
+			#else 
+				volatile int64_t* data = (int64_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 8; // 8 элементов int64_t за итерацию
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			// Main loop with scanning for int64 (8 elements per iteration)
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+			}
+			
+			// Post-processing of the remaining elements
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
 			
 			break;
 		}
@@ -420,6 +462,35 @@ bool nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 			break;
 		}
 		
+		case INT64: { 
+			int64_t filler = *(int64_t*)value; // Extracting the value to fill in
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int64_t* data = (int64_t*)tensor->data;    
+			#else 
+				volatile int64_t* data = (int64_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16; 
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			// Main loop with scanning for int64 (16 elements per iteration)
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			// Post-processing of the remaining elements
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+		
 		case FLOAT32: {
 			float filler = *(float*)value; // Extracting the value to fill in
 			
@@ -593,6 +664,39 @@ bool nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 			for (; i < total_elems; i++) {
                 data[i] = filler;
             }
+			
+			break;
+		}
+		
+		case INT64: {
+			int64_t filler = *(int64_t*)value; // Extracting the value to fill in
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int64_t* data = (int64_t*)tensor->data;    
+			#else 
+				volatile int64_t* data = (int64_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32; // 32 элемента int64_t = 256 байт
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			// Main loop with scanning for int64 (32 elements per iteration)
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			// Post-processing of the remaining elements
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
 			
 			break;
 		}
@@ -777,6 +881,36 @@ bool nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t filler = *(int64_t*)value; // Extract scalar fill value
+			int64_t* data = (int64_t*)tensor->data; // Cast tensor data to appropriate type
+			
+			// Create AVX vector with 4 copies of the fill value (AVX256 can hold 4x int64)
+			__m256i avx_filler = _mm256_set1_epi64x(filler);
+			
+			size_t avx_iters = total_elems / NNL2_INT64_ELEMENTS_PER_AVX256; // total_elems / 4
+			size_t avx_processed_elems = avx_iters * NNL2_INT64_ELEMENTS_PER_AVX256; // avx_iters * 4
+			
+			if(is_aligned) {
+				// Process aligned memory with optimized stores
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * NNL2_INT64_ELEMENTS_PER_AVX256), avx_filler);
+				}
+			} else {
+				// Process unaligned memory with unaligned stores
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * NNL2_INT64_ELEMENTS_PER_AVX256), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}   
+			
+			break;
+		}
+		
 		case FLOAT32: {
 			float filler = *(float*)value; // Extract scalar fill value
 			float* data = (float*)tensor->data; // Cast tensor data to appropriate type
@@ -878,16 +1012,21 @@ bool nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 bool nnl2_own_inplace_fill_float64(double* data, size_t total_size, double value, size_t num_threads, bool aligned);
 
 /** @brief
- * Docs similiary at nnl2_own_inplace_fill_float64 doxygen
- * See them
+ * Fill tensor of type float32
  *
  ** @see nnl2_own_inplace_fill_float64 (declaration)
  **/
 bool nnl2_own_inplace_fill_float32(float* data, size_t total_size, float value, size_t num_threads, bool aligned);
 
 /** @brief
- * Docs similiary at nnl2_own_inplace_fill_float64 doxygen
- * See them
+ * Fill tensor of type int64
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int64(int64_t* data, size_t total_size, int64_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type int32
  *
  ** @see nnl2_own_inplace_fill_float64 (declaration)
  **/
@@ -903,26 +1042,31 @@ bool nnl2_own_inplace_fill_int32(int32_t* data, size_t total_size, int32_t value
  * NULL (for pthread.h api)
  * 
  ** @details
- * Uses AVX256 instructions for vectorized filling of 8 elements
+ * Uses AVX256 instructions for vectorized filling of 4 elements
  * per operation when AVX is available and chunk size is sufficient
  */
 void* nnl2_own_pfill_float64(void* thread);
 
 /** @brief
- * Docs similiary at nnl2_own_pfill_float64 doxygen
- * See them
+ * Worker function for parallel float32 fill
  *
  ** @see nnl2_own_pfill_float64 (declaration)
  **/
 void* nnl2_own_pfill_float32(void* thread);
 
 /** @brief
- * Docs similiary at nnl2_own_pfill_float64 doxygen
- * See them
+ * Worker function for parallel int64 fill
  *
  ** @see nnl2_own_pfill_float64 (declaration)
  **/
-void* nnl2_own_pfill_int32(void* thread); 
+void* nnl2_own_pfill_int64(void* thread);
+
+/** @brief
+ * Worker function for parallel int32 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_int32(void* thread);
 
 /** @brief
  * Own nnl2 inplace_fill implementation
@@ -978,6 +1122,7 @@ bool nnl2_own_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
     switch(dtype) {
         case FLOAT64:  result = nnl2_own_inplace_fill_float64((double*)tensor->data, total_elems, *(double*)value, num_threads, is_aligned);  break;         
         case FLOAT32:  result = nnl2_own_inplace_fill_float32((float*)tensor->data, total_elems, *(float*)value, num_threads, is_aligned);    break;
+        case INT64:    result = nnl2_own_inplace_fill_int64((int64_t*)tensor->data, total_elems, *(int64_t*)value, num_threads, is_aligned);  break;
         case INT32:    result = nnl2_own_inplace_fill_int32((int32_t*)tensor->data, total_elems, *(int32_t*)value, num_threads, is_aligned);  break; 
         
         default: {
@@ -1189,6 +1334,73 @@ bool nnl2_own_inplace_fill_int32(int32_t* data, size_t total_size, int32_t value
         int join_status = pthread_join(threads[i], NULL);
         if(join_status != 0) {
             NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_int32");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_int64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int64(int64_t* data, size_t total_size, int64_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(int64_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = INT64;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_int64, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_int64");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_int64");
         }
     }
     
@@ -1484,6 +1696,102 @@ void* nnl2_own_pfill_int32(void* arg) {
 		for (size_t i = start; i < end; i++) {
 			data[i] = value;
 		}
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_int64 (declaration)
+ **/
+void* nnl2_own_pfill_int64(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    int64_t* data = (int64_t*)task->data;
+    int64_t value = *(int64_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 4) {
+            __m256i avx_value = _mm256_set1_epi64x(value);
+            size_t avx_iters = chunk_size / 4;
+            size_t avx_processed = avx_iters * 4;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 2) {
+                prefetch_distance = 2;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 4;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 4;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(int64_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 4;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 4;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(int64_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 2; // Process 2 elements at a time
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    data[idx] = value;
+                    data[idx + 1] = value;
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
     #endif
     
     return NULL;

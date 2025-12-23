@@ -225,7 +225,7 @@
   #+lispworks 'fli:pointer
   #+allegro   'excl:foreign-pointer)
 
-(defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer))
+(defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer) (:int64 . (signed-byte 64)))
   "All types of nnl2 tensors and lisp types in an associative list")
 
 (defun type/nnl2->lisp (tensor-type)
@@ -240,7 +240,8 @@
     (case (the keyword tensor-type) 
 	  (:float64 (the symbol 'double-float)) 
 	  (:float32 (the symbol 'single-float))
-	  (:int32 (the symbol 'integer)))))
+	  (:int32 (the symbol 'integer))
+	  (:int64 '(signed-byte 64)))))
 	
 (declaim (ftype (function (keyword) symbol) type/nnl2->lisp)) ;; Inline not needed	
   
@@ -253,12 +254,13 @@
   (declare (type symbol lisp-type))
 
   (nnl2.hli:fastcall
-    (cond ((eql lisp-type 'double-float) :float64) 
-		  ((eql lisp-type 'single-float) :float32) 
-		  ((eql lisp-type 'integer)      :int32))))
+    (cond ((eql lisp-type 'double-float)        :float64) 
+          ((eql lisp-type 'single-float)        :float32) 
+          ((eql lisp-type 'integer)             :int32)
+          ((equal lisp-type '(signed-byte 64))  :int64))))
 		  
-(declaim (ftype (function (symbol) keyword) type/lisp->nnl2)) ;; Inline not needed			  
-	
+(declaim (ftype (function (symbol) keyword) type/lisp->nnl2))
+
 (defun type/lisp->cffi (lisp-type)
   "Converts a lisp type to a cffi type
    lisp-type: lisp type for conversion into cffi type
@@ -268,9 +270,10 @@
   (declare (type symbol lisp-type))
 
   (nnl2.hli:fastcall
-    (cond ((eql lisp-type 'double-float) :double) 
-		  ((eql lisp-type 'single-float) :float) 
-		  ((eql lisp-type 'integer)      :int))))
+    (cond ((eql lisp-type 'double-float)        :double) 
+          ((eql lisp-type 'single-float)        :float) 
+          ((eql lisp-type 'integer)             :int)
+          ((equal lisp-type '(signed-byte 64))  :long))))
 		  
 (declaim (ftype (function (symbol) keyword) type/lisp->nnl2 type/lisp->cffi)) ;; Inline not needed		
 	
@@ -283,10 +286,11 @@
   (declare (type keyword cffi-type))
   
   (nnl2.hli:fastcall 
-    (case (the keyword cffi-type) 
+    (ecase (the keyword cffi-type) 
 	  (:float64 (the keyword :double)) 
 	  (:float32 (the keyword :float))
-	  (:int32 (the keyword :int)))))	
+	  (:int32 (the keyword :int))
+	  (:int64 (the keyword :int64)))))
 	  
 (declaim (ftype (function (keyword) keyword) type/lisp->cffi)) ;; Inline not needed		  
 	
@@ -416,7 +420,7 @@
   (nnl2.hli:fastcall
     (multiple-value-bind (shape rank) (nnl2.hli:make-shape-pntr indices)
       (let* ((cffi-type (the keyword (type/nnl2->cffi dtype)))
-		     (lisp-type (the symbol (type/nnl2->lisp dtype)))
+		     (lisp-type (type/nnl2->lisp dtype))
 	    	 (filler-pntr (cffi:foreign-alloc cffi-type)))
 			 
 		(declare (type keyword cffi-type))	 

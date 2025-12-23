@@ -3,6 +3,7 @@
   (:export #:nnl2.hli.ts-suite 
 		   #:+default-backend-tensor-type+ 
 		   #:+enum-int32+ 
+		   #:+enum-int64+ 
 		   #:+enum-float32+ 
 		   #:+enum-float64+ 
 		   #:assert-tensor-properties
@@ -29,12 +30,14 @@
 
 ;; The full definition of an enum with tensor types is something like this:
 ;; INT32 (0)
-;; FLOAT32 (1)
-;; FLOAT64 (2)
+;; INT64 (1)
+;; FLOAT32 (2)
+;; FLOAT64 (3)
 
 (defconstant +enum-int32+ 0)
-(defconstant +enum-float32+ 1)
-(defconstant +enum-float64+ 2)
+(defconstant +enum-int64+ 1)
+(defconstant +enum-float32+ 2)
+(defconstant +enum-float64+ 3)
   
 (defun assert-tensor-properties (&key tensor expected-shape expected-dtype expected-size)
   "Checks whether the tensor passes basic checks"

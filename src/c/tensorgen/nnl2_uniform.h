@@ -62,6 +62,23 @@ Tensor* naive_uniform(int* shape, int rank, TensorType dtype, void* from, void* 
 			break;
 		}
 		
+		case INT64: {
+            int64_t from_cast = *((int64_t*)from);
+            int64_t to_cast = *((int64_t*)to);
+            int64_t* data = (int64_t*)result->data;
+            for(size_t i = 0; i < total_elems; i++) {
+                if (to_cast - from_cast + 1 > RAND_MAX) {
+                    int64_t range = to_cast - from_cast + 1;
+                    int64_t rand_val = ((int64_t)rand() << 15) ^ rand();
+                    data[i] = from_cast + (rand_val % range);
+                } else {
+                    data[i] = from_cast + (rand() % (to_cast - from_cast + 1));
+                }
+            }
+			
+            break;
+        }
+		
 		case INT32: {
 			int32_t from_cast = *((int32_t*)from);
 			int32_t to_cast = *((int32_t*)to);

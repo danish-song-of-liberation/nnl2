@@ -24,6 +24,7 @@ NNL2_FORCE_INLINE static nnl2_float64 nnl2_convert_to_float64(void* value, Tenso
 		case FLOAT64: return *((nnl2_float64*)value);
 		case FLOAT32: return (nnl2_float64)(*((nnl2_float32*)value)); 
 		case INT32:   return (nnl2_float64)(*((nnl2_int32*)value)); 
+		case INT64:   return (nnl2_float64)(*((nnl2_int64*)value));
 		
 		default: {
 			NNL2_TYPE_FATAL(dtype); // Fatal error for unsupported types
@@ -66,7 +67,17 @@ NNL2_FORCE_INLINE static nnl2_float32 nnl2_convert_to_float32(void* value, Tenso
         }
 		
 		case FLOAT32: return *((nnl2_float32*)value);
-		case INT32:   return (nnl2_float32)(*((nnl2_int32*)value)); 
+		case INT32:   return (nnl2_float32)(*((nnl2_int32*)value));
+		
+		case INT64: {
+			nnl2_int64 int64_val = *((nnl2_int64*)value);
+
+			if(int64_val < -(1LL << 24) || int64_val > (1LL << 24)) {
+				NNL2_WARN("INT64 value may lose precision when converting to FLOAT32");
+			}
+			
+			return (nnl2_float32)int64_val;	
+		}
 		
 		default: {
 			NNL2_TYPE_FATAL(dtype); // Fatal error for unsupported types
@@ -135,6 +146,18 @@ NNL2_FORCE_INLINE static nnl2_int32 nnl2_convert_to_int32(void* value, TensorTyp
 		}
 		
 		case INT32: return *((nnl2_int32*)value);
+		
+		case INT64: {
+			nnl2_int64 int64_val = *((nnl2_int64*)value);
+			
+			// Checking for overflow of the int32 range
+			if (int64_val < INT32_MIN || int64_val > INT32_MAX) {
+				NNL2_FATAL("INT64 value out of INT32 range");
+				return 0;
+			}
+			
+			return (nnl2_int32)int64_val;
+		}
 		
 		default: {
 			NNL2_TYPE_FATAL(dtype); // Fatal error for unsupported types

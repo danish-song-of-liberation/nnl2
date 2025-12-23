@@ -24,7 +24,8 @@
 
 (cffi:defcenum tensor-type
   "nnl2 Type system import into cffi"
-  :int32    ;; aka 'integer (lisp), int32_t (c), int (c), :int (cffi)
+  :int32    ;; aka 'integer (lisp), int32_t (c), int (c), :int32 (cffi)
+  :int64    ;; aka 'bignum (lisp), int64_t (c), long (c), :int64 (cffi)
   :float32  ;; aka 'single-float (lisp), float (c), :float (cffi)
   :float64) ;; aka 'double-float (lisp), double (c), :double (cffi)"
   

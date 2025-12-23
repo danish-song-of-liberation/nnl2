@@ -1,6 +1,8 @@
 #ifndef NNL2_CONFIG_H
 #define NNL2_CONFIG_H
 
+#include <inttypes.h>
+
 /** @file nnl2_config.h
  ** @brief Contains auxiliary macros for other tensor files
  ** @copyright MIT License
@@ -89,7 +91,7 @@
 #endif
 
 /** @brief Number of supported tensor data types **/
-#define NUM_TENSOR_TYPES 3
+#define NUM_TENSOR_TYPES 4 
 	
 ///@{ [tensor_mem_alignment]
 
@@ -241,6 +243,7 @@
 	#define NNL2_INT32_ELEMENTS_PER_AVX256 8       ///< 256 bits / 32 bits per nnl2_int32
 	#define NNL2_FLOAT32_ELEMENTS_PER_AVX256 8     ///< 256 bits / 32 bits per nnl2_float32
 	#define NNL2_FLOAT64_ELEMENTS_PER_AVX256 4     ///< 256 bits / 64 bits per nnl2_float64
+	#define NNL2_INT64_ELEMENTS_PER_AVX256 4	   ///< 256 bits / 64 bits per nnl2_int64
 	#define NNL2_MIN_ELEMENTS_FOR_AVX256_DOUBLE 4  ///< Minimum elements for AVX256 nnl2_float64 processing
 ///@} [avx_macros]
 
@@ -254,6 +257,8 @@
 	#define NNL2_1D_TENSOR_SHOW_ELEMENTS 5		   ///< Show items BEFORE and AFTER skipping
 	#define NNL2_FLOAT64_FORMAT "%.6f"			   ///< Format string for nnl2_float64 precision floating point 
 	#define NNL2_FLOAT32_FORMAT "%.4f"			   ///< Format string for single precision floating point
+	#define NNL2_INT64_FORMAT "%" PRId64           ///< Format string for 64-bit signed integers
+	#define NNL2_INT32_FORMAT "%d"                 ///< Format string for 32-bit signed integers
 ///@} [format_parameters] 
 
 /** @brief 
@@ -343,7 +348,7 @@ NNL2_FORCE_INLINE static size_t get_dtype_size(TensorType dtype) {
 		#define NNL2_SUPPRESS_ARRAY_BOUNDS
     #endif
 	
-	return (const size_t[]){sizeof(nnl2_int32), sizeof(nnl2_float32), sizeof(nnl2_float64)}[dtype]; 
+	return (const size_t[]){sizeof(nnl2_int32), sizeof(nnl2_int64), sizeof(nnl2_float32), sizeof(nnl2_float64)}[dtype]; 
 	
 	#ifdef __GNUC__
 		#pragma GCC diagnostic pop

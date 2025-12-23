@@ -40,6 +40,13 @@ inline static void naive_fill_tensor_with_data(Tensor* tensor, void* data, size_
 			break;
 		}
 		
+		case INT64: {
+			int64_t* tensor_data = (int64_t*)tensor->data;
+			int64_t* cast_data = (int64_t*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
 		case INT32: {
 			int32_t* tensor_data = (int32_t*)tensor->data;
 			int32_t* cast_data = (int32_t*)data;
