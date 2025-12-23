@@ -1067,7 +1067,7 @@ typedef struct {
 ///@{ [tanhinplace_ptask]
 
 typedef struct {
-    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor
+    nnl2_tensor_type dtype;   ///< Data type of the nnl2_tensor
     bool approx;              ///< Whether to use approximation
     size_t start_idx;         ///< Start index for this thread
     size_t end_idx;           ///< End index for this thread
@@ -1100,7 +1100,7 @@ typedef struct {
     void* src_data;           ///< Pointer to source data 
     size_t start_idx;         ///< Start index for this thread 
     size_t end_idx;           ///< End index for this thread 
-    nnl2_tensor_type dtype;         ///< Data type of the nnl2_tensor 
+    nnl2_tensor_type dtype;   ///< Data type of the nnl2_tensor 
     bool aligned;             ///< Whether memory is aligned 
     union {
         double float64_acc;

@@ -124,7 +124,8 @@
 ///@} [force_inline]
 
 #ifdef OPENBLAS_AVAILABLE
-#include <cblas.h>
+#include <cblas.h>		///< OPENBLAS 
+#include <lapacke.h>	///< LAPACK
 #endif
 	
 ///@{ [backend_macros]	
@@ -144,6 +145,7 @@
 	#define AVX256_BACKEND_NAME "AVX256"
 	#define BLAS_BACKEND_NAME "BLAS"
 	#define NNL2_OWN_NAME "NNL2"
+	#define LAPACK_BACKEND_NAME "LAPACK"
 ///@} [backends_names]
 
 ///@} [backend_macros]	

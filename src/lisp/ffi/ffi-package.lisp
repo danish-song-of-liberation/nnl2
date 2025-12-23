@@ -761,5 +761,7 @@
    #:%ts-deserialize-tensor
    #:%internal-assign-row-add
    #:%internal-timestep-view
-   #:%ad-internal-timestep-view))
+   #:%ad-internal-timestep-view
+   #:%gesvd
+   #:%gesdd))
    

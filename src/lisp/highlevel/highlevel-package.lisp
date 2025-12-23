@@ -13,7 +13,7 @@
 
 ;; UPD: also added definition of ```:nnl2.hli.ts.loss, :nnl2.hli.ad.r.loss, 
 ;; :nnl2.hli.nn.ga, :nnl2.hli.nn.ga.fitness, :nnl2.hli.nn.ga.crossover,
-;; :nnl2.hli.nn.ga.mutation, :nnl2.hli.nn.ga.selection``` packages
+;; :nnl2.hli.nn.ga.mutation, :nnl2.hli.nn.ga.selection, nnl2.hli.ts.linalg``` packages
 
 ;; In case of errors/problems/suggestions, please write to issues or nnl.dev@proton.me
 ;; nnl2 Repository: https://github.com/danish-song-of-liberation/nnl2
@@ -803,4 +803,9 @@
    #:with-backend/.log1p!
    #:save-tensor
    #:load-tensor))
+   
+(defpackage #:nnl2.hli.ts.linalg
+  (:use #:cl)
+  (:export 
+   #:svd))  
    

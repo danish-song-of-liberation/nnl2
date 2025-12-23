@@ -625,7 +625,38 @@
 (cffi:defcfun ("nnl2_ad_tensor_timestep_view" %ad-internal-timestep-view) :pointer 
   (src :pointer)
   (time :int))    
+  
+(cffi:defcfun ("nnl2_gesvd" %gesvd) :int
+  "GESVD Singular Value Decomposition dispatcher"
+  (order nnl2-order)
+  (jobu :char)
+  (jobvt :char)
+  (m :int)
+  (n :int)
+  (a :pointer)
+  (lda :int)
+  (s :pointer)
+  (u :pointer)
+  (ldu :int)
+  (vt :pointer)
+  (ldvt :int)
+  (superb :pointer))  
     
+(cffi:defcfun ("nnl2_gesdd" %gesdd) :int
+  "GESDD Singular Value Decomposition dispatcher"
+  (order nnl2-order)
+  (jobz :char)
+  (m :int)
+  (n :int)
+  (a :pointer)
+  (lda :int)
+  (s :pointer)
+  (u :pointer)
+  (ldu :int)
+  (vt :pointer)
+  (ldvt :int)
+  (iwork :pointer))
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

@@ -14,15 +14,15 @@
 #endif               
      
 #include <stdlib.h>     
-#include <time.h>         
+#include <time.h>          
   
 #include "nnl2_core.h"          	 
-#include "nnl2_ffi_test.h"    
+#include "nnl2_ffi_test.h"     
 #include "nnl2_tensor_core.h"
 #include "nnl2_log.h"      
 #include "nnl2_foreign_log.h"  
  
-#include "backends_status/nnl2_status.h"  
+#include "backends_status/nnl2_status.h"   
    
 /// NNL2
      
@@ -297,15 +297,15 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_acos, acos_backends, CURRENT_BACKEND(acos)); 
 	EINIT_BACKEND(nnl2_atan, atan_backends, CURRENT_BACKEND(atan));     
 	EINIT_BACKEND(nnl2_atan2, atan2_backends, CURRENT_BACKEND(atan2));     
-}
-                
-void nnl2_init_standard_inplace() {               
-	INIT_BACKEND(sgemminplace, sgemminplace_backends);  
-	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);         
+}  
+                      
+void nnl2_init_standard_inplace() {                  
+	INIT_BACKEND(sgemminplace, sgemminplace_backends);    
+	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);           
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, CURRENT_BACKEND(gemm)); 
 	EINIT_BACKEND(addinplace, addinplace_backends, CURRENT_BACKEND(addinplace));       
 	EINIT_BACKEND(subinplace, subinplace_backends, CURRENT_BACKEND(subinplace));                     
-	EINIT_BACKEND(powinplace, powinplace_backends, CURRENT_BACKEND(powinplace));     
+	EINIT_BACKEND(powinplace, powinplace_backends, CURRENT_BACKEND(powinplace));      
 	EINIT_BACKEND(expinplace, expinplace_backends, CURRENT_BACKEND(expinplace));    
 	EINIT_BACKEND(loginplace, loginplace_backends, CURRENT_BACKEND(loginplace));     	
 	EINIT_BACKEND(log1pinplace, log1pinplace_backends, CURRENT_BACKEND(log1pinplace));     	
@@ -315,8 +315,8 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(maxinplace, maxinplace_backends, CURRENT_BACKEND(maxinplace));     
 	EINIT_BACKEND(mininplace, mininplace_backends, CURRENT_BACKEND(mininplace));   	
 	EINIT_BACKEND(mulinplace, mulinplace_backends, CURRENT_BACKEND(mulinplace));     
-	EINIT_BACKEND(divinplace, divinplace_backends, CURRENT_BACKEND(divinplace));  
-	EINIT_BACKEND(absinplace, absinplace_backends, CURRENT_BACKEND(absinplace));
+	EINIT_BACKEND(divinplace, divinplace_backends, CURRENT_BACKEND(divinplace));   
+	EINIT_BACKEND(absinplace, absinplace_backends, CURRENT_BACKEND(absinplace)); 
 	EINIT_BACKEND(axpy_inplace, axpy_inplace_backends, CURRENT_BACKEND(axpy_inplace));	 
 	EINIT_BACKEND(nnl2_neginplace, neginplace_backends, CURRENT_BACKEND(neginplace));
 	EINIT_BACKEND(nnl2_sqrtinplace, sqrtinplace_backends, CURRENT_BACKEND(sqrtinplace));
@@ -327,6 +327,10 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(nnl2_acosinplace, acosinplace_backends, CURRENT_BACKEND(acosinplace)); 
 	EINIT_BACKEND(nnl2_ataninplace, ataninplace_backends, CURRENT_BACKEND(ataninplace)); 
 	EINIT_BACKEND(nnl2_atan2inplace, atan2inplace_backends, CURRENT_BACKEND(atan2inplace)); 
+	INIT_BACKEND(nnl2_f64dgesvd, f64dgesvd_backends);
+	INIT_BACKEND(nnl2_f64dgesdd, f64dgesdd_backends);
+	INIT_BACKEND(nnl2_f32sgesvd, f32sgesvd_backends);
+	INIT_BACKEND(nnl2_f32sgesdd, f32sgesdd_backends);
 }               
                                
 void nnl2_init_stack() {

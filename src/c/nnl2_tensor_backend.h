@@ -286,6 +286,7 @@ typedef enum {
 	nnl2_avx256,		 ///< AVX 256-bit SIMD optimized implementation
 	nnl2_avx512,		 ///< AVX 512-bit SIMD optimized implementation
 	nnl2_own,			 ///< Custom optimized implementation
+	nnl2_lapack,	     ///< LAPACK library implementation	
 	nnl2_blas,			 ///< BLAS library implementation
 	nnl2_own_2,			 ///< Hyper-optimized own nnl2 implementation
 	nnl2_implver_count	 ///< Count of implementation versions 
@@ -1310,6 +1311,196 @@ typedef void (*log1pinplacefn)(nnl2_tensor* nnl2_tensor);
  */
 typedef int (*assignrowfn)(nnl2_tensor* dst, int seq_index, nnl2_tensor* src);
 
+/** @brief Function pointer type for double-precision Singular Value Decomposition (DGESVD) operation
+ ** @param order Memory layout ordering (RowMajor or ColumnMajor)
+ ** @param jobu Specifies options for computing left singular vectors U:
+ ** 'A': all m columns of U are returned
+ ** 'S': first min(m,n) columns of U are returned  
+ ** 'O': first min(m,n) columns of U overwrite input A
+ ** 'N': no columns of U are computed
+ ** @param jobvt Specifies options for computing right singular vectors V^T:
+ ** 'A': all n rows of V^T are returned
+ ** 'S': first min(m,n) rows of V^T are returned
+ ** 'O': first min(m,n) rows of V^T overwrite input A
+ ** 'N': no rows of V^T are computed
+ ** @param m Number of rows of the input matrix A
+ ** @param n Number of columns of the input matrix A
+ ** @param a Input tensor containing matrix A [m × n] (modified if jobu='O' or jobvt='O')
+ ** @param lda Leading dimension of matrix A (>= n if RowMajor, >= m if ColMajor)
+ ** @param s Output tensor for singular values [min(m,n)] (sorted descending)
+ ** @param u Output tensor for left singular vectors U (size depends on jobu):
+ ** jobu='A': [m × m] matrix
+ ** jobu='S': [m × min(m,n)] matrix
+ ** jobu='N': not referenced (can be NULL)
+ ** @param ldu Leading dimension of matrix U (>= m if RowMajor, >= m if ColMajor for 'A', >= min(m,n) if 'S')
+ ** @param vt Output tensor for right singular vectors V^T (size depends on jobvt):
+ ** jobvt='A': [n × n] matrix
+ ** jobvt='S': [min(m,n) × n] matrix
+ ** jobvt='N': not referenced (can be NULL)
+ ** @param ldvt Leading dimension of matrix VT (>= n if RowMajor, >= n if ColMajor for 'A', >= min(m,n) if 'S')
+ ** @param superb Workspace tensor [min(m,n)-1] for internal use
+ ** @return Integer info code:
+ **  0: successful exit
+ ** <0: the -info-th argument had an illegal value
+ ** >0: the algorithm failed to converge
+ ** @note Performs the decomposition: A = U × diag(s) × V^T
+ ** @note All tensors must be of FLOAT64 (double) data type
+ ** @note Leading dimensions must satisfy: lda >= n (RowMajor) or lda >= m (ColMajor) and similarly for ldu and ldvt
+ ** @see LAPACKE_dgesvd()
+ ** @see nnl2_lapacke_f64svd()
+ */
+typedef int (*f64dgesvdfn)(const nnl2_order order, const char jobu, const char jobvt,
+                           const int m, const int n, nnl2_tensor* a, const int lda,
+                           nnl2_tensor* s, nnl2_tensor* u, const int ldu,
+                           nnl2_tensor* vt, const int ldvt, nnl2_tensor* superb);
+						
+/** @brief Function pointer type for single-precision Singular Value Decomposition (SGESVD) operation
+ ** @param order Memory layout ordering (RowMajor or ColumnMajor)
+ ** @param jobu Specifies options for computing left singular vectors U:
+ ** 'A': all m columns of U are returned
+ ** 'S': first min(m,n) columns of U are returned  
+ ** 'O': first min(m,n) columns of U overwrite input A
+ ** 'N': no columns of U are computed
+ ** @param jobvt Specifies options for computing right singular vectors V^T:
+ ** 'A': all n rows of V^T are returned
+ ** 'S': first min(m,n) rows of V^T are returned
+ ** 'O': first min(m,n) rows of V^T overwrite input A
+ ** 'N': no rows of V^T are computed
+ ** @param m Number of rows of the input matrix A
+ ** @param n Number of columns of the input matrix A
+ ** @param a Input tensor containing matrix A [m × n] (modified if jobu='O' or jobvt='O')
+ ** @param lda Leading dimension of matrix A (>= n if RowMajor, >= m if ColMajor)
+ ** @param s Output tensor for singular values [min(m,n)] (sorted descending)
+ ** @param u Output tensor for left singular vectors U (size depends on jobu):
+ ** jobu='A': [m × m] matrix
+ ** jobu='S': [m × min(m,n)] matrix
+ ** jobu='N': not referenced (can be NULL)
+ ** @param ldu Leading dimension of matrix U (>= m if RowMajor, >= m if ColMajor for 'A', >= min(m,n) if 'S')
+ ** @param vt Output tensor for right singular vectors V^T (size depends on jobvt):
+ ** jobvt='A': [n × n] matrix
+ ** jobvt='S': [min(m,n) × n] matrix
+ ** jobvt='N': not referenced (can be NULL)
+ ** @param ldvt Leading dimension of matrix VT (>= n if RowMajor, >= n if ColMajor for 'A', >= min(m,n) if 'S')
+ ** @param superb Workspace tensor [min(m,n)-1] for internal use
+ ** @return Integer info code:
+ **  0: successful exit
+ ** <0: the -info-th argument had an illegal value
+ ** >0: the algorithm failed to converge
+ ** @note Performs the decomposition: A = U × diag(s) × V^T
+ ** @note All tensors must be of FLOAT32 (float) data type
+ ** @note Leading dimensions must satisfy: lda >= n (RowMajor) or lda >= m (ColMajor) and similarly for ldu and ldvt
+ ** @see LAPACKE_sgesvd()
+ ** @see nnl2_lapacke_f32sgesvd()
+ */
+typedef int (*f32sgesvdfn)(const nnl2_order order, const char jobu, const char jobvt,
+                           const int m, const int n, nnl2_tensor* a, const int lda,
+                           nnl2_tensor* s, nnl2_tensor* u, const int ldu,
+                           nnl2_tensor* vt, const int ldvt, nnl2_tensor* superb);						
+						
+/** @brief Function pointer type for double-precision Singular Value Decomposition using Divide-and-Conquer (DGESDD) operation
+ ** @param order Memory layout ordering (RowMajor or ColumnMajor)
+ ** @param jobz Specifies options for computing singular vectors:
+ ** 'A': all m columns of U and all n rows of V^T are returned
+ ** 'S': first min(m,n) columns of U and rows of V^T are returned
+ ** 'O': 
+ **     If m >= n: first n columns of U overwrite input A, V^T is computed
+ **     If m < n: first m rows of V^T overwrite input A, U is computed
+ ** 'N': neither U nor V^T are computed
+ ** @param m Number of rows of the input matrix A
+ ** @param n Number of columns of the input matrix A
+ ** @param a Input tensor containing matrix A [m × n] (modified if jobz='O')
+ ** @param lda Leading dimension of matrix A (>= n if RowMajor, >= m if ColMajor)
+ ** @param s Output tensor for singular values [min(m,n)] (sorted descending)
+ ** @param u Output tensor for left singular vectors U (size depends on jobz):
+ ** jobz='A': [m × m] matrix
+ ** jobz='S': [m × min(m,n)] matrix
+ ** jobz='O' and m >= n: [m × n] matrix (overwrites A)
+ ** jobz='N': not referenced (can be NULL)
+ ** @param ldu Leading dimension of matrix U:
+ ** jobz='A' or 'S': ldu >= m
+ ** jobz='O' and m >= n: ldu >= m
+ ** jobz='N': not referenced
+ ** @param vt Output tensor for right singular vectors V^T (size depends on jobz):
+ ** jobz='A': [n × n] matrix
+ ** jobz='S': [min(m,n) × n] matrix
+ ** jobz='O' and m < n: [n × m] matrix (overwrites A)
+ ** jobz='N': not referenced (can be NULL)
+ ** @param ldvt Leading dimension of matrix VT:
+ ** jobz='A': ldvt >= n
+ ** jobz='S': ldvt >= min(m,n)
+ ** jobz='O' and m < n: ldvt >= n
+ ** jobz='N': not referenced
+ ** @param iwork Workspace integer tensor [8*min(m,n)] for internal use (must be INT32 type)
+ ** @return Integer info code:
+ **  0: successful exit
+ ** <0: the -info-th argument had an illegal value
+ ** >0: the algorithm failed to converge
+ ** @note Performs the decomposition: A = U × diag(s) × V^T using divide-and-conquer algorithm
+ ** @note All float tensors must be of FLOAT64 (double) data type, iwork must be INT32
+ ** @note Leading dimensions must satisfy: lda >= n (RowMajor) or lda >= m (ColMajor)
+ ** @note dgesdd is typically faster than dgesvd for large matrices but uses more workspace
+ ** @warning When jobz='O', input matrix A is overwritten with left/right singular vectors
+ ** @see LAPACKE_dgesdd()
+ ** @see nnl2_lapacke_f64dgesdd()
+ ** @see f64dgesvdfn
+ */
+typedef int (*f64dgesddfn)(const nnl2_order order, const char jobz,
+                           const int m, const int n, nnl2_tensor* a, const int lda,
+                           nnl2_tensor* s, nnl2_tensor* u, const int ldu,
+                           nnl2_tensor* vt, const int ldvt, nnl2_tensor* iwork);
+
+/** @brief Function pointer type for single-precision Singular Value Decomposition using Divide-and-Conquer (SGESDD) operation
+ ** @param order Memory layout ordering (RowMajor or ColumnMajor)
+ ** @param jobz Specifies options for computing singular vectors:
+ ** 'A': all m columns of U and all n rows of V^T are returned
+ ** 'S': first min(m,n) columns of U and rows of V^T are returned
+ ** 'O': 
+ **     If m >= n: first n columns of U overwrite input A, V^T is computed
+ **     If m < n: first m rows of V^T overwrite input A, U is computed
+ ** 'N': neither U nor V^T are computed
+ ** @param m Number of rows of the input matrix A
+ ** @param n Number of columns of the input matrix A
+ ** @param a Input tensor containing matrix A [m × n] (modified if jobz='O')
+ ** @param lda Leading dimension of matrix A (>= n if RowMajor, >= m if ColMajor)
+ ** @param s Output tensor for singular values [min(m,n)] (sorted descending)
+ ** @param u Output tensor for left singular vectors U (size depends on jobz):
+ ** jobz='A': [m × m] matrix
+ ** jobz='S': [m × min(m,n)] matrix
+ ** jobz='O' and m >= n: [m × n] matrix (overwrites A)
+ ** jobz='N': not referenced (can be NULL)
+ ** @param ldu Leading dimension of matrix U:
+ ** jobz='A' or 'S': ldu >= m
+ ** jobz='O' and m >= n: ldu >= m
+ ** jobz='N': not referenced
+ ** @param vt Output tensor for right singular vectors V^T (size depends on jobz):
+ ** jobz='A': [n × n] matrix
+ ** jobz='S': [min(m,n) × n] matrix
+ ** jobz='O' and m < n: [n × m] matrix (overwrites A)
+ ** jobz='N': not referenced (can be NULL)
+ ** @param ldvt Leading dimension of matrix VT:
+ ** jobz='A': ldvt >= n
+ ** jobz='S': ldvt >= min(m,n)
+ ** jobz='O' and m < n: ldvt >= n
+ ** jobz='N': not referenced
+ ** @param iwork Workspace integer tensor [8*min(m,n)] for internal use (must be INT32 type)
+ ** @return Integer info code:
+ **  0: successful exit
+ ** <0: the -info-th argument had an illegal value
+ ** >0: the algorithm failed to converge
+ ** @note Performs the decomposition: A = U × diag(s) × V^T using divide-and-conquer algorithm
+ ** @note All float tensors must be of FLOAT32 (float) data type, iwork must be INT32
+ ** @note Leading dimensions must satisfy: lda >= n (RowMajor) or lda >= m (ColMajor)
+ ** @note sgesdd is typically faster than sgesvd for large matrices but uses more workspace
+ ** @warning When jobz='O', input matrix A is overwritten with left/right singular vectors
+ ** @see LAPACKE_sgesdd()
+ ** @see nnl2_lapacke_f32sgesdd()
+ ** @see f32sgesvdfn
+ */
+typedef int (*f32sgesddfn)(const nnl2_order order, const char jobz,
+                           const int m, const int n, nnl2_tensor* a, const int lda,
+                           nnl2_tensor* s, nnl2_tensor* u, const int ldu,
+                           nnl2_tensor* vt, const int ldvt, nnl2_tensor* iwork);						
+						
 /// @} [typedef]
 
 
