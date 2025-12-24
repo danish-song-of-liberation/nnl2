@@ -37,6 +37,23 @@ void nnl2_naive_atan2inplace(nnl2_tensor* y, const nnl2_tensor* x) {
                 for(size_t i = 0; i < len; i++) data_y[i] = atan2f(data_y[i], data_x[i]);
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_y = (int64_t*)y->data;
+				volatile int64_t* data_x = (int64_t*)x->data;
+				
+				for (size_t i = 0; i < len; i++) {
+					if (data_y[i] != 0 || data_x[i] != 0) {
+						NNL2_FATAL("Can't apply atan2inplace to non-zero INT64 tensors");
+					}
+				}
+				
+				for (size_t i = 0; i < len; i++) {
+					data_y[i] = 0;
+				}
+
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_y = (int32_t*)y->data;
@@ -90,6 +107,25 @@ void nnl2_naive_atan2inplace(nnl2_tensor* y, const nnl2_tensor* x) {
 				
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_y = (int64_t*)y->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					void* x_elem = x_data + i * x_step;
+					int64_t x_val = nnl2_convert_to_int64(x_elem, dtype_x);
+					
+					if (data_y[i] != 0 || x_val != 0) {
+						NNL2_FATAL("Can't apply atan2inplace to non-zero INT64 tensors");
+					}
+				}
+				
+				for(size_t i = 0; i < len; i++) {
+					data_y[i] = 0;
+				}
+
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_y = (int32_t*)y->data;

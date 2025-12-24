@@ -41,6 +41,24 @@ void nnl2_naive_loginplace(nnl2_tensor* tensor) {
 			for(size_t it = 0; it < len; it++) tensor_data[it] = logf(tensor_data[it]);
 			break;	
 		}
+		
+		case INT64: {
+			volatile int64_t* tensor_data = (int64_t*)tensor->data;	
+			
+			// 1 is the only positive integer for which log gives an integer (log(1) = 0)
+			for(size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 1) {
+					NNL2_FATAL("Can't apply .log! to passed INT64 tensor with values not equal to 1");
+				}
+			}
+			
+			// Set all values to 0 (since log(1) = 0)
+			for(size_t it = 0; it < len; it++) {
+				tensor_data[it] = 0;
+			}
+			
+			break;	
+		}
 			
 		case INT32: {
 			volatile int32_t* tensor_data = (int32_t*)tensor->data;	

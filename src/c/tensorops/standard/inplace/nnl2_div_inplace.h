@@ -93,6 +93,15 @@ void nnl2_naive_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
                 break;
             }
             
+			case INT64: {
+                volatile int64_t* data_dividend = (int64_t*)dividend->data;
+                volatile int64_t* data_divisor = (int64_t*)divisor->data;
+                
+                // Element-wise division
+                for(size_t i = 0; i < len_dividend; i++) data_dividend[i] /= data_divisor[i];        
+                break;
+            }
+			
             default: {
                 NNL2_TYPE_ERROR(dtype_dividend);
                 return;
@@ -130,6 +139,20 @@ void nnl2_naive_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
                 
                 break; 
             }
+			
+			case INT64: {
+				volatile int64_t* data_dividend = (int64_t*)dividend->data;
+				
+				// For each element, convert the divisor element to int64 and divide by it
+				for(size_t i = 0; i < len_dividend; i++) {
+					void* divisor_elem = divisor_data + i * divisor_step;
+					int64_t divisor_val = nnl2_convert_to_int64(divisor_elem, dtype_divisor);
+					
+					data_dividend[i] /= divisor_val;
+				}
+				
+				break; 
+			}
             
             case INT32: {
                 volatile int32_t* data_dividend = (int32_t*)dividend->data;
@@ -205,6 +228,19 @@ void* nnl2_own_pdiv_float32_same_type(void* arg);
 void* nnl2_own_pdiv_int32_same_type(void* arg);
 
 /** @brief
+ * Worker function for parallel 64-bit integer division with same data types
+ * 
+ ** @param arg 
+ * Pointer to divinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pdiv_float64_same_type
+ **/
+void* nnl2_own_pdiv_int64_same_type(void* arg);
+
+/** @brief
  * Worker function for parallel double precision division with type conversion
  * 
  ** @param arg 
@@ -244,6 +280,19 @@ void* nnl2_own_pdiv_float32_diff_type(void* arg);
  ** @see nnl2_own_pdiv_float64_diff_type
  **/
 void* nnl2_own_pdiv_int32_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer division with type conversion
+ * 
+ ** @param arg
+ * Pointer to divinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pdiv_float64_diff_type
+ **/
+void* nnl2_own_pdiv_int64_diff_type(void* arg);
 
 /** @brief
  * High-performance parallel implementation of in-place division
@@ -340,7 +389,9 @@ void nnl2_own_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
             switch(dtype_dividend) {
                 case FLOAT64: worker_func = nnl2_own_pdiv_float64_same_type; break;
                 case FLOAT32: worker_func = nnl2_own_pdiv_float32_same_type; break;
+				case INT64:   worker_func = nnl2_own_pdiv_int64_same_type;   break;
                 case INT32:   worker_func = nnl2_own_pdiv_int32_same_type;   break;
+				
                 default: {
                     NNL2_TYPE_ERROR(dtype_dividend);
                     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -354,7 +405,9 @@ void nnl2_own_divinplace(nnl2_tensor* dividend, const nnl2_tensor* divisor) {
             switch(dtype_dividend) {
                 case FLOAT64: worker_func = nnl2_own_pdiv_float64_diff_type; break;
                 case FLOAT32: worker_func = nnl2_own_pdiv_float32_diff_type; break;
+				case INT64:   worker_func = nnl2_own_pdiv_int64_diff_type;   break;
                 case INT32:   worker_func = nnl2_own_pdiv_int32_diff_type;   break;
+				
                 default: {
                     NNL2_TYPE_ERROR(dtype_dividend);
                     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -525,6 +578,46 @@ void* nnl2_own_pdiv_float32_same_type(void* arg) {
 /** @brief
  * See documentation at declaration
  * 
+ ** @see nnl2_own_pdiv_int64_same_type
+ **/
+void* nnl2_own_pdiv_int64_same_type(void* arg) {
+    divinplace_ptask* task = (divinplace_ptask*)arg;
+    int64_t* dividend = (int64_t*)task->dividend_data;
+    int64_t* divisor = (int64_t*)task->divisor_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // Integer division uses scalar operations (AVX256 doesn't have integer division)
+    // Use loop unrolling and prefetching for optimization
+    for(; i + 7 < end; i += 8) {
+        // Prefetch next cache lines
+        _mm_prefetch((char*)&dividend[i + 32], _MM_HINT_T0);
+        _mm_prefetch((char*)&divisor[i + 32], _MM_HINT_T0);
+        
+        // Unrolled loop for better performance
+        dividend[i] /= divisor[i];
+        dividend[i+1] /= divisor[i+1];
+        dividend[i+2] /= divisor[i+2];
+        dividend[i+3] /= divisor[i+3];
+        dividend[i+4] /= divisor[i+4];
+        dividend[i+5] /= divisor[i+5];
+        dividend[i+6] /= divisor[i+6];
+        dividend[i+7] /= divisor[i+7];
+    }
+    
+    // Process remainder
+    for(; i < end; i++) {
+        dividend[i] /= divisor[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
  ** @see nnl2_own_pdiv_int32_same_type
  **/
 void* nnl2_own_pdiv_int32_same_type(void* arg) {
@@ -664,6 +757,55 @@ void* nnl2_own_pdiv_float32_diff_type(void* arg) {
     for(; i < end; i++) {
         void* divisor_elem = divisor_data + i * divisor_step;
         dividend[i] /= nnl2_convert_to_float32(divisor_elem, task->dtype_divisor);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pdiv_int64_diff_type
+ **/
+void* nnl2_own_pdiv_int64_diff_type(void* arg) {
+    divinplace_ptask* task = (divinplace_ptask*)arg;
+    int64_t* dividend = (int64_t*)task->dividend_data;
+    char* divisor_data = (char*)task->divisor_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t divisor_step = task->divisor_step;
+    
+    size_t i = start;
+    
+    // Integer division with type conversion uses scalar operations
+    // Use loop unrolling and prefetching for optimization
+    for(; i + 7 < end; i += 8) {
+        _mm_prefetch((char*)&dividend[i + 32], _MM_HINT_T0);
+        
+        // Unrolled loop with type conversion
+        void* divisor_elem0 = divisor_data + i * divisor_step;
+        void* divisor_elem1 = divisor_data + (i+1) * divisor_step;
+        void* divisor_elem2 = divisor_data + (i+2) * divisor_step;
+        void* divisor_elem3 = divisor_data + (i+3) * divisor_step;
+        void* divisor_elem4 = divisor_data + (i+4) * divisor_step;
+        void* divisor_elem5 = divisor_data + (i+5) * divisor_step;
+        void* divisor_elem6 = divisor_data + (i+6) * divisor_step;
+        void* divisor_elem7 = divisor_data + (i+7) * divisor_step;
+        
+        dividend[i] /= nnl2_convert_to_int64(divisor_elem0, task->dtype_divisor);
+        dividend[i+1] /= nnl2_convert_to_int64(divisor_elem1, task->dtype_divisor);
+        dividend[i+2] /= nnl2_convert_to_int64(divisor_elem2, task->dtype_divisor);
+        dividend[i+3] /= nnl2_convert_to_int64(divisor_elem3, task->dtype_divisor);
+        dividend[i+4] /= nnl2_convert_to_int64(divisor_elem4, task->dtype_divisor);
+        dividend[i+5] /= nnl2_convert_to_int64(divisor_elem5, task->dtype_divisor);
+        dividend[i+6] /= nnl2_convert_to_int64(divisor_elem6, task->dtype_divisor);
+        dividend[i+7] /= nnl2_convert_to_int64(divisor_elem7, task->dtype_divisor);
+    }
+    
+    // Process remainder
+    for(; i < end; i++) {
+        void* divisor_elem = divisor_data + i * divisor_step;
+        dividend[i] /= nnl2_convert_to_int64(divisor_elem, task->dtype_divisor);
     }
     
     return NULL;

@@ -41,6 +41,29 @@ void nnl2_naive_log2inplace(nnl2_tensor* tensor) {
 			for(size_t it = 0; it < len; it++) tensor_data[it] = log2f(tensor_data[it]);
 			break;	
 		}
+		
+		case INT64: {
+			int64_t* tensor_data = (int64_t*)tensor->data;	
+			
+			// Check if all values are powers of two
+			for(size_t it = 0; it < len; it++) {
+				int64_t value = tensor_data[it];
+				if (value <= 0 || (value & (value - 1)) != 0) {
+					NNL2_FATAL("Can't apply .log2! to passed INT64 tensor - values must be positive powers of two");
+				}
+			}
+			
+			for(size_t it = 0; it < len; it++) {
+				int64_t value = tensor_data[it];
+				tensor_data[it] = 0;
+				// Calculate log2 for powers of two
+				while (value >>= 1) {
+					tensor_data[it]++;
+				}
+			}
+			
+			break;	
+		}
 			
 		case INT32: {
 			int32_t* tensor_data = (int32_t*)tensor->data;	

@@ -34,6 +34,12 @@ void naive_absinplace(nnl2_tensor* tensor) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)data;	
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = llabs(cast_data[i]);
+			break;
+		}
+		
 		case INT32: {
 			int32_t* cast_data = (int32_t*)data;	
 			for(size_t i = 0; i < total_elems; i++) cast_data[i] = abs(cast_data[i]);
@@ -101,6 +107,16 @@ void* nnl2_own_pabs_inplace_simd_float64(void* arg);
  */
 void* nnl2_own_pabs_inplace_simd_int32(void* arg);
 
+/** @brief 
+ * SIMD worker function for parallel in-place absolute value for int64
+ * 
+ * @param arg 
+ * Pointer to abs_inplace_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pabs_inplace_simd_int64(void* arg);
+
 #endif
 
 /** @brief
@@ -155,6 +171,26 @@ void nnl2_own_abs_inplace(nnl2_tensor* tensor) {
                 }
                 for(; i < total_elems; i++) {
                     cast_data[i] = fabsf(cast_data[i]);
+                }
+                break;
+            }
+			
+			case INT64: {
+                int64_t* cast_data = (int64_t*)data;
+                // Unrolled loop for small sizes
+                size_t i = 0;
+                for(; i + 7 < total_elems; i += 8) {
+                    cast_data[i] = (cast_data[i] < 0) ? -cast_data[i] : cast_data[i];
+                    cast_data[i+1] = (cast_data[i+1] < 0) ? -cast_data[i+1] : cast_data[i+1];
+                    cast_data[i+2] = (cast_data[i+2] < 0) ? -cast_data[i+2] : cast_data[i+2];
+                    cast_data[i+3] = (cast_data[i+3] < 0) ? -cast_data[i+3] : cast_data[i+3];
+                    cast_data[i+4] = (cast_data[i+4] < 0) ? -cast_data[i+4] : cast_data[i+4];
+                    cast_data[i+5] = (cast_data[i+5] < 0) ? -cast_data[i+5] : cast_data[i+5];
+                    cast_data[i+6] = (cast_data[i+6] < 0) ? -cast_data[i+6] : cast_data[i+6];
+                    cast_data[i+7] = (cast_data[i+7] < 0) ? -cast_data[i+7] : cast_data[i+7];
+                }
+                for(; i < total_elems; i++) {
+                    cast_data[i] = (cast_data[i] < 0) ? -cast_data[i] : cast_data[i];
                 }
                 break;
             }
@@ -234,6 +270,7 @@ void nnl2_own_abs_inplace(nnl2_tensor* tensor) {
                 switch(tensor->dtype) {
                     case FLOAT64: status = pthread_create(&threads[i], NULL, nnl2_own_pabs_inplace_simd_float64, &tasks[i]); break;
                     case FLOAT32: status = pthread_create(&threads[i], NULL, nnl2_own_pabs_inplace_simd_float32, &tasks[i]); break;
+					case INT64:   status = pthread_create(&threads[i], NULL, nnl2_own_pabs_inplace_simd_int64, &tasks[i]);   break;
                     case INT32:   status = pthread_create(&threads[i], NULL, nnl2_own_pabs_inplace_simd_int32, &tasks[i]);   break;
                     
                     default: {
@@ -332,6 +369,37 @@ void* nnl2_own_pabs_inplace(void* arg) {
 			
             for(; i < task->end; i++) {
                 cast_data[i] = fabsf(cast_data[i]);
+            }
+			
+            break;
+        }
+		
+		case INT64: {
+            int64_t* cast_data = (int64_t*)data;
+            size_t i = task->start;
+            
+            // Optimized loop with unrolling
+            for(; i + 15 < task->end; i += 16) {
+                cast_data[i] = (cast_data[i] < 0) ? -cast_data[i] : cast_data[i];
+                cast_data[i+1] = (cast_data[i+1] < 0) ? -cast_data[i+1] : cast_data[i+1];
+                cast_data[i+2] = (cast_data[i+2] < 0) ? -cast_data[i+2] : cast_data[i+2];
+                cast_data[i+3] = (cast_data[i+3] < 0) ? -cast_data[i+3] : cast_data[i+3];
+                cast_data[i+4] = (cast_data[i+4] < 0) ? -cast_data[i+4] : cast_data[i+4];
+                cast_data[i+5] = (cast_data[i+5] < 0) ? -cast_data[i+5] : cast_data[i+5];
+                cast_data[i+6] = (cast_data[i+6] < 0) ? -cast_data[i+6] : cast_data[i+6];
+                cast_data[i+7] = (cast_data[i+7] < 0) ? -cast_data[i+7] : cast_data[i+7];
+                cast_data[i+8] = (cast_data[i+8] < 0) ? -cast_data[i+8] : cast_data[i+8];
+                cast_data[i+9] = (cast_data[i+9] < 0) ? -cast_data[i+9] : cast_data[i+9];
+                cast_data[i+10] = (cast_data[i+10] < 0) ? -cast_data[i+10] : cast_data[i+10];
+                cast_data[i+11] = (cast_data[i+11] < 0) ? -cast_data[i+11] : cast_data[i+11];
+                cast_data[i+12] = (cast_data[i+12] < 0) ? -cast_data[i+12] : cast_data[i+12];
+                cast_data[i+13] = (cast_data[i+13] < 0) ? -cast_data[i+13] : cast_data[i+13];
+                cast_data[i+14] = (cast_data[i+14] < 0) ? -cast_data[i+14] : cast_data[i+14];
+                cast_data[i+15] = (cast_data[i+15] < 0) ? -cast_data[i+15] : cast_data[i+15];
+            }
+			
+            for(; i < task->end; i++) {
+                cast_data[i] = (cast_data[i] < 0) ? -cast_data[i] : cast_data[i];
             }
 			
             break;
@@ -501,6 +569,82 @@ void* nnl2_own_pabs_inplace_simd_float64(void* arg) {
 		
     for(; i < task->end; i++) {
         data[i] = fabs(data[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * SIMD-optimized worker function for int64 in-place absolute value
+ *
+ ** @see nnl2_own_pabs_inplace_simd_int64
+ **/
+void* nnl2_own_pabs_inplace_simd_int64(void* arg) {
+    abs_inplace_ptask* task = (abs_inplace_ptask*)arg;
+    
+    int64_t* data = (int64_t*)task->data;
+    
+    size_t i = task->start;
+    
+    // Process in large blocks of 32 elements (256 bits / 64 bits = 4 elements per iteration)
+    for(; i + 31 < task->end; i += 32) {
+        // Prefetch next block
+        _mm_prefetch((char*)&data[i + 32], _MM_HINT_T0);
+        
+        // Process 32 elements in 8 iterations (4 elements per iteration)
+        for(size_t j = 0; j < 32; j += 4) {
+            __m256i v_input = _mm256_load_si256((__m256i*)&data[i + j]);
+
+            __m256i v_zero = _mm256_setzero_si256();
+
+            __m256i v_mask = _mm256_cmpgt_epi64(v_zero, v_input);
+
+            __m256i v_xor = _mm256_xor_si256(v_input, v_mask);
+            __m256i v_result = _mm256_sub_epi64(v_xor, v_mask);
+            
+            _mm256_store_si256((__m256i*)&data[i + j], v_result);
+        }
+    }
+    
+    // Process tail - 16 elements
+    for(; i + 15 < task->end; i += 16) {
+        // Process 16 elements in 4 iterations
+        for(size_t j = 0; j < 16; j += 4) {
+            __m256i v_input = _mm256_load_si256((__m256i*)&data[i + j]);
+            __m256i v_zero = _mm256_setzero_si256();
+            __m256i v_mask = _mm256_cmpgt_epi64(v_zero, v_input);
+            __m256i v_xor = _mm256_xor_si256(v_input, v_mask);
+            __m256i v_result = _mm256_sub_epi64(v_xor, v_mask);
+            _mm256_store_si256((__m256i*)&data[i + j], v_result);
+        }
+    }
+    
+    // Process tail - 8 elements
+    for(; i + 7 < task->end; i += 8) {
+        // Process 8 elements in 2 iterations
+        for(size_t j = 0; j < 8; j += 4) {
+            __m256i v_input = _mm256_load_si256((__m256i*)&data[i + j]);
+            __m256i v_zero = _mm256_setzero_si256();
+            __m256i v_mask = _mm256_cmpgt_epi64(v_zero, v_input);
+            __m256i v_xor = _mm256_xor_si256(v_input, v_mask);
+            __m256i v_result = _mm256_sub_epi64(v_xor, v_mask);
+            _mm256_store_si256((__m256i*)&data[i + j], v_result);
+        }
+    }
+    
+    // Process tail - 4 elements
+    for(; i + 3 < task->end; i += 4) {
+        __m256i v_input = _mm256_load_si256((__m256i*)&data[i]);
+        __m256i v_zero = _mm256_setzero_si256();
+        __m256i v_mask = _mm256_cmpgt_epi64(v_zero, v_input);
+        __m256i v_xor = _mm256_xor_si256(v_input, v_mask);
+        __m256i v_result = _mm256_sub_epi64(v_xor, v_mask);
+        _mm256_store_si256((__m256i*)&data[i], v_result);
+    }
+    
+    // Process remaining elements
+    for(; i < task->end; i++) {
+        data[i] = (data[i] < 0) ? -data[i] : data[i];
     }
     
     return NULL;

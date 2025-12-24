@@ -41,6 +41,24 @@ void nnl2_naive_expinplace(nnl2_tensor* tensor) {
 			for(size_t it = 0; it < len; it++) tensor_data[it] = expf(tensor_data[it]);
 			break;	
 		}
+		
+		case INT64: {
+			volatile int64_t* tensor_data = (int64_t*)tensor->data;	
+			
+			// 0 is the only integer for which exp gives an integer (exp(0) = 1)
+			for (size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 0) {
+					NNL2_FATAL("Can't apply .exp! to a passed INT64 tensor with non-zero values");
+				}
+			}
+			
+			// Set all values to 1 (since exp(0) = 1)
+			for (size_t it = 0; it < len; it++) {
+				tensor_data[it] = 1;
+			}
+			
+			break;	
+		}
 			
 		case INT32: {
 			volatile int32_t* tensor_data = (int32_t*)tensor->data;	

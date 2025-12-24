@@ -41,6 +41,23 @@ void nnl2_naive_log10inplace(nnl2_tensor* tensor) {
 			for(size_t it = 0; it < len; it++) tensor_data[it] = log10f(tensor_data[it]);
 			break;	
 		}
+		
+		case INT64: {
+			volatile int64_t* tensor_data = (int64_t*)tensor->data;	
+			
+			for(size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 1) {
+					NNL2_FATAL("Can't apply .log10! to passed INT64 tensor - only value 1 is allowed");
+				}
+			}
+			
+			// Set all values to 0 (since log10(1) = 0)
+			for(size_t it = 0; it < len; it++) {
+				tensor_data[it] = 0;
+			}
+			
+			break;	
+		}
 			
 		case INT32: {
 			volatile int32_t* tensor_data = (int32_t*)tensor->data;	

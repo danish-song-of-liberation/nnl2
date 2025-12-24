@@ -86,6 +86,17 @@ void naive_powinplace(nnl2_tensor* base, const nnl2_tensor* exponent) {
                 }    
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_base = (int64_t*)base->data;
+				volatile int64_t* data_exponent = (int64_t*)exponent->data;
+				
+				// Element-wise exponentiation
+				for(size_t i = 0; i < len_base; i++) {
+					data_base[i] = (int64_t)pow((double)data_base[i], (double)data_exponent[i]);
+				}        
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_base = (int32_t*)base->data;
@@ -135,7 +146,19 @@ void naive_powinplace(nnl2_tensor* base, const nnl2_tensor* exponent) {
                 
                 break; 
             }
-            
+			
+			case INT64: {
+				volatile int64_t* data_base = (int64_t*)base->data;
+				
+				// For each element, convert the exponent element to INT64 and use it as exponent
+				for(size_t i = 0; i < len_base; i++) {
+					void* exponent_elem = exponent_data + i * exponent_step;
+					data_base[i] = (int64_t)pow(data_base[i], nnl2_convert_to_int64(exponent_elem, dtype_exponent));
+				}
+				
+				break; 
+			}
+
             case INT32: {
                 volatile int32_t* data_base = (int32_t*)base->data;
                 

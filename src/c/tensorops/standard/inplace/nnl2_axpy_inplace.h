@@ -94,6 +94,19 @@ void naive_axpy_inplace(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) 
 				
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_summand = (int64_t*)summand->data;
+				volatile int64_t* data_sumend = (int64_t*)sumend->data;
+				int64_t alpha_int64 = (int64_t)alpha;
+				
+				// Element-wise AXPY operation
+				for(size_t i = 0; i < total_elems; i++) {
+					data_summand[i] += data_sumend[i] * alpha_int64;
+				}
+
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_summand = (int32_t*)summand->data;
@@ -146,6 +159,19 @@ void naive_axpy_inplace(nnl2_tensor* summand, nnl2_tensor* sumend, float alpha) 
                 
                 break; 
             }
+			
+			case INT64: {
+				volatile int64_t* data_summand = (int64_t*)summand->data;
+				int64_t alpha_int64 = (int64_t)alpha;
+				
+				// For each element, convert the sumend element to INT64 and perform AXPY
+				for(size_t i = 0; i < total_elems; i++) {
+					void* sumend_elem = sumend_data + i * sumend_step;
+					data_summand[i] += nnl2_convert_to_int64(sumend_elem, dtype_sumend) * alpha_int64;
+				}
+				
+				break; 
+			}
             
             case INT32: {
                 volatile int32_t* data_summand = (int32_t*)summand->data;
@@ -219,6 +245,19 @@ void* nnl2_own_paxpy_inplace_float32(void* arg);
  ** @see nnl2_own_paxpy_inplace_float64
  **/
 void* nnl2_own_paxpy_inplace_int32(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer AXPY in-place operation
+ * 
+ ** @param arg 
+ * Pointer to axpy_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_paxpy_inplace_float64
+ **/
+void* nnl2_own_paxpy_inplace_int64(void* arg);
 
 /** @brief
  * High-performance parallel implementation of AXPY in-place operation
@@ -306,9 +345,11 @@ void nnl2_own_axpy_inplace(nnl2_tensor* summand, const nnl2_tensor* sumend, floa
         tasks[i].aligned = is_aligned;
         
         switch(dtype_summand) {
-            case FLOAT64: tasks[i].alpha.float64_alpha = (double)alpha; break;
-            case FLOAT32: tasks[i].alpha.float32_alpha = alpha; break;
-            case INT32:   tasks[i].alpha.int32_alpha = (int32_t)alpha; break;
+            case FLOAT64: tasks[i].alpha.float64_alpha = (double)alpha;  break;
+            case FLOAT32: tasks[i].alpha.float32_alpha = alpha; 		 break;
+            case INT32:   tasks[i].alpha.int32_alpha = (int32_t)alpha;   break;
+			case INT64:   tasks[i].alpha.int64_alpha = (int64_t)alpha;   break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype_summand);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -330,9 +371,11 @@ void nnl2_own_axpy_inplace(nnl2_tensor* summand, const nnl2_tensor* sumend, floa
         // Select appropriate worker function based on data type
         void* (*worker_func)(void*) = NULL;
         switch(dtype_summand) {
-            case FLOAT64: worker_func = nnl2_own_paxpy_inplace_float64; break;
-            case FLOAT32: worker_func = nnl2_own_paxpy_inplace_float32; break;
-            case INT32:   worker_func = nnl2_own_paxpy_inplace_int32;   break;
+            case FLOAT64: worker_func = nnl2_own_paxpy_inplace_float64;  break;
+            case FLOAT32: worker_func = nnl2_own_paxpy_inplace_float32;  break;
+			case INT64:   worker_func = nnl2_own_paxpy_inplace_int64;    break;
+            case INT32:   worker_func = nnl2_own_paxpy_inplace_int32;    break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype_summand);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -460,6 +503,51 @@ void* nnl2_own_paxpy_inplace_float32(void* arg) {
             __m256 v_scaled_sumend = _mm256_mul_ps(v_sumend, v_alpha);
             __m256 v_result = _mm256_add_ps(v_summand, v_scaled_sumend);
             _mm256_storeu_ps(&summand_data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        summand_data[i] += sumend_data[i] * alpha;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_paxpy_inplace_int64
+ **/
+void* nnl2_own_paxpy_inplace_int64(void* arg) {
+    axpy_inplace_ptask* task = (axpy_inplace_ptask*)arg;
+    int64_t* summand_data = (int64_t*)task->summand->data;
+    const int64_t* sumend_data = (const int64_t*)task->sumend->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t alpha = task->alpha.int64_alpha;
+    
+    size_t i = start;
+    
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand_data[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 16], _MM_HINT_T0);
+            
+            summand_data[i] += sumend_data[i] * alpha;
+            summand_data[i+1] += sumend_data[i+1] * alpha;
+            summand_data[i+2] += sumend_data[i+2] * alpha;
+            summand_data[i+3] += sumend_data[i+3] * alpha;
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&summand_data[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&sumend_data[i + 16], _MM_HINT_T0);
+            
+            summand_data[i] += sumend_data[i] * alpha;
+            summand_data[i+1] += sumend_data[i+1] * alpha;
+            summand_data[i+2] += sumend_data[i+2] * alpha;
+            summand_data[i+3] += sumend_data[i+3] * alpha;
         }
     }
     

@@ -53,6 +53,17 @@ void nnl2_naive_neg_inplace(nnl2_tensor* tensor) {
             break;
 		}
 		
+		case INT64: {
+			nnl2_int64* tensor_data = (nnl2_int64*)tensor->data;
+				
+			// Element-wise neg
+			for(size_t i = 0; i < numel; i++) {
+				tensor_data[i] = -(tensor_data[i]);
+			}
+
+			break;
+		}
+		
 		case INT32: {
             nnl2_int32* tensor_data = (nnl2_int32*)tensor->data;
                 

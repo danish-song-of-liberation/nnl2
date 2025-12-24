@@ -82,6 +82,15 @@ void nnl2_naive_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multipl
                 for(size_t i = 0; i < len_multiplicand; i++) data_multiplicand[i] *= data_multiplier[i];    
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_multiplicand = (int64_t*)multiplicand->data;
+				volatile int64_t* data_multiplier = (int64_t*)multiplier->data;
+				
+				// Element-wise multiplication
+				for(size_t i = 0; i < len_multiplicand; i++) data_multiplicand[i] *= data_multiplier[i];
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
@@ -129,6 +138,18 @@ void nnl2_naive_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multipl
                 
                 break; 
             }
+			
+			case INT64: {
+				volatile int64_t* data_multiplicand = (int64_t*)multiplicand->data;
+				
+				// For each element, convert the multiplier element to INT64 and multiply it
+				for(size_t i = 0; i < len_multiplicand; i++) {
+					void* multiplier_elem = multiplier_data + i * multiplier_step;
+					data_multiplicand[i] *= nnl2_convert_to_int64(multiplier_elem, dtype_multiplier);
+				}
+				
+				break; 
+			}
             
             case INT32: {
                 volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
@@ -204,6 +225,19 @@ void* nnl2_own_pmulinplace_float32_same_type(void* arg);
 void* nnl2_own_pmulinplace_int32_same_type(void* arg);
 
 /** @brief
+ * Worker function for parallel 64-bit integer multiplication with same data types
+ * 
+ ** @param arg 
+ * Pointer to mulinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmulinplace_float64_same_type
+ **/
+void* nnl2_own_pmulinplace_int64_same_type(void* arg);
+
+/** @brief
  * Worker function for parallel double precision multiplication with type conversion
  * 
  ** @param arg 
@@ -243,6 +277,19 @@ void* nnl2_own_pmulinplace_float32_diff_type(void* arg);
  ** @see nnl2_own_pmulinplace_float64_diff_type
  **/
 void* nnl2_own_pmulinplace_int32_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer multiplication with type conversion
+ * 
+ ** @param arg
+ * Pointer to mulinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmulinplace_float64_diff_type
+ **/
+void* nnl2_own_pmulinplace_int64_diff_type(void* arg);
 
 /** @brief
  * High-performance parallel implementation of in-place multiplication
@@ -338,7 +385,9 @@ void nnl2_own_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplie
             switch(dtype_multiplicand) {
                 case FLOAT64: worker_func = nnl2_own_pmulinplace_float64_same_type; break;
                 case FLOAT32: worker_func = nnl2_own_pmulinplace_float32_same_type; break;
+				case INT64:   worker_func = nnl2_own_pmulinplace_int64_same_type;   break;
                 case INT32:   worker_func = nnl2_own_pmulinplace_int32_same_type;   break;
+				
                 default: {
                     NNL2_TYPE_ERROR(dtype_multiplicand);
                     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -352,7 +401,9 @@ void nnl2_own_mulinplace(nnl2_tensor* multiplicand, const nnl2_tensor* multiplie
             switch(dtype_multiplicand) {
                 case FLOAT64: worker_func = nnl2_own_pmulinplace_float64_diff_type; break;
                 case FLOAT32: worker_func = nnl2_own_pmulinplace_float32_diff_type; break;
+				case INT64:   worker_func = nnl2_own_pmulinplace_int64_diff_type;   break;
                 case INT32:   worker_func = nnl2_own_pmulinplace_int32_diff_type;   break;
+				
                 default: {
                     NNL2_TYPE_ERROR(dtype_multiplicand);
                     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -509,6 +560,71 @@ void* nnl2_own_pmulinplace_float32_same_type(void* arg) {
             __m256 v_multiplier = _mm256_loadu_ps(&multiplier[i]);
             __m256 v_result = _mm256_mul_ps(v_multiplicand, v_multiplier);
             _mm256_storeu_ps(&multiplicand[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        multiplicand[i] *= multiplier[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmulinplace_int64_same_type
+ **/
+void* nnl2_own_pmulinplace_int64_same_type(void* arg) {
+    mulinplace_ptask* task = (mulinplace_ptask*)arg;
+    int64_t* multiplicand = (int64_t*)task->multiplicand_data;
+    int64_t* multiplier = (int64_t*)task->multiplier_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    if(task->aligned_multiplicand && task->aligned_multiplier) {
+        for(; i + 3 < end; i += 4) {
+            // Prefetch next cache lines
+            _mm_prefetch((char*)&multiplicand[i + 8], _MM_HINT_T0);
+            _mm_prefetch((char*)&multiplier[i + 8], _MM_HINT_T0);
+
+            multiplicand[i] *= multiplier[i];
+            multiplicand[i+1] *= multiplier[i+1];
+            multiplicand[i+2] *= multiplier[i+2];
+            multiplicand[i+3] *= multiplier[i+3];
+        }
+    } else if(task->aligned_multiplicand) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&multiplicand[i + 8], _MM_HINT_T0);
+            _mm_prefetch((char*)&multiplier[i + 8], _MM_HINT_T0);
+            
+            multiplicand[i] *= multiplier[i];
+            multiplicand[i+1] *= multiplier[i+1];
+            multiplicand[i+2] *= multiplier[i+2];
+            multiplicand[i+3] *= multiplier[i+3];
+        }
+    } else if(task->aligned_multiplier) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&multiplicand[i + 8], _MM_HINT_T0);
+            _mm_prefetch((char*)&multiplier[i + 8], _MM_HINT_T0);
+            
+            multiplicand[i] *= multiplier[i];
+            multiplicand[i+1] *= multiplier[i+1];
+            multiplicand[i+2] *= multiplier[i+2];
+            multiplicand[i+3] *= multiplier[i+3];
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&multiplicand[i + 8], _MM_HINT_T0);
+            _mm_prefetch((char*)&multiplier[i + 8], _MM_HINT_T0);
+            
+            multiplicand[i] *= multiplier[i];
+            multiplicand[i+1] *= multiplier[i+1];
+            multiplicand[i+2] *= multiplier[i+2];
+            multiplicand[i+3] *= multiplier[i+3];
         }
     }
     
@@ -704,6 +820,60 @@ void* nnl2_own_pmulinplace_float32_diff_type(void* arg) {
     for(; i < end; i++) {
         void* multiplier_elem = multiplier_data + i * multiplier_step;
         multiplicand[i] *= nnl2_convert_to_float32(multiplier_elem, task->dtype_multiplier);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmulinplace_int64_diff_type
+ **/
+void* nnl2_own_pmulinplace_int64_diff_type(void* arg) {
+    mulinplace_ptask* task = (mulinplace_ptask*)arg;
+    int64_t* multiplicand = (int64_t*)task->multiplicand_data;
+    char* multiplier_data = (char*)task->multiplier_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t multiplier_step = task->multiplier_step;
+    
+    size_t i = start;
+    
+    if(task->aligned_multiplicand) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&multiplicand[i + 8], _MM_HINT_T0);
+            
+            void* multiplier_elem0 = multiplier_data + i * multiplier_step;
+            void* multiplier_elem1 = multiplier_data + (i+1) * multiplier_step;
+            void* multiplier_elem2 = multiplier_data + (i+2) * multiplier_step;
+            void* multiplier_elem3 = multiplier_data + (i+3) * multiplier_step;
+            
+            multiplicand[i] *= nnl2_convert_to_int64(multiplier_elem0, task->dtype_multiplier);
+            multiplicand[i+1] *= nnl2_convert_to_int64(multiplier_elem1, task->dtype_multiplier);
+            multiplicand[i+2] *= nnl2_convert_to_int64(multiplier_elem2, task->dtype_multiplier);
+            multiplicand[i+3] *= nnl2_convert_to_int64(multiplier_elem3, task->dtype_multiplier);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&multiplicand[i + 8], _MM_HINT_T0);
+            
+            void* multiplier_elem0 = multiplier_data + i * multiplier_step;
+            void* multiplier_elem1 = multiplier_data + (i+1) * multiplier_step;
+            void* multiplier_elem2 = multiplier_data + (i+2) * multiplier_step;
+            void* multiplier_elem3 = multiplier_data + (i+3) * multiplier_step;
+            
+            multiplicand[i] *= nnl2_convert_to_int64(multiplier_elem0, task->dtype_multiplier);
+            multiplicand[i+1] *= nnl2_convert_to_int64(multiplier_elem1, task->dtype_multiplier);
+            multiplicand[i+2] *= nnl2_convert_to_int64(multiplier_elem2, task->dtype_multiplier);
+            multiplicand[i+3] *= nnl2_convert_to_int64(multiplier_elem3, task->dtype_multiplier);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* multiplier_elem = multiplier_data + i * multiplier_step;
+        multiplicand[i] *= nnl2_convert_to_int64(multiplier_elem, task->dtype_multiplier);
     }
     
     return NULL;

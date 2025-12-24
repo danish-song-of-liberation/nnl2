@@ -87,6 +87,17 @@ void naive_mininplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
                 break;
             }
             
+			case INT64: {
+				volatile int64_t* data_a = (int64_t*)tensora->data;
+				volatile int64_t* data_b = (int64_t*)tensorb->data;
+				
+				// Element-wise minimum calculation
+				for(size_t i = 0; i < total_elems; i++) {
+					data_a[i] = MIN(data_a[i], data_b[i]);
+				}
+				break;
+			}
+
             case INT32: {
                 volatile int32_t* data_a = (int32_t*)tensora->data;
                 volatile int32_t* data_b = (int32_t*)tensorb->data;
@@ -135,6 +146,18 @@ void naive_mininplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
                 }
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_a = (int64_t*)tensora->data;
+				
+				// For each element, convert the second tensor element to INT64 and compare
+				for(size_t i = 0; i < total_elems; i++) {
+					void* elem_b = data_b + i * typeb_step;
+					int64_t converted_b = nnl2_convert_to_int64(elem_b, typeb);
+					data_a[i] = MIN(data_a[i], converted_b);
+				}
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_a = (int32_t*)tensora->data;
@@ -207,6 +230,19 @@ void* nnl2_own_pmininplace_float32(void* arg);
  ** @see nnl2_own_pmininplace_float64
  **/
 void* nnl2_own_pmininplace_int32(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer in-place minimum operation
+ * 
+ ** @param arg 
+ * Pointer to mininplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmininplace_float64
+ **/
+void* nnl2_own_pmininplace_int64(void* arg);
 
 /** @brief
  * High-performance parallel implementation of in-place element-wise minimum operation
@@ -303,7 +339,9 @@ void nnl2_own_mininplace(nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
         switch(dtype_a) {
             case FLOAT64: worker_func = nnl2_own_pmininplace_float64; break;
             case FLOAT32: worker_func = nnl2_own_pmininplace_float32; break;
+			case INT64:   worker_func = nnl2_own_pmininplace_int64;   break;
             case INT32:   worker_func = nnl2_own_pmininplace_int32;   break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype_a);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -419,6 +457,60 @@ void* nnl2_own_pmininplace_float32(void* arg) {
             __m256 v_data_b = _mm256_loadu_ps(&data_b[i]);
             __m256 v_result = _mm256_min_ps(v_data_a, v_data_b);
             _mm256_storeu_ps(&data_a[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        data_a[i] = MIN(data_a[i], data_b[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmininplace_int64
+ **/
+void* nnl2_own_pmininplace_int64(void* arg) {
+    mininplace_ptask* task = (mininplace_ptask*)arg;
+    int64_t* data_a = (int64_t*)task->tensora->data;
+    const int64_t* data_b = (const int64_t*)task->tensorb->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (4 elements per iteration для 64-bit)
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            // Prefetch next cache lines
+            _mm_prefetch((char*)&data_a[i + 8], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 8], _MM_HINT_T0);
+            
+            __m256i v_data_a = _mm256_load_si256((__m256i*)&data_a[i]);
+            __m256i v_data_b = _mm256_load_si256((__m256i*)&data_b[i]);
+            
+            // For 64-bit integers, use compare and blend for minimum
+            // MIN(a, b) = a < b ? a : b = blend(a, b, a > b)
+            __m256i v_compare = _mm256_cmpgt_epi64(v_data_a, v_data_b);
+            __m256i v_result = _mm256_blendv_epi8(v_data_a, v_data_b, v_compare);
+            
+            _mm256_store_si256((__m256i*)&data_a[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data_a[i + 8], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 8], _MM_HINT_T0);
+            
+            __m256i v_data_a = _mm256_loadu_si256((__m256i*)&data_a[i]);
+            __m256i v_data_b = _mm256_loadu_si256((__m256i*)&data_b[i]);
+            
+            __m256i v_compare = _mm256_cmpgt_epi64(v_data_a, v_data_b);
+            __m256i v_result = _mm256_blendv_epi8(v_data_a, v_data_b, v_compare);
+            
+            _mm256_storeu_si256((__m256i*)&data_a[i], v_result);
         }
     }
     

@@ -82,6 +82,15 @@ void nnl2_naive_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) 
                 for(size_t i = 0; i < len_minuend; i++) data_minuend[i] -= data_subtrahend[i];    
                 break;
             }
+			
+			case INT64: {
+				volatile int64_t* data_minuend = (int64_t*)minuend->data;
+				volatile int64_t* data_subtrahend = (int64_t*)subtrahend->data;
+				
+				// Element-wise subtraction
+				for(size_t i = 0; i < len_minuend; i++) data_minuend[i] -= data_subtrahend[i];
+				break;
+			}
             
             case INT32: {
                 volatile int32_t* data_minuend = (int32_t*)minuend->data;
@@ -197,6 +206,14 @@ static inline void nnl2_avx_sub_float32_same_type(float* minuend, float* subtrah
 static inline void nnl2_avx_sub_int32_same_type(int32_t* minuend, int32_t* subtrahend, size_t len, bool aligned_minuend, bool aligned_subtrahend);
 
 /** @brief
+ * AVX256 optimized subtraction for int64 with the same types
+ * Documentation is identical to that of nnl2_avx_sub_float64_same_type
+ *
+ ** @see nnl2_avx_sub_float64_same_type
+ **/
+static inline void nnl2_avx_sub_int64_same_type(int64_t* minuend, int64_t* subtrahend, size_t len, bool aligned_minuend, bool aligned_subtrahend);
+
+/** @brief
  * AVX256 optimized subtraction for double with different types
  *
  ** @param minuend 
@@ -228,6 +245,14 @@ static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const nnl2_ten
  ** @see nnl2_avx_sub_float64_diff_type
  **/
 static inline void nnl2_avx_sub_int32_diff_type(int32_t* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend);
+
+/** @brief
+ * AVX256 optimized subtraction for int64 with different types
+ * Documentation is identical to that of nnl2_avx_sub_float64_diff_type
+ *
+ ** @see nnl2_avx_sub_float64_diff_type
+ **/
+static inline void nnl2_avx_sub_int64_diff_type(int64_t* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend);
 
 // Main function
 
@@ -302,7 +327,8 @@ void nnl2_avx256_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend)
         
         switch (dtype_minuend) {
             case FLOAT64: nnl2_avx_sub_float64_same_type((double*)minuend->data, (double*)subtrahend->data, len_minuend, is_aligned_minuend, is_aligned_subtrahend);  break;
-            case FLOAT32: nnl2_avx_sub_float32_same_type((float*)minuend->data, (float*)subtrahend->data, len_minuend, is_aligned_minuend, is_aligned_subtrahend);    break;    
+            case FLOAT32: nnl2_avx_sub_float32_same_type((float*)minuend->data, (float*)subtrahend->data, len_minuend, is_aligned_minuend, is_aligned_subtrahend);    break; 
+			case INT64:   nnl2_avx_sub_int64_same_type((int64_t*)minuend->data, (int64_t*)subtrahend->data, len_minuend, is_aligned_minuend, is_aligned_subtrahend);  break;
             case INT32:   nnl2_avx_sub_int32_same_type((int32_t*)minuend->data, (int32_t*)subtrahend->data, len_minuend, is_aligned_minuend, is_aligned_subtrahend);  break;
             
             default: {
@@ -316,6 +342,7 @@ void nnl2_avx256_subinplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend)
         switch(dtype_minuend) {
             case FLOAT64: nnl2_avx_sub_float64_diff_type((double*)minuend->data, subtrahend, len_minuend, is_aligned_minuend);  break;
             case FLOAT32: nnl2_avx_sub_float32_diff_type((float*)minuend->data, subtrahend, len_minuend, is_aligned_minuend);   break;
+			case INT64:   nnl2_avx_sub_int64_diff_type((int64_t*)minuend->data, subtrahend, len_minuend, is_aligned_minuend);   break;
             case INT32:   nnl2_avx_sub_int32_diff_type((int32_t*)minuend->data, subtrahend, len_minuend, is_aligned_minuend);   break;
             
             default: {
@@ -450,6 +477,67 @@ static inline void nnl2_avx_sub_float32_same_type(float* minuend, float* subtrah
             __m256 v_subtrahend = _mm256_loadu_ps(&subtrahend[i]);      // Slow loading of unaligned data
             __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);   // Vector subtraction
             _mm256_storeu_ps(&minuend[i], v_result);                    // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) minuend[i] -= subtrahend[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
+ * nnl2_runtime_implementation of int64 subtraction with the same types
+ *
+ ** @see nnl2_avx256_subinplace
+ ** @see nnl2_avx_sub_int32_same_type
+ **/
+static inline void nnl2_avx_sub_int64_same_type(int64_t* minuend, int64_t* subtrahend, size_t len, bool aligned_minuend, bool aligned_subtrahend) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_minuend && aligned_subtrahend) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);       // Fast loading of aligned data
+            __m256i v_subtrahend = _mm256_load_si256((__m256i*)&subtrahend[i]); // Fast loading of aligned data
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);       // Vector subtraction for int64
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);                // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only the minuend is aligned
+    else if(aligned_minuend) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);           // Fast loading of aligned data
+            __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&subtrahend[i]);    // Slow loading of unaligned data
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);           // Vector subtraction for int64
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);                    // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only the subtrahend is aligned
+    else if(aligned_subtrahend) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);          // Slow loading of unaligned data
+            __m256i v_subtrahend = _mm256_load_si256((__m256i*)&subtrahend[i]);     // Fast loading of aligned data
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);           // Vector subtraction for int64
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);                   // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);          // Slow loading of unaligned data
+            __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&subtrahend[i]);    // Slow loading of unaligned data
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);           // Vector subtraction for int64
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);                   // Slow saving to unaligned memory
         }
     }
     
@@ -662,6 +750,67 @@ static inline void nnl2_avx_sub_float32_diff_type(float* minuend, const nnl2_ten
 }    
 
 /** @brief 
+ * nnl2_runtime_implementation of int64 subtraction with conversion from other types
+ *
+ ** @details 
+ * Converts subtrahend elements to int64 before subtraction
+ *
+ ** @see nnl2_avx256_subinplace
+ **/
+static inline void nnl2_avx_sub_int64_diff_type(int64_t* minuend, const nnl2_tensor* subtrahend, size_t len, bool aligned_minuend) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t subtrahend_step = get_dtype_size(subtrahend->dtype);
+    char* subtrahend_data = (char*)subtrahend->data;
+    
+    size_t i = 0;
+    
+    // Vector processing of 4 elements per iteration (AVX256 supports 4 int64)
+    if(aligned_minuend) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            
+            // Creating a vector of 4 int64s with conversion
+            __m256i v_subtrahend = _mm256_set_epi64x(
+                nnl2_convert_to_int64(subtrahend_data + (i + 3) * subtrahend_step, subtrahend->dtype),
+                nnl2_convert_to_int64(subtrahend_data + (i + 2) * subtrahend_step, subtrahend->dtype),
+                nnl2_convert_to_int64(subtrahend_data + (i + 1) * subtrahend_step, subtrahend->dtype),
+                nnl2_convert_to_int64(subtrahend_data + (i + 0) * subtrahend_step, subtrahend->dtype)
+            );
+            
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else {
+        // Similarly for unaligned memory
+        for(; i + 3 < len; i += 4) {
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_set_epi64x(
+                nnl2_convert_to_int64(subtrahend_data + (i + 3) * subtrahend_step, subtrahend->dtype),
+                nnl2_convert_to_int64(subtrahend_data + (i + 2) * subtrahend_step, subtrahend->dtype),
+                nnl2_convert_to_int64(subtrahend_data + (i + 1) * subtrahend_step, subtrahend->dtype),
+                nnl2_convert_to_int64(subtrahend_data + (i + 0) * subtrahend_step, subtrahend->dtype)
+            );
+            
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing of the remainder
+    for(; i < len; i++) {
+        void* subtrahend_elem = subtrahend_data + i * subtrahend_step;
+        minuend[i] -= nnl2_convert_to_int64(subtrahend_elem, subtrahend->dtype);
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
  * nnl2_runtime_implementation of int32 subtraction with conversion from other types
  *
  ** @details 
@@ -769,6 +918,19 @@ void* nnl2_own_psub_float64_same_type(void* arg);
 void* nnl2_own_psub_float32_same_type(void* arg);
 
 /** @brief
+ * Worker function for parallel int64 subtraction with same data types
+ * 
+ ** @param arg 
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_float64_same_type
+ **/
+void* nnl2_own_psub_int64_same_type(void* arg);
+
+/** @brief
  * Worker function for parallel integer subtraction with same data types
  * 
  ** @param arg 
@@ -808,6 +970,19 @@ void* nnl2_own_psub_float64_diff_type(void* arg);
  ** @see nnl2_own_psub_float64_diff_type
  **/
 void* nnl2_own_psub_float32_diff_type(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 subtraction with type conversion
+ * 
+ ** @param arg
+ * Pointer to subinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_float64_diff_type
+ **/
+void* nnl2_own_psub_int64_diff_type(void* arg);
 
 /** @brief
  * Worker function for parallel integer subtraction with type conversion
@@ -913,7 +1088,9 @@ void nnl2_own_sub_inplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
             switch(dtype_minuend) {
                 case FLOAT64: worker_func = nnl2_own_psub_float64_same_type; break;
                 case FLOAT32: worker_func = nnl2_own_psub_float32_same_type; break;
+				case INT64:   worker_func = nnl2_own_psub_int64_same_type;   break;
                 case INT32:   worker_func = nnl2_own_psub_int32_same_type;   break;
+				
                 default: {
                     NNL2_TYPE_ERROR(dtype_minuend);
                     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -927,7 +1104,9 @@ void nnl2_own_sub_inplace(nnl2_tensor* minuend, const nnl2_tensor* subtrahend) {
             switch(dtype_minuend) {
                 case FLOAT64: worker_func = nnl2_own_psub_float64_diff_type; break;
                 case FLOAT32: worker_func = nnl2_own_psub_float32_diff_type; break;
+				case INT64:   worker_func = nnl2_own_psub_int64_diff_type;   break;
                 case INT32:   worker_func = nnl2_own_psub_int32_diff_type;   break;
+				
                 default: {
                     NNL2_TYPE_ERROR(dtype_minuend);
                     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -1084,6 +1263,71 @@ void* nnl2_own_psub_float32_same_type(void* arg) {
             __m256 v_subtrahend = _mm256_loadu_ps(&subtrahend[i]);
             __m256 v_result = _mm256_sub_ps(v_minuend, v_subtrahend);
             _mm256_storeu_ps(&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        minuend[i] -= subtrahend[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_int64_same_type
+ **/
+void* nnl2_own_psub_int64_same_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    int64_t* minuend = (int64_t*)task->minuend_data;
+    int64_t* subtrahend = (int64_t*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (4 elements per iteration for int64)
+    if(task->aligned_minuend && task->aligned_subtrahend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_load_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else if(task->aligned_minuend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else if(task->aligned_subtrahend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_load_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&subtrahend[i + 16], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_loadu_si256((__m256i*)&subtrahend[i]);
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
         }
     }
     
@@ -1279,6 +1523,63 @@ void* nnl2_own_psub_float32_diff_type(void* arg) {
     for(; i < end; i++) {
         void* subtrahend_elem = subtrahend_data + i * subtrahend_step;
         minuend[i] -= nnl2_convert_to_float32(subtrahend_elem, task->dtype_subtrahend);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_int64_diff_type
+ **/
+void* nnl2_own_psub_int64_diff_type(void* arg) {
+    subinplace_ptask* task = (subinplace_ptask*)arg;
+    int64_t* minuend = (int64_t*)task->minuend_data;
+    char* subtrahend_data = (char*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t subtrahend_step = task->subtrahend_step;
+    
+    size_t i = start;
+    
+    // AVX256 processing with type conversion and prefetching (4 elements per iteration for int64)
+    if(task->aligned_minuend) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_load_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_set_epi64x(
+                nnl2_convert_to_int64(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int64(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int64(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int64(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_store_si256((__m256i*)&minuend[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&minuend[i + 16], _MM_HINT_T0);
+            
+            __m256i v_minuend = _mm256_loadu_si256((__m256i*)&minuend[i]);
+            __m256i v_subtrahend = _mm256_set_epi64x(
+                nnl2_convert_to_int64(subtrahend_data + (i + 3) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int64(subtrahend_data + (i + 2) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int64(subtrahend_data + (i + 1) * subtrahend_step, task->dtype_subtrahend),
+                nnl2_convert_to_int64(subtrahend_data + (i + 0) * subtrahend_step, task->dtype_subtrahend)
+            );
+            
+            __m256i v_result = _mm256_sub_epi64(v_minuend, v_subtrahend);
+            _mm256_storeu_si256((__m256i*)&minuend[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        void* subtrahend_elem = subtrahend_data + i * subtrahend_step;
+        minuend[i] -= nnl2_convert_to_int64(subtrahend_elem, task->dtype_subtrahend);
     }
     
     return NULL;

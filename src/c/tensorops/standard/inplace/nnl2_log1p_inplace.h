@@ -53,39 +53,6 @@ void nnl2_naive_log1pinplace(nnl2_tensor* tensor) {
 			break;	
 		}
 			
-		case INT32: {
-			int32_t* tensor_data = (int32_t*)tensor->data;	
-			
-			// Check if all values are >= 0 
-			for(size_t it = 0; it < len; it++) {
-				if (tensor_data[it] < -1) {
-					NNL2_FATAL("Can't apply .log1p! to passed tensor - integer values must be >= -1");
-				}
-			}
-			
-			for(size_t it = 0; it < len; it++) {
-				tensor_data[it] = 0; // Reset to zero, will convert to float
-			}
-			
-			// Convert tensor dtype to FLOAT32 since result is not integer
-			tensor->dtype = FLOAT32;
-			float* new_data = (float*)malloc(len * sizeof(float));
-			
-			if (!new_data) {
-				NNL2_MALLOC_ERROR();
-				return;
-			}
-			
-			for(size_t it = 0; it < len; it++) {
-				new_data[it] = log1pf((float)((int32_t*)tensor->data)[it]);
-			}
-			
-			free(tensor->data);
-			tensor->data = new_data;
-			
-			break;	
-		}
-			
 		default: {
 			NNL2_TYPE_ERROR(tensor->dtype);
 			return;

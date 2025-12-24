@@ -41,6 +41,23 @@ void naive_scaleinplace(nnl2_tensor* tensor, float multiplier) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* data_t = (int64_t*)data;
+			
+			// Check that the multiplier is integer for the INT64 tensor
+			if(round(multiplier) != multiplier) {
+				NNL2_ERROR("Can't multiply an int64 tensor by a fractional number");
+				return;
+			}
+			
+			int64_t mult_int64 = (int64_t)multiplier;
+			for(int i = 0; i < num_elems; i++) {
+				data_t[i] *= mult_int64;
+			}
+			
+			break;
+		}
+		
 		case INT32: {
 			int32_t* data_t = (int32_t*)data;
 			
