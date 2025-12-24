@@ -101,6 +101,24 @@ nnl2_tensor* nnl2_naive_div(const nnl2_tensor* dividend, const nnl2_tensor* divi
                 break;
             }
             
+			case INT64: {
+                volatile int64_t* data_dividend = (int64_t*)dividend->data;
+                volatile int64_t* data_divisor = (int64_t*)divisor->data;
+                volatile int64_t* data_quotient = (int64_t*)quotient->data;
+        
+                // Element-wise division with zero check
+                for (size_t i = 0; i < len; i++) {
+                    if (data_divisor[i] == 0) {
+                        NNL2_ERROR("Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    data_quotient[i] = data_dividend[i] / data_divisor[i];
+                }
+                
+                break;
+            }
+			
             case INT32: {
                 volatile int32_t* data_dividend = (int32_t*)dividend->data;
                 volatile int32_t* data_divisor = (int32_t*)divisor->data;
@@ -165,6 +183,27 @@ nnl2_tensor* nnl2_naive_div(const nnl2_tensor* dividend, const nnl2_tensor* divi
                     }
                     
                     data_quotient[i] = nnl2_convert_to_float32(elem_dividend, dtype_dividend) / divisor_val;
+                }
+                
+                break;
+            }
+			
+			case INT64: {
+                volatile int64_t* data_quotient = (int64_t*)quotient->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_dividend = (char*)dividend->data + i * get_dtype_size(dtype_dividend);
+                    void* elem_divisor = (char*)divisor->data + i * get_dtype_size(dtype_divisor);
+                    
+                    int64_t divisor_val = nnl2_convert_to_int64(elem_divisor, dtype_divisor);
+                    if (divisor_val == 0) {
+                        NNL2_ERROR("Division by zero at index %zu\n", i);
+                        nnl2_free_tensor(quotient);
+                        return NULL;
+                    }
+                    
+                    data_quotient[i] = nnl2_convert_to_int64(elem_dividend, dtype_dividend) / divisor_val;
                 }
                 
                 break;
@@ -449,6 +488,23 @@ void* nnl2_own_pdiv_same_type(void* arg) {
             
             break;
         }
+		
+		case INT64: {
+            volatile int64_t* data_dividend = (int64_t*)task->dividend_data;
+            volatile int64_t* data_divisor = (int64_t*)task->divisor_data;
+            volatile int64_t* data_result = (int64_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                if (data_divisor[i] == 0) {
+                    NNL2_ERROR("Division by zero at index %zu\n", i);
+                    return NULL; // This will cause the whole operation to fail
+                }
+				
+                data_result[i] = data_dividend[i] / data_divisor[i];
+            }
+            
+            break;
+        }
         
         default: {
             // Type error should be handled in main function
@@ -581,6 +637,25 @@ void* nnl2_own_pdiv_mixed_types(void* arg) {
                 }
                 
                 data_result[i] = nnl2_convert_to_float32(elem_dividend, task->dtype_dividend) / divisor_val;
+            }
+            
+            break;
+        }
+		
+		case INT64: {
+            volatile int64_t* data_result = (int64_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_dividend = (char*)task->dividend_data + i * get_dtype_size(task->dtype_dividend);
+                void* elem_divisor = (char*)task->divisor_data + i * get_dtype_size(task->dtype_divisor);
+                
+                int64_t divisor_val = nnl2_convert_to_int64(elem_divisor, task->dtype_divisor);
+                if (divisor_val == 0) {
+                    NNL2_ERROR("Division by zero at index %zu\n", i);
+                    return NULL;
+                }
+                
+                data_result[i] = nnl2_convert_to_int64(elem_dividend, task->dtype_dividend) / divisor_val;
             }
             
             break;

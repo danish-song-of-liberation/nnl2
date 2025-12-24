@@ -66,6 +66,18 @@ nnl2_tensor* nnl2_naive_atan(const nnl2_tensor* tensor) {
             for (size_t i = 0; i < total_elems; i++) dst[i] = atanf(src[i]);
             break;
         }
+		
+		case INT64: {
+            nnl2_int64* src = (nnl2_int64*)data_in;
+            nnl2_float64* dst = (nnl2_float64*)data_out;
+            
+            for (size_t i = 0; i < total_elems; i++) {
+                double value = (double)src[i];
+                dst[i] = atan(value);
+            }
+            
+            break;
+        }
 
         case INT32: {
             nnl2_int32* src = (nnl2_int32*)data_in;

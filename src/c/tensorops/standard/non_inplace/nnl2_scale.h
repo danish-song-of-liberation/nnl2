@@ -42,33 +42,51 @@ nnl2_tensor* nnl2_naive_scale(const nnl2_tensor* tensor, float multiplier, bool 
 	
 	if (multiplier == 1.0f) {
 		// For multiplication by 1, just return a copy
-		nnl2_tensor_type output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
+		nnl2_tensor_type output_dtype = ((dtype == INT32 || dtype == INT64) && !save_type) ? FLOAT64 : dtype;
 		return nnl2_copy(tensor, output_dtype);
 	}
 	
 	if (multiplier == 0.0f) {
 		// For multiplication by 0, return a tensor of zeros
-		nnl2_tensor_type output_dtype = (dtype == INT32 && !save_type) ? FLOAT64 : dtype;
+		nnl2_tensor_type output_dtype = ((dtype == INT32 || dtype == INT64) && !save_type) ? FLOAT64 : dtype;
 		return nnl2_zeros(tensor->shape, tensor->rank, output_dtype);
 	}
 	
-	if(dtype == INT32) {
-		int32_t* data_t = (int32_t*)data_original;
-		
+	if(dtype == INT32 || dtype == INT64) {
 		if(save_type) {
-			// Scale integer data, round, and keep as INT32
-			result = nnl2_empty(tensor->shape, tensor->rank, INT32);
-			int32_t* data_o = (int32_t*)result->data;
-			for(size_t i = 0; i < num_elems; i++) {
-				data_o[i] = (int32_t)lround(data_t[i] * multiplier);
+			// Scale integer data, round, and keep as integer type
+			result = nnl2_empty(tensor->shape, tensor->rank, dtype);
+			
+			if(dtype == INT32) {
+				int32_t* data_t = (int32_t*)data_original;
+				int32_t* data_o = (int32_t*)result->data;
+				for(size_t i = 0; i < num_elems; i++) {
+					data_o[i] = (int32_t)lround(data_t[i] * multiplier);
+				}
+			} else { // INT64
+				int64_t* data_t = (int64_t*)data_original;
+				int64_t* data_o = (int64_t*)result->data;
+				for(size_t i = 0; i < num_elems; i++) {
+					data_o[i] = (int64_t)llround(data_t[i] * multiplier);
+				}
 			}
+			
 			return result;
 		} else {
 			// Scale integer data and promote to FLOAT64
 			result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
 			double* data_o = (double*)result->data;
-			for(size_t i = 0; i < num_elems; i++) {
-				data_o[i] = data_t[i] * multiplier;
+			
+			if(dtype == INT32) {
+				int32_t* data_t = (int32_t*)data_original;
+				for(size_t i = 0; i < num_elems; i++) {
+					data_o[i] = data_t[i] * multiplier;
+				}
+			} else { // INT64
+				int64_t* data_t = (int64_t*)data_original;
+				for(size_t i = 0; i < num_elems; i++) {
+					data_o[i] = data_t[i] * multiplier;
+				}
 			}
 		}
 		

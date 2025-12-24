@@ -101,6 +101,19 @@ nnl2_tensor* naive_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
                 
                 break;
             }
+			
+			case INT64: {
+                volatile int64_t* data_a = (int64_t*)tensora->data;
+                volatile int64_t* data_b = (int64_t*)tensorb->data;
+                volatile int64_t* data_result = (int64_t*)result->data;
+        
+                // Element-wise minimum calculation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = MIN(data_a[i], data_b[i]);
+                }
+                
+                break;
+            }
             
             case INT32: {
                 volatile int32_t* data_a = (int32_t*)tensora->data;
@@ -146,6 +159,20 @@ nnl2_tensor* naive_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb) {
                     void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
                     
                     data_result[i] = MIN(nnl2_convert_to_float32(elem_a, dtype_a), nnl2_convert_to_float32(elem_b, dtype_b));
+                }
+                
+                break;
+            }
+			
+			case INT64: {
+                volatile int64_t* data_result = (int64_t*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_a = (char*)tensora->data + i * get_dtype_size(dtype_a);
+                    void* elem_b = (char*)tensorb->data + i * get_dtype_size(dtype_b);
+                    
+                    data_result[i] = MIN(nnl2_convert_to_int64(elem_a, dtype_a), nnl2_convert_to_int64(elem_b, dtype_b));
                 }
                 
                 break;
@@ -226,6 +253,19 @@ void* nnl2_own_pmin_float32(void* arg);
  ** @see nnl2_own_pmin_float64
  **/
 void* nnl2_own_pmin_int32(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer minimum operation
+ * 
+ ** @param arg 
+ * Pointer to min_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmin_int32
+ **/
+void* nnl2_own_pmin_int64(void* arg);
 
 /** @brief
  * High-performance parallel implementation of element-wise minimum operation
@@ -341,9 +381,11 @@ nnl2_tensor* nnl2_own_min(const nnl2_tensor* tensora, const nnl2_tensor* tensorb
         // Select appropriate worker function based on data type
         void* (*worker_func)(void*) = NULL;
         switch (dtype_a) {
-            case FLOAT64: worker_func = nnl2_own_pmin_float64; break;
-            case FLOAT32: worker_func = nnl2_own_pmin_float32; break;
-            case INT32:   worker_func = nnl2_own_pmin_int32;   break;
+            case FLOAT64: worker_func = nnl2_own_pmin_float64;  break;
+            case FLOAT32: worker_func = nnl2_own_pmin_float32;  break;
+            case INT32:   worker_func = nnl2_own_pmin_int32;    break;
+			case INT64:   worker_func = nnl2_own_pmin_int64;    break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype_a);
                 nnl2_free_tensor(result);
@@ -464,6 +506,58 @@ void* nnl2_own_pmin_float32(void* arg) {
             __m256 v_data_b = _mm256_loadu_ps(&data_b[i]);
             __m256 v_result = _mm256_min_ps(v_data_a, v_data_b);
             _mm256_storeu_ps(&data_result[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for (; i < end; i++) {
+        data_result[i] = MIN(data_a[i], data_b[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmin_int64
+ **/
+void* nnl2_own_pmin_int64(void* arg) {
+    min_ptask* task = (min_ptask*)arg;
+    int64_t* data_a = (int64_t*)task->tensora->data;
+    int64_t* data_b = (int64_t*)task->tensorb->data;
+    int64_t* data_result = (int64_t*)task->result->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (4 elements per iteration for int64)
+    if (task->aligned) {
+        for (; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data_a[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data_a = _mm256_load_si256((__m256i*)&data_a[i]);
+            __m256i v_data_b = _mm256_load_si256((__m256i*)&data_b[i]);
+            
+            __m256i v_compare = _mm256_cmpgt_epi64(v_data_a, v_data_b);
+            __m256i v_result = _mm256_blendv_epi8(v_data_a, v_data_b, v_compare);
+            
+            _mm256_store_si256((__m256i*)&data_result[i], v_result);
+        }
+    } else {
+        for (; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data_a[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&data_b[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data_a = _mm256_loadu_si256((__m256i*)&data_a[i]);
+            __m256i v_data_b = _mm256_loadu_si256((__m256i*)&data_b[i]);
+            
+            __m256i v_compare = _mm256_cmpgt_epi64(v_data_a, v_data_b);
+            __m256i v_result = _mm256_blendv_epi8(v_data_a, v_data_b, v_compare);
+            
+            _mm256_storeu_si256((__m256i*)&data_result[i], v_result);
         }
     }
     

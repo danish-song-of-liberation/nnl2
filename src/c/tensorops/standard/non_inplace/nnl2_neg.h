@@ -53,6 +53,13 @@ nnl2_tensor* nnl2_naive_neg(const nnl2_tensor* tensor) {
             break;
         }
 
+		case INT64: {
+            nnl2_int64* src = (nnl2_int64*)data_in;
+            nnl2_int64* dst = (nnl2_int64*)data_out;
+            for (size_t i = 0; i < total_elems; i++) dst[i] = -src[i];
+            break;
+        }
+
         case INT32: {
             nnl2_int32* src = (nnl2_int32*)data_in;
             nnl2_int32* dst = (nnl2_int32*)data_out;

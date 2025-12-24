@@ -166,4 +166,74 @@ NNL2_FORCE_INLINE static nnl2_int32 nnl2_convert_to_int32(void* value, TensorTyp
 	}
 }
 
+/** @brief
+ * Converts an arbitrary type value to int64
+ *
+ ** @param value
+ * Void pointer to the value to convert
+ *
+ ** @param dtype 
+ * Source data type
+ *
+ ** @return 
+ * Converted value of the int64 type
+ *
+ ** @warning 
+ * Checks that the value is within the range of nnl2_int64
+ *
+ ** @warning
+ * Checks that fractional numbers do not have a fractional part before conversion
+ *
+ ** @note 
+ * For unsupported types, it returns 0 and generates a fatal error
+ */
+NNL2_FORCE_INLINE static nnl2_int64 nnl2_convert_to_int64(void* value, TensorType dtype) {
+	switch(dtype) {
+		case FLOAT64: {
+			nnl2_float64 casted_nnl2_float64 = *((nnl2_float64*)value);
+			
+			// Checking that the number does not have a fractional part
+			if(casted_nnl2_float64 != trunc(casted_nnl2_float64)) {
+				NNL2_FATAL("Cannot convert FLOAT64 to INT64");
+				return 0;
+			}
+			
+			// Checking for overflow of the int64 range
+			if (casted_nnl2_float64 < INT64_MIN || casted_nnl2_float64 > INT64_MAX) {
+                NNL2_FATAL("FLOAT64 value out of INT64 range");
+                return 0;
+            }
+			
+			return (nnl2_int64)casted_nnl2_float64;
+		}
+		
+		case FLOAT32: {
+			nnl2_float32 casted_float = *((nnl2_float32*)value);
+			
+			// Checking that the number does not have a fractional part
+			if(casted_float != truncf(casted_float)) {
+				NNL2_FATAL("Cannot convert FLOAT32 to INT64");
+				return 0;
+			}
+			
+			// Checking for overflow of the int64 range
+			if (casted_float < INT64_MIN || casted_float > INT64_MAX) {
+                NNL2_FATAL("FLOAT32 value out of INT64 range");
+                return 0;
+            }
+			
+			return (nnl2_int64)casted_float;
+		}
+		
+		case INT32: return (nnl2_int64)(*((nnl2_int32*)value));
+		
+		case INT64: return *((nnl2_int64*)value);
+		
+		default: {
+			NNL2_TYPE_FATAL(dtype); // Fatal error for unsupported types
+			return 0;
+		}
+	}
+}
+
 #endif /** NNL2_CONVERT_H **/

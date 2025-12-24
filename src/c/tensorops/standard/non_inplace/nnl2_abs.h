@@ -38,6 +38,13 @@ nnl2_tensor* naive_abs(nnl2_tensor* tensor) {
 			break;
 		}
 		
+		case INT64: {
+            int64_t* cast_data_t = (int64_t*)data_t;    
+            int64_t* cast_data_r = (int64_t*)data_r;
+            for(size_t i = 0; i < total_elems; i++) cast_data_r[i] = llabs(cast_data_t[i]);
+            break;
+        }
+		
 		case INT32: {
 			int32_t* cast_data_t = (int32_t*)data_t;	
 			int32_t* cast_data_r = (int32_t*)data_r;
@@ -114,6 +121,16 @@ void* nnl2_own_pabs_ultra_float64(void* arg);
  */
 void* nnl2_own_pabs_ultra_int32(void* arg);
 
+/** @brief 
+ * Ultra-optimized SIMD worker function for parallel absolute value for int64
+ * 
+ * @param arg 
+ * Pointer to abs_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pabs_ultra_int64(void* arg);
+
 #endif
 
 /** @brief
@@ -182,6 +199,26 @@ nnl2_tensor* nnl2_own_abs(const nnl2_tensor* tensor) {
 				
                 for(; i < total_elems; i++) {
                     cast_data_r[i] = fabsf(cast_data_t[i]);
+                }
+				
+                break;
+            }
+			
+			case INT64: {
+                int64_t* cast_data_t = (int64_t*)data_t;    
+                int64_t* cast_data_r = (int64_t*)data_r;
+				
+                size_t i = 0;
+				
+                for(; i + 3 < total_elems; i += 4) {
+                    cast_data_r[i] = llabs(cast_data_t[i]);
+                    cast_data_r[i+1] = llabs(cast_data_t[i+1]);
+                    cast_data_r[i+2] = llabs(cast_data_t[i+2]);
+                    cast_data_r[i+3] = llabs(cast_data_t[i+3]);
+                }
+				
+                for(; i < total_elems; i++) {
+                    cast_data_r[i] = llabs(cast_data_t[i]);
                 }
 				
                 break;
@@ -269,6 +306,7 @@ nnl2_tensor* nnl2_own_abs(const nnl2_tensor* tensor) {
                     case FLOAT64: status = pthread_create(&threads[i], NULL, nnl2_own_pabs_ultra_float64, &tasks[i]); break;
                     case FLOAT32: status = pthread_create(&threads[i], NULL, nnl2_own_pabs_ultra_float32, &tasks[i]); break;
                     case INT32:   status = pthread_create(&threads[i], NULL, nnl2_own_pabs_ultra_int32, &tasks[i]);   break;
+					case INT64:   status = pthread_create(&threads[i], NULL, nnl2_own_pabs_ultra_int64, &tasks[i]);   break;
                     
                     default: {
                         status = pthread_create(&threads[i], NULL, nnl2_own_pabs, &tasks[i]);
@@ -399,6 +437,29 @@ void* nnl2_own_pabs(void* arg) {
                 result[i+14] = abs(input[i+14]);
                 result[i+15] = abs(input[i+15]);
             }
+			
+			case INT64: {
+				int64_t* input = (int64_t*)data_input;
+				int64_t* result = (int64_t*)data_result;
+				size_t i = task->start;
+
+				for(; i + 7 < task->end; i += 8) {
+					result[i] = llabs(input[i]);
+					result[i+1] = llabs(input[i+1]);
+					result[i+2] = llabs(input[i+2]);
+					result[i+3] = llabs(input[i+3]);
+					result[i+4] = llabs(input[i+4]);
+					result[i+5] = llabs(input[i+5]);
+					result[i+6] = llabs(input[i+6]);
+					result[i+7] = llabs(input[i+7]);
+				}
+				
+				for(; i < task->end; i++) {
+					result[i] = llabs(input[i]);
+				}
+				
+				break;
+			}
 			
             for(; i < task->end; i++) {
                 result[i] = abs(input[i]);
@@ -534,6 +595,52 @@ void* nnl2_own_pabs_ultra_float64(void* arg) {
     }
     for(; i < task->end; i++) {
         data_result[i] = fabs(data_input[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * Ultra-optimized SIMD worker function for int64 absolute value
+ *
+ ** @see nnl2_own_pabs_ultra_int64
+ **/
+void* nnl2_own_pabs_ultra_int64(void* arg) {
+    abs_ptask* task = (abs_ptask*)arg;
+    
+    int64_t* data_input = (int64_t*)task->input_data;
+    int64_t* data_result = (int64_t*)task->result_data;
+    
+    size_t i = task->start;
+
+    for(; i + 3 < task->end; i += 4) {
+        // Prefetch next block
+        _mm_prefetch((char*)&data_input[i + 4], _MM_HINT_T0);
+        _mm_prefetch((char*)&data_result[i + 4], _MM_HINT_T1);
+
+        // Load 4 int64 values
+        __m256i v_input = _mm256_load_si256((__m256i*)&data_input[i]);
+        
+        __m256i v_zero = _mm256_setzero_si256();
+        __m256i v_cmp = _mm256_cmpgt_epi64(v_zero, v_input); // v_input < 0 ? -1 : 0
+        
+        __m256i v_xor = _mm256_xor_si256(v_input, v_cmp);
+        __m256i v_result = _mm256_sub_epi64(v_xor, v_cmp);
+        
+        _mm256_store_si256((__m256i*)&data_result[i], v_result);
+    }
+    
+    for(; i + 1 < task->end; i += 2) {
+        __m128i v_input = _mm_load_si128((__m128i*)&data_input[i]);
+        __m128i v_zero = _mm_setzero_si128();
+        __m128i v_cmp = _mm_cmpgt_epi64(v_zero, v_input); // SSE4.2
+        __m128i v_xor = _mm_xor_si128(v_input, v_cmp);
+        __m128i v_result = _mm_sub_epi64(v_xor, v_cmp);
+        _mm_store_si128((__m128i*)&data_result[i], v_result);
+    }
+
+    for(; i < task->end; i++) {
+        data_result[i] = llabs(data_input[i]);
     }
     
     return NULL;

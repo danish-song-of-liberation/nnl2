@@ -53,14 +53,28 @@ nnl2_tensor* nnl2_naive_sqrt(const nnl2_tensor* tensor) {
             for (size_t i = 0; i < total_elems; i++) dst[i] = sqrtf(src[i]);
             break;
         }
+		
+		case INT64: {
+            nnl2_int64* src = (nnl2_int64*)data_in;
+            nnl2_int64* dst = (nnl2_int64*)data_out;
+            
+            for (size_t i = 0; i < total_elems; i++) {
+                // For integers, we convert to double for sqrt then back to int64
+                dst[i] = (nnl2_int64)sqrt((double)src[i]);
+            }
+            
+            break;
+        }
 
         case INT32: {
             nnl2_int32* src = (nnl2_int32*)data_in;
             nnl2_int32* dst = (nnl2_int32*)data_out;
+			
             for (size_t i = 0; i < total_elems; i++) {
                 // For integers, we convert to float for sqrt then back to int
                 dst[i] = (nnl2_int32)sqrt((double)src[i]);
             }
+			
             break;
         }
 

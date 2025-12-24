@@ -90,6 +90,19 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
                 
                 break;
             }
+			
+			case INT64: {
+                volatile int64_t* data_multiplicand = (int64_t*)multiplicand->data;
+                volatile int64_t* data_multiplier = (int64_t*)multiplier->data;
+                volatile int64_t* data_product = (int64_t*)nnl2_product->data;
+        
+                // Element-wise multiplication
+                for (size_t i = 0; i < len; i++) {
+                    data_product[i] = data_multiplicand[i] * data_multiplier[i];
+                }
+                
+                break;
+            }
             
             case INT32: {
                 volatile int32_t* data_multiplicand = (int32_t*)multiplicand->data;
@@ -137,6 +150,21 @@ nnl2_tensor* nnl2_naive_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* 
                     
                     data_product[i] = nnl2_convert_to_float32(elem_multiplicand, dtype_multiplicand) * 
                                      nnl2_convert_to_float32(elem_multiplier, dtype_multiplier);
+                }
+                
+                break;
+            }
+			
+			case INT64: {
+                volatile int64_t* data_product = (int64_t*)nnl2_product->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    // Calculate the pointers to the current elements, taking into account the size of the type
+                    void* elem_multiplicand = (char*)multiplicand->data + i * get_dtype_size(dtype_multiplicand);
+                    void* elem_multiplier = (char*)multiplier->data + i * get_dtype_size(dtype_multiplier);
+                    
+                    data_product[i] = nnl2_convert_to_int64(elem_multiplicand, dtype_multiplicand) * 
+                                     nnl2_convert_to_int64(elem_multiplier, dtype_multiplier);
                 }
                 
                 break;
@@ -231,6 +259,16 @@ void* nnl2_own_pmul_simd_float32(void* arg);
  */
 void* nnl2_own_pmul_simd_int32(void* arg);
 
+/** @brief 
+ * SIMD-optimized worker function for parallel multiplication for same int64 data types
+ * 
+ * @param arg 
+ * Pointer to mul_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_pmul_simd_int64(void* arg);
+
 #endif
 
 /** @brief
@@ -321,6 +359,7 @@ nnl2_tensor* nnl2_own_mul(const nnl2_tensor* multiplicand, const nnl2_tensor* mu
                     case FLOAT64: status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_float64, &tasks[i]); break;
                     case FLOAT32: status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_float32, &tasks[i]); break;
                     case INT32:   status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_int32, &tasks[i]);   break;
+                    case INT64:   status = pthread_create(&threads[i], NULL, nnl2_own_pmul_simd_int64, &tasks[i]);   break;
                     
                     default: {
                         status = pthread_create(&threads[i], NULL, nnl2_own_pmul_same_type, &tasks[i]);
@@ -391,6 +430,18 @@ void* nnl2_own_pmul_same_type(void* arg) {
             volatile float* data_multiplicand = (float*)task->multiplicand_data;
             volatile float* data_multiplier = (float*)task->multiplier_data;
             volatile float* data_result = (float*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_result[i] = data_multiplicand[i] * data_multiplier[i];
+            }
+            
+            break;
+        }
+		
+		case INT64: {
+            volatile int64_t* data_multiplicand = (int64_t*)task->multiplicand_data;
+            volatile int64_t* data_multiplier = (int64_t*)task->multiplier_data;
+            volatile int64_t* data_result = (int64_t*)task->result_data;
             
             for(size_t i = task->start; i < task->end; i++) {
                 data_result[i] = data_multiplicand[i] * data_multiplier[i];
@@ -483,6 +534,35 @@ void* nnl2_own_pmul_simd_float32(void* arg) {
 }
 
 /** @brief
+ * optimized worker function for int64 multiplication
+ *
+ ** @see nnl2_own_pmul_simd_int64
+ **/
+void* nnl2_own_pmul_simd_int64(void* arg) {
+    mul_ptask* task = (mul_ptask*)arg;
+    
+    int64_t* data_multiplicand = (int64_t*)task->multiplicand_data;
+    int64_t* data_multiplier = (int64_t*)task->multiplier_data;
+    int64_t* data_result = (int64_t*)task->result_data;
+    
+    size_t i = task->start;
+    
+    for(; i + 3 < task->end; i += 4) {
+        data_result[i] = data_multiplicand[i] * data_multiplier[i];
+        data_result[i+1] = data_multiplicand[i+1] * data_multiplier[i+1];
+        data_result[i+2] = data_multiplicand[i+2] * data_multiplier[i+2];
+        data_result[i+3] = data_multiplicand[i+3] * data_multiplier[i+3];
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_result[i] = data_multiplicand[i] * data_multiplier[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
  * SIMD-optimized worker function for int32 multiplication
  *
  ** @see nnl2_own_pmul_simd_int32
@@ -550,6 +630,19 @@ void* nnl2_own_pmul_mixed_types(void* arg) {
                 void* elem_multiplier = (char*)task->multiplier_data + i * get_dtype_size(task->dtype_multiplier);
                 
                 data_result[i] = nnl2_convert_to_float32(elem_multiplicand, task->dtype_multiplicand) * nnl2_convert_to_float32(elem_multiplier, task->dtype_multiplier);
+            }
+            
+            break;
+        }
+		
+		case INT64: {
+            volatile int64_t* data_result = (int64_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_multiplicand = (char*)task->multiplicand_data + i * get_dtype_size(task->dtype_multiplicand);
+                void* elem_multiplier = (char*)task->multiplier_data + i * get_dtype_size(task->dtype_multiplier);
+                
+                data_result[i] = nnl2_convert_to_int64(elem_multiplicand, task->dtype_multiplicand) * nnl2_convert_to_int64(elem_multiplier, task->dtype_multiplier);
             }
             
             break;

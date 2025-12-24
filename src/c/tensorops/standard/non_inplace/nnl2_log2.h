@@ -22,16 +22,27 @@ nnl2_tensor* naive_log2(const nnl2_tensor* tensor, bool save_type) {
 	
 	size_t len = nnl2_product(tensor->shape, tensor->rank);
 	
-    if (tensor->dtype == INT32) {
-        int32_t* tensor_data = (int32_t*)tensor->data;
-        int all_powers_of_two = 1;
+    if (tensor->dtype == INT32 || tensor->dtype == INT64) {
+        bool all_powers_of_two = true;
         
         // Checking if all elements are positive powers of two
-        for (size_t it = 0; it < len; it++) {
-            int32_t value = tensor_data[it];
-            if (value <= 0 || (value & (value - 1)) != 0) {
-                all_powers_of_two = 0;
-                break;
+        if (tensor->dtype == INT32) {
+            int32_t* tensor_data = (int32_t*)tensor->data;
+            for (size_t it = 0; it < len; it++) {
+                int32_t value = tensor_data[it];
+                if (value <= 0 || (value & (value - 1)) != 0) {
+                    all_powers_of_two = false;
+                    break;
+                }
+            }
+        } else { // INT64
+            int64_t* tensor_data = (int64_t*)tensor->data;
+            for (size_t it = 0; it < len; it++) {
+                int64_t value = tensor_data[it];
+                if (value <= 0 || (value & (value - 1)) != 0) {
+                    all_powers_of_two = false;
+                    break;
+                }
             }
         }
         
@@ -39,37 +50,86 @@ nnl2_tensor* naive_log2(const nnl2_tensor* tensor, bool save_type) {
             nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
             double* result_data = (double*)result->data;
             
-            for (size_t it = 0; it < len; it++) {
-                result_data[it] = log2((double)tensor_data[it]);
+            if (tensor->dtype == INT32) {
+                int32_t* tensor_data = (int32_t*)tensor->data;
+                for (size_t it = 0; it < len; it++) {
+                    if (tensor_data[it] <= 0) {
+                        NNL2_ERROR("Log2 of non-positive value at index %zu\n", it);
+                        nnl2_free_tensor(result);
+                        return NULL;
+                    }
+                    result_data[it] = log2((double)tensor_data[it]);
+                }
+            } else { // INT64
+                int64_t* tensor_data = (int64_t*)tensor->data;
+                for (size_t it = 0; it < len; it++) {
+                    if (tensor_data[it] <= 0) {
+                        NNL2_ERROR("Log2 of non-positive value at index %zu\n", it);
+                        nnl2_free_tensor(result);
+                        return NULL;
+                    }
+                    result_data[it] = log2((double)tensor_data[it]);
+                }
             }
 			
             return result;
         } else {
             if(save_type) {
-                nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, INT32);
-                int32_t* result_data = (int32_t*)result->data;
-                
-                for (size_t it = 0; it < len; it++) {
-                    int32_t value = tensor_data[it];
-                    result_data[it] = 0;
-                    // Calculate log2 for powers of two
-                    while (value >>= 1) {
-                        result_data[it]++;
+                if (tensor->dtype == INT32) {
+                    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, INT32);
+                    int32_t* result_data = (int32_t*)result->data;
+                    int32_t* tensor_data = (int32_t*)tensor->data;
+                    
+                    for (size_t it = 0; it < len; it++) {
+                        int32_t value = tensor_data[it];
+                        result_data[it] = 0;
+                        // Calculate log2 for powers of two
+                        while (value >>= 1) {
+                            result_data[it]++;
+                        }
                     }
+                    return result;
+                } else { // INT64
+                    nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, INT64);
+                    int64_t* result_data = (int64_t*)result->data;
+                    int64_t* tensor_data = (int64_t*)tensor->data;
+                    
+                    for (size_t it = 0; it < len; it++) {
+                        int64_t value = tensor_data[it];
+                        result_data[it] = 0;
+                        // Calculate log2 for powers of two
+                        while (value >>= 1) {
+                            result_data[it]++;
+                        }
+                    }
+                    return result;
                 }
-                return result;
             } else {
                 nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
                 double* result_data = (double*)result->data;
                 
-                for (size_t it = 0; it < len; it++) {
-                    int32_t value = tensor_data[it];
-                    int32_t log_val = 0;
-                    // Calculate log2 for powers of two
-                    while (value >>= 1) {
-                        log_val++;
+                if (tensor->dtype == INT32) {
+                    int32_t* tensor_data = (int32_t*)tensor->data;
+                    for (size_t it = 0; it < len; it++) {
+                        int32_t value = tensor_data[it];
+                        int32_t log_val = 0;
+                        // Calculate log2 for powers of two
+                        while (value >>= 1) {
+                            log_val++;
+                        }
+                        result_data[it] = (double)log_val;
                     }
-                    result_data[it] = (double)log_val;
+                } else { // INT64
+                    int64_t* tensor_data = (int64_t*)tensor->data;
+                    for (size_t it = 0; it < len; it++) {
+                        int64_t value = tensor_data[it];
+                        int64_t log_val = 0;
+                        // Calculate log2 for powers of two
+                        while (value >>= 1) {
+                            log_val++;
+                        }
+                        result_data[it] = (double)log_val;
+                    }
                 }
                 return result;
             }
@@ -77,19 +137,34 @@ nnl2_tensor* naive_log2(const nnl2_tensor* tensor, bool save_type) {
     }
 	
 	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    if(len == 0) return result;
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
 			volatile double* tensor_data = (double*)tensor->data;
 			volatile double* result_data = (double*)result->data;
-			for(size_t it = 0; it < len; it++) result_data[it] = log2(tensor_data[it]);
+			for(size_t it = 0; it < len; it++) {
+                if (tensor_data[it] <= 0.0) {
+                    NNL2_ERROR("Log2 of non-positive value at index %zu\n", it);
+                    nnl2_free_tensor(result);
+                    return NULL;
+                }
+                result_data[it] = log2(tensor_data[it]);
+            }
 			break;
 		}
 		
 		case FLOAT32: {
 			volatile float* tensor_data = (float*)tensor->data;
 			volatile float* result_data = (float*)result->data;
-			for(size_t it = 0; it < len; it++) result_data[it] = log2f(tensor_data[it]);
+			for(size_t it = 0; it < len; it++) {
+                if (tensor_data[it] <= 0.0f) {
+                    NNL2_ERROR("Log2 of non-positive value at index %zu\n", it);
+                    nnl2_free_tensor(result);
+                    return NULL;
+                }
+                result_data[it] = log2f(tensor_data[it]);
+            }
 			break;
 		}
 		

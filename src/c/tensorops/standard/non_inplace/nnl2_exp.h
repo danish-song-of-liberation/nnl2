@@ -25,18 +25,26 @@ nnl2_tensor* naive_exp(nnl2_tensor* tensor, bool save_type) {
 		
 	size_t len = nnl2_product(tensor->shape, tensor->rank);
 	
-	// Processing a tensor with an integer data type of INT32.
-	// Calculates the exponent for each element, but only if the tensor
-	// has at least one non-zero element
-	if (tensor->dtype == INT32) {
-		int32_t* tensor_data = (int32_t*)tensor->data;
+	// Processing tensors with integer data types (INT32, INT64)
+	if (tensor->dtype == INT32 || tensor->dtype == INT64) {
 		bool has_non_zero = false;
 		
 		// Check whether the tensor has at least one non-zero element
-		for (size_t it = 0; it < len; it++) {
-			if (tensor_data[it] != 0) {
-				has_non_zero = true;
-				break;
+		if (tensor->dtype == INT32) {
+			int32_t* tensor_data = (int32_t*)tensor->data;
+			for (size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 0) {
+					has_non_zero = true;
+					break;
+				}
+			}
+		} else { // INT64
+			int64_t* tensor_data = (int64_t*)tensor->data;
+			for (size_t it = 0; it < len; it++) {
+				if (tensor_data[it] != 0) {
+					has_non_zero = true;
+					break;
+				}
 			}
 		}
 		
@@ -44,8 +52,16 @@ nnl2_tensor* naive_exp(nnl2_tensor* tensor, bool save_type) {
 			nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
 			double* result_data = (double*)result->data;
 			
-			for (size_t it = 0; it < len; it++) {
-				result_data[it] = exp((double)tensor_data[it]);
+			if (tensor->dtype == INT32) {
+				int32_t* tensor_data = (int32_t*)tensor->data;
+				for (size_t it = 0; it < len; it++) {
+					result_data[it] = exp((double)tensor_data[it]);
+				}
+			} else { // INT64
+				int64_t* tensor_data = (int64_t*)tensor->data;
+				for (size_t it = 0; it < len; it++) {
+					result_data[it] = exp((double)tensor_data[it]);
+				}
 			}
 			
 			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -55,7 +71,11 @@ nnl2_tensor* naive_exp(nnl2_tensor* tensor, bool save_type) {
 			return result;
 		} else {
 			if(save_type) {
-				return nnl2_ones(tensor->shape, tensor->rank, INT32);
+				if (tensor->dtype == INT32) {
+					return nnl2_ones(tensor->shape, tensor->rank, INT32);
+				} else { // INT64
+					return nnl2_ones(tensor->shape, tensor->rank, INT64);
+				}
 			} else {
 				return nnl2_ones(tensor->shape, tensor->rank, FLOAT64);
 			}

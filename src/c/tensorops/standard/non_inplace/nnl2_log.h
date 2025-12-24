@@ -22,15 +22,25 @@ nnl2_tensor* naive_log(const nnl2_tensor* tensor, bool save_type) {
 	
 	size_t len = nnl2_product(tensor->shape, tensor->rank);
 	
-    if (tensor->dtype == INT32) {
-        int32_t* tensor_data = (int32_t*)tensor->data;
-        int has_non_ones = 0;
+    if (tensor->dtype == INT32 || tensor->dtype == INT64) {
+        bool has_non_ones = false;
         
         // Checking if there are elements other than 1
-        for (size_t it = 0; it < len; it++) {
-            if (tensor_data[it] != 1) {
-                has_non_ones = 1;
-                break;
+        if (tensor->dtype == INT32) {
+            int32_t* tensor_data = (int32_t*)tensor->data;
+            for (size_t it = 0; it < len; it++) {
+                if (tensor_data[it] != 1) {
+                    has_non_ones = true;
+                    break;
+                }
+            }
+        } else { // INT64
+            int64_t* tensor_data = (int64_t*)tensor->data;
+            for (size_t it = 0; it < len; it++) {
+                if (tensor_data[it] != 1) {
+                    has_non_ones = true;
+                    break;
+                }
             }
         }
         
@@ -38,14 +48,36 @@ nnl2_tensor* naive_log(const nnl2_tensor* tensor, bool save_type) {
             nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
             double* result_data = (double*)result->data;
             
-            for (size_t it = 0; it < len; it++) {
-                result_data[it] = log((double)tensor_data[it]);
+            if (tensor->dtype == INT32) {
+                int32_t* tensor_data = (int32_t*)tensor->data;
+                for (size_t it = 0; it < len; it++) {
+                    if (tensor_data[it] <= 0) {
+                        NNL2_ERROR("Logarithm of non-positive value at index %zu\n", it);
+                        nnl2_free_tensor(result);
+                        return NULL;
+                    }
+                    result_data[it] = log((double)tensor_data[it]);
+                }
+            } else { // INT64
+                int64_t* tensor_data = (int64_t*)tensor->data;
+                for (size_t it = 0; it < len; it++) {
+                    if (tensor_data[it] <= 0) {
+                        NNL2_ERROR("Logarithm of non-positive value at index %zu\n", it);
+                        nnl2_free_tensor(result);
+                        return NULL;
+                    }
+                    result_data[it] = log((double)tensor_data[it]);
+                }
             }
 			
             return result;
         } else {
 			if(save_type) {
-				return nnl2_zeros(tensor->shape, tensor->rank, INT32);
+				if (tensor->dtype == INT32) {
+					return nnl2_zeros(tensor->shape, tensor->rank, INT32);
+				} else { // INT64
+					return nnl2_zeros(tensor->shape, tensor->rank, INT64);
+				}
 			} else {
 				return nnl2_zeros(tensor->shape, tensor->rank, FLOAT64);
 			}
@@ -53,19 +85,34 @@ nnl2_tensor* naive_log(const nnl2_tensor* tensor, bool save_type) {
     }
 	
 	nnl2_tensor* result = nnl2_empty(tensor->shape, tensor->rank, tensor->dtype);
+    if(len == 0) return result;
 	
 	switch(tensor->dtype) {
 		case FLOAT64: {
 			volatile double* tensor_data = (double*)tensor->data;
 			volatile double* result_data = (double*)result->data;
-			for(size_t it = 0; it < len; it++) result_data[it] = log(tensor_data[it]);
+			for(size_t it = 0; it < len; it++) {
+                if (tensor_data[it] <= 0.0) {
+                    NNL2_ERROR("Logarithm of non-positive value at index %zu\n", it);
+                    nnl2_free_tensor(result);
+                    return NULL;
+                }
+                result_data[it] = log(tensor_data[it]);
+            }
 			break;
 		}
 		
 		case FLOAT32: {
 			volatile float* tensor_data = (float*)tensor->data;
 			volatile float* result_data = (float*)result->data;
-			for(size_t it = 0; it < len; it++) result_data[it] = logf(tensor_data[it]);
+			for(size_t it = 0; it < len; it++) {
+                if (tensor_data[it] <= 0.0f) {
+                    NNL2_ERROR("Logarithm of non-positive value at index %zu\n", it);
+                    nnl2_free_tensor(result);
+                    return NULL;
+                }
+                result_data[it] = logf(tensor_data[it]);
+            }
 			break;
 		}
 		

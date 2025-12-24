@@ -31,15 +31,42 @@ nnl2_tensor* naive_atan2(nnl2_tensor* y, nnl2_tensor* x) {
     nnl2_tensor_type dtype_x = x->dtype;
     
     nnl2_tensor_type result_dtype;
-    if(dtype_y == INT32 && dtype_x == INT32) {
-        int32_t* y_data = (int32_t*)y->data;
-        int32_t* x_data = (int32_t*)x->data;
-        
+    if((dtype_y == INT32 || dtype_y == INT64) && (dtype_x == INT32 || dtype_x == INT64)) {
         bool all_zeros = true;
-        for (size_t it = 0; it < len; it++) {
-            if (y_data[it] != 0 || x_data[it] != 0) {
-                all_zeros = false;
-                break;
+        
+        if(dtype_y == INT32 && dtype_x == INT32) {
+            int32_t* y_data = (int32_t*)y->data;
+            int32_t* x_data = (int32_t*)x->data;
+            for (size_t it = 0; it < len; it++) {
+                if (y_data[it] != 0 || x_data[it] != 0) {
+                    all_zeros = false;
+                    break;
+                }
+            }
+        } else if(dtype_y == INT64 && dtype_x == INT64) {
+            int64_t* y_data = (int64_t*)y->data;
+            int64_t* x_data = (int64_t*)x->data;
+            for (size_t it = 0; it < len; it++) {
+                if (y_data[it] != 0 || x_data[it] != 0) {
+                    all_zeros = false;
+                    break;
+                }
+            }
+        } else {
+            size_t y_step = get_dtype_size(dtype_y);
+            size_t x_step = get_dtype_size(dtype_x);
+            char* y_data = (char*)y->data;
+            char* x_data = (char*)x->data;
+            
+            for (size_t it = 0; it < len; it++) {
+                void* y_elem = y_data + it * y_step;
+                void* x_elem = x_data + it * x_step;
+                double y_val = nnl2_convert_to_float64(y_elem, dtype_y);
+                double x_val = nnl2_convert_to_float64(x_elem, dtype_x);
+                if (y_val != 0.0 || x_val != 0.0) {
+                    all_zeros = false;
+                    break;
+                }
             }
         }
         

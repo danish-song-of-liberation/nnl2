@@ -99,6 +99,19 @@ nnl2_tensor* naive_pow(const nnl2_tensor* base, const nnl2_tensor* exponent) {
                 
                 break;
             }
+			
+			case INT64: {
+                volatile int64_t* data_base = (int64_t*)base->data;
+                volatile int64_t* data_exponent = (int64_t*)exponent->data;
+                volatile int64_t* data_result = (int64_t*)result->data;
+        
+                // Element-wise exponentiation
+                for (size_t i = 0; i < len; i++) {
+                    data_result[i] = (int64_t)pow((double)data_base[i], (double)data_exponent[i]);
+                }
+                
+                break;
+            }
             
             case INT32: {
                 volatile int32_t* data_base = (int32_t*)base->data;
@@ -144,6 +157,24 @@ nnl2_tensor* naive_pow(const nnl2_tensor* base, const nnl2_tensor* exponent) {
                     void* elem_exponent = (char*)exponent->data + i * get_dtype_size(dtype_exponent);
                     
                     data_result[i] = powf(nnl2_convert_to_float32(elem_base, dtype_base), nnl2_convert_to_float32(elem_exponent, dtype_exponent));
+                }
+                
+                break;
+            }
+			
+			case INT64: {
+                volatile int64_t* data_result = (int64_t*)result->data;
+                
+                for (size_t i = 0; i < len; i++) {
+                    void* elem_base = (char*)base->data + i * get_dtype_size(dtype_base);
+                    void* elem_exponent = (char*)exponent->data + i * get_dtype_size(dtype_exponent);
+                    
+                    int64_t base_val = nnl2_convert_to_int64(elem_base, dtype_base);
+                    int64_t exp_val = nnl2_convert_to_int64(elem_exponent, dtype_exponent);
+                    
+                    double result_val = pow((double)base_val, (double)exp_val);
+                    
+                    data_result[i] = (int64_t)result_val;
                 }
                 
                 break;

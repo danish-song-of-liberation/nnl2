@@ -87,6 +87,19 @@ nnl2_tensor* nnl2_naive_add(nnl2_tensor* summand, nnl2_tensor* addend) {
 				break;
 			}
 			
+			case INT64: {
+				volatile int64_t* data_summand = (int64_t*)summand->data;
+				volatile int64_t* data_addend = (int64_t*)addend->data;
+				volatile int64_t* data_amount = (int64_t*)amount->data;
+		
+				// Element-wise addition
+				for(size_t i = 0; i < len; i++) {
+					data_amount[i] = data_summand[i] + data_addend[i];
+				}
+				
+				break;
+			}
+			
 			case INT32: {
 				volatile int32_t* data_summand = (int32_t*)summand->data;
 				volatile int32_t* data_addend = (int32_t*)addend->data;
@@ -131,6 +144,20 @@ nnl2_tensor* nnl2_naive_add(nnl2_tensor* summand, nnl2_tensor* addend) {
 					void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
 					
 					data_amount[i] = nnl2_convert_to_float32(elem_summand, dtype_summand) + nnl2_convert_to_float32(elem_addend, dtype_addend);
+				}
+				
+				break;
+			}
+			
+			case INT64: {
+				volatile int64_t* data_amount = (int64_t*)amount->data;
+				
+				for(size_t i = 0; i < len; i++) {
+					// Calculate the pointers to the current elements, taking into account the size of the type
+					void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+					void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+					
+					data_amount[i] = nnl2_convert_to_int64(elem_summand, dtype_summand) + nnl2_convert_to_int64(elem_addend, dtype_addend);
 				}
 				
 				break;
@@ -191,6 +218,17 @@ nnl2_tensor* nnl2_naive_add(nnl2_tensor* summand, nnl2_tensor* addend) {
  ** @see nnl2_avx256_add
  **/
 static inline void nnl2_avx_add_non_in_place_int32_same_type(int32_t* a, const int32_t* b, size_t len, bool aligned_a, bool aligned_b);
+
+/** @brief 
+ * AVX256 optimized element-wise addition for int64 tensors (non-in-place)
+ *
+ * Documentation is identical to the documentation of the 
+ * nnl2_avx_add_non_in_place_int32_same_type declaration
+ *
+ ** @see nnl2_avx256_add
+ ** @see nnl2_avx_add_non_in_place_int32_same_type
+ **/
+static inline void nnl2_avx_add_non_in_place_int64_same_type(int64_t* a, const int64_t* b, size_t len, bool aligned_a, bool aligned_b);
 
 /** @brief 
  * AVX256 optimized element-wise addition for float32 tensors (non-in-place)
@@ -296,6 +334,19 @@ nnl2_tensor* nnl2_avx256_add(const nnl2_tensor* summand, const nnl2_tensor* adde
                 nnl2_avx_add_non_in_place_float32_same_type(data_sum, data_addend, len, aligned_summand, aligned_addend);
                 break;
             }
+			
+			case INT64: {
+                int64_t* data_summand = (int64_t*)summand->data;
+                int64_t* data_addend = (int64_t*)addend->data;
+                int64_t* data_sum = (int64_t*)sum->data;
+                
+                // Copy data from summand to result first
+                memcpy(data_sum, data_summand, len * sizeof(int64_t));
+                
+                // Use optimized addition
+                nnl2_avx_add_non_in_place_int64_same_type(data_sum, data_addend, len, aligned_summand, aligned_addend);
+                break;
+            }
             
             case INT32: {
                 int32_t* data_summand = (int32_t*)summand->data;
@@ -344,6 +395,20 @@ nnl2_tensor* nnl2_avx256_add(const nnl2_tensor* summand, const nnl2_tensor* adde
                     void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
                     
                     data_sum[i] = nnl2_convert_to_float32(elem_summand, dtype_summand) + nnl2_convert_to_float32(elem_addend, dtype_addend);
+                }
+                
+                break;
+            }
+			
+			case INT64: {
+                int64_t* data_sum = (int64_t*)sum->data;
+
+				// Element-wise addition
+                for(size_t i = 0; i < len; i++) {
+                    void* elem_summand = (char*)summand->data + i * get_dtype_size(dtype_summand);
+                    void* elem_addend = (char*)addend->data + i * get_dtype_size(dtype_addend);
+                    
+                    data_sum[i] = nnl2_convert_to_int64(elem_summand, dtype_summand) + nnl2_convert_to_int64(elem_addend, dtype_addend);
                 }
                 
                 break;
@@ -428,6 +493,69 @@ static inline void nnl2_avx_add_non_in_place_int32_same_type(int32_t* a, const i
             __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
             __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
             __m256i v_result = _mm256_add_epi32(v_a, v_b);          // Vector addition
+            _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    }
+    
+    // Processing the remainder
+    for(; i < len; i++) a[i] += b[i];
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+}
+
+/** @brief 
+ * AVX-optimized element-wise addition for int64 tensors (non-in-place)
+ *
+ ** @details
+ * See docs at declaration
+ *
+ ** @see nnl2_avx_add_non_in_place_int64_same_type (declaration)
+ **/
+static inline void nnl2_avx_add_non_in_place_int64_same_type(int64_t* a, const int64_t* b, size_t len, bool aligned_a, bool aligned_b) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    size_t i = 0;
+    
+    // Case 1: Both tensors are aligned 
+    if(aligned_a && aligned_b) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_a = _mm256_load_si256((__m256i*)&a[i]);       // Fast loading of aligned data
+            __m256i v_b = _mm256_load_si256((__m256i*)&b[i]);       // Fast loading of aligned data
+            __m256i v_result = _mm256_add_epi64(v_a, v_b);          // Vector addition for 64-bit integers
+            _mm256_store_si256((__m256i*)&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 2: Only tensor a is aligned
+    else if(aligned_a) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_a = _mm256_load_si256((__m256i*)&a[i]);       // Fast loading of aligned data
+            __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
+            __m256i v_result = _mm256_add_epi64(v_a, v_b);          // Vector addition for 64-bit integers
+            _mm256_store_si256((__m256i*)&a[i], v_result);          // Fast saving to aligned memory
+        }
+    } 
+    
+    // Case 3: Only tensor b is aligned
+    else if(aligned_b) {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
+            __m256i v_b = _mm256_load_si256((__m256i*)&b[i]);       // Fast loading of aligned data
+            __m256i v_result = _mm256_add_epi64(v_a, v_b);          // Vector addition for 64-bit integers
+            _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
+        }
+    } 
+    
+    // Case 4: Both tensors are not aligned
+    else {
+        for(; i + 3 < len; i += 4) {
+            __m256i v_a = _mm256_loadu_si256((__m256i*)&a[i]);      // Slow loading of unaligned data
+            __m256i v_b = _mm256_loadu_si256((__m256i*)&b[i]);      // Slow loading of unaligned data
+            __m256i v_result = _mm256_add_epi64(v_a, v_b);          // Vector addition for 64-bit integers
             _mm256_storeu_si256((__m256i*)&a[i], v_result);         // Slow saving to unaligned memory
         }
     }
@@ -620,6 +748,16 @@ void* nnl2_own_padd_simd_float32(void* arg);
  */
 void* nnl2_own_padd_simd_int32(void* arg);
 
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same int64 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_int64(void* arg);
+
 #ifdef NNL2_AVX2
 
 /** @brief 
@@ -651,6 +789,16 @@ void* nnl2_own_padd_simd_float32(void* arg);
  * @return NULL (for pthread api)
  */
 void* nnl2_own_padd_simd_int32(void* arg);
+
+/** @brief 
+ * SIMD-optimized worker function for parallel addition for same int64 data types
+ * 
+ * @param arg 
+ * Pointer to add_ptask structure containing task parameters
+ *
+ * @return NULL (for pthread api)
+ */
+void* nnl2_own_padd_simd_int64(void* arg);
 
 #endif
 
@@ -742,6 +890,7 @@ nnl2_tensor* nnl2_own_add(nnl2_tensor* summand, nnl2_tensor* addend) {
 					case FLOAT64: status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_float64, &tasks[i]); break;
 					case FLOAT32: status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_float32, &tasks[i]); break;
 					case INT32:   status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_int32, &tasks[i]);   break;
+					case INT64:   status = pthread_create(&threads[i], NULL, nnl2_own_padd_simd_int64, &tasks[i]);   break;
 					
 					default: {
 						status = pthread_create(&threads[i], NULL, nnl2_own_padd_same_type, &tasks[i]);
@@ -824,6 +973,18 @@ void* nnl2_own_padd_same_type(void* arg) {
             volatile int32_t* data_summand = (int32_t*)task->summand_data;
             volatile int32_t* data_addend = (int32_t*)task->addend_data;
             volatile int32_t* data_amount = (int32_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                data_amount[i] = data_summand[i] + data_addend[i];
+            }
+			
+            break;
+        }
+		
+		case INT64: {
+            volatile int64_t* data_summand = (int64_t*)task->summand_data;
+            volatile int64_t* data_addend = (int64_t*)task->addend_data;
+            volatile int64_t* data_amount = (int64_t*)task->result_data;
             
             for(size_t i = task->start; i < task->end; i++) {
                 data_amount[i] = data_summand[i] + data_addend[i];
@@ -933,6 +1094,36 @@ void* nnl2_own_padd_simd_int32(void* arg) {
     return NULL;
 }
 
+/** @brief
+ * SIMD-optimized worker function for int64 addition
+ *
+ ** @see nnl2_own_padd_simd_int64
+ **/
+void* nnl2_own_padd_simd_int64(void* arg) {
+    add_ptask* task = (add_ptask*)arg;
+    
+    int64_t* data_summand = (int64_t*)task->summand_data;
+    int64_t* data_addend = (int64_t*)task->addend_data;
+    int64_t* data_amount = (int64_t*)task->result_data;
+    
+    size_t i = task->start;
+    
+    // Process 4 elements at a time using AVX (256-bit / 64-bit = 4 elements)
+    for(; i + 3 < task->end; i += 4) {
+        __m256i v_summand = _mm256_load_si256((__m256i*)&data_summand[i]);  // Load 4 int64
+        __m256i v_addend = _mm256_load_si256((__m256i*)&data_addend[i]);    // Load 4 int64
+        __m256i v_result = _mm256_add_epi64(v_summand, v_addend);           // Vector addition for 64-bit integers
+        _mm256_store_si256((__m256i*)&data_amount[i], v_result);            // Store result
+    }
+    
+    // Process remainder elements
+    for(; i < task->end; i++) {
+        data_amount[i] = data_summand[i] + data_addend[i];
+    }
+    
+    return NULL;
+}
+
 #endif
 
 /** @brief
@@ -978,6 +1169,19 @@ void* nnl2_own_padd_mixed_types(void* arg) {
                 void* elem_addend = (char*)task->addend_data + i * get_dtype_size(task->dtype_addend);
                 
                 data_amount[i] = nnl2_convert_to_int32(elem_summand, task->dtype_summand) + nnl2_convert_to_int32(elem_addend, task->dtype_addend);
+            }
+			
+            break;
+        }
+		
+		case INT64: {
+            volatile int64_t* data_amount = (int64_t*)task->result_data;
+            
+            for(size_t i = task->start; i < task->end; i++) {
+                void* elem_summand = (char*)task->summand_data + i * get_dtype_size(task->dtype_summand);
+                void* elem_addend = (char*)task->addend_data + i * get_dtype_size(task->dtype_addend);
+                
+                data_amount[i] = nnl2_convert_to_int64(elem_summand, task->dtype_summand) + nnl2_convert_to_int64(elem_addend, task->dtype_addend);
             }
 			
             break;
