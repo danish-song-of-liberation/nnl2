@@ -12,7 +12,8 @@
   (:use #:cl)
   
   (:export
-    #:narrow))
+    #:narrow
+	#:swap-rows!))
 	
 (defpackage #:nnl2.hli.ad.utils
   (:use #:cl)

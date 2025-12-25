@@ -13,3 +13,8 @@
 (defun narrow (tensor &key (dim 0) start len)
   (nnl2.ffi:%narrow tensor dim start len))
   
+(defun swap-rows! (tensor row-1 row-2)
+  (nnl2.ffi:%swap-rows! tensor row-1 row-2))  
+  
+(declaim (inline narrow swap-rows!))  
+  

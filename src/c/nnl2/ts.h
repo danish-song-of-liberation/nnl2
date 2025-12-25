@@ -33,6 +33,7 @@
 #include "../tensorutils/nnl2_from_flatten.h"
 #include "../tensorutils/nnl2_slice.h"
 #include "../tensorutils/nnl2_narrow.h"
+#include "../tensorutils/nnl2_swap_rows.h"
 #include "../tensorutils/internal/nnl2_regional_axpy_inplace.h"
 #include "../tensorutils/internal/nnl2_vector_concat.h"
 #include "../tensorutils/internal/nnl2_vector_as_parameter.h"

@@ -772,5 +772,7 @@
    #:%diag-vector-matrix
    #:%diag-matrix-vector
    #:%getrf
-   #:%eye))
+   #:%eye
+   #:%eye-like
+   #:%swap-rows!))
    

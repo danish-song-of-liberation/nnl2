@@ -2672,5 +2672,8 @@
    Example:
        (nnl2.hli.ts:tlet ((a (nnl2.hli.ts.linalg:eye 3 3))) ...) ;; -> [[1 0 0] [0 1 0] [0 0 1]]"
 	   
-  (nnl2.ffi:%eye rows cols dtype))
-		
+  (nnl2.ffi:%eye rows cols dtype))		
+
+(cffi:defcfun ("nnl2_eye_like" eye-like) :pointer 
+  (tensor :pointer))
+  

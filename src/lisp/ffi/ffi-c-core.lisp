@@ -708,6 +708,11 @@
   (cols :int)
   (dtype tensor-type))  
   
+(cffi:defcfun ("nnl2_swap_rows" %swap-rows!) :void 
+  (tensor :pointer)
+  (row-1 :size)
+  (row-2 :size))
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

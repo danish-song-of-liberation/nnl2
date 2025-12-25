@@ -75,4 +75,8 @@ nnl2_tensor* nnl2_eye(size_t rows, size_t cols, nnl2_tensor_type dtype) {
     return t;
 }
 
+nnl2_tensor* nnl2_eye_like(nnl2_tensor* tensor) {
+	return nnl2_eye(tensor -> shape[0], tensor -> shape[0], tensor -> dtype);
+}
+
 #endif /** NNL2_EYE_H **/

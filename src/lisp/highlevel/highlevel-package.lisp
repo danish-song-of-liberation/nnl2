@@ -812,5 +812,6 @@
    #:svd
    #:diag
    #:luf
-   #:eye))  
+   #:eye
+   #:eye-like))  
    
