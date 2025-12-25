@@ -314,7 +314,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(loginplace, loginplace_backends, CURRENT_BACKEND(loginplace));     	
 	EINIT_BACKEND(log1pinplace, log1pinplace_backends, CURRENT_BACKEND(log1pinplace));     	
 	EINIT_BACKEND(log10inplace, log10inplace_backends, CURRENT_BACKEND(log10inplace));     	
-	EINIT_BACKEND(log2inplace, log2inplace_backends, CURRENT_BACKEND(log2inplace));     	
+	EINIT_BACKEND(log2inplace, log2inplace_backends, CURRENT_BACKEND(log2inplace));     	  
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, CURRENT_BACKEND(scaleinplace));    
 	EINIT_BACKEND(maxinplace, maxinplace_backends, CURRENT_BACKEND(maxinplace));     
 	EINIT_BACKEND(mininplace, mininplace_backends, CURRENT_BACKEND(mininplace));   	
@@ -331,7 +331,7 @@ void nnl2_init_standard_inplace() {
 	EINIT_BACKEND(nnl2_acosinplace, acosinplace_backends, CURRENT_BACKEND(acosinplace)); 
 	EINIT_BACKEND(nnl2_ataninplace, ataninplace_backends, CURRENT_BACKEND(ataninplace)); 
 	EINIT_BACKEND(nnl2_atan2inplace, atan2inplace_backends, CURRENT_BACKEND(atan2inplace)); 
-	INIT_BACKEND(nnl2_f64dgesvd, f64dgesvd_backends);
+	INIT_BACKEND(nnl2_f64dgesvd, f64dgesvd_backends); 
 	INIT_BACKEND(nnl2_f64dgesdd, f64dgesdd_backends);
 	INIT_BACKEND(nnl2_f32sgesvd, f32sgesvd_backends);
 	INIT_BACKEND(nnl2_f32sgesdd, f32sgesdd_backends);

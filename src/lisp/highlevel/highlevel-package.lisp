@@ -811,5 +811,6 @@
   (:export 
    #:svd
    #:diag
-   #:luf))  
+   #:luf
+   #:eye))  
    

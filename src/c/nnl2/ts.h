@@ -145,6 +145,7 @@
 #include "../tensorlinalg/lu/nnl2_getrf.h"
 #include "../tensorlinalg/nnl2_diag_vector_matrix.h"
 #include "../tensorlinalg/nnl2_diag_matrix_vector.h"
+#include "../tensorlinalg/nnl2_eye.h"
 #include "../tensorstack/nnl2_hstack.h"
 #include "../tensorstack/nnl2_vstack.h"
 #include "../tensorstack/nnl2_concat.h"

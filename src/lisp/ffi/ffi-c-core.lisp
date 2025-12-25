@@ -703,6 +703,11 @@
   (vector :pointer)
   (k :int))  
   
+(cffi:defcfun ("nnl2_eye" %eye) :pointer
+  (rows :int)
+  (cols :int)
+  (dtype tensor-type))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

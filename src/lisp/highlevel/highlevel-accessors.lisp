@@ -2661,3 +2661,16 @@
       
       (values lu ipiv-tensor info))))		
 		
+(defun eye (rows cols &key (dtype nnl2.system:*default-tensor-type*))
+  "Create identity matrix tensor
+   
+   Args:
+       rows: Number of rows 
+	   cols: Number of cols 
+	   dtype (&key) (default: nnl2.system:*default-tensor-type*): Data type
+	   
+   Example:
+       (nnl2.hli.ts:tlet ((a (nnl2.hli.ts.linalg:eye 3 3))) ...) ;; -> [[1 0 0] [0 1 0] [0 0 1]]"
+	   
+  (nnl2.ffi:%eye rows cols dtype))
+		

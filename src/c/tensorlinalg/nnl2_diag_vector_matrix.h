@@ -40,6 +40,13 @@ nnl2_tensor* nnl2_diag_vector_matrix(nnl2_tensor* vector, int k) {
 	
 	nnl2_tensor* out = nnl2_zeros((int32_t[]){ rows, cols }, 2, vector -> dtype);
 	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if(out == NULL) {
+			NNL2_TENSOR_ERROR("zeros");
+			return NULL;
+		}
+	#endif
+	
 	switch(out -> dtype) {
 		case FLOAT64: {
 			nnl2_float64* out_data = (nnl2_float64*)out->data;

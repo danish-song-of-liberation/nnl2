@@ -49,10 +49,13 @@ nnl2_tensor* nnl2_diag_matrix_vector(nnl2_tensor* matrix, int k) {
     if (k < 0 && -k >= (int)rows) diag_len = 0;
     
     nnl2_tensor* out = nnl2_zeros((int32_t[]){ (int32_t)diag_len }, 1, matrix -> dtype);
-    if (out == NULL) {
-        NNL2_ERROR("In function nnl2_diag_matrix_vector, failed to allocate output vector");
-        return NULL;
-    }
+	
+	#if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+		if (out == NULL) {
+			NNL2_ERROR("In function nnl2_diag_matrix_vector, failed to allocate output vector");
+			return NULL;
+		}
+	#endif
     
     if(diag_len == 0) {
         #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE

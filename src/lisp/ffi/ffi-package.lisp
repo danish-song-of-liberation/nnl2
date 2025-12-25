@@ -771,5 +771,6 @@
    #:%float-linspace
    #:%diag-vector-matrix
    #:%diag-matrix-vector
-   #:%getrf))
+   #:%getrf
+   #:%eye))
    
