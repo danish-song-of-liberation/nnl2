@@ -2576,4 +2576,24 @@
     (:gesdd (gesdd a order jobz m n lda ldu ldvt))))
 	
 (declaim (inline svd))  
+
+(defun diag (tensor &key (k 0))
+  "Extract or construct a diagonal matrix/vector
+   
+   Args:
+       tensor: Input tensor (vector or matrix)
+       k (&key) (default: 0): Diagonal index
+       k = 0: main diagonal
+       k > 0 : K-th diagonal above the main
+       k < 0 : K-th diagonal below the main
+
+   Returns:
+       If input is vector: New square matrix with diagonal elements
+       If input is matrix: New vector containing diagonal elements"
+	   
+  (if (= (nnl2.hli.ts:rank tensor) 1)
+    (nnl2.ffi:%diag-vector-matrix tensor k)
+	(nnl2.ffi:%diag-matrix-vector tensor k)))
+		
+(declaim (inline diag))
 		

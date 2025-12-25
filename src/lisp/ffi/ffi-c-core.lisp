@@ -686,6 +686,14 @@
   (endpoint :boolean)
   (dtype tensor-type))  
   
+(cffi:defcfun ("nnl2_diag_vector_matrix" %diag-vector-matrix) :pointer 
+  (vector :pointer)
+  (k :int))
+  
+(cffi:defcfun ("nnl2_diag_matrix_vector" %diag-matrix-vector) :pointer 
+  (vector :pointer)
+  (k :int))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

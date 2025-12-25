@@ -140,6 +140,8 @@
 #include "../tensorlinalg/svd/nnl2_f32sgesdd.h"
 #include "../tensorlinalg/svd/nnl2_gesvd.h"
 #include "../tensorlinalg/svd/nnl2_gesdd.h"
+#include "../tensorlinalg/nnl2_diag_vector_matrix.h"
+#include "../tensorlinalg/nnl2_diag_matrix_vector.h"
 #include "../tensorstack/nnl2_hstack.h"
 #include "../tensorstack/nnl2_vstack.h"
 #include "../tensorstack/nnl2_concat.h"

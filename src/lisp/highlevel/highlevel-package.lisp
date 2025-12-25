@@ -809,5 +809,6 @@
 (defpackage #:nnl2.hli.ts.linalg
   (:use #:cl)
   (:export 
-   #:svd))  
+   #:svd
+   #:diag))  
    

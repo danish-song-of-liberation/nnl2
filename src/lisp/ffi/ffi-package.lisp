@@ -768,5 +768,7 @@
    #:%float-arange
    #:*null*
    #:%int-linspace
-   #:%float-linspace))
+   #:%float-linspace
+   #:%diag-vector-matrix
+   #:%diag-matrix-vector))
    
