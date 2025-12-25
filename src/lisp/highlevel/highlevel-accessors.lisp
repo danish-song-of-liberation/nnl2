@@ -2597,3 +2597,67 @@
 		
 (declaim (inline diag))
 		
+(defun luf (a &key (order :nnl2rowmajor) m n lda ipiv)
+  "Compute LU factorization with partial pivoting
+  
+   Performs the decomposition A = P * L * U, where
+   P is a permutation matrix
+   L is lower triangular with unit diagonal elements
+   U is upper triangular
+  
+   Args:
+       a: Input matrix tensor [m × n] (any floating-point dtype)
+       order: Storage order, either :nnl2rowmajor or :nnl2colmajor
+       m: Number of rows (automatically determined if NIL)
+       n: Number of columns (automatically determined if NIL)
+       lda: Leading dimension of A (automatically determined if NIL)
+       ipiv: Existing tensor for pivot indices or NIL to create new
+  
+   Returns:
+       Three values:
+           1. lu: Matrix containing LU factors in compact form
+           2. ipiv: Pivot indices tensor [min(m,n), INT32]
+           3. info: Return code (0 = success, >0 = singular matrix, <0 = illegal argument)
+  
+   Notes:
+       Input matrix A is overwritten with LU factors in compact form:
+         - Upper triangle (including diagonal) contains U
+         - Lower triangle (excluding diagonal) contains multipliers for L
+         - Diagonal elements of L are implied to be 1.0
+       
+       Pivot indices are 1-based (LAPACK convention)
+       If info > 0, U(info,info) is exactly zero (matrix is singular)
+  
+   Example:
+     (multiple-value-bind (lu ipiv info) 
+         (getrf a :nnl2colmajor)
+       (when (zerop info)
+         ;; Use lu and ipiv for solving linear systems
+         ))"
+  
+  (declare (optimize (speed 3) (safety 1)))
+  
+  (declare (type nnl2.hli.ts::nnl2-tensor a)
+           (type keyword order))
+  
+  (let* ((shape-a (nnl2.hli.ts:shape a :as :vector))
+         (m (or m (aref shape-a 0)))
+         (n (or n (aref shape-a 1)))
+         (min-mn (min m n))
+         (lda (or lda (if (eq order :nnl2rowmajor) n m)))
+         
+         (ipiv-tensor (if (null ipiv)
+                        (nnl2.hli.ts:empty (list min-mn) :dtype :int32)
+                        (progn
+                          (assert (equal (nnl2.hli.ts:shape ipiv :as :list) (list min-mn)) nil "IPIV tensor must have shape (~D)" min-mn)
+                          ipiv)))
+         
+         (lu (nnl2.hli.ts:copy a)))
+    
+    (let ((info (nnl2.ffi:%getrf order 
+                                 m n
+                                 lu lda
+                                 ipiv-tensor)))
+      
+      (values lu ipiv-tensor info))))		
+		

@@ -660,6 +660,15 @@
   (ldvt :int)
   (iwork :pointer))
   
+(cffi:defcfun ("nnl2_getrf" %getrf) :int
+  "GETRF LU factorization dispatcher"
+  (order nnl2-order)
+  (m :int)
+  (n :int)
+  (a :pointer)
+  (lda :int)
+  (ipiv :pointer))  
+  
 (cffi:defcfun ("lisp_call_int_arange" %int-arange) :pointer
   (from :int64)
   (to :int64)

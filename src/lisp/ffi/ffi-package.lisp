@@ -770,5 +770,6 @@
    #:%int-linspace
    #:%float-linspace
    #:%diag-vector-matrix
-   #:%diag-matrix-vector))
+   #:%diag-matrix-vector
+   #:%getrf))
    

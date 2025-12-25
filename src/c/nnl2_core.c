@@ -335,6 +335,8 @@ void nnl2_init_standard_inplace() {
 	INIT_BACKEND(nnl2_f64dgesdd, f64dgesdd_backends);
 	INIT_BACKEND(nnl2_f32sgesvd, f32sgesvd_backends);
 	INIT_BACKEND(nnl2_f32sgesdd, f32sgesdd_backends);
+	INIT_BACKEND(nnl2_f64dgetrf, f64dgetrf_backends);
+	INIT_BACKEND(nnl2_f32sgetrf, f32sgetrf_backends);
 }               
                                
 void nnl2_init_stack() {
@@ -1001,7 +1003,7 @@ void lisp_call_assign_row_add(nnl2_tensor* dst, int seq_index, nnl2_tensor* src)
 
 Tensor* lisp_call_int_arange(int64_t from, int64_t to, int64_t step, TensorType dtype) {
     return nnl2_int_arange(from, to, step, dtype);    
-}
+}  
 
 Tensor* lisp_call_float_arange(float from, float to, float step, TensorType dtype) {
     return nnl2_float_arange(from, to, step, dtype);

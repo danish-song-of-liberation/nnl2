@@ -1543,6 +1543,28 @@ typedef nnl2_tensor* (*nnl2_int_linspacefn)(int64_t start, int64_t stop, int64_t
  ** @warning Floating-point precision may affect exact endpoint values
  */
 typedef nnl2_tensor* (*nnl2_float_linspacefn)(float start, float stop, int64_t num, bool endpoint, nnl2_tensor_type dtype);		
+
+/** @brief Function pointer type for double-precision LU factorization (dgetrf) 
+ ** @param order Matrix layout: nnl2RowMajor or nnl2ColMajor
+ ** @param m Number of rows of matrix A
+ ** @param n Number of columns of matrix A
+ ** @param a Input/output matrix A (shape m×n, dtype FLOAT64)
+ ** @param lda Leading dimension of A
+ ** @param ipiv Output pivot indices (size min(m,n), dtype INT32)
+ ** @return int Status code: 0=success, >0=singular, <0=error
+ */
+typedef int (*f64dgetrffn)(const nnl2_order order, const int m, const int n, nnl2_tensor* a, const int lda, nnl2_tensor* ipiv);		
+						   
+/** @brief Function pointer type for single-precision LU factorization (sgetrf)
+ ** @param order Matrix layout: nnl2RowMajor or nnl2ColMajor
+ ** @param m Number of rows of matrix A
+ ** @param n Number of columns of matrix A
+ ** @param a Input/output matrix A (shape m×n, dtype FLOAT32)
+ ** @param lda Leading dimension of A
+ ** @param ipiv Output pivot indices (size min(m,n), dtype INT32)
+ ** @return int Status code: 0=success, >0=singular, <0=error
+ */
+typedef int (*f32sgetrffn)(const nnl2_order order, const int m, const int n, nnl2_tensor* a, const int lda, nnl2_tensor* ipiv);				
 						
 /// @} [typedef]
 
