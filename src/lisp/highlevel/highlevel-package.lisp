@@ -802,7 +802,8 @@
    #:with-backend/.log1p
    #:with-backend/.log1p!
    #:save-tensor
-   #:load-tensor))
+   #:load-tensor
+   #:arange))
    
 (defpackage #:nnl2.hli.ts.linalg
   (:use #:cl)

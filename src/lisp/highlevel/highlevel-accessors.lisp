@@ -431,6 +431,54 @@
 	      (cffi:foreign-free filler-pntr)		  
 		  tensor)))))
 
+(defun arange (&key from to step dtype)
+  "Create a 1-dimensional tensor with evenly spaced values within a given interval
+  
+   The function automatically determines whether to use integer or floating-point
+   arithmetic based on the types of the input arguments
+
+   Args:
+       from (&key) (optional): Start value of the sequence
+	   to (&key) (required): End value of the sequence
+	   step (&key) (optional): Step size between consecutive values
+	   dtype (&key) (optional): Data type of the resulting tensor
+	   
+   Returns:
+       A 1D tensor containing the sequence [from, from+step, from+2*step, ...]
+       where each value is less than to (for step > 0) or greater than to
+       (for step < 0)
+
+   Examples:
+       (arange :from 0 :to 5) ;; -> [0 1 2 3 4] (int64)
+	   (arange :from 0 :to 10 :step 2) ;; -> [0 2 4 6 8] (int64)
+	   (arange :from 5 :to 0 :step -1 :dtype :int32) ;; -> [5 4 3 2 1] (int32)
+	   (arange :from 0.0 :to 1.0 :step 0.2) ;; -> [0.0 0.2 0.4 0.6 0.8] (float64)
+	   (arange :from 0 :to 5 :dtype :float32) ;; -> [0.0 1.0 2.0 3.0 4.0] (float32)
+	   (arange :from 0 :to 2.5 :step 0.5) ;; -> [0.0 0.5 1.0 1.5 2.0] (float64)"
+	   
+  (unless to
+    (error "arange requires the :to argument"))
+  
+  (let* ((floatp (or (floatp from) (floatp to) (floatp step)))
+         (final-dtype (cond
+                        (dtype dtype)  
+                        (floatp :float64)  
+                        (t :int64)))) 
+    
+	(unless step
+      (setf step (if floatp 
+				   (if (< from to) 1.0 -1.0)
+                   (if (< from to) 1 -1))))
+  
+    (unless from
+      (setf from (if floatp 0.0 0)))
+	
+    (if floatp
+        ;; convert all arguments to float
+        (nnl2.ffi:%float-arange (float from) (float to) (float step) final-dtype)
+        ;; convert all arguments to integers
+        (nnl2.ffi:%int-arange (truncate from) (truncate to) (truncate step) final-dtype))))
+
 (defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
   "Creates a tensor from a flat list/vector with the specified shapes
    Example: (from-flatten '(1 2 3 4 5 6) '(2 3)) -> #<NNL2:TENSOR ... [2x3]: 1.0d0 2.0d0 3.0d0\n4.0d0 5.0d0 6.0d0>

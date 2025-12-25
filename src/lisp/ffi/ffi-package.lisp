@@ -763,5 +763,8 @@
    #:%internal-timestep-view
    #:%ad-internal-timestep-view
    #:%gesvd
-   #:%gesdd))
+   #:%gesdd
+   #:%int-arange
+   #:%float-arange
+   #:*null*))
    

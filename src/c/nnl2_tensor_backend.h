@@ -1502,6 +1502,34 @@ typedef int (*f32sgesddfn)(const nnl2_order order, const char jobz,
                            nnl2_tensor* s, nnl2_tensor* u, const int ldu,
                            nnl2_tensor* vt, const int ldvt, nnl2_tensor* iwork);						
 						
+/** @brief Function pointer type for integer arange operation
+ ** @param from Starting value
+ ** @param to Ending value (exclusive)
+ ** @param step Step size
+ ** @param user_shape Whether to use user-provided shape
+ ** @param shape User-provided shape array
+ ** @param rank Rank/dimensionality
+ ** @param dtype Data type of the tensor
+ ** @return Result tensor with arange values
+ */
+typedef nnl2_tensor* (*nnl2_int_arangefn)(int64_t from, int64_t to, int64_t step, 
+                                          bool user_shape, int32_t* shape, int rank, 
+                                          nnl2_tensor_type dtype);
+
+/** @brief Function pointer type for float arange operation
+ ** @param from Starting value
+ ** @param to Ending value (exclusive)
+ ** @param step Step size
+ ** @param user_shape Whether to use user-provided shape
+ ** @param shape User-provided shape array
+ ** @param rank Rank/dimensionality
+ ** @param dtype Data type of the tensor
+ ** @return Result tensor with arange values
+ */
+typedef nnl2_tensor* (*nnl2_float_arangefn)(float from, float to, float step,
+                                            bool user_shape, int32_t* shape, int rank,
+                                            nnl2_tensor_type dtype);						
+						
 /// @} [typedef]
 
 

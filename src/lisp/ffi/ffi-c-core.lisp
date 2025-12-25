@@ -57,6 +57,8 @@
   (magic-number :char)       ;; This is necessary to avoid memory corruption when releasing the tensor
   (ts-obj nnl2-obj-type))	 ;; To separate TS tensors from AD tensors
   
+(defparameter *null* (cffi:null-pointer))  
+  
 ;; -- Main operations --  
   
 (cffi:defcfun ("lisp_call_empty" %empty) :pointer
@@ -657,6 +659,18 @@
   (vt :pointer)
   (ldvt :int)
   (iwork :pointer))
+  
+(cffi:defcfun ("lisp_call_int_arange" %int-arange) :pointer
+  (from :int64)
+  (to :int64)
+  (step :int64)
+  (dtype tensor-type))
+
+(cffi:defcfun ("lisp_call_float_arange" %float-arange) :pointer
+  (from :float)
+  (to :float)
+  (step :float)
+  (dtype tensor-type))
   
 ;; -- AD --
 

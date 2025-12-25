@@ -270,6 +270,8 @@ void nnl2_init_accessors() {
 void nnl2_init_tensor_creating() {
 	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
 	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));    
+	INIT_BACKEND(nnl2_int_arange, int_arange_backends);
+	INIT_BACKEND(nnl2_float_arange, float_arange_backends);
 }          
      
 void nnl2_init_standard() {
@@ -952,17 +954,17 @@ void lisp_call_tan_inplace(nnl2_tensor* tensor) {
 
 nnl2_tensor* lisp_call_atan(const nnl2_tensor* tensor) {
     return nnl2_atan(tensor); 
-}
+} 
  
 void lisp_call_atan_inplace(nnl2_tensor* tensor) {
     nnl2_ataninplace(tensor);   
 }
 
 nnl2_tensor* lisp_call_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_tensor_type dtype) {
-    return nnl2_vector_concat(tensors, count, dtype);
+    return nnl2_vector_concat(tensors, count, dtype); 
 }
   
-nnl2_tensor* lisp_call_atan2(nnl2_tensor* y, nnl2_tensor* x) {
+nnl2_tensor* lisp_call_atan2(nnl2_tensor* y, nnl2_tensor* x) { 
     return nnl2_atan2(y, x);  
 }
 
@@ -972,9 +974,9 @@ void lisp_call_atan2_inplace(nnl2_tensor* y, nnl2_tensor* x) {
 
 nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {  
     return nnl2_atan2_broadcasting(y, x); 
-}
-  
-void lisp_call_atan2_broadcasting_inplace(nnl2_tensor* y, nnl2_tensor* x) { 
+} 
+    
+void lisp_call_atan2_broadcasting_inplace(nnl2_tensor* y, nnl2_tensor* x) {     
     nnl2_atan2_broadcasting_inplace(y, x); 
 }     
          
@@ -985,7 +987,7 @@ nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {
 void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) { 
     nnl2_atan2_correspondence_inplace(y, x); 
 }       
-  
+       
 void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 	nnl2_assign_row(dst, seq_index, src);
 } 
@@ -993,6 +995,14 @@ void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 /** @brief internal derivative of assign_row **/
 void lisp_call_assign_row_add(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 	nnl2_assign_row_add(dst, seq_index, src);   
+}
+
+Tensor* lisp_call_int_arange(int64_t from, int64_t to, int64_t step, bool user_shape, int32_t* shape, int rank, TensorType dtype) {
+    return nnl2_int_arange(from, to, step, user_shape, shape, rank, dtype);
+}
+
+Tensor* lisp_call_float_arange(float from, float to, float step, bool user_shape, int32_t* shape, int rank, TensorType dtype) {
+    return nnl2_float_arange(from, to, step, user_shape, shape, rank, dtype);
 }
 
 ///@} [lisp_wrappers]                
