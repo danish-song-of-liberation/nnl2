@@ -1506,29 +1506,43 @@ typedef int (*f32sgesddfn)(const nnl2_order order, const char jobz,
  ** @param from Starting value
  ** @param to Ending value (exclusive)
  ** @param step Step size
- ** @param user_shape Whether to use user-provided shape
- ** @param shape User-provided shape array
- ** @param rank Rank/dimensionality
  ** @param dtype Data type of the tensor
  ** @return Result tensor with arange values
  */
-typedef nnl2_tensor* (*nnl2_int_arangefn)(int64_t from, int64_t to, int64_t step, 
-                                          bool user_shape, int32_t* shape, int rank, 
-                                          nnl2_tensor_type dtype);
+typedef nnl2_tensor* (*nnl2_int_arangefn)(int64_t from, int64_t to, int64_t step, nnl2_tensor_type dtype);
 
 /** @brief Function pointer type for float arange operation
  ** @param from Starting value
  ** @param to Ending value (exclusive)
  ** @param step Step size
- ** @param user_shape Whether to use user-provided shape
- ** @param shape User-provided shape array
- ** @param rank Rank/dimensionality
  ** @param dtype Data type of the tensor
  ** @return Result tensor with arange values
  */
-typedef nnl2_tensor* (*nnl2_float_arangefn)(float from, float to, float step,
-                                            bool user_shape, int32_t* shape, int rank,
-                                            nnl2_tensor_type dtype);						
+typedef nnl2_tensor* (*nnl2_float_arangefn)(float from, float to, float step, nnl2_tensor_type dtype);						
+						
+/** @brief Function pointer type for integer linspace operation
+ ** @param start Starting value (inclusive)
+ ** @param stop Ending value (inclusive when endpoint=true)
+ ** @param num Number of samples to generate
+ ** @param endpoint If true, stop is included as last sample
+ ** @param dtype Data type of the tensor (only INT32 or INT64)
+ ** @return Result tensor with linearly spaced values
+ ** @note For integer types, values are rounded to nearest integer
+ ** @warning For num=0 returns empty tensor, for num=1 returns [start]
+ */
+typedef nnl2_tensor* (*nnl2_int_linspacefn)(int64_t start, int64_t stop, int64_t num, bool endpoint, nnl2_tensor_type dtype);
+
+/** @brief Function pointer type for float linspace operation
+ ** @param start Starting value (inclusive)
+ ** @param stop Ending value (inclusive when endpoint=true)
+ ** @param num Number of samples to generate
+ ** @param endpoint If true, stop is included as last sample
+ ** @param dtype Data type of the tensor (only FLOAT32 or FLOAT64)
+ ** @return Result tensor with linearly spaced values
+ ** @note By default includes both endpoints (endpoint=true)
+ ** @warning Floating-point precision may affect exact endpoint values
+ */
+typedef nnl2_tensor* (*nnl2_float_linspacefn)(float start, float stop, int64_t num, bool endpoint, nnl2_tensor_type dtype);		
 						
 /// @} [typedef]
 

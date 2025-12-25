@@ -465,13 +465,13 @@
                         (floatp :float64)  
                         (t :int64)))) 
     
+	(unless from
+      (setf from (if floatp 0.0 0)))
+	
 	(unless step
       (setf step (if floatp 
 				   (if (< from to) 1.0 -1.0)
                    (if (< from to) 1 -1))))
-  
-    (unless from
-      (setf from (if floatp 0.0 0)))
 	
     (if floatp
         ;; convert all arguments to float
@@ -479,6 +479,40 @@
         ;; convert all arguments to integers
         (nnl2.ffi:%int-arange (truncate from) (truncate to) (truncate step) final-dtype))))
 
+(defun linspace (&key start stop (num 50) (endpoint t) dtype)
+  "Creates a tensor with a linear sequence of numbers
+   
+   Examples:
+       (linspace :start 0 :stop 10 :num 5)    ; 0.0, 2.5, 5.0, 7.5, 10.0
+       (linspace :start 0 :stop 1 :num 5 :endpoint nil) ; 0.0, 0.2, 0.4, 0.6, 0.8
+       (linspace :start 5 :stop 0 :num 6 :dtype :int32) ; 5, 4, 3, 2, 1, 0
+   
+   Args:
+       start (&key) (required): Starting value (inclusive)
+       stop (&key) (required): Ending value (inclusive when endpoint=true)
+       num (&key) (default: 50) (optional): Number of samples
+       endpoint (&key) (default: t) (optional): If true, stop is included
+       dtype (&key) (default: :float64 or :int64 based on inputs) (optional): Data type
+   
+   Returns:
+     A tensor with the linear sequence"
+  
+  (assert start nil "[nnl2] linspace: Parameter :start is required")
+  (assert stop nil "[nnl2] linspace: Parameter :stop is required")
+  (assert (>= num 0) nil "[nnl2] linspace: Parameter :num must be >= 0")
+
+  (let ((use-float (or (and start (or (floatp start) (floatp stop)))
+                       (and stop (or (floatp start) (floatp stop))))))
+    
+    (unless dtype
+      (setf dtype (cond
+                    (use-float :float64)
+                    (t :int64))))
+	
+    (if use-float
+      (nnl2.ffi:%float-linspace (coerce start 'single-float) (coerce stop 'single-float) num endpoint dtype)
+      (nnl2.ffi:%int-linspace (truncate start) (truncate stop) num endpoint dtype))))
+						 
 (defun from-flatten (flatten-data indices &key (dtype nnl2.system:*default-tensor-type*))
   "Creates a tensor from a flat list/vector with the specified shapes
    Example: (from-flatten '(1 2 3 4 5 6) '(2 3)) -> #<NNL2:TENSOR ... [2x3]: 1.0d0 2.0d0 3.0d0\n4.0d0 5.0d0 6.0d0>

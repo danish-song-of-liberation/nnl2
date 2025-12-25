@@ -268,11 +268,13 @@ void nnl2_init_accessors() {
 }	     
        
 void nnl2_init_tensor_creating() {
-	EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
-	EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));    
-	INIT_BACKEND(nnl2_int_arange, int_arange_backends);
-	INIT_BACKEND(nnl2_float_arange, float_arange_backends);
-}          
+    EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
+    EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));    
+    INIT_BACKEND(nnl2_int_arange, int_arange_backends);
+    INIT_BACKEND(nnl2_float_arange, float_arange_backends);
+    INIT_BACKEND(nnl2_int_linspace, int_linspace_backends);
+    INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);
+}
      
 void nnl2_init_standard() {
 	EINIT_BACKEND(add, add_backends, CURRENT_BACKEND(add));                       
@@ -990,19 +992,27 @@ void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) {
        
 void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 	nnl2_assign_row(dst, seq_index, src);
-} 
+}    
 
 /** @brief internal derivative of assign_row **/
 void lisp_call_assign_row_add(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
 	nnl2_assign_row_add(dst, seq_index, src);   
 }
 
-Tensor* lisp_call_int_arange(int64_t from, int64_t to, int64_t step, bool user_shape, int32_t* shape, int rank, TensorType dtype) {
-    return nnl2_int_arange(from, to, step, user_shape, shape, rank, dtype);
+Tensor* lisp_call_int_arange(int64_t from, int64_t to, int64_t step, TensorType dtype) {
+    return nnl2_int_arange(from, to, step, dtype); 
 }
 
-Tensor* lisp_call_float_arange(float from, float to, float step, bool user_shape, int32_t* shape, int rank, TensorType dtype) {
-    return nnl2_float_arange(from, to, step, user_shape, shape, rank, dtype);
+Tensor* lisp_call_float_arange(float from, float to, float step, TensorType dtype) {
+    return nnl2_float_arange(from, to, step, dtype);
+}
+
+Tensor* lisp_call_int_linspace(int64_t start, int64_t stop, int64_t num, bool endpoint, TensorType dtype) {
+    return nnl2_int_linspace(start, stop, num, endpoint, dtype);
+}
+
+Tensor* lisp_call_float_linspace(float start, float stop, int64_t num, bool endpoint, TensorType dtype) {
+    return nnl2_float_linspace(start, stop, num, endpoint, dtype);
 }
 
 ///@} [lisp_wrappers]                

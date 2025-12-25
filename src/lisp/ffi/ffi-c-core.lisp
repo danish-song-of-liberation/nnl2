@@ -672,6 +672,20 @@
   (step :float)
   (dtype tensor-type))
   
+(cffi:defcfun ("lisp_call_int_linspace" %int-linspace) :pointer
+  (start :int64)
+  (stop :int64)
+  (num :int64)
+  (endpoint :boolean)
+  (dtype tensor-type))
+
+(cffi:defcfun ("lisp_call_float_linspace" %float-linspace) :pointer
+  (start :float)
+  (stop :float)
+  (num :int64)
+  (endpoint :boolean)
+  (dtype tensor-type))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

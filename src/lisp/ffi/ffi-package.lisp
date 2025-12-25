@@ -766,5 +766,7 @@
    #:%gesdd
    #:%int-arange
    #:%float-arange
-   #:*null*))
+   #:*null*
+   #:%int-linspace
+   #:%float-linspace))
    
