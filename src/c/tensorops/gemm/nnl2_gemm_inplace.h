@@ -81,6 +81,7 @@ void gemminplace(const nnl2_order order, const nnl2_transpose transa,
 	switch(dtype) {
 		case FLOAT64: dgemminplace(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);						    	   break;
 		case FLOAT32: sgemminplace(order, transa, transb, m, n, k, (const float)alpha, a, lda, b, ldb, (const float)beta, c, ldc);         break;
+		case INT64:   i64gemminplace(order, transa, transb, m, n, k, (const int64_t)alpha, a, lda, b, ldb, (const int32_t)beta, c, ldc);   break;
 		case INT32:   i32gemminplace(order, transa, transb, m, n, k, (const int32_t)alpha, a, lda, b, ldb, (const int32_t)beta, c, ldc);   break;
 		
 		default: {

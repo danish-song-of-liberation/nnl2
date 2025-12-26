@@ -76,6 +76,7 @@ nnl2_tensor* gemm(const nnl2_order order, const nnl2_transpose transa,
 	switch(dtype) {
 		case FLOAT64: return dgemm(order, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta);
 		case FLOAT32: return sgemm(order, transa, transb, m, n, k, (const float)alpha, a, lda, b, ldb, (const float)beta);
+		case INT64:   return i64gemm(order, transa, transb, m, n, k, (const int64_t)alpha, a, lda, b, ldb, (const int64_t)beta);
 		case INT32:   return i32gemm(order, transa, transb, m, n, k, (const int32_t)alpha, a, lda, b, ldb, (const int32_t)beta);	
 		
 		default: {

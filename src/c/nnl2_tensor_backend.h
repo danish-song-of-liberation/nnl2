@@ -393,6 +393,14 @@ typedef void (*i32gemminplacefn)(const nnl2_order, const nnl2_transpose, const n
 
 /** @ingroup GEMM_ops
  ** @see sgemminplacefn
+ ** @see i32gemminplacefn
+ **/
+typedef void (*i64gemminplacefn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
+							     const int, const int, const int, const int64_t, const nnl2_tensor*, 
+							     const int, const nnl2_tensor*, const int, const int64_t, nnl2_tensor*, const int);
+								 
+/** @ingroup GEMM_ops
+ ** @see sgemminplacefn
  **/
 typedef nnl2_tensor* (*sgemmfn)(const nnl2_order, const nnl2_transpose, const nnl2_transpose, 
 					       const int, const int, const int, const float, const nnl2_tensor*, 

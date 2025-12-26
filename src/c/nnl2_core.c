@@ -273,10 +273,10 @@ void nnl2_init_tensor_creating() {
     INIT_BACKEND(nnl2_int_arange, int_arange_backends);
     INIT_BACKEND(nnl2_float_arange, float_arange_backends);
     INIT_BACKEND(nnl2_int_linspace, int_linspace_backends);
-    INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);
+    INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);  
 }
      
-void nnl2_init_standard() {
+void nnl2_init_standard() {       
 	EINIT_BACKEND(add, add_backends, CURRENT_BACKEND(add));                       
 	EINIT_BACKEND(sub, sub_backends, CURRENT_BACKEND(sub));                
 	EINIT_BACKEND(mul, mul_backends, CURRENT_BACKEND(mul));      	         
@@ -305,15 +305,16 @@ void nnl2_init_standard() {
                       
 void nnl2_init_standard_inplace() {                    
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);     
-	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);            
+	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);                    
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, CURRENT_BACKEND(gemm)); 
+	INIT_BACKEND(i64gemminplace, i64gemminplace_backends);    
 	EINIT_BACKEND(addinplace, addinplace_backends, CURRENT_BACKEND(addinplace));          
 	EINIT_BACKEND(subinplace, subinplace_backends, CURRENT_BACKEND(subinplace));                     
 	EINIT_BACKEND(powinplace, powinplace_backends, CURRENT_BACKEND(powinplace));      
-	EINIT_BACKEND(expinplace, expinplace_backends, CURRENT_BACKEND(expinplace));    
+	EINIT_BACKEND(expinplace, expinplace_backends, CURRENT_BACKEND(expinplace));     
 	EINIT_BACKEND(loginplace, loginplace_backends, CURRENT_BACKEND(loginplace));     	
 	EINIT_BACKEND(log1pinplace, log1pinplace_backends, CURRENT_BACKEND(log1pinplace));     	
-	EINIT_BACKEND(log10inplace, log10inplace_backends, CURRENT_BACKEND(log10inplace));     	
+	EINIT_BACKEND(log10inplace, log10inplace_backends, CURRENT_BACKEND(log10inplace));     	 
 	EINIT_BACKEND(log2inplace, log2inplace_backends, CURRENT_BACKEND(log2inplace));     	   
 	EINIT_BACKEND(scaleinplace, scaleinplace_backends, CURRENT_BACKEND(scaleinplace));    
 	EINIT_BACKEND(maxinplace, maxinplace_backends, CURRENT_BACKEND(maxinplace));     
