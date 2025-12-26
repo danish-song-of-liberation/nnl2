@@ -303,11 +303,11 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_atan2, atan2_backends, CURRENT_BACKEND(atan2));     
 }    
                       
-void nnl2_init_standard_inplace() {                  
+void nnl2_init_standard_inplace() {                    
 	INIT_BACKEND(sgemminplace, sgemminplace_backends);     
 	INIT_BACKEND(i32gemminplace, i32gemminplace_backends);            
 	EINIT_BACKEND(dgemminplace, dgemminplace_backends, CURRENT_BACKEND(gemm)); 
-	EINIT_BACKEND(addinplace, addinplace_backends, CURRENT_BACKEND(addinplace));       
+	EINIT_BACKEND(addinplace, addinplace_backends, CURRENT_BACKEND(addinplace));          
 	EINIT_BACKEND(subinplace, subinplace_backends, CURRENT_BACKEND(subinplace));                     
 	EINIT_BACKEND(powinplace, powinplace_backends, CURRENT_BACKEND(powinplace));      
 	EINIT_BACKEND(expinplace, expinplace_backends, CURRENT_BACKEND(expinplace));    

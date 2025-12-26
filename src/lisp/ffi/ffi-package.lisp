@@ -774,5 +774,7 @@
    #:%getrf
    #:%eye
    #:%eye-like
-   #:%swap-rows!))
+   #:%swap-rows!
+   #:%triu
+   #:%tril))
    

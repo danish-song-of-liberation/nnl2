@@ -713,6 +713,14 @@
   (row-1 :size)
   (row-2 :size))
   
+(cffi:defcfun ("nnl2_triu" %triu) :pointer 
+  (tensor :pointer)
+  (k :int))
+  
+(cffi:defcfun ("nnl2_tril" %tril) :pointer 
+  (tensor :pointer)
+  (k :int))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

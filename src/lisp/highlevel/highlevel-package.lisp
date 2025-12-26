@@ -813,5 +813,11 @@
    #:diag
    #:luf
    #:eye
-   #:eye-like))  
+   #:eye-like
+   #:lufu
+   #:lufl
+   #:lufp
+   #:lu
+   #:triu
+   #:tril))  
    
