@@ -844,6 +844,7 @@ typedef struct {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
         nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
         nnl2_int32 int32_alpha;           ///< Alpha value for INT32
+        nnl2_int64 int64_alpha;           ///< Alpha value for INT64
     } alpha;
 } axpy_broadcasting_ptask;
 
@@ -869,6 +870,7 @@ typedef struct {
         nnl2_float64 float64_sumend;      ///< Sumend value for FLOAT64
         nnl2_float32 float32_sumend;      ///< Sumend value for FLOAT32
         nnl2_int32 int32_sumend;          ///< Sumend value for INT32
+        nnl2_int64 int64_sumend;          ///< Sumend value for INT64
     } sumend_val;
 } axpf_inplace_ptask;
 

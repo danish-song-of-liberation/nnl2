@@ -72,6 +72,20 @@ nnl2_tensor* naive_pow_broadcasting(nnl2_tensor* base, nnl2_tensor* exponent) {
 
                     break;
                 }
+				
+                case INT64: {
+                    int64_t* cast_base_data = (int64_t*)base->data;
+                    int64_t* cast_exponent_data = (int64_t*)exponent->data;
+                    int64_t* cast_result_data = (int64_t*)result->data;
+
+                    for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                        for(size_t j = 0; j < numel_exponent; j++) {
+                            cast_result_data[i * numel_exponent + j] = (int64_t)pow((double)cast_base_data[i * numel_exponent + j], (double)cast_exponent_data[j]);
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* cast_base_data = (int32_t*)base->data;
@@ -139,6 +153,24 @@ nnl2_tensor* naive_pow_broadcasting(nnl2_tensor* base, nnl2_tensor* exponent) {
                     
                     break;
                 }
+				
+                case INT64: {
+                    int64_t* cast_data_result = (int64_t*)result->data;
+                    
+                    char* cast_base_data = (char*)base->data;
+                    char* cast_exponent_data =  (char*)exponent->data;
+                    
+                    for(size_t i = 0; i < (numel_base / numel_exponent); i++) {                    
+                        for(size_t j = 0; j < numel_exponent; j++) {
+                            void* elem_base = cast_base_data + (i * numel_exponent + j) * base_step;
+                            void* elem_exponent = cast_exponent_data + j * exponent_step;
+                        
+                            cast_data_result[i * numel_exponent + j] = (int64_t)pow((double)nnl2_convert_to_int64(elem_base, base_dtype), (double)nnl2_convert_to_int64(elem_exponent, exponent_dtype));
+                        }
+                    }
+                    
+                    break;
+                }	
                 
                 case INT32: {
                     int32_t* cast_data_result = (int32_t*)result->data;

@@ -68,6 +68,20 @@ nnl2_tensor* naive_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
 
                     break;
                 }
+				
+				case INT64: {
+                    int64_t* cast_y_data = (int64_t*)y->data;
+                    int64_t* cast_x_data = (int64_t*)x->data;
+                    double* cast_result_data = (double*)result->data;
+
+                    for(size_t i = 0; i < (numel_y / numel_x); i++) {
+                        for(size_t j = 0; j < numel_x; j++) {
+                            cast_result_data[i * numel_x + j] = atan2((double)cast_y_data[i * numel_x + j], (double)cast_x_data[j]);
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* cast_y_data = (int32_t*)y->data;
@@ -135,6 +149,24 @@ nnl2_tensor* naive_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
                     break;
                 }
                 
+                case INT64: {
+                    double* cast_data_result = (double*)result->data;
+                    
+                    char* cast_y_data = (char*)y->data;
+                    char* cast_x_data = (char*)x->data;
+                    
+                    for(size_t i = 0; i < (numel_y / numel_x); i++) {                    
+                        for(size_t j = 0; j < numel_x; j++) {
+                            void* elem_y = cast_y_data + (i * numel_x + j) * y_step;
+                            void* elem_x = cast_x_data + j * x_step;
+                        
+                            cast_data_result[i * numel_x + j] = atan2((double)nnl2_convert_to_int64(elem_y, y_dtype), (double)nnl2_convert_to_int64(elem_x, x_dtype));
+                        }
+                    }
+                    
+                    break;
+                }
+				
                 case INT32: {
                     double* cast_data_result = (double*)result->data;
                     

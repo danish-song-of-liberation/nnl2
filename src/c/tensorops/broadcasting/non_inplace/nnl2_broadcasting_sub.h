@@ -75,6 +75,20 @@ nnl2_tensor* naive_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtrahen
 					break;
 				}
 				
+				case INT64: {
+					int64_t* cast_minuend_data = (int64_t*)minuend->data;
+					int64_t* cast_subtrahend_data = (int64_t*)subtrahend->data;
+					int64_t* cast_result_data = (int64_t*)result->data;
+					
+					for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+						for(size_t j = 0; j < numel_subtrahend; j++) {
+							cast_result_data[i * numel_subtrahend + j] = cast_minuend_data[i * numel_subtrahend + j] - cast_subtrahend_data[j];
+						}
+					}
+					
+					break;
+				}
+				
 				case INT32: {
 					int32_t* cast_minuend_data = (int32_t*)minuend->data;
 					int32_t* cast_subtrahend_data = (int32_t*)subtrahend->data;
@@ -145,6 +159,24 @@ nnl2_tensor* naive_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtrahen
 					break;
 				}
 				
+				case INT64: {
+					int64_t* cast_data_result = (int64_t*)result->data;
+					
+					char* cast_minuend_data = (char*)minuend->data;
+					char* cast_subtrahend_data =  (char*)subtrahend->data;
+					
+					for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {					
+						for(size_t j = 0; j < numel_subtrahend; j++) {
+							void* elem_minuend = cast_minuend_data + (i * numel_subtrahend + j) * minuend_step;
+							void* elem_subtrahend =  cast_subtrahend_data + j * subtrahend_step;
+						
+							cast_data_result[i * numel_subtrahend + j] = nnl2_convert_to_int64(elem_minuend, minuend_dtype) - nnl2_convert_to_int64(elem_subtrahend, subtrahend_dtype);
+						}
+					}
+					
+					break;
+				}
+				
 				case INT32: {
 					int32_t* cast_data_result = (int32_t*)result->data;
 					
@@ -195,7 +227,7 @@ nnl2_tensor* naive_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtrahen
 ///@{ [subbroadcasting_ptask]
 
 typedef struct {
-    nnl2_tensor_type dtype;               ///< Data type of result tensor
+    nnl2_tensor_type dtype;         ///< Data type of result tensor
     bool aligned_minuend;           ///< Flag indicating if minuend data is 32-byte aligned
     bool aligned_subtrahend;        ///< Flag indicating if subtrahend data is 32-byte aligned  
     bool aligned_result;            ///< Flag indicating if result data is 32-byte aligned
@@ -231,6 +263,17 @@ void* nnl2_own_psub_broadcasting_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_psub_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 broadcasting subtraction
+ * 
+ ** @param arg 
+ * Pointer to subbroadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_psub_broadcasting_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer broadcasting subtraction
@@ -365,6 +408,7 @@ nnl2_tensor* nnl2_own_sub_broadcasting(nnl2_tensor* minuend, nnl2_tensor* subtra
             case FLOAT64: worker_func = nnl2_own_psub_broadcasting_float64; break;
             case FLOAT32: worker_func = nnl2_own_psub_broadcasting_float32; break;
             case INT32:   worker_func = nnl2_own_psub_broadcasting_int32;   break;
+            case INT64:   worker_func = nnl2_own_psub_broadcasting_int64;   break;
             
             default: {
                 NNL2_TYPE_ERROR(result_dtype);
@@ -602,6 +646,26 @@ void* nnl2_own_psub_broadcasting_float32(void* arg) {
         
         // Handle remaining elements
         for(; j < numel_subtrahend; j++) {
+            result_data[base_idx + j] = minuend_data[base_idx + j] - subtrahend_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_psub_broadcasting_int64(void* arg) {
+    subbroadcasting_ptask* task = (subbroadcasting_ptask*)arg;
+    const int64_t* minuend_data = (const int64_t*)task->minuend_data;
+    const int64_t* subtrahend_data = (const int64_t*)task->subtrahend_data;
+    int64_t* result_data = (int64_t*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_subtrahend = task->numel_subtrahend;
+    
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_subtrahend;
+        
+        for(size_t j = 0; j < numel_subtrahend; j++) {
             result_data[base_idx + j] = minuend_data[base_idx + j] - subtrahend_data[j];
         }
     }

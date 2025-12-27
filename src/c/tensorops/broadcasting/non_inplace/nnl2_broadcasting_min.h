@@ -72,6 +72,20 @@ nnl2_tensor* naive_min_broadcasting(nnl2_tensor* x, nnl2_tensor* y) {
 
                     break;
                 }
+				
+				case INT64: {
+                    int64_t* cast_x_data = (int64_t*)x->data;
+                    int64_t* cast_y_data = (int64_t*)y->data;
+                    int64_t* cast_result_data = (int64_t*)result->data;
+
+                    for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                        for(size_t j = 0; j < numel_y; j++) {
+                            cast_result_data[i * numel_y + j] = MIN(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* cast_x_data = (int32_t*)x->data;
@@ -137,6 +151,26 @@ nnl2_tensor* naive_min_broadcasting(nnl2_tensor* x, nnl2_tensor* y) {
                             
                             float x_val = nnl2_convert_to_float32(elem_x, x_dtype);
                             float y_val = nnl2_convert_to_float32(elem_y, y_dtype);
+                            cast_data_result[i * numel_y + j] = MIN(x_val, y_val);
+                        }
+                    }
+                    
+                    break;
+                }
+				
+                case INT64: {
+                    int64_t* cast_data_result = (int64_t*)result->data;
+                    
+                    char* cast_x_data = (char*)x->data;
+                    char* cast_y_data =  (char*)y->data;
+                    
+                    for(size_t i = 0; i < (numel_x / numel_y); i++) {                    
+                        for(size_t j = 0; j < numel_y; j++) {
+                            void* elem_x = cast_x_data + (i * numel_y + j) * x_step;
+                            void* elem_y = cast_y_data + j * y_step;
+                        
+                            int64_t x_val = nnl2_convert_to_int64(elem_x, x_dtype);
+                            int64_t y_val = nnl2_convert_to_int64(elem_y, y_dtype);
                             cast_data_result[i * numel_y + j] = MIN(x_val, y_val);
                         }
                     }
@@ -217,6 +251,19 @@ void* nnl2_own_pmin_broadcasting_float64(void* arg);
  ** @see nnl2_own_pmin_broadcasting_float64
  **/
 void* nnl2_own_pmin_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 broadcasting minimum operation
+ * 
+ ** @param arg 
+ * Pointer to min_broadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmin_broadcasting_float64
+ **/
+void* nnl2_own_pmin_broadcasting_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer broadcasting minimum operation
@@ -354,12 +401,13 @@ nnl2_tensor* nnl2_own_min_broadcasting(const nnl2_tensor* x, const nnl2_tensor* 
         tasks[i].start_block = current_block_start;
         tasks[i].end_block = current_block_start + current_blocks;
         
-        // Select appropriate worker function based on data type
+		// Select appropriate worker function based on data type
         void* (*worker_func)(void*) = NULL;
         switch(x_dtype) {
             case FLOAT64: worker_func = nnl2_own_pmin_broadcasting_float64; break;
             case FLOAT32: worker_func = nnl2_own_pmin_broadcasting_float32; break;
             case INT32:   worker_func = nnl2_own_pmin_broadcasting_int32;   break;
+            case INT64:   worker_func = nnl2_own_pmin_broadcasting_int64;   break;
             default: {
                 NNL2_TYPE_ERROR(x_dtype);
                 nnl2_free_tensor(result);
@@ -494,6 +542,33 @@ void* nnl2_own_pmin_broadcasting_float32(void* arg) {
         
         // Scalar processing for remainder in the block
         for(; i < block_size; i++) {
+            result_data[block_offset + i] = MIN(x_data[block_offset + i], y_data[i]);
+        }
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmin_broadcasting_int64
+ **/
+void* nnl2_own_pmin_broadcasting_int64(void* arg) {
+    min_broadcasting_ptask* task = (min_broadcasting_ptask*)arg;
+    const int64_t* x_data = (const int64_t*)task->x->data;
+    const int64_t* y_data = (const int64_t*)task->y->data;
+    int64_t* result_data = (int64_t*)task->result->data;
+    size_t start_block = task->start_block;
+    size_t end_block = task->end_block;
+    size_t block_size = task->block_size;
+    
+    // Process each block assigned to this thread
+    for(size_t block = start_block; block < end_block; block++) {
+        size_t block_offset = block * block_size;
+        
+        // Scalar processing for INT64
+        for(size_t i = 0; i < block_size; i++) {
             result_data[block_offset + i] = MIN(x_data[block_offset + i], y_data[i]);
         }
     }

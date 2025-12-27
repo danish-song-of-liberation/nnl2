@@ -72,6 +72,20 @@ nnl2_tensor* naive_mul_broadcasting(nnl2_tensor* multiplicand, nnl2_tensor* mult
 
                     break;
                 }
+				
+                case INT64: {
+                    int64_t* cast_multiplicand_data = (int64_t*)multiplicand->data;
+                    int64_t* cast_multiplier_data = (int64_t*)multiplier->data;
+                    int64_t* cast_result_data = (int64_t*)result->data;
+
+                    for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {
+                        for(size_t j = 0; j < numel_multiplier; j++) {
+                            cast_result_data[i * numel_multiplier + j] = cast_multiplicand_data[i * numel_multiplier + j] * cast_multiplier_data[j];
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* cast_multiplicand_data = (int32_t*)multiplicand->data;
@@ -140,6 +154,24 @@ nnl2_tensor* naive_mul_broadcasting(nnl2_tensor* multiplicand, nnl2_tensor* mult
                     break;
                 }
                 
+                case INT64: {
+                    int64_t* cast_data_result = (int64_t*)result->data;
+                    
+                    char* cast_multiplicand_data = (char*)multiplicand->data;
+                    char* cast_multiplier_data =  (char*)multiplier->data;
+                    
+                    for(size_t i = 0; i < (numel_multiplicand / numel_multiplier); i++) {                    
+                        for(size_t j = 0; j < numel_multiplier; j++) {
+                            void* elem_multiplicand = cast_multiplicand_data + (i * numel_multiplier + j) * multiplicand_step;
+                            void* elem_multiplier = cast_multiplier_data + j * multiplier_step;
+                        
+                            cast_data_result[i * numel_multiplier + j] = nnl2_convert_to_int64(elem_multiplicand, multiplicand_dtype) * nnl2_convert_to_int64(elem_multiplier, multiplier_dtype);
+                        }
+                    }
+                    
+                    break;
+                }
+				
                 case INT32: {
                     int32_t* cast_data_result = (int32_t*)result->data;
                     
@@ -206,6 +238,17 @@ void* nnl2_own_pmul_broadcasting_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_pmul_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 broadcasting multiplication
+ * 
+ ** @param arg 
+ * Pointer to mulbroadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pmul_broadcasting_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer broadcasting multiplication
@@ -340,6 +383,7 @@ nnl2_tensor* nnl2_own_mul_broadcasting(nnl2_tensor* multiplicand, nnl2_tensor* m
             case FLOAT64: worker_func = nnl2_own_pmul_broadcasting_float64; break;
             case FLOAT32: worker_func = nnl2_own_pmul_broadcasting_float32; break;
             case INT32:   worker_func = nnl2_own_pmul_broadcasting_int32;   break;
+            case INT64:   worker_func = nnl2_own_pmul_broadcasting_int64;   break;
             
             default: {
                 NNL2_TYPE_ERROR(result_dtype);
@@ -577,6 +621,26 @@ void* nnl2_own_pmul_broadcasting_float32(void* arg) {
         
         // Handle remaining elements
         for(; j < numel_multiplier; j++) {
+            result_data[base_idx + j] = multiplicand_data[base_idx + j] * multiplier_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_pmul_broadcasting_int64(void* arg) {
+    mulbroadcasting_ptask* task = (mulbroadcasting_ptask*)arg;
+    const int64_t* multiplicand_data = (const int64_t*)task->multiplicand_data;
+    const int64_t* multiplier_data = (const int64_t*)task->multiplier_data;
+    int64_t* result_data = (int64_t*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_multiplier = task->numel_multiplier;
+    
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_multiplier;
+        
+        for(size_t j = 0; j < numel_multiplier; j++) {
             result_data[base_idx + j] = multiplicand_data[base_idx + j] * multiplier_data[j];
         }
     }

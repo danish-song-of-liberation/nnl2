@@ -77,6 +77,21 @@ nnl2_tensor* naive_axpy_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend, 
 
                     break;
                 }
+				
+				case INT64: {
+                    int64_t* cast_summand_data = (int64_t*)summand->data;
+                    int64_t* cast_sumend_data = (int64_t*)sumend->data;
+                    int64_t* cast_result_data = (int64_t*)result->data;
+                    int64_t alpha_int64 = (int64_t)alpha;
+
+                    for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                        for(size_t j = 0; j < numel_sumend; j++) {
+                            cast_result_data[i * numel_sumend + j] = cast_summand_data[i * numel_sumend + j] + (cast_sumend_data[j] * alpha_int64);
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* cast_summand_data = (int32_t*)summand->data;
@@ -141,6 +156,25 @@ nnl2_tensor* naive_axpy_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumend, 
                             void* elem_sumend = cast_sumend_data + j * sumend_step;
                             
                             cast_data_result[i * numel_sumend + j] = nnl2_convert_to_float32(elem_summand, summand_dtype) + (nnl2_convert_to_float32(elem_sumend, sumend_dtype) * alpha);
+                        }
+                    }
+                    
+                    break;
+                }
+				
+			    case INT64: {
+                    int64_t* cast_data_result = (int64_t*)result->data;
+                    int64_t alpha_int64 = (int64_t)alpha;
+                    
+                    char* cast_summand_data = (char*)summand->data;
+                    char* cast_sumend_data =  (char*)sumend->data;
+                    
+                    for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {                    
+                        for(size_t j = 0; j < numel_sumend; j++) {
+                            void* elem_summand = cast_summand_data + (i * numel_sumend + j) * summand_step;
+                            void* elem_sumend = cast_sumend_data + j * sumend_step;
+                        
+                            cast_data_result[i * numel_sumend + j] = nnl2_convert_to_int64(elem_summand, summand_dtype) + (nnl2_convert_to_int64(elem_sumend, sumend_dtype) * alpha_int64);
                         }
                     }
                     
@@ -219,6 +253,19 @@ void* nnl2_own_paxpy_broadcasting_float64(void* arg);
  ** @see nnl2_own_paxpy_broadcasting_float64
  **/
 void* nnl2_own_paxpy_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 AXPY broadcasting operation
+ * 
+ ** @param arg 
+ * Pointer to axpy_broadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_paxpy_broadcasting_float64
+ **/
+void* nnl2_own_paxpy_broadcasting_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer AXPY broadcasting operation
@@ -349,6 +396,7 @@ nnl2_tensor* nnl2_own_axpy_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumen
             case FLOAT64: tasks[i].alpha.float64_alpha = (double)alpha; break;
             case FLOAT32: tasks[i].alpha.float32_alpha = alpha; break;
             case INT32:   tasks[i].alpha.int32_alpha = (int32_t)alpha; break;
+            case INT64:   tasks[i].alpha.int64_alpha = (int64_t)alpha; break;
             default: {
                 NNL2_TYPE_ERROR(summand_dtype);
                 nnl2_free_tensor(result);
@@ -374,6 +422,7 @@ nnl2_tensor* nnl2_own_axpy_broadcasting(nnl2_tensor* summand, nnl2_tensor* sumen
             case FLOAT64: worker_func = nnl2_own_paxpy_broadcasting_float64; break;
             case FLOAT32: worker_func = nnl2_own_paxpy_broadcasting_float32; break;
             case INT32:   worker_func = nnl2_own_paxpy_broadcasting_int32;   break;
+            case INT64:   worker_func = nnl2_own_paxpy_broadcasting_int64;   break;
             default: {
                 NNL2_TYPE_ERROR(summand_dtype);
                 nnl2_free_tensor(result);
@@ -523,6 +572,34 @@ void* nnl2_own_paxpy_broadcasting_float32(void* arg) {
         
         // Scalar processing for remainder in the block
         for(; i < block_size; i++) {
+            result_data[block_offset + i] = summand_data[block_offset + i] + sumend_data[i] * alpha;
+        }
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_paxpy_broadcasting_int64
+ **/
+void* nnl2_own_paxpy_broadcasting_int64(void* arg) {
+    axpy_broadcasting_ptask* task = (axpy_broadcasting_ptask*)arg;
+    const int64_t* summand_data = (const int64_t*)task->summand->data;
+    const int64_t* sumend_data = (const int64_t*)task->sumend->data;
+    int64_t* result_data = (int64_t*)task->result->data;
+    size_t start_block = task->start_block;
+    size_t end_block = task->end_block;
+    size_t block_size = task->block_size;
+    int64_t alpha = task->alpha.int64_alpha;
+    
+    // Process each block assigned to this thread
+    for(size_t block = start_block; block < end_block; block++) {
+        size_t block_offset = block * block_size;
+        
+        // Scalar processing for INT64
+        for(size_t i = 0; i < block_size; i++) {
             result_data[block_offset + i] = summand_data[block_offset + i] + sumend_data[i] * alpha;
         }
     }

@@ -72,7 +72,21 @@ nnl2_tensor* naive_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divisor)
 
                     break;
                 }
+				
+                case INT64: {
+                    int64_t* cast_dividend_data = (int64_t*)dividend->data;
+                    int64_t* cast_divisor_data = (int64_t*)divisor->data;
+                    int64_t* cast_result_data = (int64_t*)result->data;
 
+                    for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {
+                        for(size_t j = 0; j < numel_divisor; j++) {
+                            cast_result_data[i * numel_divisor + j] = cast_dividend_data[i * numel_divisor + j] / cast_divisor_data[j];
+                        }
+                    }
+
+                    break;
+                }
+				
                 case INT32: {
                     int32_t* cast_dividend_data = (int32_t*)dividend->data;
                     int32_t* cast_divisor_data = (int32_t*)divisor->data;
@@ -139,7 +153,25 @@ nnl2_tensor* naive_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divisor)
                     
                     break;
                 }
-                
+				
+                case INT64: {
+                    int64_t* cast_data_result = (int64_t*)result->data;
+                    
+                    char* cast_dividend_data = (char*)dividend->data;
+                    char* cast_divisor_data =  (char*)divisor->data;
+                    
+                    for(size_t i = 0; i < (numel_dividend / numel_divisor); i++) {                    
+                        for(size_t j = 0; j < numel_divisor; j++) {
+                            void* elem_dividend = cast_dividend_data + (i * numel_divisor + j) * dividend_step;
+                            void* elem_divisor = cast_divisor_data + j * divisor_step;
+                        
+                            cast_data_result[i * numel_divisor + j] = nnl2_convert_to_int64(elem_dividend, dividend_dtype) / nnl2_convert_to_int64(elem_divisor, divisor_dtype);
+                        }
+                    }
+                    
+                    break;
+                }
+				
                 case INT32: {
                     int32_t* cast_data_result = (int32_t*)result->data;
                     
@@ -206,6 +238,17 @@ void* nnl2_own_pdiv_broadcasting_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_pdiv_broadcasting_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 broadcasting division
+ * 
+ ** @param arg 
+ * Pointer to divbroadcasting_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pdiv_broadcasting_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer broadcasting division
@@ -340,6 +383,7 @@ nnl2_tensor* nnl2_own_div_broadcasting(nnl2_tensor* dividend, nnl2_tensor* divis
             case FLOAT64: worker_func = nnl2_own_pdiv_broadcasting_float64; break;
             case FLOAT32: worker_func = nnl2_own_pdiv_broadcasting_float32; break;
             case INT32:   worker_func = nnl2_own_pdiv_broadcasting_int32;   break;
+            case INT64:   worker_func = nnl2_own_pdiv_broadcasting_int64;   break;
             
             default: {
                 NNL2_TYPE_ERROR(result_dtype);
@@ -577,6 +621,26 @@ void* nnl2_own_pdiv_broadcasting_float32(void* arg) {
         
         // Handle remaining elements
         for(; j < numel_divisor; j++) {
+            result_data[base_idx + j] = dividend_data[base_idx + j] / divisor_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_pdiv_broadcasting_int64(void* arg) {
+    divbroadcasting_ptask* task = (divbroadcasting_ptask*)arg;
+    const int64_t* dividend_data = (const int64_t*)task->dividend_data;
+    const int64_t* divisor_data = (const int64_t*)task->divisor_data;
+    int64_t* result_data = (int64_t*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_divisor = task->numel_divisor;
+   
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_divisor;
+        
+        for(size_t j = 0; j < numel_divisor; j++) {
             result_data[base_idx + j] = dividend_data[base_idx + j] / divisor_data[j];
         }
     }
