@@ -151,6 +151,7 @@
 #include "../tensorlinalg/nnl2_eye.h"
 #include "../tensorlinalg/nnl2_triu.h"
 #include "../tensorlinalg/nnl2_tril.h"
+#include "../tensorlinalg/nnl2_pinv_diag.h"
 #include "../tensorstack/nnl2_hstack.h"
 #include "../tensorstack/nnl2_vstack.h"
 #include "../tensorstack/nnl2_concat.h"

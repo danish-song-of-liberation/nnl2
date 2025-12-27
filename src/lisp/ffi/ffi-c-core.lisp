@@ -721,6 +721,10 @@
   (tensor :pointer)
   (k :int))  
   
+(cffi:defcfun ("nnl2_pinv_diag" %pinv-diag) :pointer 
+  (in :pointer)
+  (eps :double))  
+  
 ;; -- AD --
 
 (cffi:defcstruct ad-tensor

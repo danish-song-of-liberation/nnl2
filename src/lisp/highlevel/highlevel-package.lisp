@@ -819,5 +819,7 @@
    #:lufp
    #:lu
    #:triu
-   #:tril))  
+   #:tril
+   #:pinv-diag
+   #:pinv))  
    

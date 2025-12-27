@@ -776,5 +776,6 @@
    #:%eye-like
    #:%swap-rows!
    #:%triu
-   #:%tril))
+   #:%tril
+   #:%pinv-diag))
    

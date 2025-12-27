@@ -196,7 +196,7 @@
               (if (cffi:null-pointer-p vt) nil vt)
 			  info))))
 
-(defun svd (a &key (lapack :gesdd) (order :nnl2rowmajor) (jobu #\A) (jobvt #\A) (jobz #\A) m n lda ldu ldvt)
+(defun svd (a &key (lapack :gesdd) (order :nnl2rowmajor) (jobu #\A) (jobvt #\A) (jobz #\A) (copy t) m n lda ldu ldvt)
   "Singular Value Decomposition (SVD) operation
    A = U * Σ * V^T
    
@@ -241,10 +241,11 @@
        u: left singular vectors tensor (size depends on jobu/jobz)
        vt: right singular vectors tensor (size depends on jobvt/jobz)
 	   info: return code (0 = success)"
-   
-  (ecase lapack 
-    (:gesvd (gesvd a order jobu jobvt m n lda ldu ldvt))
-    (:gesdd (gesdd a order jobz m n lda ldu ldvt))))
+  
+  (nnl2.hli.ts:tlet ((a-tensor (if copy (nnl2.hli.ts:copy a) a)))
+    (ecase lapack 
+      (:gesvd (gesvd a-tensor order jobu jobvt m n lda ldu ldvt))
+      (:gesdd (gesdd a-tensor order jobz m n lda ldu ldvt)))))
 	
 (declaim (inline svd))  
 
@@ -421,3 +422,19 @@
   
 (defun tril (tensor &key (k 0))
   (nnl2.ffi:%tril tensor k))  
+
+(defun pinv-diag (tensor &key (eps 1d-12))
+  (nnl2.ffi:%pinv-diag tensor eps))
+
+(defun pinv (a &key (eps 1d-12) (lapack :gesdd))
+  (multiple-value-bind (s u vt)
+      (svd a :lapack lapack)
+	  
+	(nnl2.hli.ts:tlet* ((s-pinv (pinv-diag s :eps eps))
+					    (diag-s-pinv (diag s-pinv))
+					    (utrans (nnl2.hli.ts:transpose u :force t))
+					    (idk (nnl2.hli.ts:gemm diag-s-pinv utrans))
+					    (vttrans (nnl2.hli.ts:transpose vt :force t)))
+	 
+	  (nnl2.hli.ts:gemm vttrans idk))))
+	

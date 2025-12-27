@@ -273,7 +273,7 @@ void nnl2_init_tensor_creating() {
     INIT_BACKEND(nnl2_int_arange, int_arange_backends);
     INIT_BACKEND(nnl2_float_arange, float_arange_backends);
     INIT_BACKEND(nnl2_int_linspace, int_linspace_backends);
-    INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);  
+    INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);    
 }
      
 void nnl2_init_standard() {       
