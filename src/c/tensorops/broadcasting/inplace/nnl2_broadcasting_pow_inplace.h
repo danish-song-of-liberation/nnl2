@@ -60,6 +60,19 @@ void naive_pow_broadcasting_inplace(nnl2_tensor* base, const nnl2_tensor* expone
 
                     break;
                 }
+				
+				case INT64: {
+                    int64_t* cast_base_data = (int64_t*)base->data;
+                    int64_t* cast_exponent_data = (int64_t*)exponent->data;
+
+                    for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                        for(size_t j = 0; j < numel_exponent; j++) {
+                            cast_base_data[i * numel_exponent + j] = (int64_t)pow((double)cast_base_data[i * numel_exponent + j], (double)cast_exponent_data[j]);
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* cast_base_data = (int32_t*)base->data;
@@ -105,6 +118,19 @@ void naive_pow_broadcasting_inplace(nnl2_tensor* base, const nnl2_tensor* expone
                         for(size_t j = 0; j < numel_exponent; j++) {
                             void* exponent_elem = exponent_data + j * exponent_step;
                             data_base[i * numel_exponent + j] = powf(data_base[i * numel_exponent + j], nnl2_convert_to_float32(exponent_elem, exponent_dtype));
+                        }
+                    }
+                
+                    break; 
+                }
+				
+				case INT64: {
+                    int64_t* data_base = (int64_t*)base->data;
+                
+                    for(size_t i = 0; i < (numel_base / numel_exponent); i++) {
+                        for(size_t j = 0; j < numel_exponent; j++) {
+                            void* exponent_elem = exponent_data + j * exponent_step;
+                            data_base[i * numel_exponent + j] = (int64_t)pow((double)data_base[i * numel_exponent + j], (double)nnl2_convert_to_int64(exponent_elem, exponent_dtype));
                         }
                     }
                 

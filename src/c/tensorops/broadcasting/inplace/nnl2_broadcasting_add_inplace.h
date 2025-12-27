@@ -77,6 +77,19 @@ void naive_add_broadcasting_inplace(nnl2_tensor* summand, nnl2_tensor* sumend) {
                     
                     break;
                 }
+				
+				case INT64: {
+                    int64_t* cast_summand_data = (int64_t*)summand->data;
+                    int64_t* cast_sumend_data = (int64_t*)sumend->data;
+                    
+                    for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                        for(size_t j = 0; j < numel_sumend; j++) {
+                            cast_summand_data[i * numel_sumend + j] += cast_sumend_data[j];
+                        }
+                    }
+                    
+                    break;
+                }
                 
                 default: {
                     NNL2_TYPE_ERROR(summand_dtype);
@@ -110,6 +123,19 @@ void naive_add_broadcasting_inplace(nnl2_tensor* summand, nnl2_tensor* sumend) {
                         for(size_t j = 0; j < numel_sumend; j++) {
                             void* sumend_elem = sumend_data + i * sumend_step;
                             data_minuend[i * numel_sumend + j] += nnl2_convert_to_float32(sumend_elem, sumend_dtype);
+                        }
+                    }
+                
+                    break; 
+                }
+				
+			    case INT64: {
+                    int64_t* data_minuend = (int64_t*)summand->data;
+                
+                    for(size_t i = 0; i < (numel_summand / numel_sumend); i++) {
+                        for(size_t j = 0; j < numel_sumend; j++) {
+                            void* sumend_elem = sumend_data + i * sumend_step;
+                            data_minuend[i * numel_sumend + j] += nnl2_convert_to_int64(sumend_elem, sumend_dtype);
                         }
                     }
                 
@@ -176,6 +202,17 @@ void* nnl2_own_padd_broadcasting_inplace_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_padd_broadcasting_inplace_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 in-place broadcasting addition
+ * 
+ ** @param arg 
+ * Pointer to addbroadcasting_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_padd_broadcasting_inplace_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer in-place broadcasting addition
@@ -281,15 +318,16 @@ void nnl2_own_add_broadcasting_inplace(nnl2_tensor* summand, nnl2_tensor* sumend
         
         void* (*worker_func)(void*) = NULL;
         switch(dtype) {
-            case FLOAT64: worker_func = nnl2_own_padd_broadcasting_inplace_float64; break;
-            case FLOAT32: worker_func = nnl2_own_padd_broadcasting_inplace_float32; break;
-            case INT32:   worker_func = nnl2_own_padd_broadcasting_inplace_int32;   break;
-            
-            default: {
-                NNL2_TYPE_ERROR(dtype);
-                return;
-            }
-        }
+			case FLOAT64: worker_func = nnl2_own_padd_broadcasting_inplace_float64; break;
+			case FLOAT32: worker_func = nnl2_own_padd_broadcasting_inplace_float32; break;
+			case INT32:   worker_func = nnl2_own_padd_broadcasting_inplace_int32;   break;
+			case INT64:   worker_func = nnl2_own_padd_broadcasting_inplace_int64;   break;
+			
+			default: {
+				NNL2_TYPE_ERROR(dtype);
+				return;
+			}
+		}
         
         int status = pthread_create(&threads[i], NULL, worker_func, &tasks[i]);
         if(status != 0) {
@@ -436,6 +474,25 @@ void* nnl2_own_padd_broadcasting_inplace_float32(void* arg) {
         
         // Handle remaining elements
         for(; j < numel_sumend; j++) {
+            summand_data[base_idx + j] += sumend_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_padd_broadcasting_inplace_int64(void* arg) {
+    addbroadcasting_inplace_ptask* task = (addbroadcasting_inplace_ptask*)arg;
+    int64_t* summand_data = (int64_t*)task->summand_data;
+    const int64_t* sumend_data = (const int64_t*)task->sumend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_sumend = task->numel_sumend;
+    
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_sumend;
+        
+        for(size_t j = 0; j < numel_sumend; j++) {
             summand_data[base_idx + j] += sumend_data[j];
         }
     }

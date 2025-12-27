@@ -283,7 +283,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_div, div_backends, CURRENT_BACKEND(div));     
 	EINIT_BACKEND(nnl2_pow, pow_backends, CURRENT_BACKEND(pow));              
 	EINIT_BACKEND(nnl2_exp, exp_backends, CURRENT_BACKEND(exp));  
-	EINIT_BACKEND(nnl2_logarithm, log_backends, CURRENT_BACKEND(log));   
+	EINIT_BACKEND(nnl2_logarithm, log_backends, CURRENT_BACKEND(log));    
 	EINIT_BACKEND(nnl2_log1p, log1p_backends, CURRENT_BACKEND(log1p));   
 	EINIT_BACKEND(nnl2_log10, log10_backends, CURRENT_BACKEND(log10));   
 	EINIT_BACKEND(nnl2_log2, log2_backends, CURRENT_BACKEND(log2));   

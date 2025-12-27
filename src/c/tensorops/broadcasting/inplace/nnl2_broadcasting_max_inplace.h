@@ -60,6 +60,19 @@ void naive_max_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
                     break;
                 }
 
+				case INT64: {
+                    int64_t* cast_x_data = (int64_t*)x->data;
+                    int64_t* cast_y_data = (int64_t*)y->data;
+
+                    for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                        for(size_t j = 0; j < numel_y; j++) {
+                            cast_x_data[i * numel_y + j] = MAX(cast_x_data[i * numel_y + j], cast_y_data[j]);
+                        }
+                    }
+
+                    break;
+                }
+				
                 case INT32: {
                     int32_t* cast_x_data = (int32_t*)x->data;
                     int32_t* cast_y_data = (int32_t*)y->data;
@@ -105,6 +118,20 @@ void naive_max_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
                         for(size_t j = 0; j < numel_y; j++) {
                             void* y_elem = y_data + j * y_step;
                             float y_val = nnl2_convert_to_float32(y_elem, y_dtype);
+                            data_x[i * numel_y + j] = MAX(data_x[i * numel_y + j], y_val);
+                        }
+                    }
+                
+                    break; 
+                }
+				
+				case INT64: {
+                    int64_t* data_x = (int64_t*)x->data;
+                
+                    for(size_t i = 0; i < (numel_x / numel_y); i++) {
+                        for(size_t j = 0; j < numel_y; j++) {
+                            void* y_elem = y_data + j * y_step;
+                            int64_t y_val = nnl2_convert_to_int64(y_elem, y_dtype);
                             data_x[i * numel_y + j] = MAX(data_x[i * numel_y + j], y_val);
                         }
                     }
@@ -176,6 +203,19 @@ void* nnl2_own_pmax_broadcasting_inplace_float64(void* arg);
  ** @see nnl2_own_pmax_broadcasting_inplace_float64
  **/
 void* nnl2_own_pmax_broadcasting_inplace_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 broadcasting maximum in-place operation
+ * 
+ ** @param arg 
+ * Pointer to max_broadcasting_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmax_broadcasting_inplace_float64
+ **/
+void* nnl2_own_pmax_broadcasting_inplace_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer broadcasting maximum in-place operation
@@ -299,6 +339,8 @@ void nnl2_own_max_broadcasting_inplace(nnl2_tensor* x, const nnl2_tensor* y) {
             case FLOAT64: worker_func = nnl2_own_pmax_broadcasting_inplace_float64; break;
             case FLOAT32: worker_func = nnl2_own_pmax_broadcasting_inplace_float32; break;
             case INT32:   worker_func = nnl2_own_pmax_broadcasting_inplace_int32;   break;
+            case INT64:   worker_func = nnl2_own_pmax_broadcasting_inplace_int64;   break;
+			
             default: {
                 NNL2_TYPE_ERROR(x_dtype);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -428,6 +470,32 @@ void* nnl2_own_pmax_broadcasting_inplace_float32(void* arg) {
         
         // Scalar processing for remainder in the block
         for(; i < block_size; i++) {
+            x_data[block_offset + i] = MAX(x_data[block_offset + i], y_data[i]);
+        }
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmax_broadcasting_inplace_int64
+ **/
+void* nnl2_own_pmax_broadcasting_inplace_int64(void* arg) {
+    max_broadcasting_inplace_ptask* task = (max_broadcasting_inplace_ptask*)arg;
+    int64_t* x_data = (int64_t*)task->x->data;
+    const int64_t* y_data = (const int64_t*)task->y->data;
+    size_t start_block = task->start_block;
+    size_t end_block = task->end_block;
+    size_t block_size = task->block_size;
+    
+    // Process each block assigned to this thread
+    for(size_t block = start_block; block < end_block; block++) {
+        size_t block_offset = block * block_size;
+        
+        // Scalar processing for INT64
+        for(size_t i = 0; i < block_size; i++) {
             x_data[block_offset + i] = MAX(x_data[block_offset + i], y_data[i]);
         }
     }

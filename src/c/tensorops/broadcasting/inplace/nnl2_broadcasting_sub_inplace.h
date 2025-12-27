@@ -64,6 +64,19 @@ void naive_sub_broadcasting_inplace(nnl2_tensor* minuend, const nnl2_tensor* sub
                     
                     break;
                 }
+				
+				case INT64: {
+                    int64_t* cast_minuend_data = (int64_t*)minuend->data;
+                    int64_t* cast_subtrahend_data = (int64_t*)subtrahend->data;
+                    
+                    for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+                        for(size_t j = 0; j < numel_subtrahend; j++) {
+                            cast_minuend_data[i * numel_subtrahend + j] -= cast_subtrahend_data[j];
+                        }
+                    }
+                    
+                    break;
+                }
                 
                 case INT32: {
                     int32_t* cast_minuend_data = (int32_t*)minuend->data;
@@ -116,6 +129,19 @@ void naive_sub_broadcasting_inplace(nnl2_tensor* minuend, const nnl2_tensor* sub
                     break; 
                 }
                 
+				case INT64: {
+                    int64_t* data_minuend = (int64_t*)minuend->data;
+                
+                    for(size_t i = 0; i < (numel_minuend / numel_subtrahend); i++) {
+                        for(size_t j = 0; j < numel_subtrahend; j++) {
+                            void* subtrahend_elem = subtrahend_data + j * subtrahend_step;
+                            data_minuend[i * numel_subtrahend + j] -= nnl2_convert_to_int64(subtrahend_elem, subtrahend_dtype);
+                        }
+                    }
+                
+                    break; 
+                }
+				
                 case INT32: {
                     int32_t* data_minuend = (int32_t*)minuend->data;
                 
@@ -176,6 +202,17 @@ void* nnl2_own_psub_broadcasting_inplace_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_psub_broadcasting_inplace_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 in-place broadcasting subtraction
+ * 
+ ** @param arg 
+ * Pointer to subbroadcasting_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_psub_broadcasting_inplace_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer in-place broadcasting subtraction
@@ -284,6 +321,7 @@ void nnl2_own_sub_broadcasting_inplace(nnl2_tensor* minuend, const nnl2_tensor* 
             case FLOAT64: worker_func = nnl2_own_psub_broadcasting_inplace_float64; break;
             case FLOAT32: worker_func = nnl2_own_psub_broadcasting_inplace_float32; break;
             case INT32:   worker_func = nnl2_own_psub_broadcasting_inplace_int32;   break;
+            case INT64:   worker_func = nnl2_own_psub_broadcasting_inplace_int64;   break;
             
             default: {
                 NNL2_TYPE_ERROR(dtype);
@@ -436,6 +474,25 @@ void* nnl2_own_psub_broadcasting_inplace_float32(void* arg) {
         
         // Handle remaining elements
         for(; j < numel_subtrahend; j++) {
+            minuend_data[base_idx + j] -= subtrahend_data[j];
+        }
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_psub_broadcasting_inplace_int64(void* arg) {
+    subbroadcasting_inplace_ptask* task = (subbroadcasting_inplace_ptask*)arg;
+    int64_t* minuend_data = (int64_t*)task->minuend_data;
+    const int64_t* subtrahend_data = (const int64_t*)task->subtrahend_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t numel_subtrahend = task->numel_subtrahend;
+    
+    for(size_t block = start; block < end; block++) {
+        size_t base_idx = block * numel_subtrahend;
+        
+        for(size_t j = 0; j < numel_subtrahend; j++) {
             minuend_data[base_idx + j] -= subtrahend_data[j];
         }
     }

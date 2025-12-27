@@ -56,6 +56,21 @@ void naive_atan2_broadcasting_inplace(nnl2_tensor* y, const nnl2_tensor* x) {
 
                     break;
                 }
+				
+			    case INT64: {
+                    int64_t* data_y = (int64_t*)y->data;
+                    int64_t* data_x = (int64_t*)x->data;
+
+                    for(size_t i = 0; i < (numel_y / numel_x); i++) {
+                        for(size_t j = 0; j < numel_x; j++) {
+                            if (data_y[i * numel_x + j] != 0 || data_x[j] != 0) {
+                                NNL2_FATAL("Can't apply atan2 to non-zero INT64 tensors");
+                            }
+                        }
+                    }
+
+                    break;
+                }
 
                 case INT32: {
                     int32_t* data_y = (int32_t*)y->data;
@@ -102,6 +117,23 @@ void naive_atan2_broadcasting_inplace(nnl2_tensor* y, const nnl2_tensor* x) {
                         for(size_t j = 0; j < numel_x; j++) {
                             void* x_elem = x_data + j * x_step;
                             data_y[i * numel_x + j] = atan2f(data_y[i * numel_x + j], nnl2_convert_to_float32(x_elem, x_dtype));
+                        }
+                    }
+                
+                    break; 
+                }
+				
+			    case INT64: {
+                    int64_t* data_y = (int64_t*)y->data;
+                
+                    for(size_t i = 0; i < (numel_y / numel_x); i++) {
+                        for(size_t j = 0; j < numel_x; j++) {
+                            void* x_elem = x_data + j * x_step;
+                            int64_t x_val = nnl2_convert_to_int64(x_elem, x_dtype);
+                            
+                            if (data_y[i * numel_x + j] != 0 || x_val != 0) {
+                                NNL2_FATAL("Can't apply atan2 to non-zero INT64 tensors");
+                            }
                         }
                     }
                 
