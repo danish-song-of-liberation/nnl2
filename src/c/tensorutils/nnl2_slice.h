@@ -88,17 +88,7 @@ Tensor* nnl2_naive_slice(Tensor* tensor, int32_t* slice_from, int32_t* slice_to)
     }
     
     // Element size calculation
-    size_t elem_size;
-    switch (tensor->dtype) {
-	    case FLOAT64: elem_size = sizeof(double); break;
-		case FLOAT32: elem_size = sizeof(float); break;
-        case INT32:   elem_size = sizeof(int32_t); break;
-		
-        default: {
-            nnl2_free_tensor(result);
-            return NULL;
-		}
-    }
+    size_t elem_size = get_dtype_size(tensor->dtype);
     
     // Copy data from original tensor to the sliced region
     char* dest_ptr = (char*)result->data;

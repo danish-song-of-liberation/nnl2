@@ -125,6 +125,34 @@ void nnl2_naive_axpy_inplace_region(nnl2_tensor* summand, nnl2_tensor* sumend, f
 				
                 break;
             }
+			
+			case INT64: {
+				nnl2_int64* data_summand = (nnl2_int64*)summand->data;
+				nnl2_int64* data_sumend = (nnl2_int64*)sumend->data;
+				nnl2_int64 alpha_int64 = (nnl2_int64)alpha;
+				
+				for(size_t i = 0; i < total_region_elems; i++) {
+					size_t idx_summand = 0;
+					for(int j = 0; j < rank; j++) {
+						idx_summand += (from[j] + coords[j]) * summand->strides[j];
+					}
+					
+					size_t idx_sumend = 0;
+					for(int j = 0; j < rank; j++) {
+						idx_sumend += coords[j] * sumend->strides[j];
+					}
+					
+					data_summand[idx_summand] += data_sumend[idx_sumend] * alpha_int64;
+					
+					for(int j = rank - 1; j >= 0; j--) {
+						coords[j]++;
+						if(coords[j] < region_dims[j]) break;
+						coords[j] = 0;
+					}
+				}
+				
+				break;
+			}
             
             case INT32: {
                 nnl2_int32* data_summand = (nnl2_int32*)summand->data;
@@ -206,6 +234,34 @@ void nnl2_naive_axpy_inplace_region(nnl2_tensor* summand, nnl2_tensor* sumend, f
 				
                 break;
             }
+			
+			case INT64: {
+				nnl2_int64* data_summand = (nnl2_int64*)summand->data;
+				nnl2_int64 alpha_int64 = (nnl2_int64)alpha;
+				
+				for(size_t i = 0; i < total_region_elems; i++) {
+					size_t idx_summand = 0;
+					for(int j = 0; j < rank; j++) {
+						idx_summand += (from[j] + coords[j]) * summand->strides[j];
+					}
+					
+					size_t idx_sumend = 0;
+					for(int j = 0; j < rank; j++) {
+						idx_sumend += coords[j] * sumend->strides[j];
+					}
+					
+					void* sumend_elem = sumend_data + idx_sumend * sumend_step;
+					data_summand[idx_summand] += nnl2_convert_to_int64(sumend_elem, dtype_sumend) * alpha_int64;
+					
+					for(int j = rank - 1; j >= 0; j--) {
+						coords[j]++;
+						if(coords[j] < region_dims[j]) break;
+						coords[j] = 0;
+					}
+				}
+				
+				break;
+			}
             
             case INT32: {
                 nnl2_int32* data_summand = (nnl2_int32*)summand->data;

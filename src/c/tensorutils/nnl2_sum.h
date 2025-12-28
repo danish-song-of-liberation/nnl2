@@ -34,6 +34,18 @@ void naive_sum_without_axis(Tensor* tensor, void* result) {
             *((float*)result) = acc; 
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			int64_t acc = 0;
+
+			for (size_t it = 0; it < total_elems; it++) {
+				acc += cast_data[it];
+			}
+			
+			*((int64_t*)result) = acc;
+			break;
+		}
 			
 		case INT32: {
             int32_t* cast_data = (int32_t*)tensor->data;
@@ -70,6 +82,11 @@ void* nnl2_own_psum_float64(void* arg);
  * Worker function for parallel single precision sum
  */
 void* nnl2_own_psum_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer sum
+ */
+void* nnl2_own_psum_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer sum
@@ -132,7 +149,9 @@ void nnl2_own_sum_without_axis(Tensor* tensor, void* result) {
         switch(tensor->dtype) {
             case FLOAT64: tasks[i].accumulator.float64_acc = 0.0; break;
             case FLOAT32: tasks[i].accumulator.float32_acc = 0.0f; break;
+			case INT64:   tasks[i].accumulator.int64_acc = 0; break;
             case INT32:   tasks[i].accumulator.int32_acc = 0; break;
+			
             default: break;
         }
     }
@@ -149,7 +168,9 @@ void nnl2_own_sum_without_axis(Tensor* tensor, void* result) {
         switch(tensor->dtype) {
             case FLOAT64: worker_func = nnl2_own_psum_float64; break;
             case FLOAT32: worker_func = nnl2_own_psum_float32; break;
+			case INT64:   worker_func = nnl2_own_psum_int64;   break;
             case INT32:   worker_func = nnl2_own_psum_int32;   break;
+			
             default: {
                 NNL2_TYPE_ERROR(tensor->dtype);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -180,6 +201,7 @@ void nnl2_own_sum_without_axis(Tensor* tensor, void* result) {
             *((double*)result) = total;
             break;
         }
+		
         case FLOAT32: {
             float total = 0.0f;
             for (size_t i = 0; i < num_threads; i++) {
@@ -189,6 +211,17 @@ void nnl2_own_sum_without_axis(Tensor* tensor, void* result) {
             *((float*)result) = total;
             break;
         }
+		
+		case INT64: {
+			int64_t total = 0;
+			for (size_t i = 0; i < num_threads; i++) {
+				pthread_join(threads[i], NULL);
+				total += tasks[i].accumulator.int64_acc;
+			}
+			*((int64_t*)result) = total;
+			break;
+		}
+		
         case INT32: {
             int32_t total = 0;
             for (size_t i = 0; i < num_threads; i++) {
@@ -198,6 +231,7 @@ void nnl2_own_sum_without_axis(Tensor* tensor, void* result) {
             *((int32_t*)result) = total;
             break;
         }
+		
         default: break;
     }
     
@@ -275,6 +309,42 @@ void* nnl2_own_psum_float32(void* arg) {
     }
     
     task->accumulator.float32_acc = sum;
+    return NULL;
+}
+
+void* nnl2_own_psum_int64(void* arg) {
+    sum_ptask* task = (sum_ptask*)arg;
+    int64_t* data = (int64_t*)task->src_data;
+    size_t start = task->start_idx;
+    size_t end = task->end_idx;
+    
+    int64_t sum = 0;
+    size_t i = start;
+    
+    #if defined(NNL2_AVX256_AVAILABLE)
+    if(task->aligned && (end - start) >= 2) {
+        // Для AVX (без AVX2) можно использовать SSE2 для сложения 64-битных целых
+        __m128i v_sum = _mm_setzero_si128();
+        
+        // SSE2 processing (2 elements per iteration)
+        for(; i + 1 < end; i += 2) {
+            __m128i v_data = _mm_load_si128((__m128i*)&data[i]);
+            v_sum = _mm_add_epi64(v_sum, v_data);
+        }
+        
+        // Extract results from SSE vector
+        int64_t temp[2] __attribute__((aligned(16)));
+        _mm_store_si128((__m128i*)temp, v_sum);
+        sum = temp[0] + temp[1];
+    }
+    #endif
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        sum += data[i];
+    }
+    
+    task->accumulator.int64_acc = sum;
     return NULL;
 }
 
@@ -436,6 +506,14 @@ NNL2_FORCE_INLINE static Tensor* nnl2_naive_sum_with_axis_float32(Tensor* tensor
 
 /** @brief
  * The documentation is identical to the 
+ * nnl2_naive_sum_with_axis_float64 but with the int64 type
+ *
+ ** @see naive_sum_with_axis_float64
+ **/
+NNL2_FORCE_INLINE static Tensor* nnl2_naive_sum_with_axis_int64(Tensor* tensor, Tensor* result, int axis, size_t result_numel, int elements_along_axis);
+
+/** @brief
+ * The documentation is identical to the 
  * nnl2_naive_sum_with_axis_float64 but with the int32 type
  *
  ** @see naive_sum_with_axis_float64
@@ -548,6 +626,11 @@ Tensor* naive_sum_with_axis(Tensor* tensor, int axis, bool keepdim) {
             break;
 		}
 		
+		case INT64: {
+			sum_func = nnl2_naive_sum_with_axis_int64;
+			break;
+		}
+
         case INT32: {
             sum_func = nnl2_naive_sum_with_axis_int32;
             break;
@@ -695,6 +778,23 @@ void* nnl2_own_paxis_sum(void* arg) {
             break;
         }
 		
+		case INT64: {
+			int64_t* data = (int64_t*)task->src_data;
+			int64_t* result_data = (int64_t*)task->dst_data;
+			
+			for (size_t i = task->start_idx; i < task->end_idx; i++) {
+				int64_t sum = 0;
+				for (int k = 0; k < task->elements_along_axis; k++) {
+					size_t original_index = nnl2_naive_calculate_original_index_for_sum_with_axis(
+						task->tensor, task->result, task->axis, i, k);
+					sum += data[original_index];
+				}
+				result_data[i] = sum;
+			}
+			
+			break;
+		}
+		
         case INT32: {
             int32_t* data = (int32_t*)task->src_data;
             int32_t* result_data = (int32_t*)task->dst_data;
@@ -786,6 +886,40 @@ NNL2_FORCE_INLINE static Tensor* nnl2_naive_sum_with_axis_float64(Tensor* tensor
     }
 	
 	#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_EXIT();
+    #endif
+    
+    return result;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see naive_sum_with_axis_int64
+ **/
+NNL2_FORCE_INLINE static Tensor* nnl2_naive_sum_with_axis_int64(Tensor* tensor, Tensor* result, int axis, size_t result_numel, int elements_along_axis) {
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
+        NNL2_FUNC_ENTER();
+    #endif
+    
+    int64_t* data = (int64_t*)tensor->data;
+    int64_t* result_data = (int64_t*)result->data;
+    
+    // Iterate over all elements in the result tensor
+    for (size_t i = 0; i < result_numel; i++) {
+        int64_t sum = 0;
+        
+        // Sum along the specified axis
+        for (int k = 0; k < elements_along_axis; k++) {
+            size_t original_index = nnl2_naive_calculate_original_index_for_sum_with_axis(tensor, result, axis, i, k);
+            sum += data[original_index];
+        }
+        
+        // Store the computed sum
+        result_data[i] = sum;
+    }
+    
+    #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_FULL
         NNL2_FUNC_EXIT();
     #endif
     

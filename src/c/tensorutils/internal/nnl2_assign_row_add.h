@@ -31,6 +31,13 @@ void nnl2_naive_assign_row_add(nnl2_tensor* dst, int seq_index, nnl2_tensor* src
                 break;
             }
 			
+			case INT64: {
+				nnl2_int64* s = (nnl2_int64*)src_ptr;
+				nnl2_int64* d = (nnl2_int64*)dst_ptr;
+				for(int f = 0; f < F; ++f) d[f] += s[f];
+				break;
+			}
+			
 			case INT32: {
                 nnl2_int32* s = (nnl2_int32*)src_ptr;
                 nnl2_int32* d = (nnl2_int32*)dst_ptr;

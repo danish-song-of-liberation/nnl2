@@ -90,6 +90,20 @@ Tensor* naive_copy(Tensor* tensor, TensorType copy_type) {
 				break;
 			}
 			
+			case INT64: {
+				int64_t* cast_data_copy = (int64_t*)result->data;
+				
+				for(size_t it = 0; it < total_elems; it++) {
+					// Getting a pointer to the current element of the source tensor
+					void* original_elem = (char*)tensor->data + it * get_dtype_size(dtype);
+					
+					// Convert and copy the element
+					cast_data_copy[it] = nnl2_convert_to_int64(original_elem, dtype);
+				}
+				
+				break;
+			}
+			
 			case FLOAT32: {
 				float* cast_data_copy = (float*)result->data;
 				
@@ -160,6 +174,17 @@ void* nnl2_own_pcopy_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_pcopy_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel 64-bit integer copy (same type)
+ * 
+ ** @param arg 
+ * Pointer to copy_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pcopy_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer copy (same type)
@@ -297,6 +322,7 @@ Tensor* nnl2_own_copy(Tensor* tensor, TensorType copy_type) {
         switch(dtype) {
             case FLOAT64: worker_func = nnl2_own_pcopy_float64; break;
             case FLOAT32: worker_func = nnl2_own_pcopy_float32; break;
+			case INT64:   worker_func = nnl2_own_pcopy_int64;   break;
             case INT32:   worker_func = nnl2_own_pcopy_int32;   break;
 			
             default: {
@@ -409,6 +435,47 @@ void* nnl2_own_pcopy_float32(void* arg) {
             
             __m256 v_data = _mm256_loadu_ps(&src_data[i]);
             _mm256_storeu_ps(&dst_data[i], v_data);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        dst_data[i] = src_data[i];
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pcopy_int64
+ **/
+void* nnl2_own_pcopy_int64(void* arg) {
+    copy_ptask* task = (copy_ptask*)arg;
+    int64_t* src_data = (int64_t*)task->src_data;
+    int64_t* dst_data = (int64_t*)task->dst_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching 
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&src_data[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&dst_data[i + 16], _MM_HINT_T1);
+            
+            __m256i v_data = _mm256_load_si256((__m256i*)&src_data[i]);
+            _mm256_store_si256((__m256i*)&dst_data[i], v_data);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&src_data[i + 16], _MM_HINT_T0);
+            _mm_prefetch((char*)&dst_data[i + 16], _MM_HINT_T1);
+            
+            __m256i v_data = _mm256_loadu_si256((__m256i*)&src_data[i]);
+            _mm256_storeu_si256((__m256i*)&dst_data[i], v_data);
         }
     }
     
