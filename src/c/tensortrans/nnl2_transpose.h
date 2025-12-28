@@ -77,6 +77,20 @@ Tensor* naive_transpose(Tensor* tensor, bool force) {
                 }
                 break;
             }
+			
+			case INT64: {
+				int64_t* src_data = (int64_t*)tensor->data;
+				int64_t* dest_data = (int64_t*)result->data;
+
+				for(int i = 0; i < rows; i++) {
+					for(int j = 0; j < cols; j++) {
+						int orig_index = i * cols + j;
+						int trans_index = j * rows + i;
+						dest_data[trans_index] = src_data[orig_index];
+					}
+				}
+				break;
+			}		
             
             case INT32: {
                 int32_t* src_data = (int32_t*)tensor->data;
@@ -99,16 +113,7 @@ Tensor* naive_transpose(Tensor* tensor, bool force) {
         }
     } else {
         // Only swap dimensions - copy data in original order
-        size_t data_size;
-        switch(tensor->dtype) {
-            case FLOAT64: data_size = sizeof(double); break;
-            case FLOAT32: data_size = sizeof(float); break;
-            case INT32: data_size = sizeof(int32_t); break;
-            default: {
-                NNL2_TYPE_ERROR(tensor->dtype);
-                return NULL;
-            }
-        }
+        size_t data_size = get_dtype_size(tensor->dtype);
         
         // Calculate total number of elements
         size_t total_elements = rows * cols;

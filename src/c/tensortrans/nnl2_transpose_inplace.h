@@ -98,6 +98,35 @@ void naive_transposeinplace(Tensor* tensor, bool force) {
                 
                 break;
             }
+			
+			case INT64: {
+				size_t total_bytes = total_elems * sizeof(int64_t);
+				
+				// Allocating memory for temporary storage of the transposed matrix
+				int64_t* trans_data = (int64_t*)malloc(total_bytes);
+				int64_t* cast_data = (int64_t*)tensor->data;
+				
+				if (trans_data == NULL) {
+					NNL2_ERROR("Memory allocation failed");
+					return;
+				}
+				
+				// Matrix transposition: element [i][j] -> [j][i]
+				for(int i = 0; i < rows; i++) {
+					for(int j = 0; j < cols; j++) { 
+						int orig_index = i * cols + j;   // Index in the original matrix
+						int trans_index = j * rows + i;  // Index in the transposed matrix
+						
+						trans_data[trans_index] = cast_data[orig_index];
+					}
+				}
+				
+				// Copying the result back to the original tensor
+				memcpy(cast_data, trans_data, total_bytes);
+				free(trans_data);
+				
+				break;
+			}
             
             case INT32: {
                 size_t total_bytes = total_elems * sizeof(int32_t);
