@@ -42,6 +42,19 @@ void naive_l2norm(Tensor* tensor, void* result) {
             *((float*)result) = sqrtf(acc); 
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			
+			double acc = 0.0;
+			for (size_t it = 0; it < total_elems; it++) {
+				double val = (double)cast_data[it];
+				acc += val * val;
+			}
+			
+			*((int64_t*)result) = (int64_t)sqrt(acc);
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data = (int32_t*)tensor->data;
