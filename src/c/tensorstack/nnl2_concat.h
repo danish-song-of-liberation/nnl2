@@ -254,6 +254,53 @@ Tensor* naive_concat(Tensor* tensora, Tensor* tensorb, int axis) {
                 }
                 break;
             }
+			
+			case INT64: {
+				int64_t* dst = (int64_t*)result->data;
+				
+				for (size_t linear_idx = 0; linear_idx < total_elements; linear_idx++) {
+					size_t temp = linear_idx;
+					for (int i = rank - 1; i >= 0; i--) {
+						indices[i] = temp % result->shape[i];
+						temp /= result->shape[i];
+					}
+					
+					if (indices[axis] < a_axis_size) {
+						size_t source_offset = 0;
+						for (int i = 0; i < rank; i++) {
+							source_offset += indices[i] * tensora->strides[i];
+						}
+						
+						void* src = (char*)tensora->data + source_offset * get_dtype_size(typea);
+						
+						size_t dest_offset = 0;
+						for (int i = 0; i < rank; i++) {
+							dest_offset += indices[i] * result->strides[i];
+						}
+						
+						dst[dest_offset] = nnl2_convert_to_int64(src, typea);
+					} else {
+						size_t source_indices[rank];
+						memcpy(source_indices, indices, rank * sizeof(size_t));
+						source_indices[axis] = indices[axis] - a_axis_size;
+						
+						size_t source_offset = 0;
+						for (int i = 0; i < rank; i++) {
+							source_offset += source_indices[i] * tensorb->strides[i];
+						}
+						
+						void* src = (char*)tensorb->data + source_offset * get_dtype_size(typeb);
+						
+						size_t dest_offset = 0;
+						for (int i = 0; i < rank; i++) {
+							dest_offset += indices[i] * result->strides[i];
+						}
+						
+						dst[dest_offset] = nnl2_convert_to_int64(src, typeb);
+					}
+				}
+				break;
+			}
             
             case INT32: {
                 int32_t* dst = (int32_t*)result->data;
@@ -605,6 +652,21 @@ Tensor* nnl2_own_concat_1d(Tensor* tensora, Tensor* tensorb, TensorType winner_t
                 break;
             }
 			
+			case INT64: {
+				int64_t* dst = (int64_t*)result->data;
+				for (size_t i = 0; i < len_a; i++) {
+					void* src = (char*)tensora->data + i * get_dtype_size(tensora->dtype);
+					dst[i] = nnl2_convert_to_int64(src, tensora->dtype);
+				}
+				
+				for (size_t i = 0; i < len_b; i++) {
+					void* src = (char*)tensorb->data + i * get_dtype_size(tensorb->dtype);
+					dst[len_a + i] = nnl2_convert_to_int64(src, tensorb->dtype);
+				}
+				
+				break;
+			}
+						
             case INT32: {
                 int32_t* dst = (int32_t*)result->data;
                 for (size_t i = 0; i < len_a; i++) {
@@ -693,6 +755,25 @@ Tensor* nnl2_own_concat_2d_axis0(Tensor* tensora, Tensor* tensorb, TensorType wi
 				
                 break;
             }
+			
+			case INT64: {
+				int64_t* dst = (int64_t*)result->data;
+				for (size_t i = 0; i < total_rows; i++) {
+					for (size_t j = 0; j < (size_t)cols; j++) {
+						size_t dst_idx = i * cols + j;
+						if (i < (size_t)rows_a) {
+							void* src = (char*)tensora->data + (i * cols + j) * get_dtype_size(tensora->dtype);
+							dst[dst_idx] = nnl2_convert_to_int64(src, tensora->dtype);
+						} else {
+							size_t src_i = i - rows_a;
+							void* src = (char*)tensorb->data + (src_i * cols + j) * get_dtype_size(tensorb->dtype);
+							dst[dst_idx] = nnl2_convert_to_int64(src, tensorb->dtype);
+						}
+					}
+				}
+				
+				break;
+			}
 			
             case INT32: {
                 int32_t* dst = (int32_t*)result->data;
@@ -795,6 +876,25 @@ Tensor* nnl2_own_concat_2d_axis1(Tensor* tensora, Tensor* tensorb, TensorType wi
 				
                 break;
             }
+			
+			case INT64: {
+				int64_t* dst = (int64_t*)result->data;
+				for (size_t i = 0; i < (size_t)rows; i++) {
+					for (size_t j = 0; j < (size_t)(cols_a + cols_b); j++) {
+						size_t dst_idx = i * (cols_a + cols_b) + j;
+						if (j < (size_t)cols_a) {
+							void* src = (char*)tensora->data + (i * cols_a + j) * get_dtype_size(tensora->dtype);
+							dst[dst_idx] = nnl2_convert_to_int64(src, tensora->dtype);
+						} else {
+							size_t src_j = j - cols_a;
+							void* src = (char*)tensorb->data + (i * cols_b + src_j) * get_dtype_size(tensorb->dtype);
+							dst[dst_idx] = nnl2_convert_to_int64(src, tensorb->dtype);
+						}
+					}
+				}
+				
+				break;
+			}
 			
             case INT32: {
                 int32_t* dst = (int32_t*)result->data;
@@ -975,6 +1075,12 @@ void* nnl2_own_pconcat_convert(void* arg) {
                     dst[dest_offset] = nnl2_convert_to_float32(src, task->type_b);
                     break;
                 }
+				
+				case INT64: {
+					int64_t* dst = (int64_t*)task->dst;
+					dst[dest_offset] = nnl2_convert_to_int64(src, task->type_b);
+					break;
+				}
 				
                 case INT32: {
                     int32_t* dst = (int32_t*)task->dst;

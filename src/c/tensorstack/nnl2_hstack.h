@@ -621,6 +621,12 @@ void* nnl2_own_phstack_convert(void* arg) {
                     break;
                 }
 				
+				case INT64: {
+					int64_t* dst = (int64_t*)task->dst;
+					dst[dst_idx] = nnl2_convert_to_int64(elem, task->type_a);
+					break;
+				}
+				
                 case INT32: {
                     int32_t* dst = (int32_t*)task->dst;
                     dst[dst_idx] = nnl2_convert_to_int32(elem, task->type_a);
@@ -650,6 +656,12 @@ void* nnl2_own_phstack_convert(void* arg) {
                     dst[dst_idx] = nnl2_convert_to_float32(elem, task->type_b);
                     break;
                 }
+				
+				case INT64: {
+					int64_t* dst = (int64_t*)task->dst;
+					dst[dst_idx] = nnl2_convert_to_int64(elem, task->type_b);
+					break;
+				}
 				
                 case INT32: {
                     int32_t* dst = (int32_t*)task->dst;

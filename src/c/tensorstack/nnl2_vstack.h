@@ -117,6 +117,28 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
                     }
                     break;
                 }
+				
+				case INT64: {
+					int64_t* dst = (int64_t*)result->data;
+					
+					if (typea == INT64 && typeb == INT64) {
+						memcpy(dst, dataa, shapea_0 * sizeof(int64_t));
+						memcpy(dst + shapea_0, datab, shapeb_0 * sizeof(int64_t));
+					} else {
+						// Convert and copy first vector
+						for(size_t i = 0; i < shapea_0; i++) {
+							void* elem = (char*)dataa + i * get_dtype_size(typea);
+							dst[i] = nnl2_convert_to_int64(elem, typea);
+						}
+						
+						// Convert and copy second vector
+						for(size_t i = 0; i < shapeb_0; i++) {
+							void* elem = (char*)datab + i * get_dtype_size(typeb);
+							dst[shapea_0 + i] = nnl2_convert_to_int64(elem, typeb);
+						}
+					}
+					break;
+				}
                 
                 case INT32: {
                     volatile int32_t* dst = (int32_t*)result->data;
@@ -224,6 +246,29 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
                     }
                     break;
                 }
+				
+				case INT64: {
+					volatile int64_t* dst = (int64_t*)result->data;
+					
+					// Convert matrix elements to int64
+					for(size_t i = 0; i < shapea_0; i++) {
+						for(size_t j = 0; j < shapea_1; j++) {
+							size_t src_idx = i * shapea_1 + j;
+							size_t dst_idx = i * shapea_1 + j;
+							
+							void* elem = (char*)dataa + src_idx * get_dtype_size(typea);
+							dst[dst_idx] = nnl2_convert_to_int64(elem, typea);
+						}
+					}
+					
+					// Convert vector elements to int64
+					for(size_t j = 0; j < shapeb_0; j++) {
+						size_t dst_idx = shapea_0 * shapea_1 + j;
+						void* elem = (char*)datab + j * get_dtype_size(typeb);
+						dst[dst_idx] = nnl2_convert_to_int64(elem, typeb);
+					}
+					break;
+				}
                 
                 case INT32: {
                     volatile int32_t* dst = (int32_t*)result->data;
@@ -336,6 +381,28 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
                     }
                     break;
                 }
+				
+				case INT64: {
+					volatile int64_t* dst = (int64_t*)result->data;
+					
+					// Convert vector to int64 for first row
+					for(size_t j = 0; j < shapea_0; j++) {
+						void* elem = (char*)dataa + j * get_dtype_size(typea);
+						dst[j] = nnl2_convert_to_int64(elem, typea);
+					}
+					
+					// Convert matrix to int64 for remaining rows
+					for(size_t i = 0; i < shapeb_0; i++) {
+						for(size_t j = 0; j < shapeb_1; j++) {
+							size_t src_idx = i * shapeb_1 + j;
+							size_t dst_idx = (i + 1) * shapeb_1 + j;
+							
+							void* elem = (char*)datab + src_idx * get_dtype_size(typeb);
+							dst[dst_idx] = nnl2_convert_to_int64(elem, typeb);
+						}
+					}
+					break;
+				}
                 
                 case INT32: {
                     volatile int32_t* dst = (int32_t*)result->data;
@@ -451,6 +518,24 @@ Tensor* naive_vstack(const Tensor* tensora, const Tensor* tensorb) {
 					
                     break;
                 }
+				
+				case INT64: {
+					volatile int64_t* dst = (int64_t*)result->data;
+					
+					// Convert and copy first tensor
+					for(size_t i = 0; i < sizea; i++) {
+						void* elem = (char*)dataa + i * get_dtype_size(typea);
+						dst[i] = nnl2_convert_to_int64(elem, typea);
+					}
+					
+					// Convert and copy second tensor
+					for(size_t i = 0; i < sizeb; i++) {
+						void* elem = (char*)datab + i * get_dtype_size(typeb);
+						dst[sizea + i] = nnl2_convert_to_int64(elem, typeb);
+					}
+					
+					break;
+				}
                 
                 case INT32: {
                     volatile int32_t* dst = (int32_t*)result->data;
@@ -818,6 +903,12 @@ void* nnl2_own_pvstack_convert(void* arg) {
                     break;
                 }
 				
+				case INT64: {
+					int64_t* dst = (int64_t*)task->dst;
+					dst[dst_idx] = nnl2_convert_to_int64(elem, task->type_a);
+					break;
+				}
+				
                 case INT32: {
                     int32_t* dst = (int32_t*)task->dst;
                     dst[dst_idx] = nnl2_convert_to_int32(elem, task->type_a);
@@ -844,6 +935,12 @@ void* nnl2_own_pvstack_convert(void* arg) {
                     dst[dst_idx] = nnl2_convert_to_float32(elem, task->type_b);
                     break;
                 }
+				
+				case INT64: {
+					int64_t* dst = (int64_t*)task->dst;
+					dst[dst_idx] = nnl2_convert_to_int64(elem, task->type_b);
+					break;
+				}
 				
                 case INT32: {
                     int32_t* dst = (int32_t*)task->dst;

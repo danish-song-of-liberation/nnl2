@@ -151,6 +151,13 @@ void nnl2_naive_tref_setter(Tensor* tensor, int* shape, int rank, void* change_w
                 break;
             }
 			
+			case INT64: {
+				int64_t* change_elem = (int64_t*)change_with;
+				int64_t* elem = (int64_t*)nnl2_view(tensor, shape, rank);
+				*elem = *change_elem;
+				break;
+			}
+			
             case INT32: {
                 int32_t* change_elem = (int32_t*)change_with;
                 int32_t* elem = (int32_t*)nnl2_view(tensor, shape, rank);

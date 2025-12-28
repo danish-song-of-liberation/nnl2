@@ -173,6 +173,13 @@ Tensor* nnl2_naive_reshape(Tensor* tensor, int32_t* new_shape, int32_t new_shape
             for(size_t it = 0; it < total_elems; it++) reshape_data[it] = original_data[it];
             break;
         }
+		
+		case INT64: {
+			int64_t* reshape_data = (int64_t*)new_tensor->data;
+			int64_t* original_data = (int64_t*)tensor->data;
+			for(size_t it = 0; it < total_elems; it++) reshape_data[it] = original_data[it];
+			break;
+		}
         
         case INT32: {
             int32_t* reshape_data = (int32_t*)new_tensor->data;
