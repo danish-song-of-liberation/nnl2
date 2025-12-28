@@ -76,6 +76,8 @@ void naive_sigmoidinplace(Tensor* tensor, bool approx) {
 			break;
 		}
 		
+		case INT64:
+		
 		case INT32: {
 			NNL2_FATAL("Sigmoid in-place cannot be applied to the provided tensor");
 			break;

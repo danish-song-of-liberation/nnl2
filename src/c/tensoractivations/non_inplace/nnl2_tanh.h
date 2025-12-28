@@ -43,7 +43,7 @@ Tensor* naive_tanh(Tensor* tensor, bool approx) {
 	int total_elems = nnl2_product(tensor->shape, tensor->rank);
 	TensorType dtype = tensor->dtype;
 	
-	if(dtype == INT32) dtype = FLOAT64;
+	if(dtype == INT32 || dtype == INT64) dtype = FLOAT64;
 	
 	Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
 	if(total_elems == 0) return result;
@@ -85,6 +85,24 @@ Tensor* naive_tanh(Tensor* tensor, bool approx) {
                     cast_data_r[i] = tanh(cast_data_t[i]);
                 }
             }
+			break;
+		}
+		
+		case INT64: {
+			int64_t* cast_data_t = (int64_t*)data_t;
+			double* cast_data_r = (double*)data_r;
+			if (approx) {
+				for(int i = 0; i < total_elems; i++) {
+					double x = (double)cast_data_t[i];
+					double x2 = x * x;
+					// Rational approximation: tanh(x) ~= x * (27 + x^2) / (27 + 9 * x^2)
+					cast_data_r[i] = x * (27.0 + x2) / (27.0 + 9.0 * x2);
+				}
+			} else {
+				for(int i = 0; i < total_elems; i++) {
+					cast_data_r[i] = tanh((double)cast_data_t[i]);
+				}
+			}
 			break;
 		}
 		
@@ -154,8 +172,8 @@ Tensor* nnl2_own_tanh(Tensor* tensor, bool approx) {
     int total_elems = nnl2_product(tensor->shape, tensor->rank);
     TensorType dtype = tensor->dtype;
     
-    if(dtype == INT32) dtype = FLOAT64;
-    
+    if(dtype == INT32 || dtype == INT64) dtype = FLOAT64;
+	
     Tensor* result = nnl2_empty(tensor->shape, tensor->rank, dtype);
     if(total_elems == 0) return result;
 
@@ -217,6 +235,25 @@ Tensor* nnl2_own_tanh(Tensor* tensor, bool approx) {
 				
                 break;
             }
+			
+			case INT64: {
+				int64_t* src_data = (int64_t*)task->src_data;
+				double* dst_data = (double*)task->dst_data;
+				
+				if (task->approx) {
+					for(size_t i = start; i < end; i++) {
+						double x = (double)src_data[i];
+						double x2 = x * x;
+						dst_data[i] = x * (27.0 + x2) / (27.0 + 9.0 * x2);
+					}
+				} else {
+					for(size_t i = start; i < end; i++) {
+						dst_data[i] = tanh((double)src_data[i]);
+					}
+				}
+				
+				break;
+			}
             
             case FLOAT32: {
                 float* src_data = (float*)task->src_data;

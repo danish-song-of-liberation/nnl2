@@ -61,6 +61,8 @@ void naive_tanhinplace(Tensor* tensor, bool approx) {
 			break;
 		}
 		
+		case INT64:
+		
 		case INT32: {
 			NNL2_FATAL("Tanh (in-place) cannot be applied to the provided tensor");
 			break;

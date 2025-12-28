@@ -93,6 +93,46 @@ Tensor* naive_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* cast_data_t = (int64_t*)data_t;	
+			int64_t* cast_data_r = (int64_t*)data_r;
+			
+			// Check if conversion to float64 is needed for int64
+			for(int i = 0; i < total_elems; i++) {
+				if(cast_data_t[i] < 0) {
+					float result_val = cast_data_t[i] * alpha;
+					
+					// Check if result has fractional part
+					if(fmodf(result_val, 1.0f) != 0.0f) {
+						float64_conversion = true;
+						break;
+					}
+				}
+			}
+			
+			// Handle int64 with potential type conversion
+			if(float64_conversion || !save_type) {
+				nnl2_free_tensor(result); 
+				
+				result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+				data_r = result->data;
+				
+				double* cast_data_r_f64 = (double*)data_r;
+				
+				for(int i = 0; i < total_elems; i++) {
+					if(cast_data_t[i] >= 0) {
+						cast_data_r_f64[i] = (double)cast_data_t[i];
+					} else {
+						cast_data_r_f64[i] = (double)(cast_data_t[i] * alpha);
+					}
+				}
+			} else {
+				for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_leaky_relu_int64(cast_data_t[i], alpha);
+			}
+			
+			break;
+		}
+		
 		default: {
 			NNL2_TYPE_ERROR(tensor->dtype);
 			return NULL;	
@@ -127,6 +167,33 @@ void* nnl2_simple_pleakyrelu_float64(void* arg) {
 }
 
 /** @brief
+ * Worker function for parallel int64 Leaky ReLU with proper type checking
+ */
+void* nnl2_simple_pleakyrelu_int64(void* arg) {
+    leakyrelu_ptask* task = (leakyrelu_ptask*)arg;
+    int64_t* src_data = (int64_t*)task->src_data;
+    int64_t* dst_data = (int64_t*)task->dst_data;
+    float alpha = task->alpha;
+    
+    for(size_t i = task->start_idx; i < task->end_idx; i++) {
+        if(src_data[i] >= 0) {
+            dst_data[i] = src_data[i];
+        } else {
+            float result_val = src_data[i] * alpha;
+            // Check if the result can be represented as int64 without fractional part
+            if(fmodf(fabsf(result_val), 1.0f) == 0.0f && result_val >= INT64_MIN && result_val <= INT64_MAX) {
+                dst_data[i] = (int64_t)result_val;
+            } else {
+                // If cannot be represented as int64, use 0 as fallback
+                dst_data[i] = 0;
+            }
+        }
+    }
+    
+    return NULL;
+}
+
+/** @brief
  * Worker function for parallel single precision Leaky ReLU
  */
 void* nnl2_simple_pleakyrelu_float32(void* arg) {
@@ -137,6 +204,26 @@ void* nnl2_simple_pleakyrelu_float32(void* arg) {
     
     for(size_t i = task->start_idx; i < task->end_idx; i++) {
         dst_data[i] = src_data[i] >= 0.0f ? src_data[i] : src_data[i] * alpha;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * Worker function for parallel int64 Leaky ReLU with conversion to float64
+ */
+void* nnl2_simple_pleakyrelu_int64_to_float64(void* arg) {
+    leakyrelu_ptask* task = (leakyrelu_ptask*)arg;
+    int64_t* src_data = (int64_t*)task->src_data;
+    double* dst_data = (double*)task->dst_data;
+    float alpha = task->alpha;
+    
+    for(size_t i = task->start_idx; i < task->end_idx; i++) {
+        if(src_data[i] >= 0) {
+            dst_data[i] = (double)src_data[i];
+        } else {
+            dst_data[i] = (double)(src_data[i] * alpha);
+        }
     }
     
     return NULL;
@@ -187,6 +274,24 @@ void* nnl2_simple_pleakyrelu_int32_to_float64(void* arg) {
     }
     
     return NULL;
+}
+
+/** @brief
+ * Check if int64 tensor requires conversion to float64 for LeakyReLU
+ */
+static bool nnl2_leakyrelu_int64_needs_conversion(Tensor* tensor, float alpha) {
+    int64_t* data = (int64_t*)tensor->data;
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
+    
+    for(size_t i = 0; i < total_elems; i++) {
+        if(data[i] < 0) {
+            float result_val = data[i] * alpha;
+            if(fmodf(fabsf(result_val), 1.0f) != 0.0f) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /** @brief
@@ -319,7 +424,92 @@ Tensor* nnl2_simple_leakyrelu(Tensor* tensor, float alpha, bool save_type) {
             #endif
             return result;
         }
-    }
+    } else if(tensor->dtype == INT64) {
+		bool float64_conversion = nnl2_leakyrelu_int64_needs_conversion(tensor, alpha);
+		
+		if(float64_conversion || !save_type) {
+			nnl2_free_tensor(result);
+			result = nnl2_empty(tensor->shape, tensor->rank, FLOAT64);
+			
+			// Use parallel processing for int64 to float64 conversion
+			size_t num_threads = NNL2_NUM_THREADS;
+			pthread_t threads[num_threads];
+			leakyrelu_ptask tasks[num_threads];
+			
+			size_t chunk = total_elems / num_threads;
+			size_t remainder = total_elems % num_threads;
+			
+			size_t current_start = 0;
+			for (size_t i = 0; i < num_threads; i++) {
+				size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+				
+				tasks[i].dtype = FLOAT64;
+				tasks[i].src_data = tensor->data;
+				tasks[i].dst_data = result->data;
+				tasks[i].alpha = alpha;
+				tasks[i].inplace = false;
+				tasks[i].start_idx = current_start;
+				tasks[i].end_idx = current_start + current_chunk;
+				
+				int status = pthread_create(&threads[i], NULL, nnl2_simple_pleakyrelu_int64_to_float64, &tasks[i]);
+				if(status != 0) {
+					NNL2_THREAD_CREATE_ERROR(status, "nnl2_simple_leakyrelu");
+					num_threads = i;
+					break;
+				}
+				
+				current_start += current_chunk;
+			}
+			
+			for (size_t i = 0; i < num_threads; i++) {
+				pthread_join(threads[i], NULL);
+			}
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			return result;
+		} else {
+			// Use parallel processing for int64 without conversion
+			size_t num_threads = NNL2_NUM_THREADS;
+			pthread_t threads[num_threads];
+			leakyrelu_ptask tasks[num_threads];
+			
+			size_t chunk = total_elems / num_threads;
+			size_t remainder = total_elems % num_threads;
+			
+			size_t current_start = 0;
+			for (size_t i = 0; i < num_threads; i++) {
+				size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+				
+				tasks[i].dtype = INT64;
+				tasks[i].src_data = tensor->data;
+				tasks[i].dst_data = result->data;
+				tasks[i].alpha = alpha;
+				tasks[i].inplace = false;
+				tasks[i].start_idx = current_start;
+				tasks[i].end_idx = current_start + current_chunk;
+				
+				int status = pthread_create(&threads[i], NULL, nnl2_simple_pleakyrelu_int64, &tasks[i]);
+				if(status != 0) {
+					NNL2_THREAD_CREATE_ERROR(status, "nnl2_simple_leakyrelu");
+					num_threads = i;
+					break;
+				}
+				
+				current_start += current_chunk;
+			}
+			
+			for (size_t i = 0; i < num_threads; i++) {
+				pthread_join(threads[i], NULL);
+			}
+			
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			return result;
+		}
+	}
     
     // Parallel processing for float32, float64
     size_t num_threads = NNL2_NUM_THREADS;
@@ -400,7 +590,16 @@ void nnl2_simple_leakyrelu_inplace(Tensor* tensor, float alpha) {
             #endif
             return;
         }
-    }
+    } else if(tensor->dtype == INT64) {
+		// Check if conversion would be needed
+		if(nnl2_leakyrelu_int64_needs_conversion(tensor, alpha)) {
+			NNL2_ERROR("In-place LeakyReLU cannot convert int64 to float64. Use out-of-place version.");
+			#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+				NNL2_FUNC_EXIT();
+			#endif
+			return;
+		}
+	}
     
     size_t num_threads = NNL2_NUM_THREADS;
     pthread_t threads[num_threads];
@@ -423,9 +622,10 @@ void nnl2_simple_leakyrelu_inplace(Tensor* tensor, float alpha) {
         
         void* (*worker_func)(void*) = NULL;
         switch(tensor->dtype) {
-            case FLOAT64: worker_func = nnl2_simple_pleakyrelu_float64; break;
-            case FLOAT32: worker_func = nnl2_simple_pleakyrelu_float32; break;
-            case INT32:   worker_func = nnl2_simple_pleakyrelu_int32;   break;
+            case FLOAT64: worker_func = nnl2_simple_pleakyrelu_float64;  break;
+            case FLOAT32: worker_func = nnl2_simple_pleakyrelu_float32;  break;
+			case INT64:   worker_func = nnl2_simple_pleakyrelu_int64;    break;
+            case INT32:   worker_func = nnl2_simple_pleakyrelu_int32;    break;
             default: {
                 NNL2_TYPE_ERROR(tensor->dtype);
                 return;

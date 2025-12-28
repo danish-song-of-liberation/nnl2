@@ -275,7 +275,7 @@ void nnl2_init_tensor_creating() {
     INIT_BACKEND(nnl2_int_linspace, int_linspace_backends);
     INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);    
 }
-     
+      
 void nnl2_init_standard() {       
 	EINIT_BACKEND(add, add_backends, CURRENT_BACKEND(add));                       
 	EINIT_BACKEND(sub, sub_backends, CURRENT_BACKEND(sub));                
@@ -284,7 +284,7 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(nnl2_pow, pow_backends, CURRENT_BACKEND(pow));              
 	EINIT_BACKEND(nnl2_exp, exp_backends, CURRENT_BACKEND(exp));  
 	EINIT_BACKEND(nnl2_logarithm, log_backends, CURRENT_BACKEND(log));     
-	EINIT_BACKEND(nnl2_log1p, log1p_backends, CURRENT_BACKEND(log1p));   
+	EINIT_BACKEND(nnl2_log1p, log1p_backends, CURRENT_BACKEND(log1p));      
 	EINIT_BACKEND(nnl2_log10, log10_backends, CURRENT_BACKEND(log10));   
 	EINIT_BACKEND(nnl2_log2, log2_backends, CURRENT_BACKEND(log2));   
 	EINIT_BACKEND(scale, scale_backends, CURRENT_BACKEND(scale));   

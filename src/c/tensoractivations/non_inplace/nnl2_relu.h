@@ -51,6 +51,13 @@ Tensor* naive_relu(Tensor* tensor) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* cast_data_t = (int64_t*)data_t;	
+			int64_t* cast_data_r = (int64_t*)data_r;
+			for(int i = 0; i < total_elems; i++) cast_data_r[i] = nnl2_relu_int64(cast_data_t[i]);
+			break;
+		}
+		
 		case INT32: {
 			int32_t* cast_data_t = (int32_t*)data_t;	
 			int32_t* cast_data_r = (int32_t*)data_r;
@@ -87,6 +94,11 @@ void* nnl2_own_prelu_float64(void* arg);
  * Worker function for parallel single precision ReLU
  */
 void* nnl2_own_prelu_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 ReLU
+ */
+void* nnl2_own_prelu_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer ReLU
@@ -199,6 +211,7 @@ Tensor* nnl2_own_relu(Tensor* tensor) {
 			
             case FLOAT32: worker_func = nnl2_own_prelu_float32; break;
             case INT32:   worker_func = nnl2_own_prelu_int32;   break;
+			case INT64:   worker_func = nnl2_own_prelu_int64;   break;
 			
             default: {
                 NNL2_TYPE_ERROR(tensor->dtype);
@@ -331,6 +344,64 @@ void* nnl2_own_prelu_float64(void* arg) {
     return NULL;
 }
 
+void* nnl2_own_prelu_int64(void* arg) {
+    relu_ptask* task = (relu_ptask*)arg;
+    int64_t* src_data = (int64_t*)task->src_data;
+    int64_t* dst_data = (int64_t*)task->dst_data;
+    size_t start = task->start_idx;
+    size_t end = task->end_idx;
+    
+    #if defined(NNL2_AVX512_AVAILABLE)
+		if(task->aligned && (end - start) >= 8) {
+			// AVX-512 can process 8 int64 elements at once
+			__m512i v_zero = _mm512_setzero_si512();
+			
+			size_t i = start;
+			for(; i + 7 < end; i += 8) {
+				__m512i v_data = _mm512_load_si512((__m512i*)&src_data[i]);
+				// For int64, we need to implement max manually as there's no direct intrinsic
+				__mmask8 cmp_mask = _mm512_cmpgt_epi64_mask(v_data, v_zero);
+				__m512i v_result = _mm512_mask_blend_epi64(cmp_mask, v_zero, v_data);
+				_mm512_store_si512((__m512i*)&dst_data[i], v_result);
+			}
+			
+			// Scalar processing for remainder
+			for(; i < end; i++) {
+				dst_data[i] = src_data[i] > 0 ? src_data[i] : 0;
+			}
+		} else 
+	#endif
+	
+	#if defined(NNL2_AVX256_AVAILABLE)
+		if(task->aligned && (end - start) >= 4) {
+			__m256i v_zero = _mm256_setzero_si256();
+			
+			// AVX256 processing (4 int64 elements per iteration)
+			size_t i = start;
+			for(; i + 3 < end; i += 4) {
+				__m256i v_data = _mm256_load_si256((__m256i*)&src_data[i]);
+				// Manual max for int64 - compare and blend
+				__m256i cmp = _mm256_cmpgt_epi64(v_data, v_zero);
+				__m256i v_result = _mm256_and_si256(cmp, v_data);
+				_mm256_store_si256((__m256i*)&dst_data[i], v_result);
+			}
+			
+			// Scalar processing for remainder
+			for(; i < end; i++) {
+				dst_data[i] = src_data[i] > 0 ? src_data[i] : 0;
+			}
+		} else 
+	#endif
+	{
+		// Scalar processing for unaligned memory or small chunks
+		for(size_t i = start; i < end; i++) {
+			dst_data[i] = src_data[i] > 0 ? src_data[i] : 0;
+		}
+	}
+    
+    return NULL;
+}
+
 /** @brief
  * Extreme optimization with non-temporal stores
  */
@@ -444,6 +515,55 @@ void* nnl2_own_prelu_int32(void* arg) {
     return NULL;
 }
 
+/** @brief
+ * Extreme optimization for large int64 tensors
+ */
+void nnl2_own_relu_inplace_int64_extreme(Tensor* tensor) {
+    int64_t* data = (int64_t*)tensor->data;
+    size_t total_elems = nnl2_product(tensor->shape, tensor->rank);
+    
+    #if defined(NNL2_AVX512_AVAILABLE)
+		// AVX-512 version for int64
+		size_t i = 0;
+		__m512i v_zero = _mm512_setzero_si512();
+		
+		for(; i + 7 < total_elems; i += 8) {
+			__m512i v_data = _mm512_load_si512((__m512i*)&data[i]);
+			__mmask8 cmp_mask = _mm512_cmpgt_epi64_mask(v_data, v_zero);
+			__m512i v_result = _mm512_mask_blend_epi64(cmp_mask, v_zero, v_data);
+			_mm512_store_si512((__m512i*)&data[i], v_result);
+		}
+		
+    #elif defined(NNL2_AVX256_AVAILABLE)
+		// AVX256 version with aggressive unrolling for int64
+		size_t i = 0;
+		__m256i v_zero = _mm256_setzero_si256();
+		
+		// Process 32 elements at a time (8 AVX operations)
+		for(; i + 31 < total_elems; i += 32) {
+			// Unroll 8 times
+			for(int j = 0; j < 8; j++) {
+				__m256i v_data = _mm256_load_si256((__m256i*)&data[i + j * 4]);
+				__m256i cmp = _mm256_cmpgt_epi64(v_data, v_zero);
+				__m256i v_result = _mm256_and_si256(cmp, v_data);
+				_mm256_store_si256((__m256i*)&data[i + j * 4], v_result);
+			}
+		}
+		
+		// Process remaining elements
+		for(; i + 3 < total_elems; i += 4) {
+			__m256i v_data = _mm256_load_si256((__m256i*)&data[i]);
+			__m256i cmp = _mm256_cmpgt_epi64(v_data, v_zero);
+			__m256i v_result = _mm256_and_si256(cmp, v_data);
+			_mm256_store_si256((__m256i*)&data[i], v_result);
+		}
+    #endif
+    
+    // Scalar for final elements
+    for(; i < total_elems; i++) {
+        data[i] = data[i] > 0 ? data[i] : 0;
+    }
+}
 
 /** @brief
  * Extreme in-place optimization for large float64 tensors

@@ -48,6 +48,12 @@ void naive_reluinplace(Tensor* tensor) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)data;    
+			for(size_t i = 0; i < total_elems; i++) nnl2_relu_int64_inplace(&cast_data[i]);
+			break;
+		}
+		
 		case INT32: {
 			int32_t* cast_data = (int32_t*)data;	
 			for(size_t i = 0; i < total_elems; i++) nnl2_relu_int32_inplace(&cast_data[i]);
@@ -91,6 +97,13 @@ void* nnl2_own_relu_inplace_float64(double* data, size_t total_size, size_t nthr
 void* nnl2_own_relu_inplace_float32(float* data, size_t total_size,  size_t nthreads);
 
 /** @brief 
+ * Similarly nnl2_own_relu_inplace_float64 but for int64
+ *
+ ** @see nnl2_own_relu_inplace_float64
+ **/
+void* nnl2_own_relu_inplace_int64(int64_t* data, size_t total_size,  size_t nthreads);
+
+/** @brief 
  * Similarly nnl2_own_relu_inplace_float64 but for int32
  *
  ** @see nnl2_own_relu_inplace_float64
@@ -113,6 +126,13 @@ void* nnl2_own_prelu_inplace_float64(void* arg);
  ** @see nnl2_own_prelu_inplace_float64
  **/
 void* nnl2_own_prelu_inplace_float32(void* arg);
+
+/** @brief 
+ * Similarly nnl2_own_prelu_inplace_float64 but for int64
+ *
+ ** @see nnl2_own_prelu_inplace_float64
+ **/
+void* nnl2_own_prelu_inplace_int64(void* arg);
 
 /** @brief 
  * Similarly nnl2_own_prelu_inplace_float64 but for int32
@@ -149,6 +169,7 @@ void nnl2_own_relu_inplace(Tensor* tensor) {
 	switch(tensor->dtype) {
 		case FLOAT64: nnl2_own_relu_inplace_float64((double*)data, total_elems, NNL2_NUM_THREADS);  break;
 		case FLOAT32: nnl2_own_relu_inplace_float32((float*)data, total_elems,  NNL2_NUM_THREADS);  break;
+		case INT64:   nnl2_own_relu_inplace_int64((int64_t*)data, total_elems,  NNL2_NUM_THREADS);  break;
 		case INT32:   nnl2_own_relu_inplace_int32((int32_t*)data, total_elems,  NNL2_NUM_THREADS);  break;
 		
 		default: {
@@ -253,6 +274,52 @@ void* nnl2_own_relu_inplace_float32(float* data, size_t total_size, size_t num_t
     
     return NULL;
 }
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_relu_inplace_int64
+ **/	
+void* nnl2_own_relu_inplace_int64(int64_t* data, size_t total_size, size_t num_threads) {
+    // Allocate arrays for thread handles and task descriptors
+    pthread_t threads[num_threads];
+    single_arr_ptask tasks[num_threads];
+    
+    // Calculate base chunk size and remainder for balanced distribution
+    size_t chunk = total_size / num_threads;
+    size_t remainder = total_size % num_threads;
+    
+    // Distribute work among threads with load balancing
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = chunk + (i < remainder ? 1 : 0);
+        
+        // Configure task for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        
+        // Create thread to process the assigned chunk
+        int status = pthread_create(&threads[i], NULL, nnl2_own_prelu_inplace_int64, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_relu_inplace_int64");
+            num_threads = i;
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete their work
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_relu_inplace_int64");
+        }
+    }
+    
+    return NULL;
+}
 	
 /** @brief
  * See docs at declaration
@@ -331,6 +398,24 @@ void* nnl2_own_prelu_inplace_float32(void* arg) {
     // Apply ReLU activation to each element in the assigned range
     for (size_t i = task->start; i < task->end; i++) {
         nnl2_relu_float32_inplace(&input[i]);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_prelu_inplace_int64
+ **/
+void* nnl2_own_prelu_inplace_int64(void* arg) {
+    // Extract task parameters from argument
+    single_arr_ptask* task = (single_arr_ptask*)arg;
+    int64_t* input = (int64_t*)task->data;
+    
+    // Apply ReLU activation to each element in the assigned range
+    for (size_t i = task->start; i < task->end; i++) {
+        nnl2_relu_int64_inplace(&input[i]);
     }
     
     return NULL;
