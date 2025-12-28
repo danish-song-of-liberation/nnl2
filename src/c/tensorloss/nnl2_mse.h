@@ -50,6 +50,21 @@ void nnl2_naive_mse(nnl2_tensor* prediction, nnl2_tensor* target, void* record) 
             *result = (numel > 0) ? acc / (nnl2_float32)numel : 0.0f;
             break;
         }
+		
+		case INT64: {
+			int64_t acc = 0;
+			nnl2_int64* prediction_data = (nnl2_int64*)prediction -> data;
+			nnl2_int64* target_data = (nnl2_int64*)target -> data;
+			
+			for(size_t it = 0; it < numel; it++) {
+				int64_t diff = prediction_data[it] - target_data[it];
+				acc += diff * diff;
+			}
+
+			nnl2_float64* result = (nnl2_float64*)record;
+			*result = (numel > 0) ? (nnl2_float64)acc / (nnl2_float64)numel : 0.0;
+			break;
+		}
         
         case INT32: {
             int64_t acc = 0; 
