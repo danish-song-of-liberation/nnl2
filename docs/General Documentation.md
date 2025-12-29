@@ -52,13 +52,14 @@ If the error persists, please write to issues or nnl.dev@proton.me
 
 # 3. Tensor System 
 
-So far, there are only **3** types of tensors:
+So far, there are only **4** types of tensors:
 
 |  Element Type | Class Suffix | 
 |---------------|--------------|
 | DOUBLE-FLOAT  | FLOAT64      |
 | SINGLE-FLOAT  | FLOAT32			 |
 | INTEGER       | INT32        |
+| (SIGNED-BYTE . 64) | INT64        |
 
 # Other Library Equivalents
 
@@ -270,7 +271,7 @@ Or this
 
   ;; Element-wise multiplication
   ;; nnl2 has its own type hierarchy
-  ;; float64 -> float32 -> int32
+  ;; float64 -> float32 -> int64 -> int32
   (tlet ((c (.* a b)))
 
     ;; 5x5 float32 tensor filled with 6 (3 * 2)
