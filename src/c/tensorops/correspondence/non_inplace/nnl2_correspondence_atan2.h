@@ -45,6 +45,28 @@ nnl2_tensor* naive_correspondence_atan2(const nnl2_tensor* y, void* x) {
             for(size_t i = 0; i < total_elems; i++) result_data[i] = atan2f(y_data[i], x_val);
             break;
         }
+		
+		case INT64: {
+			int64_t* y_data = (int64_t*)y->data;
+			double* result_data = (double*)result->data;
+			int64_t x_val = *((int64_t*)x);
+			
+			bool all_zeros = true;
+			for(size_t i = 0; i < total_elems; i++) {
+				if(y_data[i] != 0 || x_val != 0) {
+					all_zeros = false;
+					break;
+				}
+			}
+			
+			if(all_zeros) {
+				for(size_t i = 0; i < total_elems; i++) result_data[i] = 0.0;
+			} else {
+				for(size_t i = 0; i < total_elems; i++) result_data[i] = atan2((double)y_data[i], (double)x_val);
+			}
+			
+			break;
+		}
         
         case INT32: {
             int32_t* y_data = (int32_t*)y->data;

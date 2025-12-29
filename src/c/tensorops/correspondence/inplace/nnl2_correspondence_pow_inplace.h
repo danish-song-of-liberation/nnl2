@@ -32,6 +32,13 @@ void naive_pow_powf_inplace(nnl2_tensor* tensor, void* exponent) {
             for(size_t i = 0; i < total_elems; i++) cast_data[i] = powf(cast_data[i], pow_val);
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			int64_t pow_val = *((int64_t*)exponent);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] = (int64_t)pow((double)cast_data[i], pow_val);
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data = (int32_t*)tensor->data;

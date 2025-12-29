@@ -32,6 +32,13 @@ void naive_sub_decf_inplace(nnl2_tensor* tensor, void* dec) {
             for(size_t i = 0; i < total_elems; i++) cast_data[i] -= decrement;
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			int64_t decrement = *((int64_t*)dec);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] -= decrement;
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data = (int32_t*)tensor->data;
@@ -86,6 +93,19 @@ void* nnl2_own_psub_decf_float64(void* arg);
  ** @see nnl2_own_psub_decf_float64
  **/
 void* nnl2_own_psub_decf_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 scalar subtraction
+ * 
+ ** @param arg 
+ * Pointer to subdecfinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_psub_decf_float64
+ **/
+void* nnl2_own_psub_decf_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer scalar subtraction
@@ -176,6 +196,7 @@ void nnl2_own_sub_decf_inplace(nnl2_tensor* tensor, void* dec) {
         switch(dtype) {
             case FLOAT64: tasks[i].decrement.float64_dec = *((double*)dec);  break;
             case FLOAT32: tasks[i].decrement.float32_dec = *((float*)dec);   break;
+			case INT64:   tasks[i].decrement.int64_dec = *((int64_t*)dec);   break;
             case INT32:   tasks[i].decrement.int32_dec = *((int32_t*)dec);   break;
 			
             default: {
@@ -197,9 +218,11 @@ void nnl2_own_sub_decf_inplace(nnl2_tensor* tensor, void* dec) {
         // Select appropriate worker function based on data type
         void* (*worker_func)(void*) = NULL;
         switch(dtype) {
-            case FLOAT64: worker_func = nnl2_own_psub_decf_float64; break;
-            case FLOAT32: worker_func = nnl2_own_psub_decf_float32; break;
-            case INT32:   worker_func = nnl2_own_psub_decf_int32;   break;
+            case FLOAT64: worker_func = nnl2_own_psub_decf_float64;  break;
+            case FLOAT32: worker_func = nnl2_own_psub_decf_float32;  break;
+			case INT64:   worker_func = nnl2_own_psub_decf_int64;    break;
+            case INT32:   worker_func = nnl2_own_psub_decf_int32;    break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -313,6 +336,50 @@ void* nnl2_own_psub_decf_float32(void* arg) {
             __m256 v_data = _mm256_loadu_ps(&data[i]);
             __m256 v_result = _mm256_sub_ps(v_data, v_decrement);
             _mm256_storeu_ps(&data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        data[i] -= decrement;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_psub_decf_int64
+ **/
+void* nnl2_own_psub_decf_int64(void* arg) {
+    subdecfinplace_ptask* task = (subdecfinplace_ptask*)arg;
+    int64_t* data = (int64_t*)task->tensor_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t decrement = task->decrement.int64_dec;
+    
+    // Create AVX256 vector with decrement value repeated
+    __m256i v_decrement = _mm256_set1_epi64x(decrement);
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (4 elements per iteration for 64-bit)
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data = _mm256_load_si256((__m256i*)&data[i]);
+            __m256i v_result = _mm256_sub_epi64(v_data, v_decrement);
+            _mm256_store_si256((__m256i*)&data[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data = _mm256_loadu_si256((__m256i*)&data[i]);
+            __m256i v_result = _mm256_sub_epi64(v_data, v_decrement);
+            _mm256_storeu_si256((__m256i*)&data[i], v_result);
         }
     }
     

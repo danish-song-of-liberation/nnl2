@@ -33,6 +33,13 @@ void naive_add_incf_inplace(nnl2_tensor* tensor, void* inc) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			int64_t increment = *((int64_t*)inc);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] += increment;
+			break;
+		}
+		
 		case INT32: {
 			int32_t* cast_data = (int32_t*)tensor->data;
 			int32_t increment = *((int32_t*)inc);
@@ -86,6 +93,19 @@ void* nnl2_own_padd_incf_float64(void* arg);
  ** @see nnl2_own_padd_incf_float64
  **/
 void* nnl2_own_padd_incf_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 scalar addition
+ * 
+ ** @param arg 
+ * Pointer to addincfinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_padd_incf_float64
+ **/
+void* nnl2_own_padd_incf_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer scalar addition
@@ -176,7 +196,9 @@ void nnl2_own_add_incf_inplace(nnl2_tensor* tensor, void* inc) {
         switch(dtype) {
             case FLOAT64: tasks[i].increment.float64_inc = *((double*)inc);  break;
             case FLOAT32: tasks[i].increment.float32_inc = *((float*)inc);   break;
+			case INT64:   tasks[i].increment.int64_inc = *((int64_t*)inc);   break;
             case INT32:   tasks[i].increment.int32_inc = *((int32_t*)inc);   break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype);
 					#if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -201,7 +223,9 @@ void nnl2_own_add_incf_inplace(nnl2_tensor* tensor, void* inc) {
         switch(dtype) {
             case FLOAT64: worker_func = nnl2_own_padd_incf_float64; break;
             case FLOAT32: worker_func = nnl2_own_padd_incf_float32; break;
+			case INT64:   worker_func = nnl2_own_padd_incf_int64;   break;
             case INT32:   worker_func = nnl2_own_padd_incf_int32;   break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -315,6 +339,50 @@ void* nnl2_own_padd_incf_float32(void* arg) {
             __m256 v_data = _mm256_loadu_ps(&data[i]);
             __m256 v_result = _mm256_add_ps(v_data, v_increment);
             _mm256_storeu_ps(&data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        data[i] += increment;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_padd_incf_int64
+ **/
+void* nnl2_own_padd_incf_int64(void* arg) {
+    addincfinplace_ptask* task = (addincfinplace_ptask*)arg;
+    int64_t* data = (int64_t*)task->tensor_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t increment = task->increment.int64_inc;
+    
+    // Create AVX256 vector with increment value repeated
+    __m256i v_increment = _mm256_set1_epi64x(increment);
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (4 elements per iteration for 64-bit)
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data = _mm256_load_si256((__m256i*)&data[i]);
+            __m256i v_result = _mm256_add_epi64(v_data, v_increment);
+            _mm256_store_si256((__m256i*)&data[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data = _mm256_loadu_si256((__m256i*)&data[i]);
+            __m256i v_result = _mm256_add_epi64(v_data, v_increment);
+            _mm256_storeu_si256((__m256i*)&data[i], v_result);
         }
     }
     

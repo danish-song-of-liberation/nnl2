@@ -227,6 +227,7 @@ typedef struct {
         nnl2_float64 float64_inc;    ///< Scalar increment for FLOAT64 
         nnl2_float32 float32_inc;    ///< Scalar increment for FLOAT32 
         nnl2_int32   int32_inc;      ///< Scalar increment for INT32 
+        nnl2_int64   int64_inc;      ///< Scalar increment for INT64 
     } increment;                ///< Scalar increment value 
 } addincfinplace_ptask;
 
@@ -246,6 +247,7 @@ typedef struct {
         nnl2_float64 float64_dec;     ///< Scalar decrement for FLOAT64 
         nnl2_float32 float32_dec;     ///< Scalar decrement for FLOAT32 
         nnl2_int32   int32_dec;       ///< Scalar decrement for INT32 
+        nnl2_int64   int64_dec;       ///< Scalar decrement for INT64  
     } decrement;                ///< Scalar decrement value 
 } subdecfinplace_ptask;
 	
@@ -265,6 +267,7 @@ typedef struct {
         nnl2_float64 float64_mult;    ///< Scalar multiplier for FLOAT64 
         nnl2_float32 float32_mult;    ///< Scalar multiplier for FLOAT32 
         nnl2_int32   int32_mult;      ///< Scalar multiplier for INT32 
+        nnl2_int64   int64_mult;      ///< Scalar multiplier for INT64 
     } multiplier;               ///< Scalar multiplier value 
 } mulmulfinplace_ptask;
 
@@ -284,6 +287,7 @@ typedef struct {
         nnl2_float64 float64_div;     ///< Scalar divisor for FLOAT64
         nnl2_float32 float32_div;     ///< Scalar divisor for FLOAT32
         nnl2_int32   int32_div;       ///< Scalar divisor for INT32
+        nnl2_int64   int64_div;       ///< Scalar divisor for INT64
     } divisor;                  ///< Scalar divisor value
 } divdivfinplace_ptask;
 
@@ -305,6 +309,7 @@ typedef struct {
         nnl2_float64 float64_inc;     ///< Scalar increment for FLOAT64
         nnl2_float32 float32_inc;     ///< Scalar increment for FLOAT32
         nnl2_int32   int32_inc;       ///< Scalar increment for INT32
+        nnl2_int64   int64_inc;       ///< Scalar increment for INT64
     } increment;                ///< Scalar increment value
 } addincf_non_inplace_ptask;
 
@@ -326,6 +331,7 @@ typedef struct {
         nnl2_float64 float64_dec;     ///< Scalar decrement for FLOAT64
         nnl2_float32 float32_dec;     ///< Scalar decrement for FLOAT32
         nnl2_int32 int32_dec;         ///< Scalar decrement for INT32
+        nnl2_int64 int64_dec;         ///< Scalar decrement for INT64
     } decrement;                ///< Scalar decrement value
 } subdecf_non_inplace_ptask;
 
@@ -347,6 +353,7 @@ typedef struct {
         nnl2_float64 float64_mult;    ///< Scalar multiplier for FLOAT64
         nnl2_float32 float32_mult;    ///< Scalar multiplier for FLOAT32
         nnl2_int32 int32_mult;        ///< Scalar multiplier for INT32
+        nnl2_int64 int64_mult;        ///< Scalar multiplier for INT64
     } multiplier;               ///< Scalar multiplier value
 } mulmulf_non_inplace_ptask;
 
@@ -368,6 +375,7 @@ typedef struct {
         nnl2_float64 float64_div;     ///< Scalar divisor for FLOAT64
         nnl2_float32 float32_div;     ///< Scalar divisor for FLOAT32
         nnl2_int32 int32_div;         ///< Scalar divisor for INT32
+        nnl2_int64 int64_div;         ///< Scalar divisor for INT64
     } divisor;                  ///< Scalar divisor value
 } divdivf_non_inplace_ptask;
 
@@ -660,6 +668,7 @@ typedef struct {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
         nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
         nnl2_int32   int32_threshold;     ///< Threshold value for INT32
+        nnl2_int64   int64_threshold;     ///< Threshold value for INT64
     } threshold;
 } min_minf_ptask;
 
@@ -687,6 +696,7 @@ typedef struct {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
         nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
         nnl2_int32   int32_threshold;     ///< Threshold value for INT32
+        nnl2_int64   int64_threshold;     ///< Threshold value for INT64
     } threshold;
 } max_maxf_ptask;
 
@@ -706,6 +716,7 @@ typedef struct {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
         nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
         nnl2_int32   int32_threshold;     ///< Threshold value for INT32
+        nnl2_int64   int64_threshold;     ///< Threshold value for INT64
     } threshold;
 } max_maxf_inplace_ptask;
 
@@ -725,6 +736,7 @@ typedef struct {
         nnl2_float64 float64_threshold;   ///< Threshold value for FLOAT64
         nnl2_float32 float32_threshold;   ///< Threshold value for FLOAT32
         nnl2_int32   int32_threshold;     ///< Threshold value for INT32
+        nnl2_int64   int64_threshold;     ///< Threshold value for INT64
     } threshold;
 } min_minf_inplace_ptask;
 
@@ -791,6 +803,7 @@ typedef struct {
         nnl2_float64 float64_sumend;      ///< Sumend value for FLOAT64
         nnl2_float32 float32_sumend;      ///< Sumend value for FLOAT32
         nnl2_int32   int32_sumend;        ///< Sumend value for INT32
+        nnl2_int64   int64_sumend;        ///< Sumend value for INT64
     } sumend;
     union {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
@@ -865,6 +878,7 @@ typedef struct {
         nnl2_float64 float64_alpha;       ///< Alpha value for FLOAT64
         nnl2_float32 float32_alpha;       ///< Alpha value for FLOAT32
         nnl2_int32 int32_alpha;           ///< Alpha value for INT32
+		nnl2_int64 int64_alpha;			  ///< Alpha value for INT64
     } alpha;
     union {
         nnl2_float64 float64_sumend;      ///< Sumend value for FLOAT64
@@ -1016,6 +1030,7 @@ typedef struct {
         nnl2_float64 float64_acc;
         nnl2_float32 float32_acc;
         nnl2_int32   int32_acc;
+        nnl2_int64   int64_acc;
     } accumulator;            ///< Thread-local accumulator for squared values 
 } l2norm_ptask;
 
@@ -1112,6 +1127,7 @@ typedef struct {
         double float64_acc;
         float float32_acc;
         int32_t int32_acc;
+        int64_t int64_acc;
     } accumulator;            ///< Thread-local accumulator 
 } sum_ptask;
 

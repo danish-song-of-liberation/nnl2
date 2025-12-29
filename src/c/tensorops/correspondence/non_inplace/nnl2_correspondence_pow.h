@@ -46,6 +46,14 @@ nnl2_tensor* naive_pow_powf(const nnl2_tensor* tensor, void* exponent) {
             for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = powf(cast_data_original[i], pow_val);
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data_original = (int64_t*)tensor->data;
+			int64_t* cast_data_result = (int64_t*)result->data;
+			int64_t pow_val = *((int64_t*)exponent);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = (int64_t)pow((double)cast_data_original[i], pow_val);
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data_original = (int32_t*)tensor->data;

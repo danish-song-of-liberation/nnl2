@@ -46,6 +46,15 @@ nnl2_tensor* naive_add_incf(nnl2_tensor* tensor, void* inc) {
 			break;
 		}
 		
+		case INT64: {
+			int64_t* cast_data_original = (int64_t*)tensor->data;
+			int64_t* cast_data_result = (int64_t*)result->data;
+			int64_t increment = *((int64_t*)inc);
+			for(size_t i = 0; i < total_elems; i++) 
+				cast_data_result[i] = cast_data_original[i] + increment;
+			break;
+		}
+		
 		case INT32: {
 			int32_t* cast_data_original = (int32_t*)tensor->data;
 			int32_t* cast_data_result = (int32_t*)result->data;
@@ -97,6 +106,17 @@ void* nnl2_own_padd_incf_float64_non_inplace(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_padd_incf_float32_non_inplace(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 scalar addition with increment
+ * 
+ ** @param arg 
+ * Pointer to addincf_non_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_padd_incf_int64_non_inplace(void* arg);
 
 /** @brief
  * Worker function for parallel integer scalar addition with increment
@@ -198,6 +218,7 @@ nnl2_tensor* nnl2_own_add_incf(nnl2_tensor* tensor, void* inc) {
 			
             break;
         }
+		
         case FLOAT32: {
             float inc_val = *((float*)inc);
             for (size_t i = 0; i < num_threads; i++) {
@@ -209,6 +230,18 @@ nnl2_tensor* nnl2_own_add_incf(nnl2_tensor* tensor, void* inc) {
 			
             break;
         }
+		
+		case INT64: {
+			int64_t inc_val = *((int64_t*)inc);
+			for (size_t i = 0; i < num_threads; i++) {
+				tasks[i].dtype = dtype;
+				tasks[i].aligned_tensor = is_aligned_tensor;
+				tasks[i].aligned_result = is_aligned_result;
+				tasks[i].increment.int64_inc = inc_val;
+			}
+			break;
+		}
+		
         case INT32: {
             int32_t inc_val = *((int32_t*)inc);
             for (size_t i = 0; i < num_threads; i++) {
@@ -220,6 +253,7 @@ nnl2_tensor* nnl2_own_add_incf(nnl2_tensor* tensor, void* inc) {
 			
             break;
         }
+		
         default: {
             NNL2_TYPE_ERROR(dtype);
             nnl2_free_tensor(result);
@@ -240,6 +274,7 @@ nnl2_tensor* nnl2_own_add_incf(nnl2_tensor* tensor, void* inc) {
         switch(dtype) {
             case FLOAT64: worker_func = nnl2_own_padd_incf_float64_non_inplace; break;
             case FLOAT32: worker_func = nnl2_own_padd_incf_float32_non_inplace; break;
+			case INT64:   worker_func = nnl2_own_padd_incf_int64_non_inplace;   break;
             case INT32:   worker_func = nnl2_own_padd_incf_int32_non_inplace;   break;
 			
             default: {
@@ -359,6 +394,54 @@ void* nnl2_own_padd_incf_float32_non_inplace(void* arg) {
             __m256 v_tensor = _mm256_loadu_ps(&tensor_data[i]);
             __m256 v_result = _mm256_add_ps(v_tensor, v_increment);
             _mm256_storeu_ps(&result_data[i], v_result);
+        }
+    }
+    
+    for(; i < end; i++) {
+        result_data[i] = tensor_data[i] + increment;
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_padd_incf_int64_non_inplace(void* arg) {
+    addincf_non_inplace_ptask* task = (addincf_non_inplace_ptask*)arg;
+    int64_t* tensor_data = (int64_t*)task->tensor_data;
+    int64_t* result_data = (int64_t*)task->result_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t increment = task->increment.int64_inc;
+    
+    __m256i v_increment = _mm256_set1_epi64x(increment);
+    size_t i = start;
+    
+    if(task->aligned_tensor && task->aligned_result) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&tensor_data[i + 16], _MM_HINT_T0);
+            __m256i v_tensor = _mm256_load_si256((__m256i*)&tensor_data[i]);
+            __m256i v_result = _mm256_add_epi64(v_tensor, v_increment);
+            _mm256_store_si256((__m256i*)&result_data[i], v_result);
+        }
+    } else if(task->aligned_tensor) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&tensor_data[i + 16], _MM_HINT_T0);
+            __m256i v_tensor = _mm256_load_si256((__m256i*)&tensor_data[i]);
+            __m256i v_result = _mm256_add_epi64(v_tensor, v_increment);
+            _mm256_storeu_si256((__m256i*)&result_data[i], v_result);
+        }
+    } else if(task->aligned_result) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&tensor_data[i + 16], _MM_HINT_T0);
+            __m256i v_tensor = _mm256_loadu_si256((__m256i*)&tensor_data[i]);
+            __m256i v_result = _mm256_add_epi64(v_tensor, v_increment);
+            _mm256_store_si256((__m256i*)&result_data[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&tensor_data[i + 16], _MM_HINT_T0);
+            __m256i v_tensor = _mm256_loadu_si256((__m256i*)&tensor_data[i]);
+            __m256i v_result = _mm256_add_epi64(v_tensor, v_increment);
+            _mm256_storeu_si256((__m256i*)&result_data[i], v_result);
         }
     }
     

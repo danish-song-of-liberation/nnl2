@@ -33,6 +33,13 @@ void naive_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
             break;
         }
         
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			int64_t multiply = *((int64_t*)multiplier);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] *= multiply;
+			break;
+		}
+
         case INT32: {
             int32_t* cast_data = (int32_t*)tensor->data;
             int32_t multiply = *((int32_t*)multiplier);
@@ -86,6 +93,19 @@ void* nnl2_own_pmul_mulf_float64(void* arg);
  ** @see nnl2_own_pmul_mulf_float64
  **/
 void* nnl2_own_pmul_mulf_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 scalar multiplication
+ * 
+ ** @param arg 
+ * Pointer to mulmulfinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmul_mulf_float64
+ **/
+void* nnl2_own_pmul_mulf_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer scalar multiplication
@@ -176,6 +196,7 @@ void nnl2_own_2_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
         switch(dtype) {
             case FLOAT64: tasks[i].multiplier.float64_mult = *((double*)multiplier); break;
             case FLOAT32: tasks[i].multiplier.float32_mult = *((float*)multiplier);  break;
+			case INT64:   tasks[i].multiplier.int64_mult = *((int64_t*)multiplier);  break;
             case INT32:   tasks[i].multiplier.int32_mult = *((int32_t*)multiplier);  break;
 			
             default: {
@@ -199,7 +220,9 @@ void nnl2_own_2_mul_mulf_inplace(nnl2_tensor* tensor, void* multiplier) {
         switch(dtype) {
             case FLOAT64: worker_func = nnl2_own_pmul_mulf_float64; break;
             case FLOAT32: worker_func = nnl2_own_pmul_mulf_float32; break;
+			case INT64:   worker_func = nnl2_own_pmul_mulf_int64;   break;
             case INT32:   worker_func = nnl2_own_pmul_mulf_int32;   break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype);
                 #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -317,6 +340,27 @@ void* nnl2_own_pmul_mulf_float32(void* arg) {
     }
     
     // Scalar processing for remainder
+    for(; i < end; i++) {
+        data[i] *= multiplier;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmul_mulf_int64
+ **/
+void* nnl2_own_pmul_mulf_int64(void* arg) {
+    mulmulfinplace_ptask* task = (mulmulfinplace_ptask*)arg;
+    int64_t* data = (int64_t*)task->tensor_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t multiplier = task->multiplier.int64_mult;
+    
+    size_t i = start;
+    
     for(; i < end; i++) {
         data[i] *= multiplier;
     }

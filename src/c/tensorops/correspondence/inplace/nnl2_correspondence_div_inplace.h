@@ -32,6 +32,13 @@ void naive_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
             for(size_t i = 0; i < total_elems; i++) cast_data[i] /= div;
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data = (int64_t*)tensor->data;
+			int64_t div = *((int64_t*)divisor);
+			for(size_t i = 0; i < total_elems; i++) cast_data[i] /= div;
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data = (int32_t*)tensor->data;
@@ -80,6 +87,17 @@ void* nnl2_own_pdiv_divf_float64(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_pdiv_divf_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 scalar division
+ * 
+ ** @param arg 
+ * Pointer to divdivfinplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pdiv_divf_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer scalar division
@@ -166,6 +184,16 @@ void nnl2_own_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
             break;
         }
 		
+		case INT64: {
+			int64_t div_val = *((int64_t*)divisor);
+			for (size_t i = 0; i < num_threads; i++) {
+				tasks[i].dtype = dtype;
+				tasks[i].aligned = is_aligned;
+				tasks[i].divisor.int64_div = div_val;
+			}
+			break;
+		}
+		
         case INT32: {
             int32_t div_val = *((int32_t*)divisor);
             for (size_t i = 0; i < num_threads; i++) {
@@ -194,6 +222,7 @@ void nnl2_own_div_divf_inplace(nnl2_tensor* tensor, void* divisor) {
         switch(dtype) {
             case FLOAT64: worker_func = nnl2_own_pdiv_divf_float64; break;
             case FLOAT32: worker_func = nnl2_own_pdiv_divf_float32; break;
+			case INT64:   worker_func = nnl2_own_pdiv_divf_int64;   break;
             case INT32:   worker_func = nnl2_own_pdiv_divf_int32;   break;
 			
             default: {
@@ -283,6 +312,23 @@ void* nnl2_own_pdiv_divf_float32(void* arg) {
         }
     }
     
+    for(; i < end; i++) {
+        data[i] /= divisor;
+    }
+    
+    return NULL;
+}
+
+void* nnl2_own_pdiv_divf_int64(void* arg) {
+    divdivfinplace_ptask* task = (divdivfinplace_ptask*)arg;
+    int64_t* data = (int64_t*)task->tensor_data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t divisor = task->divisor.int64_div;
+    
+    size_t i = start;
+    
+    // Integer division uses scalar operations
     for(; i < end; i++) {
         data[i] /= divisor;
     }

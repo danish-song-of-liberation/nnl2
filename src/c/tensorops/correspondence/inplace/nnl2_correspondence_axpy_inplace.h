@@ -49,6 +49,14 @@ void naive_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
             for(size_t i = 0; i < total_elems; i++) cast_summand[i] += cast_sumend * alpha;
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_summand = (int64_t*)summand->data;
+			int64_t cast_sumend = *((int64_t*)sumend);
+			int64_t alpha_int64 = (int64_t)alpha;
+			for(size_t i = 0; i < total_elems; i++) cast_summand[i] += cast_sumend * alpha_int64;
+			break;
+		}
         
         case INT32: {
             int32_t* cast_summand = (int32_t*)summand->data;
@@ -105,6 +113,19 @@ void* nnl2_own_paxpf_inplace_float64(void* arg);
 void* nnl2_own_paxpf_inplace_float32(void* arg);
 
 /** @brief
+ * Worker function for parallel int64 AXPF in-place operation
+ * 
+ ** @param arg 
+ * Pointer to axpf_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_paxpf_inplace_float64
+ **/
+void* nnl2_own_paxpf_inplace_int64(void* arg);
+
+/** @brief
  * Worker function for parallel integer AXPF in-place operation
  * 
  ** @param arg 
@@ -141,7 +162,7 @@ void* nnl2_own_paxpf_inplace_int32(void* arg);
  ** @warning
  * Requires pthread support and AVX256 capable CPU
  * Modifies the summand tensor directly
- * Only supports FLOAT64, FLOAT32, and INT32 data types
+ * Only supports FLOAT64, FLOAT32, INT64 and INT32 data types
  */
 void nnl2_own_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
     #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
@@ -212,6 +233,10 @@ void nnl2_own_axpf_inplace(nnl2_tensor* summand, void* sumend, float alpha) {
                 tasks[i].alpha.float32_alpha = alpha;
                 tasks[i].sumend_val.float32_sumend = *((float*)sumend);
                 break;
+			case INT64:   
+				tasks[i].alpha.int64_alpha = (int64_t)alpha;
+				tasks[i].sumend_val.int64_sumend = *((int64_t*)sumend);
+				break;	
             case INT32:   
                 tasks[i].alpha.int32_alpha = (int32_t)alpha;
                 tasks[i].sumend_val.int32_sumend = *((int32_t*)sumend);
@@ -361,6 +386,54 @@ void* nnl2_own_paxpf_inplace_float32(void* arg) {
             __m256 v_summand = _mm256_loadu_ps(&summand_data[i]);
             __m256 v_result = _mm256_add_ps(v_summand, v_scaled_sumend);
             _mm256_storeu_ps(&summand_data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder elements
+    for(; i < end_index; i++) {
+        summand_data[i] += scaled_sumend;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_paxpf_inplace_int64
+ **/
+void* nnl2_own_paxpf_inplace_int64(void* arg) {
+    axpf_inplace_ptask* task = (axpf_inplace_ptask*)arg;
+    int64_t* summand_data = (int64_t*)task->summand->data;
+    size_t start_index = task->start_index;
+    size_t end_index = task->end_index;
+    int64_t alpha = task->alpha.int64_alpha;
+    int64_t sumend_val = task->sumend_val.int64_sumend;
+    
+    // Precompute scaled sumend value
+    int64_t scaled_sumend = sumend_val * alpha;
+    
+    // Create AVX256 vector with scaled sumend value repeated
+    __m256i v_scaled_sumend = _mm256_set1_epi64x(scaled_sumend);
+    
+    size_t i = start_index;
+    
+    // AVX256 processing with prefetching (4 elements per iteration for 64-bit)
+    if(task->aligned) {
+        for(; i + 3 < end_index; i += 4) {
+            _mm_prefetch((char*)&summand_data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_load_si256((__m256i*)&summand_data[i]);
+            __m256i v_result = _mm256_add_epi64(v_summand, v_scaled_sumend);
+            _mm256_store_si256((__m256i*)&summand_data[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end_index; i += 4) {
+            _mm_prefetch((char*)&summand_data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_summand = _mm256_loadu_si256((__m256i*)&summand_data[i]);
+            __m256i v_result = _mm256_add_epi64(v_summand, v_scaled_sumend);
+            _mm256_storeu_si256((__m256i*)&summand_data[i], v_result);
         }
     }
     

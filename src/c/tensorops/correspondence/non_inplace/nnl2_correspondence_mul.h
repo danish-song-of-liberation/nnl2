@@ -46,6 +46,14 @@ nnl2_tensor* naive_mul_mulf(const nnl2_tensor* tensor, void* multiplier) {
             for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] * multiply;
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data_original = (int64_t*)tensor->data;
+			int64_t* cast_data_result = (int64_t*)result->data;
+			int64_t multiply = *((int64_t*)multiplier);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = cast_data_original[i] * multiply;
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data_original = (int32_t*)tensor->data;
@@ -98,6 +106,17 @@ void* nnl2_own_pmul_mulf_float64_non_inplace(void* arg);
  * NULL (for pthread API compatibility)
  */
 void* nnl2_own_pmul_mulf_float32_non_inplace(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 scalar multiplication
+ * 
+ ** @param arg 
+ * Pointer to mulmulf_non_inplace_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ */
+void* nnl2_own_pmul_mulf_int64_non_inplace(void* arg);
 
 /** @brief
  * Worker function for parallel integer scalar multiplication
@@ -193,8 +212,10 @@ nnl2_tensor* nnl2_own_mul_mulf(const nnl2_tensor* tensor, void* multiplier) {
                 tasks[i].aligned_result = is_aligned_result;
                 tasks[i].multiplier.float64_mult = mult_val;
             }
+			
             break;
         }
+		
         case FLOAT32: {
             float mult_val = *((float*)multiplier);
             for (size_t i = 0; i < num_threads; i++) {
@@ -203,8 +224,22 @@ nnl2_tensor* nnl2_own_mul_mulf(const nnl2_tensor* tensor, void* multiplier) {
                 tasks[i].aligned_result = is_aligned_result;
                 tasks[i].multiplier.float32_mult = mult_val;
             }
+			
             break;
         }
+		
+		case INT64: {
+			int64_t mult_val = *((int64_t*)multiplier);
+			for (size_t i = 0; i < num_threads; i++) {
+				tasks[i].dtype = dtype;
+				tasks[i].aligned_tensor = is_aligned_tensor;
+				tasks[i].aligned_result = is_aligned_result;
+				tasks[i].multiplier.int64_mult = mult_val;
+			}
+			
+			break;
+		}
+		
         case INT32: {
             int32_t mult_val = *((int32_t*)multiplier);
             for (size_t i = 0; i < num_threads; i++) {
@@ -213,8 +248,10 @@ nnl2_tensor* nnl2_own_mul_mulf(const nnl2_tensor* tensor, void* multiplier) {
                 tasks[i].aligned_result = is_aligned_result;
                 tasks[i].multiplier.int32_mult = mult_val;
             }
+			
             break;
         }
+		
         default: {
             NNL2_TYPE_ERROR(dtype);
             nnl2_free_tensor(result);

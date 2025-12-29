@@ -46,6 +46,14 @@ nnl2_tensor* naive_max_maxf(const nnl2_tensor* tensor, void* threshold) {
             for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = MAX(cast_data_original[i], max_val);
             break;
         }
+		
+		case INT64: {
+			int64_t* cast_data_original = (int64_t*)tensor->data;
+			int64_t* cast_data_result = (int64_t*)result->data;
+			int64_t max_val = *((int64_t*)threshold);
+			for(size_t i = 0; i < total_elems; i++) cast_data_result[i] = (cast_data_original[i] > max_val) ? cast_data_original[i] : max_val;	
+			break;
+		}
         
         case INT32: {
             int32_t* cast_data_original = (int32_t*)tensor->data;
@@ -103,6 +111,19 @@ void* nnl2_own_pmax_maxf_float64(void* arg);
  ** @see nnl2_own_pmax_maxf_float64
  **/
 void* nnl2_own_pmax_maxf_float32(void* arg);
+
+/** @brief
+ * Worker function for parallel int64 element-wise maximum operation
+ * 
+ ** @param arg 
+ * Pointer to max_maxf_ptask structure containing thread parameters
+ *
+ ** @return 
+ * NULL (for pthread API compatibility)
+ * 
+ ** @see nnl2_own_pmax_maxf_float64
+ **/
+void* nnl2_own_pmax_maxf_int64(void* arg);
 
 /** @brief
  * Worker function for parallel integer element-wise maximum operation
@@ -212,9 +233,11 @@ nnl2_tensor* nnl2_own_max_maxf(const nnl2_tensor* tensor, void* threshold) {
         tasks[i].aligned = is_aligned;
         
         switch(dtype) {
-            case FLOAT64: tasks[i].threshold.float64_threshold = *((double*)threshold); break;
-            case FLOAT32: tasks[i].threshold.float32_threshold = *((float*)threshold);  break;
-            case INT32:   tasks[i].threshold.int32_threshold = *((int32_t*)threshold);  break;
+            case FLOAT64: tasks[i].threshold.float64_threshold = *((double*)threshold);  break;
+            case FLOAT32: tasks[i].threshold.float32_threshold = *((float*)threshold);   break;
+			case INT64:   tasks[i].threshold.int64_threshold = *((int64_t*)threshold);   break;
+            case INT32:   tasks[i].threshold.int32_threshold = *((int32_t*)threshold);   break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype);
                 nnl2_free_tensor(result);
@@ -237,9 +260,11 @@ nnl2_tensor* nnl2_own_max_maxf(const nnl2_tensor* tensor, void* threshold) {
         // Select appropriate worker function based on data type
         void* (*worker_func)(void*) = NULL;
         switch(dtype) {
-            case FLOAT64: worker_func = nnl2_own_pmax_maxf_float64; break;
-            case FLOAT32: worker_func = nnl2_own_pmax_maxf_float32; break;
-            case INT32:   worker_func = nnl2_own_pmax_maxf_int32;   break;
+            case FLOAT64: worker_func = nnl2_own_pmax_maxf_float64;  break;
+            case FLOAT32: worker_func = nnl2_own_pmax_maxf_float32;  break;
+			case INT64:   worker_func = nnl2_own_pmax_maxf_int64;    break;
+            case INT32:   worker_func = nnl2_own_pmax_maxf_int32;    break;
+			
             default: {
                 NNL2_TYPE_ERROR(dtype);
                 nnl2_free_tensor(result);
@@ -364,6 +389,57 @@ void* nnl2_own_pmax_maxf_float32(void* arg) {
     // Scalar processing for remainder
     for(; i < end; i++) {
         result_data[i] = MAX(data[i], threshold);
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See documentation at declaration
+ * 
+ ** @see nnl2_own_pmax_maxf_int64
+ **/
+void* nnl2_own_pmax_maxf_int64(void* arg) {
+    max_maxf_ptask* task = (max_maxf_ptask*)arg;
+    const int64_t* data = (const int64_t*)task->tensor->data;
+    int64_t* result_data = (int64_t*)task->result->data;
+    size_t start = task->start;
+    size_t end = task->end;
+    int64_t threshold = task->threshold.int64_threshold;
+    
+    // Create AVX256 vector with threshold value repeated
+    __m256i v_threshold = _mm256_set1_epi64x(threshold);
+    
+    size_t i = start;
+    
+    // AVX256 processing with prefetching (4 elements per iteration for 64-bit)
+    if(task->aligned) {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data = _mm256_load_si256((__m256i*)&data[i]);
+
+            __m256i v_compare = _mm256_cmpgt_epi64(v_data, v_threshold);
+            __m256i v_result = _mm256_blendv_epi8(v_threshold, v_data, v_compare);
+            
+            _mm256_store_si256((__m256i*)&result_data[i], v_result);
+        }
+    } else {
+        for(; i + 3 < end; i += 4) {
+            _mm_prefetch((char*)&data[i + 16], _MM_HINT_T0);
+            
+            __m256i v_data = _mm256_loadu_si256((__m256i*)&data[i]);
+            
+            __m256i v_compare = _mm256_cmpgt_epi64(v_data, v_threshold);
+            __m256i v_result = _mm256_blendv_epi8(v_threshold, v_data, v_compare);
+            
+            _mm256_storeu_si256((__m256i*)&result_data[i], v_result);
+        }
+    }
+    
+    // Scalar processing for remainder
+    for(; i < end; i++) {
+        result_data[i] = (data[i] > threshold) ? data[i] : threshold;
     }
     
     return NULL;

@@ -32,6 +32,20 @@ void naive_correspondence_atan2_inplace(nnl2_tensor* y, void* x) {
             for(size_t i = 0; i < total_elems; i++) data_y[i] = atan2f(data_y[i], x_val);
             break;
         }
+		
+		case INT64: {
+			int64_t* data_y = (int64_t*)y->data;
+			int64_t x_val = *((int64_t*)x);
+			
+			for (size_t i = 0; i < total_elems; i++) {
+				if (data_y[i] != 0 || x_val != 0) {
+					NNL2_FATAL("Can't apply atan2 to non-zero INT64 tensor with non-zero scalar");
+				}
+			}
+			
+			for(size_t i = 0; i < total_elems; i++) data_y[i] = 0;
+			break;
+		}
         
         case INT32: {
             int32_t* data_y = (int32_t*)y->data;
