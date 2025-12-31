@@ -111,6 +111,8 @@ Tensor* naive_concat(Tensor* tensora, Tensor* tensorb, int axis) {
         nnl2_free_tensor(result);
         return NULL;
     }
+	
+	memset(indices, 0, rank * sizeof(size_t));
     
     if (typea == typeb && typea == winner_type) {
         // Fast path: same types

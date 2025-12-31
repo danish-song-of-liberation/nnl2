@@ -359,7 +359,7 @@ void nnl2_init_activations() {
 	EINIT_BACKEND(sigmoid, sigmoid_backends, CURRENT_BACKEND(sigmoid)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, CURRENT_BACKEND(tanh));  
 } 
-      
+         
 void nnl2_init_initializers() {
     EINIT_BACKEND(nnl2_rand, rand_backends, CURRENT_BACKEND(rand));       
 	EINIT_BACKEND(nnl2_randn, randn_backends, CURRENT_BACKEND(randn));    
