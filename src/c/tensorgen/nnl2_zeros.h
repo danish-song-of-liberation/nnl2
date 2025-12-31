@@ -77,10 +77,20 @@ Tensor* nnl2_zeros(int32_t* shape, int32_t rank, TensorType dtype) {
 
 	// Filling the tensor with units depending on the data type
     switch(dtype) {
-        case INT32:    success = inplace_fill(tensor_t, &(nnl2_int32){0}, dtype);   break;
-        case INT64:    success = inplace_fill(tensor_t, &(nnl2_int64){0}, dtype);   break;
-        case FLOAT32:  success = inplace_fill(tensor_t, &(nnl2_float32){0.0f}, dtype);  break;     
-        case FLOAT64:  success = inplace_fill(tensor_t, &(nnl2_float64){0.0}, dtype);  break;
+        case INT8:     success = inplace_fill(tensor_t, &(nnl2_int8){0}, dtype);     break;
+		case INT16:    success = inplace_fill(tensor_t, &(nnl2_int16){0}, dtype);    break;
+		case INT32:    success = inplace_fill(tensor_t, &(nnl2_int32){0}, dtype);   break;
+		case INT64:    success = inplace_fill(tensor_t, &(nnl2_int64){0}, dtype);   break;
+		case UINT8:    success = inplace_fill(tensor_t, &(nnl2_uint8){0}, dtype);    break;
+		case UINT16:   success = inplace_fill(tensor_t, &(nnl2_uint16){0}, dtype);   break;
+		case UINT32:   success = inplace_fill(tensor_t, &(nnl2_uint32){0}, dtype);   break;
+		case UINT64:   success = inplace_fill(tensor_t, &(nnl2_uint64){0}, dtype);   break;
+		case BOOL:     success = inplace_fill(tensor_t, &(nnl2_bool){false}, dtype);  break;
+		case FLOAT32:  success = inplace_fill(tensor_t, &(nnl2_float32){0.0f}, dtype);  break;     
+		case FLOAT64:  success = inplace_fill(tensor_t, &(nnl2_float64){0.0}, dtype);  break;
+		case INT128:   success = inplace_fill(tensor_t, &(nnl2_int128){0}, dtype);   break;
+		case UINT128:  success = inplace_fill(tensor_t, &(nnl2_uint128){0}, dtype);  break;
+		case FLOAT128: success = inplace_fill(tensor_t, &(nnl2_float128){0.0}, dtype); break;
 
 		// Processing unsupported data types
         default: {

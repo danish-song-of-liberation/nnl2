@@ -225,7 +225,22 @@
   #+lispworks 'fli:pointer
   #+allegro   'excl:foreign-pointer)
 
-(defparameter *nnl2-tensor-types* '((:float64 . double-float) (:float32 . single-float) (:int32 . integer) (:int64 . (signed-byte 64)))
+(defparameter *nnl2-tensor-types* 
+  '((:bool . boolean)
+    (:int8 . (signed-byte 8))
+    (:uint8 . (unsigned-byte 8))
+    (:int16 . (signed-byte 16))
+    (:uint16 . (unsigned-byte 16))
+    (:int32 . integer)   
+    (:uint32 . (unsigned-byte 32))
+    (:int64 . (signed-byte 64))
+    (:uint64 . (unsigned-byte 64))
+    (:int128 . (signed-byte 128))
+    (:uint128 . (unsigned-byte 128))
+    (:float32 . single-float)
+    (:float64 . double-float)
+    (:float128 . long-float))
+	
   "All types of nnl2 tensors and lisp types in an associative list")
 
 (defun type/nnl2->lisp (tensor-type)
@@ -237,11 +252,21 @@
   (declare (type keyword tensor-type))
   
   (nnl2.hli:fastcall 
-    (case (the keyword tensor-type) 
-	  (:float64 (the symbol 'double-float)) 
-	  (:float32 (the symbol 'single-float))
-	  (:int32 (the symbol 'integer))
-	  (:int64 '(signed-byte 64)))))
+    (ecase (the keyword tensor-type) 
+	  (:bool 'boolean)
+	  (:int8 '(signed-byte 8))
+      (:int16 '(signed-byte 16))
+      (:int32 'integer)  
+      (:int64 '(signed-byte 64))
+      (:int128 '(signed-byte 128))
+	  (:uint8 '(unsigned-byte 8))
+      (:uint16 '(unsigned-byte 16))
+      (:uint32 '(unsigned-byte 32))
+      (:uint64 '(unsigned-byte 64))
+      (:uint128 '(unsigned-byte 128))
+      (:float32 'single-float)
+      (:float64 'double-float)
+      (:float128 'long-float))))
 	
 (declaim (ftype (function (keyword) symbol) type/nnl2->lisp)) ;; Inline not needed	
   
@@ -251,13 +276,22 @@
    
    Example: (type/lisp->nnl2 'double-float) -> :FLOAT64"
    
-  (declare (type symbol lisp-type))
-
   (nnl2.hli:fastcall
-    (cond ((eql lisp-type 'double-float)        :float64) 
-          ((eql lisp-type 'single-float)        :float32) 
-          ((eql lisp-type 'integer)             :int32)
-          ((equal lisp-type '(signed-byte 64))  :int64))))
+    (cond ((eql lisp-type 'boolean) 			   :bool)
+		  ((equal lisp-type '(signed-byte 8))      :int8)
+          ((equal lisp-type '(signed-byte 16))     :int16)
+          ((eql lisp-type 'integer)                :int32)
+          ((equal lisp-type '(signed-byte 32))     :int32) 
+          ((equal lisp-type '(signed-byte 64))     :int64)
+          ((equal lisp-type '(signed-byte 128))    :int128)
+          ((equal lisp-type '(unsigned-byte 8))    :uint8)
+          ((equal lisp-type '(unsigned-byte 16))   :uint16)
+          ((equal lisp-type '(unsigned-byte 32))   :uint32)
+          ((equal lisp-type '(unsigned-byte 64))   :uint64)
+          ((equal lisp-type '(unsigned-byte 128))  :uint128)
+          ((eql lisp-type 'single-float)           :float32)
+          ((eql lisp-type 'double-float)           :float64)
+          ((eql lisp-type 'long-float)             :float128))))
 		  
 (declaim (ftype (function (symbol) keyword) type/lisp->nnl2))
 
@@ -267,30 +301,52 @@
    
    Example: (type/lisp->cffi 'double-float) -> :double"
    
-  (declare (type symbol lisp-type))
+  (declare (type t lisp-type)) 
 
   (nnl2.hli:fastcall
-    (cond ((eql lisp-type 'double-float)        :double) 
-          ((eql lisp-type 'single-float)        :float) 
-          ((eql lisp-type 'integer)             :int)
-          ((equal lisp-type '(signed-byte 64))  :long))))
+    (cond 
+      ((eql lisp-type 'boolean)                :bool)
+      ((equal lisp-type '(signed-byte 8))      :int8)
+      ((equal lisp-type '(signed-byte 16))     :int16)
+      ((eql lisp-type 'integer)                :int32)
+      ((equal lisp-type '(signed-byte 32))     :int32)
+      ((equal lisp-type '(signed-byte 64))     :int64)
+      ((equal lisp-type '(signed-byte 128))    :int64) 
+      ((equal lisp-type '(unsigned-byte 8))    :uint8)
+      ((equal lisp-type '(unsigned-byte 16))   :uint16)
+      ((equal lisp-type '(unsigned-byte 32))   :uint32)
+      ((equal lisp-type '(unsigned-byte 64))   :uint64)
+      ((equal lisp-type '(unsigned-byte 128))  :uint64) 
+      ((eql lisp-type 'single-float)           :float)
+      ((eql lisp-type 'double-float)           :double)
+      ((eql lisp-type 'long-float)             :double)))) 
 		  
 (declaim (ftype (function (symbol) keyword) type/lisp->nnl2 type/lisp->cffi)) ;; Inline not needed		
 	
-(defun type/nnl2->cffi (cffi-type)
+(defun type/nnl2->cffi (nnl2-type)
   "Converts the tensor system type to a cffi type
-   cffi-type: type for conversion
+   nnl2-type: type for conversion
    
    Example: (type/nnl2->cffi :float64) -> :double"
 
-  (declare (type keyword cffi-type))
+  (declare (type keyword nnl2-type))
   
   (nnl2.hli:fastcall 
-    (ecase (the keyword cffi-type) 
-	  (:float64 (the keyword :double)) 
-	  (:float32 (the keyword :float))
-	  (:int32 (the keyword :int))
-	  (:int64 (the keyword :int64)))))
+    (ecase (the keyword nnl2-type) 
+      (:bool      :bool)
+      (:int8      :int8)
+      (:int16     :int16)
+      (:int32     :int32)  
+      (:int64     :int64)    
+      (:int128    :int64)    
+      (:uint8     :uint8)
+      (:uint16    :uint16)
+      (:uint32    :uint32)
+      (:uint64    :uint64)
+      (:uint128   :uint64)  
+      (:float32   :float)
+      (:float64   :double)
+      (:float128  :double))))
 	  
 (declaim (ftype (function (keyword) keyword) type/lisp->cffi)) ;; Inline not needed		  
 	

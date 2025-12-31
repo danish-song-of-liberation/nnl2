@@ -43,58 +43,90 @@ nnl2_tensor* naive_randn(int* shape, int rank, TensorType dtype, double mean, do
     
     switch(dtype) {
         case FLOAT64: {
-            double* data = (double*)result->data;
+			nnl2_float64* data = (nnl2_float64*)result->data;
 			
-            for(size_t i = 0; i + 1 < total_elems; i += 2) {
-                double u1 = 1.0 - ((double)rand() / RAND_MAX);  
-                double u2 = 1.0 - ((double)rand() / RAND_MAX);  
-                
-                double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
-                double z1 = sqrt(-2.0 * log(u1)) * sin(2.0 * M_PI * u2);
-                
-                data[i] = mean + std * z0;
+			for(size_t i = 0; i + 1 < total_elems; i += 2) {
+				nnl2_float64 u1 = 1.0 - ((nnl2_float64)rand() / RAND_MAX);  
+				nnl2_float64 u2 = 1.0 - ((nnl2_float64)rand() / RAND_MAX);  
 				
-                if(i + 1 < total_elems) 
-                    data[i + 1] = mean + std * z1;
-            }
-            
-            if(total_elems % 2 == 1) {
-                double u1 = 1.0 - ((double)rand() / RAND_MAX);
-                double u2 = 1.0 - ((double)rand() / RAND_MAX);
-                double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
-                data[total_elems - 1] = mean + std * z0;
-            }
+				nnl2_float64 z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
+				nnl2_float64 z1 = sqrt(-2.0 * log(u1)) * sin(2.0 * M_PI * u2);
+				
+				data[i] = mean + std * z0;
+				
+				if(i + 1 < total_elems) 
+					data[i + 1] = mean + std * z1;
+			}
 			
-            break;
-        }
-        
-        case FLOAT32: {
-            float* data = (float*)result->data;
-            float mean_f = (float)mean;
-            float std_f = (float)std;
+			if(total_elems % 2 == 1) {
+				nnl2_float64 u1 = 1.0 - ((nnl2_float64)rand() / RAND_MAX);
+				nnl2_float64 u2 = 1.0 - ((nnl2_float64)rand() / RAND_MAX);
+				nnl2_float64 z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
+				data[total_elems - 1] = mean + std * z0;
+			}
+			
+			break;
+		}
 
-            for(size_t i = 0; i + 1 < total_elems; i += 2) {
-                float u1 = 1.0f - ((float)rand() / RAND_MAX);  
-                float u2 = 1.0f - ((float)rand() / RAND_MAX); 
-                
-                float z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (float)M_PI * u2);
-                float z1 = sqrtf(-2.0f * logf(u1)) * sinf(2.0f * (float)M_PI * u2);
-                
-                data[i] = mean_f + std_f * z0;
-                if(i + 1 < total_elems) {
-                    data[i + 1] = mean_f + std_f * z1;
-                }
-            }
-            
-            if(total_elems % 2 == 1) {
-                float u1 = 1.0f - ((float)rand() / RAND_MAX);
-                float u2 = 1.0f - ((float)rand() / RAND_MAX);
-                float z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (float)M_PI * u2);
-                data[total_elems - 1] = mean_f + std_f * z0;
-            }
+		case FLOAT32: {
+			nnl2_float32* data = (nnl2_float32*)result->data;
+			nnl2_float32 mean_f = (nnl2_float32)mean;
+			nnl2_float32 std_f = (nnl2_float32)std;
+
+			for(size_t i = 0; i + 1 < total_elems; i += 2) {
+				nnl2_float32 u1 = 1.0f - ((nnl2_float32)rand() / RAND_MAX);  
+				nnl2_float32 u2 = 1.0f - ((nnl2_float32)rand() / RAND_MAX); 
+				
+				nnl2_float32 z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (nnl2_float32)M_PI * u2);
+				nnl2_float32 z1 = sqrtf(-2.0f * logf(u1)) * sinf(2.0f * (nnl2_float32)M_PI * u2);
+				
+				data[i] = mean_f + std_f * z0;
+				if(i + 1 < total_elems) {
+					data[i + 1] = mean_f + std_f * z1;
+				}
+			}
 			
-            break;
-        }
+			if(total_elems % 2 == 1) {
+				nnl2_float32 u1 = 1.0f - ((nnl2_float32)rand() / RAND_MAX);
+				nnl2_float32 u2 = 1.0f - ((nnl2_float32)rand() / RAND_MAX);
+				nnl2_float32 z0 = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * (nnl2_float32)M_PI * u2);
+				data[total_elems - 1] = mean_f + std_f * z0;
+			}
+			
+			break;
+		}
+		
+		case FLOAT128: {
+			nnl2_float128* data = (nnl2_float128*)result->data;
+			nnl2_float128 mean_l = (nnl2_float128)mean;
+			nnl2_float128 std_l = (nnl2_float128)std;
+
+			for(size_t i = 0; i + 1 < total_elems; i += 2) {
+				nnl2_float128 u1 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);  
+				nnl2_float128 u2 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);  
+				
+				nnl2_float128 z0 = NNL2_FLOAT128_SQRT(NNL2_FLOAT128_MINUS_TWO * NNL2_FLOAT128_LOG(u1)) * 
+								  NNL2_FLOAT128_COS(NNL2_FLOAT128_TWO * NNL2_FLOAT128_PI * u2);
+				nnl2_float128 z1 = NNL2_FLOAT128_SQRT(NNL2_FLOAT128_MINUS_TWO * NNL2_FLOAT128_LOG(u1)) * 
+								  NNL2_FLOAT128_SIN(NNL2_FLOAT128_TWO * NNL2_FLOAT128_PI * u2);
+				
+				data[i] = mean_l + std_l * z0;
+				
+				if(i + 1 < total_elems) 
+					data[i + 1] = mean_l + std_l * z1;
+			}
+			
+			if(total_elems % 2 == 1) {
+				nnl2_float128 u1 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);
+				nnl2_float128 u2 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);
+				
+				nnl2_float128 z0 = NNL2_FLOAT128_SQRT(NNL2_FLOAT128_MINUS_TWO * NNL2_FLOAT128_LOG(u1)) * 
+								  NNL2_FLOAT128_COS(NNL2_FLOAT128_TWO * NNL2_FLOAT128_PI * u2);
+				data[total_elems - 1] = mean_l + std_l * z0;
+			}
+			
+			break;
+		}
         
         default: {
             NNL2_TYPE_ERROR(dtype);

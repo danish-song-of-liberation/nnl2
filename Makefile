@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -O3 -fPIC -mavx -mavx2 -msse4.1 -msse4.2 -mfma -DNNL2_PTHREAD_AVAILABLE -fopenmp -lm
+CFLAGS = -Wall -Wextra -Werror -O3 -fPIC -mavx -mavx2 -msse4.1 -msse4.2 -mfma -DNNL2_PTHREAD_AVAILABLE -fopenmp -lm 
 
 SRC = src/c/nnl2_core.c
 OBJ = $(SRC:.c=.o)
@@ -12,11 +12,13 @@ OPENBLAS_LIB := $(OPENBLAS_DIR)/lib
 
 ifeq ($(OS),Windows_NT)
     TARGET = src/c/libnnl.dll
-    LDFLAGS = -shared
+    LDFLAGS = -shared 
 else
     TARGET = src/c/libnnl.so
     LDFLAGS = -shared 
 endif
+
+LDFLAGS += -lquadmath
 
 ifeq ($(openblas0330woa64static_available), 1)
 	CFLAGS += -I$(OPENBLAS_INCLUDE)

@@ -43,8 +43,8 @@ Tensor* naive_xavier(int* shape, int rank, TensorType dtype, int in, int out, fl
         NNL2_FUNC_ENTER();
     #endif
 	
-	if(dtype == INT32) {
-		NNL2_FATAL("INT32 Can't be used for xavier distribution");
+	if(dtype != FLOAT32 && dtype != FLOAT64 && dtype != FLOAT128) {
+		NNL2_FATAL("Passed type can't be used for xavier distribution");
 		return NULL;
 	}
 	

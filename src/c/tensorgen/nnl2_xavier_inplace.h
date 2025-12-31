@@ -37,8 +37,10 @@ void nnl2_naive_xavier_inplace(nnl2_tensor* tensor, int in, int out, float gain,
         NNL2_CHECK_NULL_IF_ERR_RETURN(tensor, "In nnl2_naive_xavier_inplace, tensor is NULL");
     #endif
 
-    if(tensor->dtype == INT32) {
-        NNL2_FATAL("INT32 can't be used for Xavier initialization");
+	nnl2_tensor_type dtype = tensor -> dtype;
+
+    if(dtype != FLOAT32 && dtype != FLOAT64 && dtype != FLOAT128) {
+        NNL2_FATAL("Passed type can't be used for Xavier initialization");
         return;
     }
 

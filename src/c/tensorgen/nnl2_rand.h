@@ -70,6 +70,86 @@ Tensor* naive_rand(int* shape, int rank, TensorType dtype) {
             break;
         }
 		
+		case INT8: {
+			int8_t* data = (int8_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = rand() % 2; 
+			}
+			break;
+		}
+
+		case INT16: {
+			int16_t* data = (int16_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = rand() % 2; 
+			}
+			break;
+		}
+
+		case UINT8: {
+			uint8_t* data = (uint8_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = rand() % 2; 
+			}
+			break;
+		}
+
+		case UINT16: {
+			uint16_t* data = (uint16_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = rand() % 2; 
+			}
+			break;
+		}
+
+		case UINT32: {
+			uint32_t* data = (uint32_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = rand() % 2; 
+			}
+			break;
+		}
+
+		case UINT64: {
+			uint64_t* data = (uint64_t*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = rand() % 2; 
+			}
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool* data = (nnl2_bool*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = (rand() % 2) ? true : false;
+			}
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128* data = (nnl2_int128*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = (nnl2_int128)(rand() % 2);
+			}
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128* data = (nnl2_uint128*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = (nnl2_uint128)(rand() % 2);
+			}
+			break;
+		}
+
+		case FLOAT128: {
+			nnl2_float128* data = (nnl2_float128*)result->data;
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = (nnl2_float128)((double)rand() / RAND_MAX);
+			}
+			break;
+		}
+		
         default: {
             NNL2_TYPE_ERROR(dtype);
             nnl2_free_tensor(result);

@@ -5,6 +5,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <quadmath.h>
 
 /// NNL2
 
@@ -175,10 +176,20 @@
  * Enumerations of available tensor types (INT32/INT, INT64/LONG, FLOAT32/FLOAT, FLOAT64/DOUBLE)
  */
 typedef enum {
+	BOOL,
+	INT8,
+	UINT8,
+	INT16,
+	UINT16,
 	INT32,
+	UINT32,
 	INT64,
+	UINT64,
+	INT128,
+	UINT128,
 	FLOAT32,
-	FLOAT64
+	FLOAT64,
+	FLOAT128
 } TensorType;
 
 /// @}
@@ -1591,11 +1602,21 @@ typedef int (*f32sgetrffn)(const nnl2_order order, const int m, const int n, nnl
  */
 inline static char* get_tensortype_name(nnl2_tensor_type dtype) {
 	switch(dtype) {
-		case INT32:   return "INT32";
-		case INT64:   return "INT64";
-		case FLOAT32: return "FLOAT32";
-		case FLOAT64: return "FLOAT64";
-		default:	  return "UNKNOWN";
+		case BOOL:     return "BOOL";
+		case INT8:     return "INT8";
+		case UINT8:    return "UINT8";
+		case INT16:    return "INT16";
+		case UINT16:   return "UINT16";
+		case INT32:    return "INT32";
+		case UINT32:   return "UINT32";
+		case INT64:    return "INT64";
+		case UINT64:   return "UINT64";
+		case INT128:   return "INT128";
+		case UINT128:  return "UINT128";
+		case FLOAT32:  return "FLOAT32";
+		case FLOAT64:  return "FLOAT64";
+		case FLOAT128: return "FLOAT128";
+		default:       return "UNKNOWN";
 	}	
 }
 

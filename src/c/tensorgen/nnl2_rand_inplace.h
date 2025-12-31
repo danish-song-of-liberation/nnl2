@@ -81,6 +81,96 @@ void nnl2_naive_rand_inplace(nnl2_tensor* tensor) {
 			
             break;
         }
+		
+		case INT8: {
+			nnl2_int8* data = (nnl2_int8*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = rand() % 2;
+			
+			break;
+		}
+
+		case INT16: {
+			nnl2_int16* data = (nnl2_int16*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = rand() % 2;
+			
+			break;
+		}
+
+		case UINT8: {
+			nnl2_uint8* data = (nnl2_uint8*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = rand() % 2;
+			
+			break;
+		}
+
+		case UINT16: {
+			nnl2_uint16* data = (nnl2_uint16*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = rand() % 2;
+			
+			break;
+		}
+
+		case UINT32: {
+			nnl2_uint32* data = (nnl2_uint32*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = rand() % 2;
+			
+			break;
+		}
+
+		case UINT64: {
+			nnl2_uint64* data = (nnl2_uint64*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = rand() % 2;
+			
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool* data = (nnl2_bool*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = (rand() % 2) ? true : false;
+			
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128* data = (nnl2_int128*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = (nnl2_int128)(rand() % 2);
+			
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128* data = (nnl2_uint128*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = (nnl2_uint128)(rand() % 2);
+			
+			break;
+		}
+
+		case FLOAT128: {
+			nnl2_float128* data = (nnl2_float128*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) 
+				data[i] = (nnl2_float128)((double)rand() / RAND_MAX);
+			
+			break;
+		}
         
         default: {
             NNL2_TYPE_ERROR(tensor->dtype);

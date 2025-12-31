@@ -65,30 +65,151 @@ nnl2_tensor* nnl2_naive_int_arange(int64_t from, int64_t to, int64_t step, nnl2_
     }
     
     switch(dtype) {
-        case INT32: {
-            nnl2_int32* data = (nnl2_int32*)result->data;
-            for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
-                if (val > INT32_MAX) {
-                    data[it] = INT32_MAX;
-                } else if (val < INT32_MIN) {
-                    data[it] = INT32_MIN;
-                } else {
-                    data[it] = (nnl2_int32)val;
-                }
-            }
-            
-            break;
-        }
-        
-        case INT64: {
-            nnl2_int64* data = (nnl2_int64*)result->data;
-            for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
-                data[it] = (nnl2_int64)val;
-            }
-            
-            break;
-        }
-        
+        case INT8: {
+			nnl2_int8* data = (nnl2_int8*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val > INT8_MAX) {
+					data[it] = INT8_MAX;
+				} else if (val < INT8_MIN) {
+					data[it] = INT8_MIN;
+				} else {
+					data[it] = (nnl2_int8)val;
+				}
+			}
+			
+			break;
+		}
+
+		case INT16: {
+			nnl2_int16* data = (nnl2_int16*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val > INT16_MAX) {
+					data[it] = INT16_MAX;
+				} else if (val < INT16_MIN) {
+					data[it] = INT16_MIN;
+				} else {
+					data[it] = (nnl2_int16)val;
+				}
+			}
+			
+			break;
+		}
+
+		case INT32: {
+			nnl2_int32* data = (nnl2_int32*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val > INT32_MAX) {
+					data[it] = INT32_MAX;
+				} else if (val < INT32_MIN) {
+					data[it] = INT32_MIN;
+				} else {
+					data[it] = (nnl2_int32)val;
+				}
+			}
+			
+			break;
+		}
+
+		case INT64: {
+			nnl2_int64* data = (nnl2_int64*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				data[it] = (nnl2_int64)val;
+			}
+			
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128* data = (nnl2_int128*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				data[it] = (nnl2_int128)val;
+			}
+			
+			break;
+		}
+
+		case UINT8: {
+			nnl2_uint8* data = (nnl2_uint8*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val > UINT8_MAX) {
+					data[it] = UINT8_MAX;
+				} else if (val < 0) {
+					data[it] = 0;
+				} else {
+					data[it] = (nnl2_uint8)val;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT16: {
+			nnl2_uint16* data = (nnl2_uint16*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val > UINT16_MAX) {
+					data[it] = UINT16_MAX;
+				} else if (val < 0) {
+					data[it] = 0;
+				} else {
+					data[it] = (nnl2_uint16)val;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT32: {
+			nnl2_uint32* data = (nnl2_uint32*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val > UINT32_MAX) {
+					data[it] = UINT32_MAX;
+				} else if (val < 0) {
+					data[it] = 0;
+				} else {
+					data[it] = (nnl2_uint32)val;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT64: {
+			nnl2_uint64* data = (nnl2_uint64*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val < 0) {
+					data[it] = 0;
+				} else {
+					data[it] = (nnl2_uint64)val;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128* data = (nnl2_uint128*)result->data;
+			for (int64_t it = 0, val = from; it < capacity; it++, val += step) {
+				if (val < 0) {
+					data[it] = 0;
+				} else {
+					data[it] = (nnl2_uint128)val;
+				}
+			}
+			
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool* data = (nnl2_bool*)result->data;
+
+			for (int64_t it = 0; it < capacity; it++) {
+				int64_t val = from + it * step;
+				data[it] = (val % 2) ? true : false;
+			}
+			
+			break;
+		}
+				
         default: {
             nnl2_free_tensor(result);
             NNL2_TYPE_ERROR(dtype);
@@ -190,6 +311,18 @@ nnl2_tensor* nnl2_naive_float_arange(float from, float to, float step, nnl2_tens
             break;
         }
         
+		case FLOAT128: {
+			nnl2_float128* data = (nnl2_float128*)result->data;
+			
+			nnl2_float128 value = (nnl2_float128)from;
+			nnl2_float128 step_l = (nnl2_float128)step;
+			for (size_t it = 0; it < capacity; it++, value += step_l) {
+				data[it] = value;
+			}
+			
+			break;
+		}
+
         default: {
             nnl2_free_tensor(result);
             NNL2_TYPE_ERROR(dtype);

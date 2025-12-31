@@ -26,31 +26,116 @@ inline static void naive_fill_tensor_with_data(Tensor* tensor, void* data, size_
 	if(num_elems == 0) return;
 	
 	switch(tensor->dtype) {
-		case FLOAT64: {
-			double* tensor_data = (double*)tensor->data;
-			double* cast_data = (double*)data;
-			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];			
+		case BOOL: {
+			nnl2_bool* tensor_data = (nnl2_bool*)tensor->data;
+			nnl2_bool* cast_data = (nnl2_bool*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
 			break;
 		}
 		
-		case FLOAT32: {
-			float* tensor_data = (float*)tensor->data;
-			float* cast_data = (float*)data;
-			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];			
+		case INT8: {
+			nnl2_int8* tensor_data = (nnl2_int8*)tensor->data;
+			nnl2_int8* cast_data = (nnl2_int8*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
 			break;
 		}
 		
-		case INT64: {
-			int64_t* tensor_data = (int64_t*)tensor->data;
-			int64_t* cast_data = (int64_t*)data;
+		case UINT8: {
+			nnl2_uint8* tensor_data = (nnl2_uint8*)tensor->data;
+			nnl2_uint8* cast_data = (nnl2_uint8*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case INT16: {
+			nnl2_int16* tensor_data = (nnl2_int16*)tensor->data;
+			nnl2_int16* cast_data = (nnl2_int16*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case UINT16: {
+			nnl2_uint16* tensor_data = (nnl2_uint16*)tensor->data;
+			nnl2_uint16* cast_data = (nnl2_uint16*)data;
 			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
 			break;
 		}
 		
 		case INT32: {
-			int32_t* tensor_data = (int32_t*)tensor->data;
-			int32_t* cast_data = (int32_t*)data;
-			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];			
+			nnl2_int32* tensor_data = (nnl2_int32*)tensor->data;
+			nnl2_int32* cast_data = (nnl2_int32*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case UINT32: {
+			nnl2_uint32* tensor_data = (nnl2_uint32*)tensor->data;
+			nnl2_uint32* cast_data = (nnl2_uint32*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case INT64: {
+			nnl2_int64* tensor_data = (nnl2_int64*)tensor->data;
+			nnl2_int64* cast_data = (nnl2_int64*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case UINT64: {
+			nnl2_uint64* tensor_data = (nnl2_uint64*)tensor->data;
+			nnl2_uint64* cast_data = (nnl2_uint64*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case INT128: {
+			#if NNL2_INT128_SUPPORTED
+				nnl2_int128* tensor_data = (nnl2_int128*)tensor->data;
+				nnl2_int128* cast_data = (nnl2_int128*)data;
+				for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			#else
+				NNL2_INT128_FATAL();
+			#endif
+			
+			break;
+		}
+		
+		case UINT128: {
+			#if NNL2_UINT128_SUPPORTED
+				nnl2_uint128* tensor_data = (nnl2_uint128*)tensor->data;
+				nnl2_uint128* cast_data = (nnl2_uint128*)data;
+				for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			#else
+				NNL2_UINT128_FATAL();
+			#endif
+			
+			break;
+		}
+		
+		case FLOAT32: {
+			nnl2_float32* tensor_data = (nnl2_float32*)tensor->data;
+			nnl2_float32* cast_data = (nnl2_float32*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case FLOAT64: {
+			nnl2_float64* tensor_data = (nnl2_float64*)tensor->data;
+			nnl2_float64* cast_data = (nnl2_float64*)data;
+			for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			break;
+		}
+		
+		case FLOAT128: {
+			#if NNL2_FLOAT128_SUPPORTED
+				nnl2_float128* tensor_data = (nnl2_float128*)tensor->data;
+				nnl2_float128* cast_data = (nnl2_float128*)data;
+				for(size_t it = 0; it < num_elems; it++) tensor_data[it] = cast_data[it];
+			#else
+				NNL2_FLOAT128_FATAL();
+			#endif
+			
 			break;
 		}
 	}

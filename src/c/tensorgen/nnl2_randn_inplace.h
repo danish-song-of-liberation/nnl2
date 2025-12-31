@@ -80,9 +80,9 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
 			
             break;
         }
-        
-        case FLOAT32: {
-            nnl2_float32* data = (nnl2_float32*)tensor->data;
+
+		case FLOAT32: {
+			nnl2_float32* data = (nnl2_float32*)tensor->data;
             float mean_f = (float)mean;
             float std_f = (float)std;
 
@@ -108,6 +108,38 @@ void nnl2_naive_randn_inplace(nnl2_tensor* tensor, double mean, double std) {
 			
             break;
         }
+
+		case FLOAT128: {
+			nnl2_float128* data = (nnl2_float128*)tensor->data;
+			nnl2_float128 mean_l = (nnl2_float128)mean;
+			nnl2_float128 std_l = (nnl2_float128)std;
+
+			for(size_t i = 0; i + 1 < total_elems; i += 2) {
+				nnl2_float128 u1 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);  
+				nnl2_float128 u2 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);  
+				
+				nnl2_float128 z0 = NNL2_FLOAT128_SQRT(NNL2_FLOAT128_MINUS_TWO * NNL2_FLOAT128_LOG(u1)) * 
+								  NNL2_FLOAT128_COS(NNL2_FLOAT128_TWO * NNL2_FLOAT128_PI * u2);
+				nnl2_float128 z1 = NNL2_FLOAT128_SQRT(NNL2_FLOAT128_MINUS_TWO * NNL2_FLOAT128_LOG(u1)) * 
+								  NNL2_FLOAT128_SIN(NNL2_FLOAT128_TWO * NNL2_FLOAT128_PI * u2);
+				
+				data[i] = mean_l + std_l * z0;
+				
+				if(i + 1 < total_elems) 
+					data[i + 1] = mean_l + std_l * z1;
+			}
+			
+			if(total_elems % 2 == 1) {
+				nnl2_float128 u1 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);
+				nnl2_float128 u2 = NNL2_FLOAT128_ONE - ((nnl2_float128)rand() / RAND_MAX);
+				
+				nnl2_float128 z0 = NNL2_FLOAT128_SQRT(NNL2_FLOAT128_MINUS_TWO * NNL2_FLOAT128_LOG(u1)) * 
+								  NNL2_FLOAT128_COS(NNL2_FLOAT128_TWO * NNL2_FLOAT128_PI * u2);
+				data[total_elems - 1] = mean_l + std_l * z0;
+			}
+			
+			break;
+		}
 
         default: {
             NNL2_TYPE_ERROR(tensor->dtype);

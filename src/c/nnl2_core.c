@@ -269,12 +269,12 @@ void nnl2_init_accessors() {
        
 void nnl2_init_tensor_creating() {
     EINIT_BACKEND(inplace_fill, inplace_fill_backends, CURRENT_BACKEND(inplace_fill));
-    EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));    
+    EINIT_BACKEND(nnl2_empty, nnl2_empty_backends, CURRENT_BACKEND(nnl2_empty));     
     INIT_BACKEND(nnl2_int_arange, int_arange_backends);
     INIT_BACKEND(nnl2_float_arange, float_arange_backends);
     INIT_BACKEND(nnl2_int_linspace, int_linspace_backends);
     INIT_BACKEND(nnl2_float_linspace, float_linspace_backends);    
-}
+}    
       
 void nnl2_init_standard() {       
 	EINIT_BACKEND(add, add_backends, CURRENT_BACKEND(add));                       
@@ -282,12 +282,12 @@ void nnl2_init_standard() {
 	EINIT_BACKEND(mul, mul_backends, CURRENT_BACKEND(mul));      	         
 	EINIT_BACKEND(nnl2_div, div_backends, CURRENT_BACKEND(div));     
 	EINIT_BACKEND(nnl2_pow, pow_backends, CURRENT_BACKEND(pow));              
-	EINIT_BACKEND(nnl2_exp, exp_backends, CURRENT_BACKEND(exp));  
+	EINIT_BACKEND(nnl2_exp, exp_backends, CURRENT_BACKEND(exp));     
 	EINIT_BACKEND(nnl2_logarithm, log_backends, CURRENT_BACKEND(log));            
 	EINIT_BACKEND(nnl2_log1p, log1p_backends, CURRENT_BACKEND(log1p));      
 	EINIT_BACKEND(nnl2_log10, log10_backends, CURRENT_BACKEND(log10));   
 	EINIT_BACKEND(nnl2_log2, log2_backends, CURRENT_BACKEND(log2));   
-	EINIT_BACKEND(scale, scale_backends, CURRENT_BACKEND(scale));   
+	EINIT_BACKEND(scale, scale_backends, CURRENT_BACKEND(scale));      
 	EINIT_BACKEND(nnl2_max, max_backends, CURRENT_BACKEND(max));           
 	EINIT_BACKEND(nnl2_min, min_backends, CURRENT_BACKEND(min));     	   
 	EINIT_BACKEND(nnl2_abs, abs_backends, CURRENT_BACKEND(abs));           
@@ -354,7 +354,7 @@ void nnl2_init_activations_inplace() {
 } 
 
 void nnl2_init_activations() {
-	EINIT_BACKEND(relu, relu_backends, CURRENT_BACKEND(relu));          
+	EINIT_BACKEND(relu, relu_backends, CURRENT_BACKEND(relu));                
 	EINIT_BACKEND(leakyrelu, leakyrelu_backends, CURRENT_BACKEND(leakyrelu));     
 	EINIT_BACKEND(sigmoid, sigmoid_backends, CURRENT_BACKEND(sigmoid)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, CURRENT_BACKEND(tanh));  
@@ -373,18 +373,18 @@ void nnl2_init_initializers() {
 	EINIT_BACKEND(kaiming_inplace, kaiming_inplace_backends, CURRENT_BACKEND(kaiming_inplace));    
 } 
    
-void nnl2_init_transposition() {     
+void nnl2_init_transposition() {         
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, CURRENT_BACKEND(transposeinplace));    
 	EINIT_BACKEND(transpose, transpose_backends, CURRENT_BACKEND(transpose));  
 	EINIT_BACKEND(nnl2_transposition_inplace, transposition_inplace_backends, CURRENT_BACKEND(transposition_inplace)); 
 	EINIT_BACKEND(nnl2_transposition, transposition_backends, CURRENT_BACKEND(transposition));            
-}   
-        
+}          
+             
 void nnl2_init_auxiliary() {
 	EINIT_BACKEND(nnl2_sum_without_axis, sum_without_axis_backends, CURRENT_BACKEND(sum_without_axis));   
-	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);         
+	INIT_BACKEND(nnl2_sum_with_axis, sum_with_axis_backends);            
 	EINIT_BACKEND(l2norm, l2norm_backends, CURRENT_BACKEND(l2norm));          
-	EINIT_BACKEND(nnl2_copy, copy_backends, CURRENT_BACKEND(copy)); 	
+	EINIT_BACKEND(nnl2_copy, copy_backends, CURRENT_BACKEND(copy)); 	  
 	INIT_BACKEND(fill_tensor_with_data, fill_tensor_with_data_backends);  
 	EINIT_BACKEND(nnl2_slice, slice_backends, CURRENT_BACKEND(slice));  
 	INIT_BACKEND(nnl2_axpy_inplace_region, axpy_inplace_region_backends);  

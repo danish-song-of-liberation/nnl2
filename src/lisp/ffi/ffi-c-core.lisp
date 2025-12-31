@@ -24,10 +24,20 @@
 
 (cffi:defcenum tensor-type
   "nnl2 Type system import into cffi"
-  :int32    ;; aka 'integer (lisp), int32_t (c), int (c), :int32 (cffi)
-  :int64    ;; aka 'bignum (lisp), int64_t (c), long (c), :int64 (cffi)
-  :float32  ;; aka 'single-float (lisp), float (c), :float (cffi)
-  :float64) ;; aka 'double-float (lisp), double (c), :double (cffi)"
+  :bool      ;; aka 'boolean (lisp), nnl2_bool (c), :bool (cffi)
+  :int8      ;; aka '(signed-byte . 8) (lisp), nnl2_int8 (c), int8_t (c), :int8 (cffi)
+  :uint8     ;; aka '(unsigned-byte . 8) (lisp), nnl2_uint8 (c), uint8_t (c), :uint8 (cffi)
+  :int16     ;; aka '(signed-byte . 16) (lisp), nnl2_int16 (c), int16_t (c), :int16 (cffi)
+  :uint16    ;; aka '(unsigned-byte . 16) (lisp), nnl2_uint16 (c), uint16_t (c), :uint16 (cffi)
+  :int32     ;; aka 'integer (lisp), int32_t (c), int (c), :int32 (cffi), :int32 (cffi)
+  :uint32    ;; aka '(unsigned-byte . 32) (lisp), nnl2_uint32 (c), uint32_t (c), :uint32 (cffi)
+  :int64     ;; aka '(signed-byte . 64) (lisp), int64_t (c), long (c), :int64 (cffi)
+  :uint64    ;; aka '(unsigned-byte . 64) (lisp), nnl2_uint64 (c), uint64_t (c), :uint64 (cffi)
+  :int128    ;; aka '(signed-byte . 128), nnl2_int128 (c), :int64 (cffi)
+  :uint128   ;; aka '(unsigned-byte . 128), nnl2_uint128 (c), :uint64 (cffi)
+  :float32   ;; aka 'single-float (lisp), float (c), :float (cffi)
+  :float64   ;; aka 'double-float (lisp), double (c), :double (cffi)
+  :float128) ;; aka 'long-float (lisp), nnl2_float128 (c), __float128 or _Float128 (c), :double (cffi)
   
 (cffi:defcenum nnl2-order
   "Enum for storage order (made for BLAS)"

@@ -101,9 +101,34 @@ nnl2_tensor* nnl2_naive_float_linspace(float start, float stop, int64_t num, boo
             
             break;
         }
+		
+		case FLOAT128: {
+			nnl2_float128* data = (nnl2_float128*)result->data;
+			
+			if(capacity == 1) {
+				data[0] = (nnl2_float128)start;
+			} else if(capacity > 1) {
+				nnl2_float128 step;
+				if (endpoint) {
+					step = ((nnl2_float128)stop - (nnl2_float128)start) / ((nnl2_float128)capacity - NNL2_FLOAT128_ONE);
+				} else {
+					step = ((nnl2_float128)stop - (nnl2_float128)start) / (nnl2_float128)capacity;
+				}
+				
+				nnl2_float128 value = (nnl2_float128)start;
+				for (size_t it = 0; it < capacity; it++) {
+					data[it] = value;
+					value += step;
+				}
+			}
+			
+			// nothing to fill
+			
+			break;
+		}
         
         default: {
-			NNL2_WARN("You are trying to pass an int type to the arange fleet. Use :float32/:float64 or change the :start/:stop to int");
+			NNL2_WARN("You are trying to pass an int type to the arange fleet. Use float type or change the :start/:stop to int");
             nnl2_free_tensor(result);
             NNL2_TYPE_ERROR(dtype);
             return NULL;
@@ -169,70 +194,371 @@ nnl2_tensor* nnl2_naive_int_linspace(int64_t start, int64_t stop, int64_t num, b
     }
     
     switch(dtype) {
-        case INT32: {
-            nnl2_int32* data = (nnl2_int32*)result->data;
-            
-            if (capacity == 1) {
-                if (start > INT32_MAX) {
-                    data[0] = INT32_MAX;
-                } else if (start < INT32_MIN) {
-                    data[0] = INT32_MIN;
-                } else {
-                    data[0] = (nnl2_int32)start;
-                }
-            } else if (capacity > 1) {
-                double step;
-                if (endpoint) {
-                    step = ((double)stop - (double)start) / ((double)capacity - 1.0);
-                } else {
-                    step = ((double)stop - (double)start) / (double)capacity;
-                }
-                
-                double value = (double)start;
-                for (int64_t it = 0; it < capacity; it++) {
-                    int64_t rounded = (int64_t)llround(value);
-                    
-                    if (rounded > INT32_MAX) {
-                        data[it] = INT32_MAX;
-                    } else if (rounded < INT32_MIN) {
-                        data[it] = INT32_MIN;
-                    } else {
-                        data[it] = (nnl2_int32)rounded;
-                    }
-                    
-                    value += step;
-                }
-            }
+        case INT8: {
+			nnl2_int8* data = (nnl2_int8*)result->data;
 			
-            // nothing to fill
-            
-            break;
-        }
-        
-        case INT64: {
-            nnl2_int64* data = (nnl2_int64*)result->data;
-            
-            if (capacity == 1) {
-                data[0] = start;
-            } else if (capacity > 1) {
-                double step;
-                if (endpoint) {
-                    step = ((double)stop - (double)start) / ((double)capacity - 1.0);
-                } else {
-                    step = ((double)stop - (double)start) / (double)capacity;
-                }
-                
-                double value = (double)start;
-                for (int64_t it = 0; it < capacity; it++) {
-                    data[it] = (nnl2_int64)llround(value);
-                    value += step;
-                }
-            }
+			if (capacity == 1) {
+				if (start > INT8_MAX) {
+					data[0] = INT8_MAX;
+				} else if (start < INT8_MIN) {
+					data[0] = INT8_MIN;
+				} else {
+					data[0] = (nnl2_int8)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded > INT8_MAX) {
+						data[it] = INT8_MAX;
+					} else if (rounded < INT8_MIN) {
+						data[it] = INT8_MIN;
+					} else {
+						data[it] = (nnl2_int8)rounded;
+					}
+					
+					value += step;
+				}
+			}
 			
-            //nothing to fill
-            
-            break;
-        }
+			break;
+		}
+
+		case INT16: {
+			nnl2_int16* data = (nnl2_int16*)result->data;
+			
+			if (capacity == 1) {
+				if (start > INT16_MAX) {
+					data[0] = INT16_MAX;
+				} else if (start < INT16_MIN) {
+					data[0] = INT16_MIN;
+				} else {
+					data[0] = (nnl2_int16)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded > INT16_MAX) {
+						data[it] = INT16_MAX;
+					} else if (rounded < INT16_MIN) {
+						data[it] = INT16_MIN;
+					} else {
+						data[it] = (nnl2_int16)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case INT32: {
+			nnl2_int32* data = (nnl2_int32*)result->data;
+			
+			if (capacity == 1) {
+				if (start > INT32_MAX) {
+					data[0] = INT32_MAX;
+				} else if (start < INT32_MIN) {
+					data[0] = INT32_MIN;
+				} else {
+					data[0] = (nnl2_int32)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded > INT32_MAX) {
+						data[it] = INT32_MAX;
+					} else if (rounded < INT32_MIN) {
+						data[it] = INT32_MIN;
+					} else {
+						data[it] = (nnl2_int32)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case INT64: {
+			nnl2_int64* data = (nnl2_int64*)result->data;
+			
+			if (capacity == 1) {
+				data[0] = start;
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					data[it] = (nnl2_int64)llround(value);
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128* data = (nnl2_int128*)result->data;
+			
+			if (capacity == 1) {
+				data[0] = (nnl2_int128)start;
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					data[it] = (nnl2_int128)llround(value);
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT8: {
+			nnl2_uint8* data = (nnl2_uint8*)result->data;
+			
+			if (capacity == 1) {
+				if (start > UINT8_MAX) {
+					data[0] = UINT8_MAX;
+				} else if (start < 0) {
+					data[0] = 0;
+				} else {
+					data[0] = (nnl2_uint8)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded > UINT8_MAX) {
+						data[it] = UINT8_MAX;
+					} else if (rounded < 0) {
+						data[it] = 0;
+					} else {
+						data[it] = (nnl2_uint8)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT16: {
+			nnl2_uint16* data = (nnl2_uint16*)result->data;
+			
+			if (capacity == 1) {
+				if (start > UINT16_MAX) {
+					data[0] = UINT16_MAX;
+				} else if (start < 0) {
+					data[0] = 0;
+				} else {
+					data[0] = (nnl2_uint16)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded > UINT16_MAX) {
+						data[it] = UINT16_MAX;
+					} else if (rounded < 0) {
+						data[it] = 0;
+					} else {
+						data[it] = (nnl2_uint16)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT32: {
+			nnl2_uint32* data = (nnl2_uint32*)result->data;
+			
+			if (capacity == 1) {
+				if (start > UINT32_MAX) {
+					data[0] = UINT32_MAX;
+				} else if (start < 0) {
+					data[0] = 0;
+				} else {
+					data[0] = (nnl2_uint32)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded > UINT32_MAX) {
+						data[it] = UINT32_MAX;
+					} else if (rounded < 0) {
+						data[it] = 0;
+					} else {
+						data[it] = (nnl2_uint32)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT64: {
+			nnl2_uint64* data = (nnl2_uint64*)result->data;
+			
+			if (capacity == 1) {
+				if (start < 0) {
+					data[0] = 0;
+				} else {
+					data[0] = (nnl2_uint64)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded < 0) {
+						data[it] = 0;
+					} else {
+						data[it] = (nnl2_uint64)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128* data = (nnl2_uint128*)result->data;
+			
+			if (capacity == 1) {
+				if (start < 0) {
+					data[0] = 0;
+				} else {
+					data[0] = (nnl2_uint128)start;
+				}
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					
+					if (rounded < 0) {
+						data[it] = 0;
+					} else {
+						data[it] = (nnl2_uint128)rounded;
+					}
+					
+					value += step;
+				}
+			}
+			
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool* data = (nnl2_bool*)result->data;
+			
+			if (capacity == 1) {
+				data[0] = (start != 0) ? true : false;
+			} else if (capacity > 1) {
+				double step;
+				if (endpoint) {
+					step = ((double)stop - (double)start) / ((double)capacity - 1.0);
+				} else {
+					step = ((double)stop - (double)start) / (double)capacity;
+				}
+				
+				double value = (double)start;
+				for (int64_t it = 0; it < capacity; it++) {
+					int64_t rounded = (int64_t)llround(value);
+					data[it] = (rounded != 0) ? true : false;
+					value += step;
+				}
+			}
+			
+			break;
+		}
         
         default: {
 			NNL2_WARN("You are trying to pass an float type to the arange fleet. Use :int32/:int64 or change the :start/:stop to float");

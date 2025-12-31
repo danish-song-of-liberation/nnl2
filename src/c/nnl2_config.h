@@ -91,7 +91,7 @@
 #endif
 
 /** @brief Number of supported tensor data types **/
-#define NUM_TENSOR_TYPES 4 
+#define NUM_TENSOR_TYPES 14 
 	
 ///@{ [tensor_mem_alignment]
 
@@ -172,6 +172,10 @@
 ///@}
 
 ///@{ [errors_handling]
+    #define NNL2_INT128_FATAL() NNL2_FATAL("In function %s, the system/compiler does not support INT128. Use INT64", __func__)
+	#define NNL2_UINT128_FATAL() NNL2_FATAL("In function %s, the system/compiler does not support UINT128. Use UINT64", __func__)
+	#define NNL2_FLOAT16_FATAL() NNL2_FATAL("In function %s, the system/compiler does not support FLOAT16. Use FLOAT32", __func__)
+	#define NNL2_FLOAT128_FATAL() NNL2_FATAL("In function %s, the system/compiler does not support FLOAT128. Use FLOAT64", __func__)
 	#define NNL2_STACK_OVERFLOW(function) NNL2_FATAL("Stack overflow (" function ")")
 	#define NNL2_STACK_UNDERFLOW(function) NNL2_FATAL("Stack underflow (" function ")")
 	#define NNL2_TYPE_ERROR(transmitted_data_type) NNL2_ERROR("An unsupported/incorrect data type was passed. Enum type numbering: %d", transmitted_data_type)
@@ -255,10 +259,28 @@
 												    **  macros that I later removed in format function **/
 	#define NNL2_LARGE_TENSOR_SAMPLE_SIZE 10	   ///< Same
 	#define NNL2_1D_TENSOR_SHOW_ELEMENTS 5		   ///< Show items BEFORE and AFTER skipping
-	#define NNL2_FLOAT64_FORMAT "%.6f"			   ///< Format string for nnl2_float64 precision floating point 
-	#define NNL2_FLOAT32_FORMAT "%.4f"			   ///< Format string for single precision floating point
+	#define NNL2_FLOAT64_FORMAT "%.6f"             ///< Format string for nnl2_float64 precision floating point 
+	#define NNL2_FLOAT32_FORMAT "%.4f"             ///< Format string for single precision floating point
+	
+	#ifdef __FLT128_MANT_DIG__
+		#define NNL2_FLOAT128_FORMAT "%.10Lf"          ///< Format string for 128-bit floating point (long double)
+	#elif defined(LDBL_MANT_DIG) && LDBL_MANT_DIG == 113
+		#define NNL2_FLOAT128_FORMAT "%.30Lf"          ///< Format string for 128-bit long double
+	#else
+		#define NNL2_FLOAT128_FORMAT "%.30f"           ///< Format string with conversion to double
+	#endif
+
+	#define NNL2_INT128_FORMAT "%" PRId128         ///< Format string for 128-bit signed integers
 	#define NNL2_INT64_FORMAT "%" PRId64           ///< Format string for 64-bit signed integers
 	#define NNL2_INT32_FORMAT "%d"                 ///< Format string for 32-bit signed integers
+	#define NNL2_INT16_FORMAT "%d"                 ///< Format string for 16-bit signed integers
+	#define NNL2_INT8_FORMAT "%d"                  ///< Format string for 8-bit signed integers
+	//#define NNL2_UINT128_FORMAT "%" PRId64        ///< Format string for 128-bit unsigned integers
+	#define NNL2_UINT64_FORMAT "%" PRIu64          ///< Format string for 64-bit unsigned integers
+	#define NNL2_UINT32_FORMAT "%u"                ///< Format string for 32-bit unsigned integers
+	#define NNL2_UINT16_FORMAT "%u"                ///< Format string for 16-bit unsigned integers
+	#define NNL2_UINT8_FORMAT "%u"                 ///< Format string for 8-bit unsigned integers
+	#define NNL2_BOOL_FORMAT "%s"                  ///< Format string for boolean (t/nil)
 ///@} [format_parameters] 
 
 /** @brief 
@@ -281,19 +303,6 @@
 
 /** @brief Invalid tensor type value **/
 #define NNL2_TENSOR_TYPE_INVALID -1
-
-/** @brief 
- * Maps tensor types to corresponding C types
- *
- ** @param type 
- * Tensor type enumeration
- */
-#define NNL2_TENSORTYPE_TO_C_TYPE(type) \
-    _Generic((type), \
-        INT32: nnl2_int32, \
-        FLOAT32: nnl2_float32, \
-        FLOAT64: nnl2_float64 \
-    )
 	
 /** @brief Wildcard dimension value for reinterpret (reshape as a world and representation (view)) **/	
 #define NNL2_WILDCARD_DIM -1
@@ -307,9 +316,6 @@
 
 /** @brief
  * Returns the size of the TensorType data type in bytes
- *
- * This function uses a constant size array to quickly determine the size of the
- * data type represented by the TensorType enumerations
  *
  ** @param dtype
  * The data type of the tensor (TensorType)
@@ -348,12 +354,27 @@ NNL2_FORCE_INLINE static size_t get_dtype_size(TensorType dtype) {
 		#define NNL2_SUPPRESS_ARRAY_BOUNDS
     #endif
 	
-	return (const size_t[]){sizeof(nnl2_int32), sizeof(nnl2_int64), sizeof(nnl2_float32), sizeof(nnl2_float64)}[dtype]; 
+	return (const size_t[]){
+		sizeof(nnl2_bool),      // BOOL
+		sizeof(nnl2_int8),      // INT8
+		sizeof(nnl2_uint8),     // UINT8
+		sizeof(nnl2_int16),     // INT16
+		sizeof(nnl2_uint16),    // UINT16
+		sizeof(nnl2_int32),     // INT32
+		sizeof(nnl2_uint32),    // UINT32
+		sizeof(nnl2_int64),     // INT64
+		sizeof(nnl2_uint64),    // UINT64
+		sizeof(nnl2_int128),    // INT128
+		sizeof(nnl2_uint128),   // UINT128
+		sizeof(nnl2_float32),   // FLOAT32
+		sizeof(nnl2_float64),   // FLOAT64
+		sizeof(nnl2_float128)   // FLOAT128
+	}[dtype]; 
 	
 	#ifdef __GNUC__
 		#pragma GCC diagnostic pop
 	    #undef NNL2_SUPPRESS_ARRAY_BOUNDS
     #endif
-}	
+}
 
 #endif /** NNL2_CONFIG_H **/

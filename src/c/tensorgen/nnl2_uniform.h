@@ -87,6 +87,147 @@ Tensor* naive_uniform(int* shape, int rank, TensorType dtype, void* from, void* 
 			break;
 		}
 		
+		case FLOAT128: {
+			nnl2_float128 from_cast = (nnl2_float128)(*(nnl2_float64*)from);
+			nnl2_float128 to_cast = (nnl2_float128)(*(nnl2_float64*)to);
+			nnl2_float128* data = (nnl2_float128*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				nnl2_float128 rand_val = (nnl2_float128)rand() / RAND_MAX;
+				data[i] = from_cast + (to_cast - from_cast) * rand_val;
+			}
+			break;
+		}
+
+		case INT8: {
+			int8_t from_cast = *((int8_t*)from);
+			int8_t to_cast = *((int8_t*)to);
+			int8_t* data = (int8_t*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % (to_cast - from_cast + 1);
+			}
+			break;
+		}
+
+		case INT16: {
+			int16_t from_cast = *((int16_t*)from);
+			int16_t to_cast = *((int16_t*)to);
+			int16_t* data = (int16_t*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % (to_cast - from_cast + 1);
+			}
+			break;
+		}
+
+		case UINT8: {
+			uint8_t from_cast = *((uint8_t*)from);
+			uint8_t to_cast = *((uint8_t*)to);
+			uint8_t* data = (uint8_t*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % (to_cast - from_cast + 1);
+			}
+			break;
+		}
+
+		case UINT16: {
+			uint16_t from_cast = *((uint16_t*)from);
+			uint16_t to_cast = *((uint16_t*)to);
+			uint16_t* data = (uint16_t*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % (to_cast - from_cast + 1);
+			}
+			break;
+		}
+
+		case UINT32: {
+			uint32_t from_cast = *((uint32_t*)from);
+			uint32_t to_cast = *((uint32_t*)to);
+			uint32_t* data = (uint32_t*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % (to_cast - from_cast + 1);
+			}
+			break;
+		}
+
+		case UINT64: {
+			uint64_t from_cast = *((uint64_t*)from);
+			uint64_t to_cast = *((uint64_t*)to);
+			uint64_t* data = (uint64_t*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				if (to_cast - from_cast + 1 > RAND_MAX) {
+					uint64_t range = to_cast - from_cast + 1;
+					uint64_t rand_val = ((uint64_t)rand() << 15) ^ rand();
+					data[i] = from_cast + (rand_val % range);
+				} else {
+					data[i] = from_cast + (rand() % (to_cast - from_cast + 1));
+				}
+			}
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128 from_cast = (nnl2_int128)(*(nnl2_float64*)from);
+			nnl2_int128 to_cast = (nnl2_int128)(*(nnl2_float64*)to);
+			nnl2_int128* data = (nnl2_int128*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				if (to_cast - from_cast + 1 > RAND_MAX) {
+					nnl2_int128 range = to_cast - from_cast + 1;
+					nnl2_int128 rand_val = ((nnl2_int128)rand() << 48) ^ 
+										  ((nnl2_int128)rand() << 32) ^ 
+										  ((nnl2_int128)rand() << 16) ^ 
+										  rand();
+					data[i] = from_cast + (rand_val % range);
+				} else {
+					data[i] = from_cast + (rand() % (to_cast - from_cast + 1));
+				}
+			}
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128 from_cast = (nnl2_uint128)(*(nnl2_float64*)from);
+			nnl2_uint128 to_cast = (nnl2_uint128)(*(nnl2_float64*)to);
+			nnl2_uint128* data = (nnl2_uint128*)result->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				if (to_cast - from_cast + 1 > RAND_MAX) {
+					nnl2_uint128 range = to_cast - from_cast + 1;
+					nnl2_uint128 rand_val = ((nnl2_uint128)rand() << 48) ^ 
+										   ((nnl2_uint128)rand() << 32) ^ 
+										   ((nnl2_uint128)rand() << 16) ^ 
+										   rand();
+					data[i] = from_cast + (rand_val % range);
+				} else {
+					data[i] = from_cast + (rand() % (to_cast - from_cast + 1));
+				}
+			}
+			break;
+		}
+
+case BOOL: {
+    nnl2_bool from_cast = *((nnl2_bool*)from);
+    nnl2_bool to_cast = *((nnl2_bool*)to);
+    nnl2_bool* data = (nnl2_bool*)result->data;
+    
+    if (from_cast == false && to_cast == true) {
+        for(size_t i = 0; i < total_elems; i++) {
+            data[i] = (rand() % 2) ? true : false;
+        }
+    } else { 
+        for(size_t i = 0; i < total_elems; i++) {
+            data[i] = from_cast;
+        }
+    }
+    break;
+}
+		
 		default: {
 			NNL2_TYPE_ERROR(dtype);
 			return NULL;

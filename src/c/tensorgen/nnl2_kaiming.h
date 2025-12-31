@@ -53,8 +53,8 @@ nnl2_tensor* nnl2_naive_kaiming(int* shape, int rank, nnl2_tensor_type dtype, in
         NNL2_FUNC_ENTER();
     #endif
     
-    if(dtype == INT32) {
-        NNL2_FATAL("INT32 Can't be used for kaiming distribution");
+    if(dtype != FLOAT32 && dtype != FLOAT64 && dtype != FLOAT128) {
+        NNL2_FATAL("Passed type can't be used for kaiming distribution");
         return NULL;
     }
     

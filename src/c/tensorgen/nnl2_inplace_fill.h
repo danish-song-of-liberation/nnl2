@@ -144,6 +144,156 @@ bool nnl2_naive_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			break;
 		}
 		
+		case INT8: {
+			int8_t filler = *(int8_t*)value; // Extract integer fill value
+			
+			// Cast tensor data to integer pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int8_t* data = (int8_t*)tensor->data;
+			#else
+				volatile int8_t* data = (int8_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for INT8 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case INT16: {
+			int16_t filler = *(int16_t*)value; // Extract integer fill value
+			
+			// Cast tensor data to integer pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int16_t* data = (int16_t*)tensor->data;
+			#else
+				volatile int16_t* data = (int16_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for INT16 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case UINT8: {
+			uint8_t filler = *(uint8_t*)value; // Extract unsigned integer fill value
+			
+			// Cast tensor data to unsigned integer pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint8_t* data = (uint8_t*)tensor->data;
+			#else
+				volatile uint8_t* data = (uint8_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for UINT8 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case UINT16: {
+			uint16_t filler = *(uint16_t*)value; // Extract unsigned integer fill value
+			
+			// Cast tensor data to unsigned integer pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint16_t* data = (uint16_t*)tensor->data;
+			#else
+				volatile uint16_t* data = (uint16_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for UINT16 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case UINT32: {
+			uint32_t filler = *(uint32_t*)value; // Extract unsigned integer fill value
+			
+			// Cast tensor data to unsigned integer pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint32_t* data = (uint32_t*)tensor->data;
+			#else
+				volatile uint32_t* data = (uint32_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for UINT32 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case UINT64: {
+			uint64_t filler = *(uint64_t*)value; // Extract unsigned int64 fill value
+			
+			// Cast tensor data to uint64 pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint64_t* data = (uint64_t*)tensor->data;
+			#else
+				volatile uint64_t* data = (uint64_t*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for UINT64 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool filler = *(nnl2_bool*)value; // Extract boolean fill value
+			
+			// Cast tensor data to boolean pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_bool* data = (nnl2_bool*)tensor->data;
+			#else
+				volatile nnl2_bool* data = (nnl2_bool*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for BOOL elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128 filler = (nnl2_int128)(*(nnl2_int64*)value);
+			
+			// Cast tensor data to int128 pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_int128* data = (nnl2_int128*)tensor->data;
+			#else
+				volatile nnl2_int128* data = (nnl2_int128*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for INT128 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128 filler = (nnl2_uint128)(*(nnl2_uint64*)value); // Extract uint128 fill value
+			
+			// Cast tensor data to uint128 pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_uint128* data = (nnl2_uint128*)tensor->data;
+			#else
+				volatile nnl2_uint128* data = (nnl2_uint128*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for UINT128 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+
+		case FLOAT128: {
+			nnl2_float128 filler = (nnl2_float128)(*(nnl2_float64*)value); // Extract float128 fill value
+			
+			// Cast tensor data to float128 pointer
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_float128* data = (nnl2_float128*)tensor->data;
+			#else
+				volatile nnl2_float128* data = (nnl2_float128*)tensor->data;
+			#endif 
+			
+			// Simple scalar loop for FLOAT128 elements
+			for(size_t i = 0; i < total_elems; ++i) data[i] = filler;
+			break;
+		}
+		
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Error: unsupported data type
 			result = false;
@@ -336,6 +486,258 @@ bool nnl2_unroll_128_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 			for (; i < total_elems; i++) {
                 data[i] = filler;
             }
+			
+			break;
+		}
+		
+		case INT8: {
+			int8_t filler = *(int8_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int8_t* data = (int8_t*)tensor->data;    
+			#else 
+				volatile int8_t* data = (int8_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case INT16: {
+			int16_t filler = *(int16_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int16_t* data = (int16_t*)tensor->data;    
+			#else 
+				volatile int16_t* data = (int16_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT8: {
+			uint8_t filler = *(uint8_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint8_t* data = (uint8_t*)tensor->data;    
+			#else 
+				volatile uint8_t* data = (uint8_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT16: {
+			uint16_t filler = *(uint16_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint16_t* data = (uint16_t*)tensor->data;    
+			#else 
+				volatile uint16_t* data = (uint16_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT32: {
+			uint32_t filler = *(uint32_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint32_t* data = (uint32_t*)tensor->data;    
+			#else 
+				volatile uint32_t* data = (uint32_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT64: {
+			uint64_t filler = *(uint64_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint64_t* data = (uint64_t*)tensor->data;    
+			#else 
+				volatile uint64_t* data = (uint64_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool filler = *(nnl2_bool*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_bool* data = (nnl2_bool*)tensor->data;    
+			#else 
+				volatile nnl2_bool* data = (nnl2_bool*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128 filler = (nnl2_int128)(*(nnl2_int64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_int128* data = (nnl2_int128*)tensor->data;    
+			#else 
+				volatile nnl2_int128* data = (nnl2_int128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 2;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128 filler = (nnl2_uint128)(*(nnl2_uint64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_uint128* data = (nnl2_uint128*)tensor->data;    
+			#else 
+				volatile nnl2_uint128* data = (nnl2_uint128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 2;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case FLOAT128: {
+			nnl2_float128 filler = (nnl2_float128)(*(nnl2_float64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_float128* data = (nnl2_float128*)tensor->data;    
+			#else 
+				volatile nnl2_float128* data = (nnl2_float128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 2;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
 			
 			break;
 		}
@@ -547,6 +949,277 @@ bool nnl2_unroll_256_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 			break;
 		}
 		
+		case INT8: { 
+			int8_t filler = *(int8_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int8_t* data = (int8_t*)tensor->data;    
+			#else 
+				volatile int8_t* data = (int8_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case INT16: { 
+			int16_t filler = *(int16_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int16_t* data = (int16_t*)tensor->data;    
+			#else 
+				volatile int16_t* data = (int16_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT8: { 
+			uint8_t filler = *(uint8_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint8_t* data = (uint8_t*)tensor->data;    
+			#else 
+				volatile uint8_t* data = (uint8_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT16: { 
+			uint16_t filler = *(uint16_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint16_t* data = (uint16_t*)tensor->data;    
+			#else 
+				volatile uint16_t* data = (uint16_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT32: { 
+			uint32_t filler = *(uint32_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint32_t* data = (uint32_t*)tensor->data;    
+			#else 
+				volatile uint32_t* data = (uint32_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT64: { 
+			uint64_t filler = *(uint64_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint64_t* data = (uint64_t*)tensor->data;    
+			#else 
+				volatile uint64_t* data = (uint64_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case BOOL: { 
+			nnl2_bool filler = *(nnl2_bool*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_bool* data = (nnl2_bool*)tensor->data;    
+			#else 
+				volatile nnl2_bool* data = (nnl2_bool*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case INT128: { 
+			nnl2_int128 filler = (nnl2_int128)(*(nnl2_int64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_int128* data = (nnl2_int128*)tensor->data;    
+			#else 
+				volatile nnl2_int128* data = (nnl2_int128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT128: { 
+			nnl2_uint128 filler = (nnl2_uint128)(*(nnl2_uint64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_uint128* data = (nnl2_uint128*)tensor->data;    
+			#else 
+				volatile nnl2_uint128* data = (nnl2_uint128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case FLOAT128: { 
+			nnl2_float128 filler = (nnl2_float128)(*(nnl2_float64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_float128* data = (nnl2_float128*)tensor->data;    
+			#else 
+				volatile nnl2_float128* data = (nnl2_float128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
 		default: {
 			NNL2_TYPE_ERROR(dtype);
 			result = false;
@@ -763,6 +1436,277 @@ bool nnl2_unroll_512_inplace_fill(Tensor* tensor, void* value, TensorType dtype)
 			break;
 		}
 		
+		case INT8: { 
+			int8_t filler = *(int8_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int8_t* data = (int8_t*)tensor->data;    
+			#else 
+				volatile int8_t* data = (int8_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case INT16: { 
+			int16_t filler = *(int16_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				int16_t* data = (int16_t*)tensor->data;    
+			#else 
+				volatile int16_t* data = (int16_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT8: { 
+			uint8_t filler = *(uint8_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint8_t* data = (uint8_t*)tensor->data;    
+			#else 
+				volatile uint8_t* data = (uint8_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT16: { 
+			uint16_t filler = *(uint16_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint16_t* data = (uint16_t*)tensor->data;    
+			#else 
+				volatile uint16_t* data = (uint16_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT32: { 
+			uint32_t filler = *(uint32_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint32_t* data = (uint32_t*)tensor->data;    
+			#else 
+				volatile uint32_t* data = (uint32_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 8;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT64: { 
+			uint64_t filler = *(uint64_t*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				uint64_t* data = (uint64_t*)tensor->data;    
+			#else 
+				volatile uint64_t* data = (uint64_t*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 16;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case BOOL: { 
+			nnl2_bool filler = *(nnl2_bool*)value;
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_bool* data = (nnl2_bool*)tensor->data;    
+			#else 
+				volatile nnl2_bool* data = (nnl2_bool*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 32;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+				data[i + 4] = filler; data[i + 5] = filler; data[i + 6] = filler; data[i + 7] = filler;
+				data[i + 8] = filler; data[i + 9] = filler; data[i + 10] = filler; data[i + 11] = filler;
+				data[i + 12] = filler; data[i + 13] = filler; data[i + 14] = filler; data[i + 15] = filler;
+				data[i + 16] = filler; data[i + 17] = filler; data[i + 18] = filler; data[i + 19] = filler;
+				data[i + 20] = filler; data[i + 21] = filler; data[i + 22] = filler; data[i + 23] = filler;
+				data[i + 24] = filler; data[i + 25] = filler; data[i + 26] = filler; data[i + 27] = filler;
+				data[i + 28] = filler; data[i + 29] = filler; data[i + 30] = filler; data[i + 31] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case INT128: { 
+			nnl2_int128 filler = (nnl2_int128)(*(nnl2_int64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_int128* data = (nnl2_int128*)tensor->data;    
+			#else 
+				volatile nnl2_int128* data = (nnl2_int128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case UINT128: { 
+			nnl2_uint128 filler = (nnl2_uint128)(*(nnl2_uint64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_uint128* data = (nnl2_uint128*)tensor->data;    
+			#else 
+				volatile nnl2_uint128* data = (nnl2_uint128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
+		case FLOAT128: { 
+			nnl2_float128 filler = (nnl2_float128)(*(nnl2_float64*)value);
+			
+			#if NNL2_SAFETY_MODE == NNL2_SAFETY_MODE_OFF
+				nnl2_float128* data = (nnl2_float128*)tensor->data;    
+			#else 
+				volatile nnl2_float128* data = (nnl2_float128*)tensor->data;    
+			#endif
+			
+			size_t i = 0;
+			size_t unroll_factor = 4;
+			size_t main_elems = total_elems & ~(unroll_factor - 1);
+			
+			for(; i < main_elems; i += unroll_factor) {
+				data[i] = filler; data[i + 1] = filler; data[i + 2] = filler; data[i + 3] = filler;
+			}
+			
+			for (; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			
+			break;
+		}
+
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Unsupported data type error
 			result = false;
@@ -968,6 +1912,242 @@ bool nnl2_avx256_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
 			break;
 		}
 		
+		case INT8: {
+			int8_t filler = *(int8_t*)value;
+			int8_t* data = (int8_t*)tensor->data;
+			
+			// Create AVX vector with 32 copies of the fill value
+			__m256i avx_filler = _mm256_set1_epi8(filler);
+			
+			size_t avx_iters = total_elems / 32; // 32 int8 per AVX256
+			size_t avx_processed_elems = avx_iters * 32;
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 32), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 32), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}    
+			break;
+		}
+
+		case INT16: {
+			int16_t filler = *(int16_t*)value;
+			int16_t* data = (int16_t*)tensor->data;
+			
+			// Create AVX vector with 16 copies of the fill value
+			__m256i avx_filler = _mm256_set1_epi16(filler);
+			
+			size_t avx_iters = total_elems / 16; // 16 int16 per AVX256
+			size_t avx_processed_elems = avx_iters * 16;
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 16), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 16), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}    
+			break;
+		}
+
+		case UINT8: {
+			uint8_t filler = *(uint8_t*)value;
+			uint8_t* data = (uint8_t*)tensor->data;
+			
+			// Create AVX vector with 32 copies of the fill value
+			__m256i avx_filler = _mm256_set1_epi8(filler);
+			
+			size_t avx_iters = total_elems / 32; // 32 uint8 per AVX256
+			size_t avx_processed_elems = avx_iters * 32;
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 32), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 32), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}    
+			break;
+		}
+
+		case UINT16: {
+			uint16_t filler = *(uint16_t*)value;
+			uint16_t* data = (uint16_t*)tensor->data;
+			
+			// Create AVX vector with 16 copies of the fill value
+			__m256i avx_filler = _mm256_set1_epi16(filler);
+			
+			size_t avx_iters = total_elems / 16; // 16 uint16 per AVX256
+			size_t avx_processed_elems = avx_iters * 16;
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 16), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 16), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}    
+			break;
+		}
+
+		case UINT32: {
+			uint32_t filler = *(uint32_t*)value;
+			uint32_t* data = (uint32_t*)tensor->data;
+			
+			// Create AVX vector with 8 copies of the fill value
+			__m256i avx_filler = _mm256_set1_epi32(filler);
+			
+			size_t avx_iters = total_elems / 8; // 8 uint32 per AVX256
+			size_t avx_processed_elems = avx_iters * 8;
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 8), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 8), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}    
+			break;
+		}
+
+		case UINT64: {
+			uint64_t filler = *(uint64_t*)value;
+			uint64_t* data = (uint64_t*)tensor->data;
+			
+			// Create AVX vector with 4 copies of the fill value
+			__m256i avx_filler = _mm256_set1_epi64x(filler);
+			
+			size_t avx_iters = total_elems / 4; // 4 uint64 per AVX256
+			size_t avx_processed_elems = avx_iters * 4;
+			
+			if(is_aligned) {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_store_si256((__m256i*)(data + i * 4), avx_filler);
+				}
+			} else {
+				for (size_t i = 0; i < avx_iters; i++) { 
+					_mm256_storeu_si256((__m256i*)(data + i * 4), avx_filler);
+				}
+			}
+
+			// Process remaining elements
+			for (size_t j = avx_processed_elems; j < total_elems; j++) {
+				data[j] = filler;
+			}    
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool filler = *(nnl2_bool*)value;
+			nnl2_bool* data = (nnl2_bool*)tensor->data;
+			
+			// For bool type (assuming it's 1 byte)
+			if (sizeof(nnl2_bool) == 1) {
+				// Create AVX vector with 32 copies of the fill value
+				__m256i avx_filler = _mm256_set1_epi8(filler);
+				
+				size_t avx_iters = total_elems / 32; // 32 bool per AVX256
+				size_t avx_processed_elems = avx_iters * 32;
+				
+				if(is_aligned) {
+					for (size_t i = 0; i < avx_iters; i++) { 
+						_mm256_store_si256((__m256i*)(data + i * 32), avx_filler);
+					}
+				} else {
+					for (size_t i = 0; i < avx_iters; i++) { 
+						_mm256_storeu_si256((__m256i*)(data + i * 32), avx_filler);
+					}
+				}
+
+				// Process remaining elements
+				for (size_t j = avx_processed_elems; j < total_elems; j++) {
+					data[j] = filler;
+				}
+			} else {
+				// Fallback for bool types larger than 1 byte
+				for (size_t i = 0; i < total_elems; i++) {
+					data[i] = filler;
+				}
+			}
+			break;
+		}
+
+		case INT128: {
+			// Cast from float64 to int128 as specified
+			nnl2_int128 filler = (nnl2_int128)(*(nnl2_float64*)value);
+			nnl2_int128* data = (nnl2_int128*)tensor->data;
+			
+			// AVX256 can't handle 128-bit types directly
+			// Use simple scalar loop
+			for (size_t i = 0; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			break;
+		}
+
+		case UINT128: {
+			// Cast from float64 to uint128 as specified
+			nnl2_uint128 filler = (nnl2_uint128)(*(nnl2_float64*)value);
+			nnl2_uint128* data = (nnl2_uint128*)tensor->data;
+			
+			// AVX256 can't handle 128-bit types directly
+			// Use simple scalar loop
+			for (size_t i = 0; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			break;
+		}
+
+		case FLOAT128: {
+			// Cast from float64 to float128 as specified
+			nnl2_float128 filler = (nnl2_float128)(*(nnl2_float64*)value);
+			nnl2_float128* data = (nnl2_float128*)tensor->data;
+			
+			// AVX256 doesn't support 128-bit floating point
+			// Use simple scalar loop
+			for (size_t i = 0; i < total_elems; i++) {
+				data[i] = filler;
+			}
+			break;
+		}
+		
 		default: {
 			NNL2_TYPE_ERROR(dtype); // Unsupported data type error
 			result = false;
@@ -1031,6 +2211,146 @@ bool nnl2_own_inplace_fill_int64(int64_t* data, size_t total_size, int64_t value
  ** @see nnl2_own_inplace_fill_float64 (declaration)
  **/
 bool nnl2_own_inplace_fill_int32(int32_t* data, size_t total_size, int32_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type int8
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int8(int8_t* data, size_t total_size, int8_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type int16
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int16(int16_t* data, size_t total_size, int16_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type uint8
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint8(uint8_t* data, size_t total_size, uint8_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type uint16
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint16(uint16_t* data, size_t total_size, uint16_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type uint32
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint32(uint32_t* data, size_t total_size, uint32_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type uint64
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint64(uint64_t* data, size_t total_size, uint64_t value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type bool
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_bool(nnl2_bool* data, size_t total_size, nnl2_bool value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type int128
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int128(nnl2_int128* data, size_t total_size, nnl2_int128 value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type uint128
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint128(nnl2_uint128* data, size_t total_size, nnl2_uint128 value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Fill tensor of type float128
+ *
+ ** @see nnl2_own_inplace_fill_float64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_float128(nnl2_float128* data, size_t total_size, nnl2_float128 value, size_t num_threads, bool aligned);
+
+/** @brief
+ * Worker function for parallel int8 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_int8(void* thread);
+
+/** @brief
+ * Worker function for parallel int16 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_int16(void* thread);
+
+/** @brief
+ * Worker function for parallel uint8 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_uint8(void* thread);
+
+/** @brief
+ * Worker function for parallel uint16 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_uint16(void* thread);
+
+/** @brief
+ * Worker function for parallel uint32 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_uint32(void* thread);
+
+/** @brief
+ * Worker function for parallel uint64 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_uint64(void* thread);
+
+/** @brief
+ * Worker function for parallel bool fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_bool(void* thread);
+
+/** @brief
+ * Worker function for parallel int128 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_int128(void* thread);
+
+/** @brief
+ * Worker function for parallel uint128 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_uint128(void* thread);
+
+/** @brief
+ * Worker function for parallel float128 fill
+ *
+ ** @see nnl2_own_pfill_float64 (declaration)
+ **/
+void* nnl2_own_pfill_float128(void* thread);
 
 /** @brief 
  * Worker function for parallel float64 fill
@@ -1124,6 +2444,16 @@ bool nnl2_own_inplace_fill(Tensor* tensor, void* value, TensorType dtype) {
         case FLOAT32:  result = nnl2_own_inplace_fill_float32((float*)tensor->data, total_elems, *(float*)value, num_threads, is_aligned);    break;
         case INT64:    result = nnl2_own_inplace_fill_int64((int64_t*)tensor->data, total_elems, *(int64_t*)value, num_threads, is_aligned);  break;
         case INT32:    result = nnl2_own_inplace_fill_int32((int32_t*)tensor->data, total_elems, *(int32_t*)value, num_threads, is_aligned);  break; 
+		case INT8:     result = nnl2_own_inplace_fill_int8((int8_t*)tensor->data, total_elems, *(int8_t*)value, num_threads, is_aligned);      break;
+		case INT16:    result = nnl2_own_inplace_fill_int16((int16_t*)tensor->data, total_elems, *(int16_t*)value, num_threads, is_aligned);   break;
+		case UINT8:    result = nnl2_own_inplace_fill_uint8((uint8_t*)tensor->data, total_elems, *(uint8_t*)value, num_threads, is_aligned);   break;
+		case UINT16:   result = nnl2_own_inplace_fill_uint16((uint16_t*)tensor->data, total_elems, *(uint16_t*)value, num_threads, is_aligned);  break;
+		case UINT32:   result = nnl2_own_inplace_fill_uint32((uint32_t*)tensor->data, total_elems, *(uint32_t*)value, num_threads, is_aligned);  break;
+		case UINT64:   result = nnl2_own_inplace_fill_uint64((uint64_t*)tensor->data, total_elems, *(uint64_t*)value, num_threads, is_aligned);  break;
+		case BOOL:     result = nnl2_own_inplace_fill_bool((nnl2_bool*)tensor->data, total_elems, *(nnl2_bool*)value, num_threads, is_aligned);  break;
+		case INT128:   result = nnl2_own_inplace_fill_int128((nnl2_int128*)tensor->data, total_elems, *(nnl2_int128*)value, num_threads, is_aligned);  break;
+		case UINT128:  result = nnl2_own_inplace_fill_uint128((nnl2_uint128*)tensor->data, total_elems, *(nnl2_uint128*)value, num_threads, is_aligned);  break;
+		case FLOAT128: result = nnl2_own_inplace_fill_float128((nnl2_float128*)tensor->data, total_elems, *(nnl2_float128*)value, num_threads, is_aligned);  break;
         
         default: {
             NNL2_TYPE_ERROR(dtype);
@@ -1793,6 +3123,1424 @@ void* nnl2_own_pfill_int64(void* arg) {
             data[i] = value;
         }
     #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_int8 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int8(int8_t* data, size_t total_size, int8_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(int8_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = INT8;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_int8, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_int8");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_int8");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_int16 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int16(int16_t* data, size_t total_size, int16_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(int16_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = INT16;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_int16, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_int16");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_int16");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_uint8 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint8(uint8_t* data, size_t total_size, uint8_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(uint8_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = UINT8;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_uint8, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_uint8");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_uint8");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_uint16 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint16(uint16_t* data, size_t total_size, uint16_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(uint16_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = UINT16;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_uint16, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_uint16");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_uint16");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_uint32 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint32(uint32_t* data, size_t total_size, uint32_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(uint32_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = UINT32;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_uint32, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_uint32");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_uint32");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_uint64 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint64(uint64_t* data, size_t total_size, uint64_t value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(uint64_t);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = UINT64;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_uint64, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_uint64");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_uint64");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_bool (declaration)
+ **/
+bool nnl2_own_inplace_fill_bool(nnl2_bool* data, size_t total_size, nnl2_bool value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(nnl2_bool);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 4) {
+        aligned_chunk = cache_line_elements * 4;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = BOOL;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_bool, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_bool");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_bool");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_int128 (declaration)
+ **/
+bool nnl2_own_inplace_fill_int128(nnl2_int128* data, size_t total_size, nnl2_int128 value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(nnl2_int128);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 2) {
+        aligned_chunk = cache_line_elements * 2;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = INT128;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_int128, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_int128");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_int128");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_uint128 (declaration)
+ **/
+bool nnl2_own_inplace_fill_uint128(nnl2_uint128* data, size_t total_size, nnl2_uint128 value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(nnl2_uint128);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 2) {
+        aligned_chunk = cache_line_elements * 2;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = UINT128;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_uint128, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_uint128");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_uint128");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_inplace_fill_float128 (declaration)
+ **/
+bool nnl2_own_inplace_fill_float128(nnl2_float128* data, size_t total_size, nnl2_float128 value, size_t num_threads, bool aligned) {
+    pthread_t threads[num_threads];
+    fill_ptask tasks[num_threads];
+    
+    // Calculate chunk size with cache-friendly alignment
+    size_t cache_line_elements = NNL2_CACHE_LINE_SIZE / sizeof(nnl2_float128);
+    size_t base_chunk = total_size / num_threads;
+    
+    // Align chunks to cache line boundaries
+    size_t aligned_chunk = (base_chunk + cache_line_elements - 1) / cache_line_elements;
+    aligned_chunk *= cache_line_elements;
+    
+    // Ensure minimum chunk size for vectorization
+    if (aligned_chunk < cache_line_elements * 2) {
+        aligned_chunk = cache_line_elements * 2;
+    }
+    
+    // Recalculate thread distribution with aligned chunks
+    size_t full_chunks = total_size / aligned_chunk;
+    size_t remainder = total_size % aligned_chunk;
+    
+    // Adjust thread count if we have fewer chunks than threads
+    size_t actual_threads = (full_chunks + (remainder > 0 ? 1 : 0));
+    if (actual_threads < num_threads) {
+        num_threads = actual_threads;
+    }
+    
+    size_t current_start = 0;
+    for (size_t i = 0; i < num_threads; i++) {
+        size_t current_chunk = (i < full_chunks) ? aligned_chunk : remainder;
+        if (current_chunk == 0) break;
+        
+        // Initialize task parameters for this thread
+        tasks[i].data = data;
+        tasks[i].start = current_start;
+        tasks[i].end = current_start + current_chunk;
+        tasks[i].value = &value;
+        tasks[i].dtype = FLOAT128;
+        tasks[i].aligned = aligned;
+        
+        // Create worker thread
+        int status = pthread_create(&threads[i], NULL, nnl2_own_pfill_float128, &tasks[i]);
+        if(status != 0) {
+            NNL2_THREAD_CREATE_ERROR(status, "nnl2_own_inplace_fill_float128");
+            num_threads = i;  // Adjust thread count if creation failed
+            break;
+        }
+        
+        current_start += current_chunk;
+    }
+    
+    // Wait for all threads to complete
+    for (size_t i = 0; i < num_threads; i++) {
+        int join_status = pthread_join(threads[i], NULL);
+        if(join_status != 0) {
+            NNL2_THREAD_JOIN_ERROR(join_status, "nnl2_own_inplace_fill_float128");
+        }
+    }
+    
+    return true;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_int8 (declaration)
+ **/
+void* nnl2_own_pfill_int8(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    int8_t* data = (int8_t*)task->data;
+    int8_t value = *(int8_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 32) {
+            __m256i avx_value = _mm256_set1_epi8(value);
+            size_t avx_iters = chunk_size / 32;
+            size_t avx_processed = avx_iters * 32;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 8) {
+                prefetch_distance = 8;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 32;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 32;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(int8_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 32;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 32;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(int8_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 16;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_int16 (declaration)
+ **/
+void* nnl2_own_pfill_int16(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    int16_t* data = (int16_t*)task->data;
+    int16_t value = *(int16_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 16) {
+            __m256i avx_value = _mm256_set1_epi16(value);
+            size_t avx_iters = chunk_size / 16;
+            size_t avx_processed = avx_iters * 16;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 8) {
+                prefetch_distance = 8;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 16;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 16;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(int16_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 16;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 16;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(int16_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 8;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_uint8 (declaration)
+ **/
+void* nnl2_own_pfill_uint8(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    uint8_t* data = (uint8_t*)task->data;
+    uint8_t value = *(uint8_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 32) {
+            __m256i avx_value = _mm256_set1_epi8(value);
+            size_t avx_iters = chunk_size / 32;
+            size_t avx_processed = avx_iters * 32;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 8) {
+                prefetch_distance = 8;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 32;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 32;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint8_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 32;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 32;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint8_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 16;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_uint16 (declaration)
+ **/
+void* nnl2_own_pfill_uint16(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    uint16_t* data = (uint16_t*)task->data;
+    uint16_t value = *(uint16_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 16) {
+            __m256i avx_value = _mm256_set1_epi16(value);
+            size_t avx_iters = chunk_size / 16;
+            size_t avx_processed = avx_iters * 16;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 8) {
+                prefetch_distance = 8;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 16;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 16;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint16_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 16;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 16;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint16_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 8;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_uint32 (declaration)
+ **/
+void* nnl2_own_pfill_uint32(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    uint32_t* data = (uint32_t*)task->data;
+    uint32_t value = *(uint32_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 8) {
+            __m256i avx_value = _mm256_set1_epi32(value);
+            size_t avx_iters = chunk_size / 8;
+            size_t avx_processed = avx_iters * 8;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 4) {
+                prefetch_distance = 4;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 8;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 8;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint32_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 8;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 8;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint32_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 4;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_uint64 (declaration)
+ **/
+void* nnl2_own_pfill_uint64(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    uint64_t* data = (uint64_t*)task->data;
+    uint64_t value = *(uint64_t*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 4) {
+            __m256i avx_value = _mm256_set1_epi64x(value);
+            size_t avx_iters = chunk_size / 4;
+            size_t avx_processed = avx_iters * 4;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 2) {
+                prefetch_distance = 2;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 4;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 4;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint64_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 4;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 4;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(uint64_t)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 2;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_bool (declaration)
+ **/
+void* nnl2_own_pfill_bool(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    nnl2_bool* data = (nnl2_bool*)task->data;
+    nnl2_bool value = *(nnl2_bool*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    size_t chunk_size = end - start;
+    
+    #ifdef NNL2_AVX256_AVAILABLE
+        if (chunk_size >= 32 && sizeof(nnl2_bool) == 1) {
+            __m256i avx_value = _mm256_set1_epi8(value);
+            size_t avx_iters = chunk_size / 32;
+            size_t avx_processed = avx_iters * 32;
+            
+            // Adaptive prefetching based on chunk size
+            size_t prefetch_distance = NNL2_PREFETCH_DISTANCE;
+            if (prefetch_distance > avx_iters / 2) {
+                prefetch_distance = avx_iters / 4;
+            }
+            if (prefetch_distance < 8) {
+                prefetch_distance = 8;
+            }
+            
+            if (task->aligned) {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 32;
+                    
+                    // Aggressive prefetching for multiple cache lines ahead
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 32;
+                        // Prefetch multiple cache lines
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(nnl2_bool)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_store_si256((__m256i*)(data + idx), avx_value);
+                }
+            } else {
+                for (size_t i = 0; i < avx_iters; i++) {
+                    size_t idx = start + i * 32;
+                    
+                    if (i + prefetch_distance < avx_iters) {
+                        size_t prefetch_idx = idx + prefetch_distance * 32;
+                        for (int j = 0; j < NNL2_CACHE_LINES_AHEAD; j++) {
+                            __builtin_prefetch(data + prefetch_idx + j * (NNL2_CACHE_LINE_SIZE / sizeof(nnl2_bool)), 1, 3);
+                        }
+                    }
+                    
+                    _mm256_storeu_si256((__m256i*)(data + idx), avx_value);
+                }
+            }
+            
+            size_t remaining_start = start + avx_processed;
+            if (remaining_start < end) {
+                size_t remaining_size = end - remaining_start;
+                
+                // Process remainder in small blocks for better cache locality
+                const size_t block_size = 16;
+                size_t block_iters = remaining_size / block_size;
+                size_t block_processed = block_iters * block_size;
+                
+                for (size_t i = 0; i < block_iters; i++) {
+                    size_t idx = remaining_start + i * block_size;
+                    for (size_t j = 0; j < block_size; j++) {
+                        data[idx + j] = value;
+                    }
+                }
+                
+                // Process final elements
+                for (size_t i = remaining_start + block_processed; i < end; i++) {
+                    data[i] = value;
+                }
+            }
+        } else {
+            // Small chunk or different bool size - use simple sequential processing
+            for (size_t i = start; i < end; i++) {
+                data[i] = value;
+            }
+        }
+    #else
+        // Fallback branch - AVX not available
+        for (size_t i = start; i < end; i++) {
+            data[i] = value;
+        }
+    #endif
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_int128 (declaration)
+ **/
+void* nnl2_own_pfill_int128(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    nnl2_int128* data = (nnl2_int128*)(nnl2_int64*)task->data;
+    nnl2_int128 value = (nnl2_int128)*(nnl2_int64*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    // For 128-bit types, use simple sequential processing
+    // AVX256 can't handle 128-bit integers directly
+    for (size_t i = start; i < end; i++) {
+        data[i] = value;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_uint128 (declaration)
+ **/
+void* nnl2_own_pfill_uint128(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    nnl2_uint128* data = (nnl2_uint128*)(nnl2_uint64*)task->data;
+    nnl2_uint128 value = (nnl2_uint128)*(nnl2_uint64*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    // For 128-bit types, use simple sequential processing
+    // AVX256 can't handle 128-bit integers directly
+    for (size_t i = start; i < end; i++) {
+        data[i] = value;
+    }
+    
+    return NULL;
+}
+
+/** @brief
+ * See docs at declaration
+ *
+ ** @see nnl2_own_pfill_float128 (declaration)
+ **/
+void* nnl2_own_pfill_float128(void* arg) {
+    fill_ptask* task = (fill_ptask*)arg;
+    
+    nnl2_float128* data = (nnl2_float128*)(nnl2_float64*)task->data;
+    nnl2_float128 value = (nnl2_float128)*(nnl2_float64*)task->value;
+    
+    size_t start = task->start;
+    size_t end = task->end;
+    
+    // For 128-bit floating point, use simple sequential processing
+    // AVX256 doesn't support 128-bit floats
+    for (size_t i = start; i < end; i++) {
+        data[i] = value;
+    }
     
     return NULL;
 }

@@ -91,6 +91,134 @@ void nnl2_naive_uniform_inplace(nnl2_tensor* tensor, void* from, void* to) {
             break;
         }
 		
+		case FLOAT128: {
+			nnl2_float128 from_cast = (nnl2_float128)(*(nnl2_float64*)from);
+			nnl2_float128 to_cast = (nnl2_float128)(*(nnl2_float64*)to);
+			nnl2_float128* data = (nnl2_float128*)tensor->data;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				nnl2_float128 rand_ratio = (nnl2_float128)rand() / RAND_MAX;
+				data[i] = from_cast + (to_cast - from_cast) * rand_ratio;
+			}
+			break;
+		}
+
+		case INT8: {
+			nnl2_int8 from_cast = *((nnl2_int8*)from);
+			nnl2_int8 to_cast = *((nnl2_int8*)to);
+			nnl2_int8* data = (nnl2_int8*)tensor->data;
+			nnl2_int8 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % range;
+			}
+			break;
+		}
+
+		case INT16: {
+			nnl2_int16 from_cast = *((nnl2_int16*)from);
+			nnl2_int16 to_cast = *((nnl2_int16*)to);
+			nnl2_int16* data = (nnl2_int16*)tensor->data;
+			nnl2_int16 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % range;
+			}
+			break;
+		}
+
+		case UINT8: {
+			nnl2_uint8 from_cast = *((nnl2_uint8*)from);
+			nnl2_uint8 to_cast = *((nnl2_uint8*)to);
+			nnl2_uint8* data = (nnl2_uint8*)tensor->data;
+			nnl2_uint8 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % range;
+			}
+			break;
+		}
+
+		case UINT16: {
+			nnl2_uint16 from_cast = *((nnl2_uint16*)from);
+			nnl2_uint16 to_cast = *((nnl2_uint16*)to);
+			nnl2_uint16* data = (nnl2_uint16*)tensor->data;
+			nnl2_uint16 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % range;
+			}
+			break;
+		}
+
+		case UINT32: {
+			nnl2_uint32 from_cast = *((nnl2_uint32*)from);
+			nnl2_uint32 to_cast = *((nnl2_uint32*)to);
+			nnl2_uint32* data = (nnl2_uint32*)tensor->data;
+			nnl2_uint32 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				data[i] = from_cast + rand() % range;
+			}
+			break;
+		}
+
+		case UINT64: {
+			nnl2_uint64 from_cast = *((nnl2_uint64*)from);
+			nnl2_uint64 to_cast = *((nnl2_uint64*)to);
+			nnl2_uint64* data = (nnl2_uint64*)tensor->data;
+			nnl2_uint64 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				double rand_ratio = (double)rand() / RAND_MAX;
+				data[i] = from_cast + (nnl2_uint64)(rand_ratio * range);
+			}
+			break;
+		}
+
+		case INT128: {
+			nnl2_int128 from_cast = (nnl2_int128)(*(nnl2_float64*)from);
+			nnl2_int128 to_cast = (nnl2_int128)(*(nnl2_float64*)to);
+			nnl2_int128* data = (nnl2_int128*)tensor->data;
+			nnl2_int128 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				double rand_ratio = (double)rand() / RAND_MAX;
+				data[i] = from_cast + (nnl2_int128)(rand_ratio * range);
+			}
+			break;
+		}
+
+		case UINT128: {
+			nnl2_uint128 from_cast = (nnl2_uint128)(*(nnl2_float64*)from);
+			nnl2_uint128 to_cast = (nnl2_uint128)(*(nnl2_float64*)to);
+			nnl2_uint128* data = (nnl2_uint128*)tensor->data;
+			nnl2_uint128 range = to_cast - from_cast + 1;
+			
+			for(size_t i = 0; i < total_elems; i++) {
+				double rand_ratio = (double)rand() / RAND_MAX;
+				data[i] = from_cast + (nnl2_uint128)(rand_ratio * range);
+			}
+			break;
+		}
+
+		case BOOL: {
+			nnl2_bool from_cast = *((nnl2_bool*)from);
+			nnl2_bool to_cast = *((nnl2_bool*)to);
+			nnl2_bool* data = (nnl2_bool*)tensor->data;
+			
+			if (from_cast == false && to_cast == true) {
+				for(size_t i = 0; i < total_elems; i++) {
+					data[i] = (rand() % 2) ? true : false;
+				}
+			} else {
+				for(size_t i = 0; i < total_elems; i++) {
+					data[i] = from_cast;
+				}
+			}
+			break;
+		}
+		
 		default: {
 			NNL2_TYPE_ERROR(tensor->dtype); 
 			return;

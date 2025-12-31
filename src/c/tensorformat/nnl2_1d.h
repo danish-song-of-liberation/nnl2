@@ -86,37 +86,145 @@ void nnl2_print_1d_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int
 		int skip = rows - 2 * show_rows;
 	
         switch(dtype_tensor) {
-            case FLOAT64: {
-                double* data_t = (double*)tensor->data;
-                for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
-                printf("\n    ... (%d elements skipped) ...", skip);
-                for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
-                break;
-            }
-            
-            case FLOAT32: {
-                float* data_t = (float*)tensor->data;
-                for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
-                printf("\n    ... (%d elements skipped) ...", skip);
-                for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
-                break;
-            }
+			case BOOL: {
+				nnl2_bool* data_t = (nnl2_bool*)tensor->data;
+				for(int i = 0; i < show_rows; i++) 
+					printf("\n    %s", data_t[i] ? "t" : "nil");
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) 
+					printf("\n    %s", data_t[i] ? "t" : "nil");
+				break;
+			}
+			
+			// Signed integer types
+			case INT8: {
+				int8_t* data_t = (int8_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    %d", data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    %d", data_t[i]);
+				break;
+			}
+			
+			case INT16: {
+				int16_t* data_t = (int16_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    %d", data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    %d", data_t[i]);
+				break;
+			}
+			
+			case INT32: {
+				int32_t* data_t = (int32_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_INT32_FORMAT, data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_INT32_FORMAT, data_t[i]);
+				break;
+			}
 			
 			case INT64: {
-                int64_t* data_t = (int64_t*)tensor->data;
-                for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_INT64_FORMAT, data_t[i]);
-                printf("\n    ... (%d elements skipped) ...", skip);
-                for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_INT64_FORMAT, data_t[i]);
-                break;
-            }
-            
-            case INT32: {
-                int32_t* data_t = (int32_t*)tensor->data;
-                for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_INT32_FORMAT, data_t[i]);
-                printf("\n    ... (%d elements skipped) ...", skip);
-                for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_INT32_FORMAT, data_t[i]);
-                break;
-            }
+				int64_t* data_t = (int64_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_INT64_FORMAT, data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_INT64_FORMAT, data_t[i]);
+				break;
+			}
+			
+			// Unsigned integer types
+			case UINT8: {
+				uint8_t* data_t = (uint8_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    %u", data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    %u", data_t[i]);
+				break;
+			}
+			
+			case UINT16: {
+				uint16_t* data_t = (uint16_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    %u", data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    %u", data_t[i]);
+				break;
+			}
+			
+			case UINT32: {
+				uint32_t* data_t = (uint32_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_UINT32_FORMAT, data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_UINT32_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case UINT64: {
+				uint64_t* data_t = (uint64_t*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_UINT64_FORMAT, data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_UINT64_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case FLOAT32: {
+				float* data_t = (float*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case FLOAT64: {
+				double* data_t = (double*)tensor->data;
+				for(int i = 0; i < show_rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case INT128: {
+				nnl2_int128* data_t = (nnl2_int128*)tensor->data;
+				for(int i = 0; i < show_rows; i++) {
+					printf("\n    ");
+					nnl2_print_int128(data_t[i]);
+				}
+				
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) {
+					printf("\n    ");
+					nnl2_print_int128(data_t[i]);
+				}
+				
+				break;
+			}
+
+			case UINT128: {
+				nnl2_uint128* data_t = (nnl2_uint128*)tensor->data;
+				for(int i = 0; i < show_rows; i++) {
+					printf("\n    ");
+					nnl2_print_uint128(data_t[i]);
+				}
+				
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) {
+					printf("\n    ");
+					nnl2_print_uint128(data_t[i]);
+				}
+				
+				break;
+			}
+
+			case FLOAT128: {
+				nnl2_float128* data_t = (nnl2_float128*)tensor->data;
+				for(int i = 0; i < show_rows; i++) {
+					printf("\n    ");
+					nnl2_print_float128(data_t[i]);
+				}
+				
+				printf("\n    ... (%d elements skipped) ...", skip);
+				for(int i = rows - show_rows; i < rows; i++) {
+					printf("\n    ");
+					nnl2_print_float128(data_t[i]);
+				}
+				
+				break;
+			}
             
             default: {
                 NNL2_TYPE_ERROR(dtype_tensor);
@@ -126,33 +234,103 @@ void nnl2_print_1d_tensor(Tensor* tensor, bool full_print, int32_t max_rows, int
     } else {
 		// Print all elements for small tensors or when full_print is requested
         switch(dtype_tensor) {
-            case FLOAT64: {
-                double* data_t = (double*)tensor->data;
-                for(int i = 0; i < rows; i++) 
-                    printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
-                break;
-            }
-            
-            case FLOAT32: {
-                float* data_t = (float*)tensor->data;
-                for(int i = 0; i < rows; i++) 
-                    printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
-                break;
-            }
+			// Boolean type
+			case BOOL: {
+				nnl2_bool* data_t = (nnl2_bool*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    %s", data_t[i] ? "t" : "nil");
+				break;
+			}
+			
+			// Signed integer types
+			case INT8: {
+				int8_t* data_t = (int8_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    %d", data_t[i]);
+				break;
+			}
+			
+			case INT16: {
+				int16_t* data_t = (int16_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    %d", data_t[i]);
+				break;
+			}
+			
+			case INT32: {
+				int32_t* data_t = (int32_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    " NNL2_INT32_FORMAT, data_t[i]);
+				break;
+			}
 			
 			case INT64: {
-                int64_t* data_t = (int64_t*)tensor->data;
-                for(int i = 0; i < rows; i++) 
-                    printf("\n    " NNL2_INT64_FORMAT, data_t[i]);
-                break;
-            }
-            
-            case INT32: {
-                int32_t* data_t = (int32_t*)tensor->data;
-                for(int i = 0; i < rows; i++) 
-                    printf("\n    " NNL2_INT32_FORMAT, data_t[i]);
-                break;
-            }
+				int64_t* data_t = (int64_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    " NNL2_INT64_FORMAT, data_t[i]);
+				break;
+			}
+			
+			// Unsigned integer types
+			case UINT8: {
+				uint8_t* data_t = (uint8_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    %u", data_t[i]);
+				break;
+			}
+			
+			case UINT16: {
+				uint16_t* data_t = (uint16_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    %u", data_t[i]);
+				break;
+			}
+			
+			case UINT32: {
+				uint32_t* data_t = (uint32_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    " NNL2_UINT32_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case UINT64: {
+				uint64_t* data_t = (uint64_t*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    " NNL2_UINT64_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case FLOAT32: {
+				float* data_t = (float*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    " NNL2_FLOAT32_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case FLOAT64: {
+				double* data_t = (double*)tensor->data;
+				for(int i = 0; i < rows; i++) 
+					printf("\n    " NNL2_FLOAT64_FORMAT, data_t[i]);
+				break;
+			}
+			
+			case INT128: {
+				nnl2_int128* data_t = (nnl2_int128*)tensor->data;
+				for(int i = 0; i < rows; i++) { printf("\n    "); nnl2_print_int128(data_t[i]); }
+				break;
+			}
+						
+			case UINT128: {
+				nnl2_uint128* data_t = (nnl2_uint128*)tensor->data;
+				for(int i = 0; i < rows; i++) { printf("\n    "); nnl2_print_uint128(data_t[i]); }
+				break;
+			}
+						
+			case FLOAT128: {
+				nnl2_float128* data_t = (nnl2_float128*)tensor->data;
+				for(int i = 0; i < rows; i++) { printf("\n    "); nnl2_print_float128(data_t[i]); }
+				break;
+			}
             
             default: {
                 NNL2_TYPE_ERROR(dtype_tensor);
