@@ -215,95 +215,116 @@ typedef int64_t nnl2_int64;
 	
 
 
+/** @brief 
+ * Print a 128-bit unsigned integer value 
+ * in decimal format
+ *
+ ** @param value 
+ * The 128-bit unsigned integer value to print
+ */
 static inline void nnl2_print_uint128(nnl2_uint128 value) {
-    char buffer[50];
-    
     #if NNL2_UINT128_SUPPORTED
         if (value == 0) {
             printf("0");
             return;
         }
-
-        char temp[50];
-        int i = 0;
         
+        // Maximum 39 digits for 128-bit unsigned + null terminator
+        char buffer[40];
+        char* end = buffer + 39;
+        char* ptr = end;
+        *ptr = '\0'; // Null-terminate
+
         while (value > 0) {
-            temp[i++] = '0' + (char)(value % 10);
+            *(--ptr) = '0' + (char)(value % 10);
             value /= 10;
         }
         
-        for (int j = 0; j < i; j++) {
-            buffer[j] = temp[i - 1 - j];
-        }
-		
-        buffer[i] = '\0';
+        printf("%s", ptr);
         
-        printf("%s", buffer);
     #else
-        printf("%llu", (unsigned long long)value);
+        printf("%llu", (unsigned long long int)value);
     #endif
 }
 
+/** @brief 
+ * Print a 128-bit signed integer value in decimal format
+ *
+ ** @param value 
+ * The 128-bit signed integer to print
+ */
 static inline void nnl2_print_int128(nnl2_int128 value) {
-    char buffer[50];
-    
     #if NNL2_INT128_SUPPORTED
-        nnl2_uint128 uval;
-        int is_negative = 0;
-        
-        if (value < 0) {
-            is_negative = 1;
-            uval = (nnl2_uint128)(-value);
-        } else {
-            uval = (nnl2_uint128)value;
+        static const nnl2_int128 INT128_MIN_VALUE = ((nnl2_int128)1 << 127);
+        if (value == INT128_MIN_VALUE) {
+            printf("-170141183460469231731687303715884105728");
+            return;
         }
         
-        char temp[50];
-        int i = 0;
+        int is_negative = (value < 0);
+        nnl2_uint128 abs_value = is_negative ? (nnl2_uint128)(-value) : (nnl2_uint128)value;
         
-        if (uval == 0) {
-            buffer[0] = '0';
-            buffer[1] = '\0';
-        } else {
-            while (uval > 0) {
-                temp[i++] = '0' + (char)(uval % 10);
-                uval /= 10;
-            }
-            
-            if (is_negative) {
-                buffer[0] = '-';
-                for (int j = 0; j < i; j++) {
-                    buffer[j + 1] = temp[i - 1 - j];
-                }
-				
-                buffer[i + 1] = '\0';
-            } else {
-                for (int j = 0; j < i; j++) {
-                    buffer[j] = temp[i - 1 - j];
-                }
-				
-                buffer[i] = '\0';
-            }
+        if (abs_value == 0) {
+            printf("0");
+            return;
         }
+        
+        char temp[40];  // 39 digits max for 128-bit
+        int digit_count = 0;
+        
+        while (abs_value > 0) {
+            temp[digit_count++] = '0' + (char)(abs_value % 10);
+            abs_value /= 10;
+        }
+        
+        char buffer[50];
+        char* dest = buffer;
+        
+        if (is_negative) {
+            *dest++ = '-';
+        }
+        
+        for (int i = digit_count - 1; i >= 0; i--) {
+            *dest++ = temp[i];
+        }
+        
+        *dest = '\0';  // Null-terminate
         
         printf("%s", buffer);
     #else
-        printf("%lld", (long long)value);
+        printf("%lld", (long long int)value);
     #endif
 }
 
+/** @brief 
+ * Print a 128-bit floating-point value with 8 decimal places precision
+ *
+ ** @param value 
+ * The 128-bit floating-point value to print
+ */
 static inline void nnl2_print_float128(nnl2_float128 value) {
     #if NNL2_FLOAT128_SUPPORTED
-        #ifdef __USE_GNU
-            char buffer[100];
+        char buffer[100];
+        #if defined(NNL2_USE_FLOAT128_QUADMATH) && defined(quadmath_snprintf)
             quadmath_snprintf(buffer, sizeof(buffer), "%.8Qf", value);
-            printf("%s", buffer);
+        #elif defined(NNL2_USE_FLOAT128_GCC) && defined(__GNUC__) && !defined(__STRICT_ANSI__)
+            #if defined(__GLIBC__) && __GLIBC__ >= 2
+                snprintf(buffer, sizeof(buffer), "%.8Qf", value);
+            #else
+                snprintf(buffer, sizeof(buffer), "%.8Lf", (long double)value);
+            #endif
+            
+        #elif defined(NNL2_USE_FLOAT128_LONG_DOUBLE)
+            snprintf(buffer, sizeof(buffer), "%.8Lf", (long double)value);   
         #else
-            printf("%.8Lf", (long double)value);
-        #endif
+            snprintf(buffer, sizeof(buffer), "%.8Lf", (long double)value);
+        #endif 
+        printf("%s", buffer);     
     #else
-        printf("%.8Lf", value);
+        printf("%.8Lf", (long double)value);
     #endif
+	
+	return;
 }
 
 ///@}
