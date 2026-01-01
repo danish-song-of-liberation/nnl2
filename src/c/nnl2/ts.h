@@ -167,6 +167,7 @@
 #include "../tensoractivations/non_inplace/nnl2_leaky_relu.h"
 #include "../tensoractivations/non_inplace/nnl2_sigmoid.h"
 #include "../tensoractivations/non_inplace/nnl2_tanh.h"
+#include "../tensoractivations/non_inplace/nnl2_softmax.h"
 #include "../tensorref/getter/nnl2_view.h"
 #include "../tensorref/getter/nnl2_tref_getter.h"
 #include "../tensorref/getter/nnl2_trefw_getter.h"

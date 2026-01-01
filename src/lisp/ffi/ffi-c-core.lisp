@@ -446,6 +446,10 @@
   (tensor :pointer)
   (copy-type tensor-type))  
   
+(cffi:defcfun ("lisp_call_softmax" %softmax) :pointer 
+  (tensor :pointer)
+  (dim :int))  
+  
 (cffi:defcfun ("nnl2_free_tensor" free-tensor) :void
   (tensor :pointer))     
   
@@ -2210,6 +2214,9 @@
 (cffi:defcfun ("set_mae_backend" %set-mae-backend) :void
   (backend-name :string))     
   
+(cffi:defcfun ("set_softmax_backend" %set-softmax-backend) :void
+  (backend-name :string))   
+  
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
 (cffi:defcfun ("nnl2_get_empty_backend" %get-empty-backend) :string)  
@@ -2297,6 +2304,7 @@
 (cffi:defcfun ("get_atan_backend" %get-atan-backend) :string)
 (cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
 (cffi:defcfun ("get_mae_backend" %get-mae-backend) :string)
+(cffi:defcfun ("get_softmax_backend" %get-softmax-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -2472,6 +2480,8 @@
 (cffi:defcfun ("get_mse_num_backends" %get-mse-num-backends) :int)
 (cffi:defcfun ("get_mae_backends" %get-mae-backends) :pointer)
 (cffi:defcfun ("get_mae_num_backends" %get-mae-num-backends) :int)
+(cffi:defcfun ("get_softmax_backends" %get-softmax-backends) :pointer)
+(cffi:defcfun ("get_softmax_num_backends" %get-softmax-num-backends) :int)
 
 ;; -- mem-aref setters/getters --
 

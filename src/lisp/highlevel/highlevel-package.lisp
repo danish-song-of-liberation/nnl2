@@ -804,7 +804,12 @@
    #:save-tensor
    #:load-tensor
    #:arange
-   #:linspace))
+   #:linspace
+   #:softmax
+   #:use-backend/softmax
+   #:get-backend/softmax
+   #:get-backends/softmax
+   #:with-backend/softmax))
    
 (defpackage #:nnl2.hli.ts.linalg
   (:use #:cl)

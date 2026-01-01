@@ -1505,6 +1505,10 @@
           (cffi:foreign-free out) 
           result))))) 
 	
+(defun softmax (tensor &key dim)
+  (unless dim (setf dim (1- (rank tensor))))
+  (nnl2.ffi:%softmax tensor dim))  
+	
 (defun l2-norm (tensor &key (axes #(0)) &aux (dtype (dtype tensor)))
   "WARNING: YET DOES NOT SUPPORT AXES (W.I.P.)
    

@@ -777,5 +777,10 @@
    #:%swap-rows!
    #:%triu
    #:%tril
-   #:%pinv-diag))
+   #:%pinv-diag
+   #:%softmax
+   #:%set-softmax-backend
+   #:%get-softmax-backend
+   #:%get-softmax-backends
+   #:%get-softmax-num-backends))
    

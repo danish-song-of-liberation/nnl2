@@ -358,6 +358,7 @@ void nnl2_init_activations() {
 	EINIT_BACKEND(leakyrelu, leakyrelu_backends, CURRENT_BACKEND(leakyrelu));     
 	EINIT_BACKEND(sigmoid, sigmoid_backends, CURRENT_BACKEND(sigmoid)); 
 	EINIT_BACKEND(nnl2_tanh, tanh_backends, CURRENT_BACKEND(tanh));  
+	EINIT_BACKEND(nnl2_softmax, softmax_backends, CURRENT_BACKEND(softmax));
 } 
          
 void nnl2_init_initializers() {
@@ -372,7 +373,7 @@ void nnl2_init_initializers() {
 	EINIT_BACKEND(kaiming, kaiming_backends, CURRENT_BACKEND(kaiming));    
 	EINIT_BACKEND(kaiming_inplace, kaiming_inplace_backends, CURRENT_BACKEND(kaiming_inplace));    
 } 
-   
+      
 void nnl2_init_transposition() {         
 	EINIT_BACKEND(transposeinplace, transposeinplace_backends, CURRENT_BACKEND(transposeinplace));    
 	EINIT_BACKEND(transpose, transpose_backends, CURRENT_BACKEND(transpose));  
@@ -1011,12 +1012,16 @@ Tensor* lisp_call_float_arange(float from, float to, float step, TensorType dtyp
 }
 
 Tensor* lisp_call_int_linspace(int64_t start, int64_t stop, int64_t num, bool endpoint, TensorType dtype) {
-    return nnl2_int_linspace(start, stop, num, endpoint, dtype);
+    return nnl2_int_linspace(start, stop, num, endpoint, dtype);  
 }
 
 Tensor* lisp_call_float_linspace(float start, float stop, int64_t num, bool endpoint, TensorType dtype) {
     return nnl2_float_linspace(start, stop, num, endpoint, dtype);
 } 
+
+Tensor* lisp_call_softmax(Tensor* input, int dim) {
+    return nnl2_softmax(input, dim);  
+}
 
 ///@} [lisp_wrappers]                
 		             
