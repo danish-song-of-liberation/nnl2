@@ -158,6 +158,9 @@
 	  (setf (cffi:mem-aref layers-pntr :pointer i) (nth i layers)))
 	  
 	(nnl2.ffi:%create-nn-sequential len layers-pntr)))  
+	
+(defun embedding (&key vocab-size embed-dim (dtype nnl2.system:*default-tensor-type*))
+  (nnl2.ffi:%create-nn-embedding vocab-size embed-dim dtype))	
   
 (defun .sigmoid (&key (approx t))
   (nnl2.ffi:%create-nn-sigmoid approx))

@@ -790,5 +790,6 @@
    #:%get-ce-num-backends
    #:%ad-softmax
    #:%ad-ce
-   #:%create-nn-softmax))
+   #:%create-nn-softmax
+   #:%create-nn-embedding))
    

@@ -69,7 +69,8 @@
    #:copy
    #:nnp
    #:rnn
-   #:softmax))
+   #:softmax
+   #:embedding))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

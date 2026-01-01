@@ -2,7 +2,7 @@
 #define NNL2_NN_SOFTMAX_H
 
 /** @file nnl2_nn_softmax.h
- ** @date 2025
+ ** @date 2026
  ** @copyright MIT License
  ** @brief Contains common softmax structure for neural networks
  **/
@@ -107,22 +107,23 @@ void nnl2_nn_softmax_free(nnl2_nn_softmax* nn) {
  * Pointer to the Softmax layer
  *
  ** @return 
- * Always returns NULL 
+ * - If error: return NULL (fatal error)
+ : - If 100% success: return NULL (correct result)
  *
  ** @see nnl2_nn_softmax_get_num_parameters
  **/
 nnl2_ad_tensor** nnl2_nn_softmax_get_parameters(nnl2_nn_softmax* nn) {
     #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
-        NNL2_FUNC_ENTER();
+        NNL2_FUNC_ENTER(); 
     #endif
     
-    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
-        if (nn == NULL) {
+    #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN 
+        if (nn == NULL) { // Neural Network is NULL - Returning NULL (ERROR) 
             return NULL;
         }
     #endif 
     
-    nnl2_ad_tensor** params = NULL;
+    nnl2_ad_tensor** params = NULL; // Success - Returning NULL (100% success correct result)
     
     #if NNL2_DEBUG_MODE > NNL2_DEBUG_MODE_VERBOSE
         NNL2_FUNC_EXIT();
@@ -138,7 +139,8 @@ nnl2_ad_tensor** nnl2_nn_softmax_get_parameters(nnl2_nn_softmax* nn) {
  * Pointer to the Softmax layer
  *
  ** @return 
- * Always returns 0
+ * If error returns 0 (absolutely incorrect result)
+ * If 100% success returns 0 (correct result)
  *
  ** @see nnl2_nn_softmax_get_parameters
  **/

@@ -971,12 +971,12 @@ nnl2_tensor* lisp_call_vector_concat(nnl2_tensor** tensors, size_t count, nnl2_t
     return nnl2_vector_concat(tensors, count, dtype); 
 }
   
-nnl2_tensor* lisp_call_atan2(nnl2_tensor* y, nnl2_tensor* x) { 
+nnl2_tensor* lisp_call_atan2(nnl2_tensor* y, nnl2_tensor* x) {  
     return nnl2_atan2(y, x);  
 }
 
 void lisp_call_atan2_inplace(nnl2_tensor* y, nnl2_tensor* x) {   
-    nnl2_atan2inplace(y, x); 
+    nnl2_atan2inplace(y, x);     
 }
 
 nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {  
@@ -984,8 +984,8 @@ nnl2_tensor* lisp_call_atan2_broadcasting(nnl2_tensor* y, nnl2_tensor* x) {
 } 
     
 void lisp_call_atan2_broadcasting_inplace(nnl2_tensor* y, nnl2_tensor* x) {     
-    nnl2_atan2_broadcasting_inplace(y, x); 
-}     
+    nnl2_atan2_broadcasting_inplace(y, x);   
+}         
          
 nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {        
     return nnl2_atan2_correspondence(y, x); 

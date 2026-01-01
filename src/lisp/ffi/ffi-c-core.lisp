@@ -1710,12 +1710,13 @@
   (:rnncell 1)      ;; Vanilla Recurrent Neural Network Cell
   (:rnn 2)		    ;; Vanilla Recurrent Neural Network
   (:sequential 3)   ;; Sequential neural network (layers in sequence)
-  (:sigmoid 4)		;; Sigmoid layer
-  (:tanh 5)			;; Tanh layer
-  (:relu 6)			;; ReLU layer
-  (:leaky-relu 7)   ;; Leaky-ReLU layer
-  (:softmax 8)      ;; Softmax layer
-  (:unknown 9))     ;; Unknown or unsupported network type 
+  (:embedding 4)	;; Embedding layer
+  (:sigmoid 5)		;; Sigmoid layer
+  (:tanh 6)			;; Tanh layer
+  (:relu 7)			;; ReLU layer
+  (:leaky-relu 8)   ;; Leaky-ReLU layer
+  (:softmax 9)      ;; Softmax layer
+  (:unknown 10))    ;; Unknown or unsupported network type 
 
 (cffi:defcenum nnl2-nn-handle-as
   (:copy 0)    ;; Make a copy of the passed tensors
@@ -1734,7 +1735,12 @@
   (alpha :float))  
   
 (cffi:defcfun ("nnl2_nn_softmax_create" %create-nn-softmax) :pointer
-  (dim :int))  
+  (dim :int)) 
+
+(cffi:defcfun ("nnl2_nn_embedding_create" %create-nn-embedding) :pointer
+  (vocab-size :int)
+  (embed-dim :int)
+  (dtype tensor-type))  
 
 (cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
   (in-features :int)

@@ -22,12 +22,13 @@ typedef enum {
 	nnl2_nn_type_rnn_cell    =  1,    ///< Vanilla Recurrent Neural Network Cell
 	nnl2_nn_type_rnn     	 =  2,    ///< Vanilla Recurrent Neural Network
 	nnl2_nn_type_sequential  =  3,    ///< Sequential neural network (layers in sequence)
-	nnl2_nn_type_sigmoid     =  4,	  ///< Sigmoid layer
-	nnl2_nn_type_tanh 		 =  5,	  ///< Tanh layer
-	nnl2_nn_type_relu 		 =  6,	  ///< ReLU layer
-	nnl2_nn_type_leaky_relu  =  7,	  ///< Leaky-ReLU layer
-	nnl2_nn_type_softmax     =  8,	  ///< Softmax layer
-    nnl2_nn_type_unknown     =  9     ///< Unknown or unsupported network type 
+	nnl2_nn_type_embedding   =  4,    ///< Embedding Layer
+	nnl2_nn_type_sigmoid     =  5,	  ///< Sigmoid layer
+	nnl2_nn_type_tanh 		 =  6,	  ///< Tanh layer
+	nnl2_nn_type_relu 		 =  7,	  ///< ReLU layer
+	nnl2_nn_type_leaky_relu  =  8,	  ///< Leaky-ReLU layer
+	nnl2_nn_type_softmax     =  9,	  ///< Softmax layer
+    nnl2_nn_type_unknown     =  10    ///< Unknown or unsupported network type 
 } nnl2_nn_type;
 
 ///@} [nnl2_nn_type]

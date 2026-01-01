@@ -85,6 +85,11 @@ void nnl2_ann_free(void* nn) {
 			nnl2_nn_sequential_free(nn);
 			break;
 		}
+		
+		case nnl2_nn_type_embedding: {
+			nnl2_nn_embedding_free(nn);
+			break;
+		}
         
         case nnl2_nn_type_unknown:
 		
