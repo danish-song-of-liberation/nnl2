@@ -1148,6 +1148,12 @@
   (mode ad-mode)
   (track-grad :bool))     
  
+(cffi:defcfun ("nnl2_ad_softmax" %ad-softmax) :pointer
+  (ad-tensor :pointer)
+  (dim :int)
+  (mode ad-mode)
+  (track-grad :bool))   
+  
 (cffi:defcfun ("nnl2_ad_inplace_tanh" %ad-.tanh!) :void
   (ad-tensor :pointer)
   (approx :bool)
@@ -1593,6 +1599,20 @@
   (mode ad-mode)
   (track-graph :bool))    
   
+(cffi:defcfun ("nnl2_ad_mae" %ad-mae) :pointer
+  (prediction :pointer)
+  (target :pointer)
+  (force :bool)
+  (mode ad-mode)
+  (track-graph :bool))    
+  
+(cffi:defcfun ("nnl2_ad_cross_entropy" %ad-ce) :pointer
+  (prediction :pointer)
+  (target :pointer)
+  (force :bool)
+  (mode ad-mode)
+  (track-graph :bool))    
+    
 (cffi:defcfun ("nnl2_ad_randn_like" %ad-randn-like) :pointer  
   (ad-tensor :pointer)
   (mean :double)

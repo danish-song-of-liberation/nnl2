@@ -2394,5 +2394,5 @@
 	(let ((result (cffi:mem-ref result-pntr :double)))
 	  (cffi:foreign-free result-pntr)
 	  
-	  result)))
+	  result)))	  
 	  

@@ -148,6 +148,7 @@ static void nnl2_naive_cross_entropy_onehot(nnl2_tensor* prediction, nnl2_tensor
                     total_loss += loss;
                 }
             }
+			
             else if (target->dtype == FLOAT64) {
                 nnl2_float64* target_data = (nnl2_float64*)target->data;
                 

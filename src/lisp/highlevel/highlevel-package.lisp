@@ -241,13 +241,15 @@
    #:.log
    #:.log10
    #:.log2
-   #:.log1p))   
+   #:.log1p
+   #:softmax))   
  
 (defpackage #:nnl2.hli.ad.r.loss
   (:use #:cl)
   (:export
    #:mse
-   #:mae))  
+   #:mae
+   #:ce))  
  
 (defpackage #:nnl2.hli.ts.loss
   (:use #:cl)

@@ -1273,6 +1273,11 @@
   "Returns a new tensor with tanh activation applied"
   (nnl2.ffi:%ad-.tanh ad-tensor approx nnl2.ffi:ad-reverse-mode track-graph)) 	
 	
+(defun softmax (ad-tensor &key dim (track-graph nnl2.system:*ad-default-track-graph*))
+  "Returns a new tensor with softmax activation applied"
+  (unless dim (setf dim (1- (nnl2.hli.ad:rank ad-tensor))))
+  (nnl2.ffi:%ad-softmax ad-tensor dim nnl2.ffi:ad-reverse-mode track-graph))   
+  
 (defun .neg (ad-tensor &key (track-graph nnl2.system:*ad-default-track-graph*))
   "Returns a new tensor with elementwise negation"
   (nnl2.ffi:%.neg ad-tensor nnl2.ffi:ad-reverse-mode track-graph))
@@ -1435,4 +1440,14 @@
 	  (cffi:mem-ref out :double)
 	  out)))  
   
+(defun ce (prediction target &key force (track-graph nnl2.system:*ad-default-track-graph*))
+  "Computes Cross-Entropy error
   
+   Example:
+       (nnl2.hli.ts.loss:ce prediction target) -> loss (scalar)"
+   
+  (let ((out (nnl2.ffi:%ad-mse prediction target force nnl2.ffi:ad-reverse-mode track-graph)))
+    (if force 
+	  (cffi:mem-ref out :double)
+	  out)))  
+	  

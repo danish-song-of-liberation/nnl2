@@ -787,5 +787,7 @@
    #:%set-ce-backend
    #:%get-ce-backend
    #:%get-ce-backends
-   #:%get-ce-num-backends))
+   #:%get-ce-num-backends
+   #:%ad-softmax
+   #:%ad-ce))
    
