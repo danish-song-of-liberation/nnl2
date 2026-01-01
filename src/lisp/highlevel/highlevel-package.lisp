@@ -253,7 +253,8 @@
   (:use #:cl)
   (:export
    #:mse
-   #:mae))  
+   #:mae
+   #:ce))  
 
 (defpackage #:nnl2.hli.ts
   (:use #:cl)
@@ -809,7 +810,11 @@
    #:use-backend/softmax
    #:get-backend/softmax
    #:get-backends/softmax
-   #:with-backend/softmax))
+   #:with-backend/softmax
+   #:use-backend/ce
+   #:get-backend/ce
+   #:get-backends/ce
+   #:with-backend/ce))
    
 (defpackage #:nnl2.hli.ts.linalg
   (:use #:cl)

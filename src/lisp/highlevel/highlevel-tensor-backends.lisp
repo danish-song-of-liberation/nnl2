@@ -337,7 +337,10 @@
   nnl2.ffi:%set-mae-backend)   
   
 (define-backend-setter use-backend/softmax
-  nnl2.ffi:%set-softmax-backend)     
+  nnl2.ffi:%set-softmax-backend) 
+
+(define-backend-setter use-backend/ce
+  nnl2.ffi:%set-ce-backend)   
   
 (defun use-backend/ones (name) (use-backend/full name))
 (defun use-backend/full-like (name) (use-backend/full name))  
@@ -375,7 +378,8 @@
 							  use-backend/.atan! use-backend/.atan use-backend/mae
 							  use-backend/.atan2! use-backend/.atan2 use-backend/.log10!
 							  use-backend/.log10 use-backend/.log2 use-backend/.log2!
-							  use-backend/.log1p use-backend/.log1p! use-backend/softmax))
+							  use-backend/.log1p use-backend/.log1p! use-backend/softmax
+							  use-backend/ce))
 							  
       (funcall backend-function name)))
 	  
@@ -499,6 +503,7 @@
 (define-backend-getter-setter get-backend/mse use-backend/mse nnl2.ffi:%get-mse-backend)
 (define-backend-getter-setter get-backend/mae use-backend/mae nnl2.ffi:%get-mae-backend)
 (define-backend-getter-setter get-backend/softmax use-backend/softmax nnl2.ffi:%get-softmax-backend)
+(define-backend-getter-setter get-backend/ce use-backend/ce nnl2.ffi:%get-ce-backend)
 
 (defun get-backend/norm (&key (p :l2))
   "Gets current backend for norm operation. P: Norm type (:l2 supported)"
@@ -898,6 +903,10 @@
   nnl2.ffi:%get-softmax-num-backends
   nnl2.ffi:%get-softmax-backends)     
   
+(define-backends-getter get-backends/ce
+  nnl2.ffi:%get-ce-num-backends
+  nnl2.ffi:%get-ce-backends)       
+  
 (defun get-backends/norm (&key (p :l2))
   "Returns list of available backends for norm operation. 
    P: Norm type (:l2 supported)"
@@ -1016,4 +1025,5 @@
 (define-with-backend with-backend/mse get-backend/mse)
 (define-with-backend with-backend/mae get-backend/mae)
 (define-with-backend with-backend/softmax get-backend/softmax)
+(define-with-backend with-backend/ce get-backend/ce)
 		 

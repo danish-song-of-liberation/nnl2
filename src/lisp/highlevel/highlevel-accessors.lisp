@@ -2387,3 +2387,12 @@
       
       result)))
 	  
+(defun ce (prediction target)
+  (let* ((result-pntr (cffi:foreign-alloc :double)))
+    (nnl2.ffi:%ce prediction target result-pntr)
+	
+	(let ((result (cffi:mem-ref result-pntr :double)))
+	  (cffi:foreign-free result-pntr)
+	  
+	  result)))
+	  

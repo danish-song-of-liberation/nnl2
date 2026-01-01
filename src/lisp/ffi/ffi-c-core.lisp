@@ -586,6 +586,11 @@
   (target :pointer)
   (record :pointer))  
   
+(cffi:defcfun ("lisp_call_cross_entropy" %ce) :void
+  (prediction :pointer)
+  (target :pointer)
+  (record :pointer))  
+  
 (cffi:defcfun ("nnl2_ts_set_magic_number" %ts-set-magic-number) :void
   (tensor :pointer)
   (new-magic :char))
@@ -2212,10 +2217,16 @@
   (backend-name :string))   
   
 (cffi:defcfun ("set_mae_backend" %set-mae-backend) :void
-  (backend-name :string))     
+  (backend-name :string)) 
+
+(cffi:defcfun ("set_cross_entropy_backend" %set-ce-backend) :void
+  (backend-name :string))   
   
 (cffi:defcfun ("set_softmax_backend" %set-softmax-backend) :void
   (backend-name :string))   
+  
+(cffi:defcfun ("set_softmax_backend" %set-softmax-backend) :void
+  (backend-name :string))     
   
 (cffi:defcfun ("nnl2_get_view_backend" %get-view-backend) :string)    
 (cffi:defcfun ("nnl2_get_tref_getter_backend" %get-tref-getter-backend) :string)    
@@ -2305,6 +2316,7 @@
 (cffi:defcfun ("get_mse_backend" %get-mse-backend) :string)
 (cffi:defcfun ("get_mae_backend" %get-mae-backend) :string)
 (cffi:defcfun ("get_softmax_backend" %get-softmax-backend) :string)
+(cffi:defcfun ("get_cross_entropy_backend" %get-ce-backend) :string)
 
 (cffi:defcfun ("get_nnl2_view_num_backends" %get-view-num-backends) :int)
 (cffi:defcfun ("get_nnl2_view_backends" %get-view-backends) :pointer)
@@ -2482,6 +2494,8 @@
 (cffi:defcfun ("get_mae_num_backends" %get-mae-num-backends) :int)
 (cffi:defcfun ("get_softmax_backends" %get-softmax-backends) :pointer)
 (cffi:defcfun ("get_softmax_num_backends" %get-softmax-num-backends) :int)
+(cffi:defcfun ("get_cross_entropy_backends" %get-ce-backends) :pointer)
+(cffi:defcfun ("get_cross_entropy_num_backends" %get-ce-num-backends) :int)
 
 ;; -- mem-aref setters/getters --
 

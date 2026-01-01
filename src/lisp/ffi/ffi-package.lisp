@@ -782,5 +782,10 @@
    #:%set-softmax-backend
    #:%get-softmax-backend
    #:%get-softmax-backends
-   #:%get-softmax-num-backends))
+   #:%get-softmax-num-backends
+   #:%ce
+   #:%set-ce-backend
+   #:%get-ce-backend
+   #:%get-ce-backends
+   #:%get-ce-num-backends))
    

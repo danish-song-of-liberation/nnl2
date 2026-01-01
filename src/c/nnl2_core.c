@@ -451,6 +451,7 @@ void nnl2_init_reshaping() {
 void nnl2_init_loss() {
     EINIT_BACKEND(nnl2_mse, mse_backends, CURRENT_BACKEND(mse));
     EINIT_BACKEND(nnl2_mae, mae_backends, CURRENT_BACKEND(mae));
+    EINIT_BACKEND(nnl2_cross_entropy, cross_entropy_backends, CURRENT_BACKEND(cross_entropy));
 }
      
 void nnl2_init_ga() {
@@ -1012,7 +1013,7 @@ Tensor* lisp_call_float_arange(float from, float to, float step, TensorType dtyp
 }
 
 Tensor* lisp_call_int_linspace(int64_t start, int64_t stop, int64_t num, bool endpoint, TensorType dtype) {
-    return nnl2_int_linspace(start, stop, num, endpoint, dtype);  
+    return nnl2_int_linspace(start, stop, num, endpoint, dtype);    
 }
 
 Tensor* lisp_call_float_linspace(float start, float stop, int64_t num, bool endpoint, TensorType dtype) {
@@ -1020,7 +1021,11 @@ Tensor* lisp_call_float_linspace(float start, float stop, int64_t num, bool endp
 } 
 
 Tensor* lisp_call_softmax(Tensor* input, int dim) {
-    return nnl2_softmax(input, dim);  
+    return nnl2_softmax(input, dim);    
+}
+
+void lisp_call_cross_entropy(Tensor* prediction, Tensor* target, void* record) {
+    nnl2_cross_entropy(prediction, target, record);
 }
 
 ///@} [lisp_wrappers]                

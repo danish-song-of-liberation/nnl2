@@ -1584,7 +1584,15 @@ typedef int (*f64dgetrffn)(const nnl2_order order, const int m, const int n, nnl
  ** @return int Status code: 0=success, >0=singular, <0=error
  */
 typedef int (*f32sgetrffn)(const nnl2_order order, const int m, const int n, nnl2_tensor* a, const int lda, nnl2_tensor* ipiv);				
-						
+			
+/** @brief Function pointer type for Cross-Entropy loss computation
+ ** @param prediction Prediction tensor (logits, shape: [batch_size, num_classes])
+ ** @param target Target tensor (class indices or one-hot encoded)
+ ** @param record Pointer to memory where result will be stored
+ ** @note The function computes average cross-entropy loss over the batch
+ */
+typedef void (*cross_entropyfn)(nnl2_tensor* prediction, nnl2_tensor* target, void* record);
+			
 /// @} [typedef]
 
 
