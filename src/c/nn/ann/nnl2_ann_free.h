@@ -76,6 +76,11 @@ void nnl2_ann_free(void* nn) {
 			break;
 		}
 		
+		case nnl2_nn_type_softmax: {
+			nnl2_nn_softmax_free(nn);
+			break;
+		}
+		
 		case nnl2_nn_type_sequential: {
 			nnl2_nn_sequential_free(nn);
 			break;

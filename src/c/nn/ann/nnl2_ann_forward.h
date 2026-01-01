@@ -15,6 +15,7 @@ typedef struct nnl2_nn_sigmoid_struct nnl2_nn_sigmoid;
 typedef struct nnl2_nn_tanh_struct nnl2_nn_tanh;
 typedef struct nnl2_nn_relu_struct nnl2_nn_relu;
 typedef struct nnl2_nn_leaky_relu_struct nnl2_nn_leaky_relu;
+typedef struct nnl2_nn_softmax_struct nnl2_nn_softmax;
 typedef struct nnl2_nn_sequential_struct nnl2_nn_sequential;
 typedef struct nnl2_nn_rnn_cell_struct nnl2_nn_rnn_cell;
 
@@ -22,6 +23,7 @@ nnl2_ad_tensor* nnl2_nn_sigmoid_forward(nnl2_nn_sigmoid* nn, nnl2_ad_tensor* x);
 nnl2_ad_tensor* nnl2_nn_tanh_forward(nnl2_nn_tanh* nn, nnl2_ad_tensor* x);
 nnl2_ad_tensor* nnl2_nn_relu_forward(nnl2_nn_relu* nn, nnl2_ad_tensor* x);
 nnl2_ad_tensor* nnl2_nn_leaky_relu_forward(nnl2_nn_leaky_relu* nn, nnl2_ad_tensor* x);
+nnl2_ad_tensor* nnl2_nn_softmax_forward(nnl2_nn_softmax* nn, nnl2_ad_tensor* x);
 nnl2_ad_tensor* nnl2_nn_sequential_forward(nnl2_nn_sequential* seq, nnl2_ad_tensor* x);
 
 /** @brief 
@@ -186,6 +188,23 @@ nnl2_ad_tensor* nnl2_ann_forward(void* model, void** args) {
             
             return nnl2_nn_leaky_relu_forward((nnl2_nn_leaky_relu*)model, input);
         }
+		
+		case nnl2_nn_type_softmax: {
+            #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN
+                if(safe_args[0] == NULL) {
+                    NNL2_ERROR("Input tensor is NULL for softmax layer");
+                    return NULL;
+                }
+            #endif
+            
+            nnl2_ad_tensor* input = (nnl2_ad_tensor*)safe_args[0];
+            
+            #if NNL2_DEBUG_MODE >= NNL2_DEBUG_MODE_VERBOSE
+                NNL2_DEBUG("Dispatching forward to softmax layer");
+            #endif
+            
+            return nnl2_nn_softmax_forward((nnl2_nn_softmax*)model, input);
+        }        
         
         case nnl2_nn_type_sequential: {
             #if NNL2_SAFETY_MODE >= NNL2_SAFETY_MODE_MIN

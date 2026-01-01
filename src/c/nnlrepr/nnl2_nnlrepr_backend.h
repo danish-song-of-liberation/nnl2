@@ -26,7 +26,8 @@ typedef enum {
 	nnl2_nn_type_tanh 		 =  5,	  ///< Tanh layer
 	nnl2_nn_type_relu 		 =  6,	  ///< ReLU layer
 	nnl2_nn_type_leaky_relu  =  7,	  ///< Leaky-ReLU layer
-    nnl2_nn_type_unknown     =  8     ///< Unknown or unsupported network type 
+	nnl2_nn_type_softmax     =  8,	  ///< Softmax layer
+    nnl2_nn_type_unknown     =  9     ///< Unknown or unsupported network type 
 } nnl2_nn_type;
 
 ///@} [nnl2_nn_type]

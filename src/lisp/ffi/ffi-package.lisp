@@ -789,5 +789,6 @@
    #:%get-ce-backends
    #:%get-ce-num-backends
    #:%ad-softmax
-   #:%ad-ce))
+   #:%ad-ce
+   #:%create-nn-softmax))
    

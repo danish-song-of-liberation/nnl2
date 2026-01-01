@@ -991,8 +991,8 @@ nnl2_tensor* lisp_call_atan2_correspondence(nnl2_tensor* y, void* x) {
     return nnl2_atan2_correspondence(y, x); 
 }         
           
-void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) { 
-    nnl2_atan2_correspondence_inplace(y, x); 
+void lisp_call_atan2_correspondence_inplace(nnl2_tensor* y, void* x) {     
+    nnl2_atan2_correspondence_inplace(y, x);  
 }       
        
 void lisp_call_assign_row(nnl2_tensor* dst, int seq_index, nnl2_tensor* src) {
@@ -1007,7 +1007,7 @@ void lisp_call_assign_row_add(nnl2_tensor* dst, int seq_index, nnl2_tensor* src)
 Tensor* lisp_call_int_arange(int64_t from, int64_t to, int64_t step, TensorType dtype) {
     return nnl2_int_arange(from, to, step, dtype);    
 }  
-  
+    
 Tensor* lisp_call_float_arange(float from, float to, float step, TensorType dtype) {  
     return nnl2_float_arange(from, to, step, dtype);
 }

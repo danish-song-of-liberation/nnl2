@@ -1714,7 +1714,8 @@
   (:tanh 5)			;; Tanh layer
   (:relu 6)			;; ReLU layer
   (:leaky-relu 7)   ;; Leaky-ReLU layer
-  (:unknown 8))     ;; Unknown or unsupported network type 
+  (:softmax 8)      ;; Softmax layer
+  (:unknown 9))     ;; Unknown or unsupported network type 
 
 (cffi:defcenum nnl2-nn-handle-as
   (:copy 0)    ;; Make a copy of the passed tensors
@@ -1731,6 +1732,9 @@
   
 (cffi:defcfun ("nnl2_nn_leaky_relu_create" %create-nn-leaky-relu) :pointer
   (alpha :float))  
+  
+(cffi:defcfun ("nnl2_nn_softmax_create" %create-nn-softmax) :pointer
+  (dim :int))  
 
 (cffi:defcfun ("nnl2_nn_fnn_create" %create-nn-fnn) :pointer
   (in-features :int)

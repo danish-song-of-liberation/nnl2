@@ -68,7 +68,8 @@
    #:print-model
    #:copy
    #:nnp
-   #:rnn))
+   #:rnn
+   #:softmax))
 
 (defpackage #:nnl2.hli
   (:use #:cl)

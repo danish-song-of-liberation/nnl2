@@ -157,7 +157,7 @@
     (dotimes (i len)
 	  (setf (cffi:mem-aref layers-pntr :pointer i) (nth i layers)))
 	  
-	(nnl2.ffi:%create-nn-sequential len layers-pntr)))
+	(nnl2.ffi:%create-nn-sequential len layers-pntr)))  
   
 (defun .sigmoid (&key (approx t))
   (nnl2.ffi:%create-nn-sigmoid approx))
@@ -170,6 +170,9 @@
 (defun .leaky-relu (&key (alpha nnl2.system:*leaky-relu-default-shift*))
   (nnl2.ffi:%create-nn-leaky-relu alpha)) 
 
+(defun softmax (&key (dim -1))
+  (nnl2.ffi:%create-nn-softmax dim))
+  
 (defun print-model (nn)
   (nnl2.ffi:%print-model nn t 0))
   
