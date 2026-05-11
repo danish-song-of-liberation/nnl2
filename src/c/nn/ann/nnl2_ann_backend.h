@@ -33,7 +33,7 @@ typedef enum {
 	nnl2_nn_type_leaky_relu  =  8,	  ///< Leaky-ReLU layer
 	nnl2_nn_type_softmax     =  9,	  ///< Softmax layer
     nnl2_nn_type_unknown     =  10    ///< Unknown or unsupported network type 
-} nnl2_nn_type;
+} nnl2_nn_type; // abc
 
 ///@} [nnl2_nn_type]
 
